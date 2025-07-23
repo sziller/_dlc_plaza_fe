@@ -53,7 +53,7 @@ const articles = [
       </p>
       <div class="mt-10 flex justify-center sm:justify-start">
         <router-link
-          to="/borrow"
+          to="/register"
           class="inline-block rounded-full bg-secondary px-12 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
         >
           Get Started Today
@@ -303,14 +303,14 @@ const articles = [
 
     <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
       <router-link
-        to="/borrow"
+        to="/register"
         class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
       >
         Borrow Bitcoin
       </router-link>
 
       <router-link
-        to="/lend"
+        to="/register"
         class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
       >
         Lend Bitcoin
