@@ -40,62 +40,70 @@ const articles = [
   <section class="py-12 bg-primary"></section>
 
   <!-- Hero Section -->
-  <section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2">
-    <div class="p-8 md:p-12 lg:px-16 lg:py-24">
-      <div class="mx-auto max-w-xl text-center sm:text-left">
-        <h2 class="text-3xl font-extrabold md:text-4xl leading-tight">
-          Unlock your Bitcoin's potential.
-        </h2>
-        <p class="hidden md:block mt-4 text-white text-lg leading-relaxed">
-          Get a Bitcoin loan for liquidity or to leverage your Bitcoin exposure. Give a Bitcoin loan to generate fiat yield. 
-          No KYC, no credit checks, no hassle. Just Bitcoin.
-        </p>
-        <div class="mt-10 flex justify-center sm:justify-start">
-          <router-link
-            to="/borrow"
-            class="inline-block rounded-full bg-secondary px-16 py-5 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
-          >
-            Get Started Today
-          </router-link>
-        </div>
+<section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2">
+  <!-- Left Column (Centered Content) -->
+  <div class="flex items-center justify-center p-8 md:p-12 lg:px-16 lg:py-24">
+    <div class="w-full max-w-xl text-center sm:text-left">
+      <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
+        Unlock your Bitcoin's potential.
+      </h2>
+      <p class="mt-6 text-white text-lg leading-relaxed">
+        Get a Bitcoin loan for liquidity or to leverage your Bitcoin exposure. Give a Bitcoin loan to generate fiat yield. 
+        No KYC, no credit checks, no hassle. Just Bitcoin.
+      </p>
+      <div class="mt-10 flex justify-center sm:justify-start">
+        <router-link
+          to="/borrow"
+          class="inline-block rounded-full bg-secondary px-12 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
+        >
+          Get Started Today
+        </router-link>
       </div>
     </div>
-    <div class="hidden sm:flex justify-center items-center bg-gradient-to-tr from-secondary/10 to-transparent px-6 py-12">
-      <LiveRatesImac />
-    </div>
-  </section>
+  </div>
+
+  <!-- Right Column (Image or Graphic) -->
+  <div class="hidden sm:flex justify-center items-center bg-gradient-to-tr from-secondary/10 to-transparent px-6 py-12">
+    <LiveRatesImac />
+  </div>
+</section>
+
 
   <!-- What is Cadena Bitcoin -->
   <section>
-    <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-8 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-4 md:items-center md:gap-8">
-        <div class="md:col-span-1">
-          <div class="max-w-lg md:max-w-none">
-            <h2 class="text-2xl font-semibold text-white sm:text-3xl">
-              What is Cadena Bitcoin?
-            </h2>
-            <p class="mt-4 text-white">
-              Cadena Bitcoin’s product enables peer-to-peer lending and borrowing using Bitcoin as collateral through 
-              Discreet Log Contracts (DLCs). Cadena Bitcoin lets you use Bitcoin flexibly—whether you want to grow your
-              Bitcoin holdings, access fiat without losing Bitcoin exposure, or generate fiat returns secured by Bitcoin.
-            </p>
-          </div>
+  <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-3 md:items-start">
+      <!-- 📄 Text Column (now larger) -->
+      <div class="md:col-span-2">
+        <div class="max-w-3xl">
+          <h2 class="text-3xl sm:text-4xl font-bold text-white leading-tight">
+            What is Cadena Bitcoin?
+          </h2>
+          <p class="mt-6 text-white text-lg leading-relaxed">
+            Cadena Bitcoin’s product enables peer-to-peer lending and borrowing using Bitcoin as collateral through 
+            Discreet Log Contracts (DLCs). Cadena Bitcoin lets you use Bitcoin flexibly—whether you want to grow your
+            Bitcoin holdings, access fiat without losing Bitcoin exposure, or generate fiat returns secured by Bitcoin.
+          </p>
         </div>
-        <div class="md:col-span-3">
-          <div class="rounded overflow-hidden aspect-w-16 aspect-h-9">
-            <iframe
-              src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt"
-              title="Cadena Bitcoin Video"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-              class="w-full h-full"
-            ></iframe>
-          </div>
+      </div>
+
+      <!-- 🎥 Video Column (now smaller) -->
+      <div class="md:col-span-1">
+        <div class="rounded overflow-hidden aspect-w-16 aspect-h-9">
+          <iframe
+            src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt"
+            title="Cadena Bitcoin Video"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            class="w-full h-full"
+          ></iframe>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
 
   <!-- Featured Articles -->
   <section class="bg-primary text-white px-4 py-20 sm:px-6 lg:px-8">
