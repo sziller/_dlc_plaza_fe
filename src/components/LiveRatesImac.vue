@@ -12,14 +12,14 @@
           <div class="flex flex-col sm:flex-row w-full max-w-4xl mx-auto z-20">
             <!-- Left (Borrow Rate) -->
             <div class="flex-1 flex flex-col justify-center items-center text-center px-4 space-y-2">
-              <p class="text-xl sm:text-2xl tracking-wide">Borrow Rate</p>
-              <p class="text-5xl sm:text-6xl font-extrabold text-secondary">9.00%</p>
+              <p class="text-xl sm:text-2xl tracking-wide">Invest Rate</p>
+              <p class="text-5xl sm:text-6xl font-extrabold text-secondary">8.16%</p>
             </div>
 
             <!-- Right (Lend Rate) -->
             <div class="flex-1 flex flex-col justify-center items-center text-center px-4 space-y-2">
-              <p class="text-xl sm:text-2xl tracking-wide">Lend Rate</p>
-              <p class="text-5xl sm:text-6xl font-extrabold text-secondary">8.16%</p>
+              <p class="text-xl sm:text-2xl tracking-wide">Borrower Rate</p>
+              <p class="text-5xl sm:text-6xl font-extrabold text-secondary">9.00%</p>
             </div>
           </div>
         </div>

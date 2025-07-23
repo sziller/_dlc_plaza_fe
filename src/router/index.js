@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import About from '../views/About.vue';
 import Article1View from '../views/Article1view.vue';
+import BTCUSD from '../views/BTCUSD.vue';
+import Register from '../views/Register.vue';
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
@@ -9,7 +11,9 @@ const routes = [
     path: '/article/cadena-vs-others',
     name: 'Article1',
     component: Article1View,
-  }
+  },
+  { path: '/btcusd', name: 'BTCUSD', component: BTCUSD },
+  { path: '/register', name: 'Register', component: Register}
 ];
 
 const router = createRouter({

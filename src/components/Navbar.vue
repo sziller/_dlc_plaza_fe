@@ -25,20 +25,41 @@
     <div class="hidden md:flex space-x-6 items-center">
       <router-link to="/" class="hover:text-secondary transition">Home</router-link>
 
-      <!-- Products and Services Dropdown -->
-      <div class="relative group">
-        <button class="flex items-center space-x-1 hover:text-secondary transition">
-          <span>Products and Services</span>
-          <svg class="w-4 h-4 text-gray-500 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+     <!-- Products and Services Dropdown -->
+<div class="relative group">
+  <button class="flex items-center space-x-1 hover:text-secondary transition">
+    <span>Products and Services</span>
+    <svg class="w-4 h-4 text-gray-500 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
             <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z"/>
           </svg>
-        </button>
+  </button>
 
-        <div class="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-          <router-link to="/borrow" class="block px-4 py-2 hover:bg-gray-100 transition">Borrow</router-link>
-          <router-link to="/lend" class="block px-4 py-2 hover:bg-gray-100 transition">Invest</router-link>
-        </div>
-      </div>
+  <div class="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+    <router-link to="/btcusd" class="block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2">
+  <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" />
+  BTC/USD
+</router-link>
+
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+      <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTC/EUR
+    </div>
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+      <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTC/JPY
+    </div>
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+      🟡 BTC/XAU
+    </div>
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+      <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTC/GBP
+    </div>
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+      <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTC/CAD
+    </div>
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+      <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTC/AUD
+    </div>
+  </div>
+</div>
 
       <!-- Explore Cadena Dropdown -->
       <div class="relative group">
@@ -63,7 +84,7 @@
     <div class="hidden md:flex items-center space-x-4">
       <router-link to="/login" class="text-sm hover:text-secondary transition">Login</router-link>
       <router-link
-        to="/borrow"
+        to="/register"
         class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
       >
         Get Started
@@ -88,13 +109,13 @@
     <!-- Products and Services Mobile -->
     <div>
       <div class="text-gray-500 uppercase text-xs mt-4 mb-1">Products and Services</div>
-      <router-link @click="isMobileMenuOpen = false" to="/borrow" class="block pl-2 py-1 hover:text-secondary">Borrow</router-link>
-      <router-link @click="isMobileMenuOpen = false" to="/lend" class="block pl-2 py-1 hover:text-secondary">Invest</router-link>
+      <router-link @click="isMobileMenuOpen = false" to="/register" class="block pl-2 py-1 hover:text-secondary">Borrow</router-link>
+      <router-link @click="isMobileMenuOpen = false" to="/register" class="block pl-2 py-1 hover:text-secondary">Invest</router-link>
     </div>
 
     <router-link @click="isMobileMenuOpen = false" to="/login" class="block hover:text-secondary">Login</router-link>
     <router-link
-      to="/borrow"
+      to="/register"
       class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-2 rounded-full text-sm font-semibold text-center transition"
     >
       Get Started
