@@ -76,7 +76,7 @@
           <router-link to="/explore#technical-faq" class="block px-4 py-2 hover:bg-gray-100 transition">Technical FAQ</router-link>
           <router-link to="/explore#technical-overview" class="block px-4 py-2 hover:bg-gray-100 transition">Cadena Paper</router-link>
           <router-link to="/explore#about-us" class="block px-4 py-2 hover:bg-gray-100 transition">About Us</router-link>
-          <router-link to="/explore#contact" class="block px-4 py-2 hover:bg-gray-100 transition">Contact</router-link>
+          <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">Contact</router-link>
         </div>
       </div>
     </div>
@@ -104,7 +104,7 @@
       <router-link @click="isMobileMenuOpen = false" to="/explore#technical-faq" class="block pl-2 py-1 hover:text-secondary">Technical FAQ</router-link>
       <router-link @click="isMobileMenuOpen = false" to="/explore#technical-overview" class="block pl-2 py-1 hover:text-secondary">Cadena Paper</router-link>
       <router-link @click="isMobileMenuOpen = false" to="/explore#about-us" class="block pl-2 py-1 hover:text-secondary">About Us</router-link>
-      <router-link @click="isMobileMenuOpen = false" to="/explore#contact" class="block pl-2 py-1 hover:text-secondary">Contact</router-link>
+      <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-1 hover:text-secondary">Contact</router-link>
     </div>
 
     <!-- Products and Services Mobile -->

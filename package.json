@@ -8,6 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.18",
+    "@fullcalendar/daygrid": "^6.1.18",
+    "@vuepic/vue-datepicker": "^11.0.2",
     "chart.js": "^4.5.0",
     "devices.css": "^0.2.0",
     "heroicons": "^2.2.0",
