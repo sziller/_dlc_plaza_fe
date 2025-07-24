@@ -2,15 +2,21 @@
   <section class="w-full min-h-screen bg-primary text-white px-2 py-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 md:gap-5 items-start justify-center">
 
-      <!-- 📈 BTC/USD Chart (5/12) -->
-      <div class="w-full md:w-5/12 mt-4">
-        <div class="rounded-xl border border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
-          <div class="text-lg font-semibold mb-4 text-center">BTC/USD 30-Day Chart</div>
-          <canvas ref="btcChart" class="flex-1 w-full"></canvas>
-        </div>
-      </div>
+      <!-- 📈 BTC/USD Chart -->
+<div class="w-full md:w-5/12 mt-4">
+  <div class="rounded-xl border border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
 
-      <!-- 📊 Rates Table (7/12) – vertically centered with chart -->
+    <!-- Chart Header using Secondary -->
+    <div class="bg-secondary text-white text-lg font-semibold rounded-md px-4 py-2 mb-4 text-center shadow">
+      BTC/USD 30-Day Chart
+    </div>
+
+    <!-- Chart Canvas -->
+    <canvas ref="btcChart" class="flex-1 w-full"></canvas>
+  </div>
+</div>
+
+      <!-- 📊 Market Overview Table (unchanged) -->
       <div class="w-full md:w-7/12 md:self-center mt-4">
         <div class="rounded-xl border border-secondary shadow-lg bg-dark p-4">
           <h1 class="text-2xl font-extrabold mb-4 text-center md:text-left">BTC/USD Market Overview</h1>
@@ -55,6 +61,7 @@
 </template>
 
 
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import Chart from 'chart.js/auto'
@@ -71,42 +78,44 @@ onMounted(async () => {
   const prices = data.prices.map(p => p[1])
 
   new Chart(btcChart.value, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'BTC/USD',
-          data: prices,
-          borderColor: '#00ffcc',
-          backgroundColor: 'rgba(0, 255, 204, 0.15)',
-          tension: 0.3,
-          fill: true,
-          pointRadius: 0,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          ticks: { color: '#aaa' },
-          grid: { color: '#333' }
-        },
-        y: {
-          ticks: { color: '#aaa' },
-          grid: { color: '#333' }
-        }
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'BTC/USD',
+        data: prices,
+        borderColor: '#8387c3', // ← your tertiary color
+        backgroundColor: 'rgba(131, 135, 195, 0.15)', // translucent tertiary
+        tension: 0.3,
+        fill: true,
+        pointRadius: 0,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        ticks: { color: '#aaa' },
+        grid: { color: '#333' }
       },
-      plugins: {
-        legend: {
-          labels: { color: '#fff' }
-        }
+      y: {
+        ticks: { color: '#aaa' },
+        grid: { color: '#333' }
+      }
+    },
+    plugins: {
+      legend: {
+        labels: { color: '#fff' }
       }
     }
-  })
+  }
 })
+
+})
+
 </script>
 
 <style scoped>
