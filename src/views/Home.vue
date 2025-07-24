@@ -70,11 +70,12 @@ const articles = [
 
 
   <!-- What is Cadena Bitcoin -->
-  <section>
+<section>
   <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-3 md:items-start">
-      <!-- 📄 Text Column (now larger) -->
-      <div class="md:col-span-2">
+    <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
+      
+      <!-- 📄 Text Column -->
+      <div>
         <div class="max-w-3xl">
           <h2 class="text-3xl sm:text-4xl font-bold text-white leading-tight">
             What is Cadena Bitcoin?
@@ -87,8 +88,8 @@ const articles = [
         </div>
       </div>
 
-      <!-- 🎥 Video Column (now smaller) -->
-      <div class="md:col-span-1">
+      <!-- 🎥 Video Column -->
+      <div>
         <div class="rounded overflow-hidden aspect-w-16 aspect-h-9">
           <iframe
             src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt"
@@ -100,9 +101,11 @@ const articles = [
           ></iframe>
         </div>
       </div>
+
     </div>
   </div>
 </section>
+
 
 
   <!-- Featured Articles -->

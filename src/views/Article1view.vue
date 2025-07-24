@@ -1,20 +1,24 @@
 <template>
-     <section class="py-12 bg-primary"></section>
-
-  <section class="min-h-screen bg-primary text-white px-6 py-24">
-    <div class="max-w-3xl mx-auto space-y-10">
-      <!-- Hero Header -->
-      <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight text-white">
+  <!-- Intro Title Block (add top padding for fixed header offset) -->
+  <section class="bg-secondary text-white pt-28 pb-12 px-6">
+    <div class="max-w-4xl mx-auto text-center space-y-4">
+      <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight">
         Cadena Bitcoin vs Other Bitcoin Lending Platforms
       </h1>
+      <p class="text-white/80 text-lg font-medium">Written by Kevin Bell, President</p>
+    </div>
+  </section>
 
+  <!-- Main Content Section -->
+  <section class="bg-primary text-white px-6 py-24">
+    <div class="max-w-3xl mx-auto space-y-10">
       <!-- Paragraph 1 -->
       <p class="text-lg leading-relaxed text-white/90">
         Cadena Bitcoin evolved as a solution to a personal problem. I wanted to borrow against Bitcoin, and when I explored 
         the market options, all the solutions involved centralization and trusting third parties.
       </p>
 
-      <!-- Paragraph 2 w/ Whitepaper Link -->
+      <!-- Paragraph 2 -->
       <p class="text-lg leading-relaxed text-white/90">
         Three lines into the 
         <a 
@@ -35,7 +39,7 @@
         over thousands of years, humans have developed to respond to incentives. Just look at recent history.
       </p>
 
-      <!-- Paragraph 4 -->
+      <!-- Quote -->
       <blockquote class="border-l-4 border-secondary pl-4 italic text-white/70">
         From Mt. Gox to Celsius, it’s a story as old as time.
       </blockquote>
@@ -63,11 +67,42 @@
         We want borrowers and investors to benefit from using decentralized financial services in a free market to achieve their goals.
       </p>
 
-      <!-- CTA Paragraph -->
+      <!-- CTA -->
       <p class="text-xl font-semibold leading-relaxed text-white">
         Join us at <span class="text-secondary font-bold">Cadena Bitcoin</span> to experience decentralized peer-to-peer finance, 
         powered by the Bitcoin blockchain.
       </p>
     </div>
   </section>
+
+  <!-- 🖼️ Infographic Section -->
+  <section class="bg-white px-6 py-20">
+    <div class="max-w-6xl mx-auto text-center">
+      <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-8">
+        How Cadena Compares
+      </h2>
+      <div class="rounded-xl overflow-hidden shadow-xl border border-gray-200">
+        <img 
+          src="../assets/images/Infographic Comparison 2.jpg" 
+          alt="Infographic Comparison" 
+          class="w-full h-auto object-contain"
+        />
+      </div>
+      <p class="text-gray-700 text-base mt-6 max-w-4xl mx-auto leading-relaxed">
+        This visual comparison highlights how Cadena Bitcoin’s decentralized approach offers greater transparency, independence, 
+        and control compared to traditional custodial lending platforms.
+      </p>
+    </div>
+  </section>
 </template>
+
+<script setup>
+// Static content – no logic required
+</script>
+
+<style scoped>
+img {
+  max-width: 100%;
+  height: auto;
+}
+</style>

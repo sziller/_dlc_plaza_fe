@@ -60,6 +60,13 @@
         >
           Register
         </button>
+
+        <!-- Centered Login Link -->
+        <div class="text-center text-sm pt-4">
+          <router-link to="/login" class="text-secondary hover:underline font-medium">
+            Already have an account? Log in
+          </router-link>
+        </div>
       </form>
     </div>
 
@@ -75,68 +82,66 @@
     </div>
 
     <!-- 🧭 Step Tracker -->
-<div class="mt-20 flex justify-center">
-  <ol class="flex items-center gap-10 text-base font-semibold">
-    <!-- Step 1 -->
-    <li class="flex items-center gap-3">
-      <div
-        class="flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300"
-        :class="{
-          'bg-green-600 text-white border-green-600': step > 1,
-          'bg-secondary text-white border-secondary': step === 1,
-          'bg-gray-200 text-gray-400 border-gray-300': step < 1
-        }"
-      >
-        <svg
-          v-if="step > 1"
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-        </svg>
-        <span v-else>1</span>
-      </div>
-      <span class="hidden sm:inline" :class="step === 1 ? 'text-white' : step > 1 ? 'text-green-500' : 'text-gray-400'">
-        Register Email
-      </span>
-    </li>
+    <div class="mt-20 flex justify-center">
+      <ol class="flex items-center gap-10 text-base font-semibold">
+        <!-- Step 1 -->
+        <li class="flex items-center gap-3">
+          <div
+            class="flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300"
+            :class="{
+              'bg-green-600 text-white border-green-600': step > 1,
+              'bg-secondary text-white border-secondary': step === 1,
+              'bg-gray-200 text-gray-400 border-gray-300': step < 1
+            }"
+          >
+            <svg
+              v-if="step > 1"
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+            <span v-else>1</span>
+          </div>
+          <span class="hidden sm:inline" :class="step === 1 ? 'text-white' : step > 1 ? 'text-green-500' : 'text-gray-400'">
+            Register Email
+          </span>
+        </li>
 
-    <!-- Step 2 -->
-    <li class="flex items-center gap-3">
-      <div
-        class="flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300"
-        :class="{
-          'bg-secondary text-white border-secondary': step === 2,
-          'bg-gray-200 text-gray-400 border-gray-300': step < 2
-        }"
-      >
-        <span>2</span>
-      </div>
-      <span class="hidden sm:inline" :class="step === 2 ? 'text-white' : step < 2 ? 'text-gray-400' : 'text-green-500'">
-        Confirm Email
-      </span>
-    </li>
+        <!-- Step 2 -->
+        <li class="flex items-center gap-3">
+          <div
+            class="flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300"
+            :class="{
+              'bg-secondary text-white border-secondary': step === 2,
+              'bg-gray-200 text-gray-400 border-gray-300': step < 2
+            }"
+          >
+            <span>2</span>
+          </div>
+          <span class="hidden sm:inline" :class="step === 2 ? 'text-white' : step < 2 ? 'text-gray-400' : 'text-green-500'">
+            Confirm Email
+          </span>
+        </li>
 
-    <!-- Step 3 -->
-    <li class="flex items-center gap-3">
-      <div
-        class="flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300"
-        :class="{
-          'bg-secondary text-white border-secondary': step === 3,
-          'bg-gray-200 text-gray-400 border-gray-300': step < 3
-        }"
-      >
-        <span>3</span>
-      </div>
-      <span class="hidden sm:inline" :class="step === 3 ? 'text-white' : 'text-gray-400'">Scan QR</span>
-    </li>
-  </ol>
-</div>
-
-
+        <!-- Step 3 -->
+        <li class="flex items-center gap-3">
+          <div
+            class="flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300"
+            :class="{
+              'bg-secondary text-white border-secondary': step === 3,
+              'bg-gray-200 text-gray-400 border-gray-300': step < 3
+            }"
+          >
+            <span>3</span>
+          </div>
+          <span class="hidden sm:inline" :class="step === 3 ? 'text-white' : 'text-gray-400'">Scan QR</span>
+        </li>
+      </ol>
+    </div>
   </section>
 </template>
 

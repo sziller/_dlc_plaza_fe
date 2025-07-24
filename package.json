@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "chart.js": "^4.5.0",
     "devices.css": "^0.2.0",
     "heroicons": "^2.2.0",
     "vue": "^3.4.0",
