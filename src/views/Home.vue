@@ -19,10 +19,10 @@ const articles = [
   },
   {
     id: 2,
-    title: 'Why LTV Matters in Crypto Lending',
-    description: 'Learn the importance of Loan-To-Value ratios when borrowing using BTC.',
+    title: 'How Cadena Bitcoin is improving Bitcoin Borrowing and Lending',
+    description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
     image: article1Img,
-    link: 'https://example.com/article2',
+    link: '/article/cadena-improving-btc',
     internal: false,
   },
   {
