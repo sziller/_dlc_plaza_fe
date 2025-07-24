@@ -4,10 +4,11 @@
     <div class="flex flex-col items-start space-y-1">
       <div class="text-xl text-secondary font-bold tracking-wide leading-tight">Cadena Bitcoin</div>
       <div class="text-sm font-medium flex items-center gap-1">
-        <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4 inline-block" />
-        BTC/USD:
-         <span class="text-secondary font-semibold">${{ btcPrice }}</span>
-      </div>
+  <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4 inline-block" />
+  BTCUSD:
+  <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
+</div>
+
     </div>
 
     <!-- Hamburger Menu Button -->
@@ -37,26 +38,26 @@
   <div class="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
     <router-link to="/btcusd" class="block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2">
   <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" />
-  BTC/USD
+  BTCUSD
 </router-link>
 
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTC/EUR
+      <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTCEUR
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTC/JPY
+      <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTCJPY
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
       🟡 BTC/XAU
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTC/GBP
+      <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTCGBP
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTC/CAD
+      <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTCCAD
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTC/AUD
+      <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTCAUD
     </div>
   </div>
 </div>
