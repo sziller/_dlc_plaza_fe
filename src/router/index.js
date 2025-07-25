@@ -6,6 +6,9 @@ import BTCUSD from '../views/BTCUSD.vue';
 import Register from '../views/Register.vue';
 import Article2View from '../views/Article2view.vue';
 import Contact from '../views/contact.vue';
+import FAQ from '../views/FAQ.vue';
+import TechnicalOverview from '../views/TechnicalOverview.vue';
+
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
@@ -18,6 +21,8 @@ const routes = [
   { path: '/register', name: 'Register', component: Register},
    {path: '/article/cadena-improving-btc', name: 'Article2', component: Article2View},
    {path: '/contact', name: 'Contact', component: Contact},
+   {path: '/faq', name: 'FAQ', component: FAQ},
+   {path: '/technical-overview', name: 'TechnicalOverview', component: TechnicalOverview},
 ];
 
 const router = createRouter({
