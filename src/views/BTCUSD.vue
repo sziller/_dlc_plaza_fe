@@ -1,34 +1,33 @@
 <template>
   <section class="w-full min-h-screen bg-primary text-white px-0 py-4">
-    <div class="flex flex-col md:flex-row gap-4 md:gap-5 items-start justify-center w-full">
-      
+    <div class="flex flex-col md:flex-row items-stretch justify-center w-full">
+
       <!-- 📈 BTC/USD Chart -->
-      <div class="w-full md:w-1/2 px-[6px] mt-4">
-        <div class="rounded-xl border border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
-          
-          <!-- ✅ Matching Title Style -->
+      <div class="w-full md:w-1/2 md:pr-0 mt-4">
+        <div class="rounded-none md:rounded-l-xl border-y md:border-l border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
+
+          <!-- Title -->
           <div class="text-2xl font-extrabold text-center mb-6">
-            BTC/USD 30-Day Chart
+            BTCUSD Chart - {{ selectedTerm.label }}
           </div>
 
-          <!-- ✅ Chart Container -->
+          <!-- Chart Container -->
           <div class="flex-1 relative pb-6">
             <canvas ref="btcChart" class="w-full h-full"></canvas>
           </div>
-
         </div>
       </div>
 
       <!-- 📊 Market Overview Table -->
-      <div class="w-full md:w-1/2 px-[6px] mt-4">
-        <div class="rounded-xl border border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
-          
-          <!-- ✅ Matching Title Style -->
+      <div class="w-full md:w-1/2 md:pl-0 mt-4">
+        <div class="rounded-none md:rounded-r-xl border-y md:border-r border-l md:border-l-0 border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
+
+          <!-- Title -->
           <div class="text-2xl font-extrabold text-center mb-6">
-            BTC/USD Market Overview
+            BTCUSD Market Overview
           </div>
 
-          <!-- ✅ Table fills the remaining vertical space -->
+          <!-- Table -->
           <div class="overflow-x-auto flex-1">
             <table class="w-full table-fixed border border-secondary rounded-xl h-full">
               <thead>
@@ -39,25 +38,15 @@
                 </tr>
               </thead>
               <tbody class="text-white/90 text-lg">
-                <tr class="border-t border-secondary">
-                  <td class="px-4 py-5 text-left border-r border-secondary">1 Month</td>
-                  <td class="px-6 py-5 text-center border-x-4 border-secondary">5.1% – 5.2%</td>
-                  <td class="px-8 py-5 text-center border-l border-secondary">9.8% – 9.9%</td>
-                </tr>
-                <tr class="border-t border-secondary">
-                  <td class="px-4 py-5 text-left border-r border-secondary">3 Months</td>
-                  <td class="px-6 py-5 text-center border-x-4 border-secondary">6.2% – 6.3%</td>
-                  <td class="px-8 py-5 text-center border-l border-secondary">11.2% – 13.3%</td>
-                </tr>
-                <tr class="border-t border-secondary">
-                  <td class="px-4 py-5 text-left border-r border-secondary">6 Months</td>
-                  <td class="px-6 py-5 text-center border-x-4 border-secondary">7.2% – 7.5%</td>
-                  <td class="px-8 py-5 text-center border-l border-secondary">* – *</td>
-                </tr>
-                <tr class="border-t border-b border-secondary">
-                  <td class="px-4 py-5 text-left border-r border-secondary">1 Year</td>
-                  <td class="px-6 py-5 text-center border-x-4 border-secondary">8.0% – 8.2%</td>
-                  <td class="px-8 py-5 text-center border-l border-secondary">* – *</td>
+                <tr
+                  v-for="term in terms"
+                  :key="term.label"
+                  @click="updateChart(term)"
+                  :class="['cursor-pointer transition duration-200', selectedTerm.label === term.label ? 'bg-secondary/20' : 'hover:bg-secondary/10']"
+                >
+                  <td class="px-4 py-5 text-left border-r border-secondary">{{ term.label }}</td>
+                  <td class="px-6 py-5 text-center border-x-4 border-secondary">{{ term.ltv50 }}</td>
+                  <td class="px-8 py-5 text-center border-l border-secondary">{{ term.ltv80 }}</td>
                 </tr>
               </tbody>
             </table>
@@ -70,22 +59,36 @@
   </section>
 </template>
 
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import Chart from 'chart.js/auto'
 
 const btcChart = ref(null)
+let chartInstance = null
 
-onMounted(async () => {
-  const res = await fetch(
-    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30'
-  )
+// Available terms and their API day mapping
+const terms = [
+  { label: '1 Month', days: 30, ltv50: '5.1% – 5.2%', ltv80: '9.8% – 9.9%' },
+  { label: '3 Months', days: 90, ltv50: '6.2% – 6.3%', ltv80: '11.2% – 13.3%' },
+  { label: '6 Months', days: 180, ltv50: '7.2% – 7.5%', ltv80: '* – *' },
+  { label: '1 Year', days: 365, ltv50: '8.0% – 8.2%', ltv80: '* – *' }
+]
+
+const selectedTerm = ref(terms[0]) // Default: 1 Month
+
+const fetchAndRenderChart = async (days) => {
+  const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`)
   const data = await res.json()
 
   const labels = data.prices.map(p => new Date(p[0]).toLocaleDateString())
   const prices = data.prices.map(p => p[1])
 
-  new Chart(btcChart.value, {
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+
+  chartInstance = new Chart(btcChart.value, {
     type: 'line',
     data: {
       labels,
@@ -97,7 +100,7 @@ onMounted(async () => {
           backgroundColor: 'rgba(131, 135, 195, 0.15)',
           tension: 0.3,
           fill: true,
-          pointRadius: 0,
+          pointRadius: 0
         }
       ]
     },
@@ -105,26 +108,16 @@ onMounted(async () => {
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: {
-          bottom: 16 // Reserve space for X-axis ticks
-        }
+        padding: { bottom: 16 }
       },
       scales: {
         x: {
-          ticks: {
-            color: '#fff'
-          },
-          grid: {
-            color: '#333'
-          }
+          ticks: { color: '#fff' },
+          grid: { color: '#333' }
         },
         y: {
-          ticks: {
-            color: '#fff'
-          },
-          grid: {
-            color: '#333'
-          }
+          ticks: { color: '#fff' },
+          grid: { color: '#333' }
         }
       },
       plugins: {
@@ -134,9 +127,18 @@ onMounted(async () => {
       }
     }
   })
+}
+
+const updateChart = (term) => {
+  selectedTerm.value = term
+  fetchAndRenderChart(term.days)
+}
+
+onMounted(() => {
+  fetchAndRenderChart(selectedTerm.value.days)
 })
 </script>
 
 <style scoped>
-/* Optional styles here if needed */
+/* optional hover indicator, already handled in :class bindings */
 </style>
