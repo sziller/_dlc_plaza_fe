@@ -1,5 +1,5 @@
 <template>
-  <section class="min-h-screen w-full bg-primary text-white flex flex-col md:flex-row">
+  <section class="min-h-screen w-full bg-primary text-white flex flex-col md:flex-row" >
 
     <!-- 🧾 Left Side: Title & Description -->
     <div class="md:w-1/2 w-full flex flex-col justify-center items-start p-8">
