@@ -10,15 +10,7 @@
         </h1>
         <p class="text-white/80 text-lg font-medium mb-8">Written by Kevin Bell, President</p>
 
-        <img 
-          src="../assets/images/Infographic Comparison 2.jpg" 
-          alt="Cadena vs Other Lending Platforms"
-          class="w-full max-w-md lg:max-w-lg object-contain rounded-lg shadow-md"
-        />
-
-        <p class="text-white text-base lg:text-lg mt-6 leading-relaxed px-4">
-          A visual breakdown of how Cadena Bitcoin compares to centralized lending platforms.
-        </p>
+        
       </div>
 
       <!-- RIGHT SIDE: Article Content -->
@@ -79,3 +71,10 @@
     </div>
   </section>
 </template>
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
+</script>

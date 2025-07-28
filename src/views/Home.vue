@@ -1,7 +1,7 @@
 <script setup>
 import LiveRatesImac from '../components/LiveRatesImac.vue'
 import article1Img from '../assets/images/article1.png'
-
+import TheFooter from '../components/TheFooter.vue'
 const videos = [
   'https://www.youtube.com/embed/Psuh8mml91o?si=XRhe6RtETvYUOhEJ',
   'https://www.youtube.com/embed/XdyEtPCpIto?si=XAQd9Vo3jupFqh-z',
@@ -128,8 +128,8 @@ const articles = [
           <img :src="article.image" :alt="article.title" class="w-full h-48 object-cover" />
           <div class="p-6">
             <h3 class="text-xl font-semibold mb-2 group-hover:underline">{{ article.title }}</h3>
-            <p class="text-tertiary mb-4">{{ article.description }}</p>
-            <span class="inline-block text-blue-400 font-medium">Read more →</span>
+            <p class="text-white mb-4">{{ article.description }}</p>
+            <span class="inline-block text-secondary font-medium">Read more →</span>
           </div>
           <span class="absolute inset-0 z-10"></span>
         </component>
@@ -183,7 +183,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">Loans are standard 0.1 Bitcoin.</p>
+        <p class="px-4 pt-4 text-white">Loans are standard 0.1 Bitcoin.</p>
       </details>
 
       <details class="group [&_summary::-webkit-details-marker]:hidden">
@@ -194,7 +194,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">All loans settle after a standard 30 day term.</p>
+        <p class="px-4 pt-4 text-white">All loans settle after a standard 30 day term.</p>
       </details>
 
       <details class="group [&_summary::-webkit-details-marker]:hidden">
@@ -205,7 +205,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">There are no payments. All loans settle after 30 days.</p>
+        <p class="px-4 pt-4 text-white">There are no payments. All loans settle after 30 days.</p>
       </details>
 
       <details class="group [&_summary::-webkit-details-marker]:hidden">
@@ -216,7 +216,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">80%</p>
+        <p class="px-4 pt-4 text-white">80%</p>
       </details>
 
       <details class="group [&_summary::-webkit-details-marker]:hidden">
@@ -227,7 +227,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">
+        <p class="px-4 pt-4 text-white">
           Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin’s core security principle: Your Keys, Your Coins.
           You control your private keys and funds. Cadena Bitcoin does not hold or access your private keys or seed phrase.
         </p>
@@ -241,7 +241,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">Loans are funded in Bitcoin and settled in Bitcoin.</p>
+        <p class="px-4 pt-4 text-white">Loans are funded in Bitcoin and settled in Bitcoin.</p>
       </details>
 
       <details class="group [&_summary::-webkit-details-marker]:hidden">
@@ -252,7 +252,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">Register online and download the signer app.</p>
+        <p class="px-4 pt-4 text-white">Register online and download the signer app.</p>
       </details>
 
       <details class="group [&_summary::-webkit-details-marker]:hidden">
@@ -263,7 +263,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">
+        <p class="px-4 pt-4 text-white">
           Minutes. Funding transactions are broadcast as soon as both peers sign the contract.
         </p>
       </details>
@@ -276,7 +276,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">
+        <p class="px-4 pt-4 text-white">
           Nothing happens with the collateral until it is divided on final settlement.
         </p>
       </details>
@@ -289,7 +289,7 @@ const articles = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <p class="px-4 pt-4 text-tertiary">No. Your bitcoin is your credit.</p>
+        <p class="px-4 pt-4 text-white">No. Your bitcoin is your credit.</p>
       </details>
     </div>
   </div>
@@ -321,5 +321,6 @@ const articles = [
     </div>
   </div>
 </section>
+<TheFooter/>
 
 </template>

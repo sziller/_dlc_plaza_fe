@@ -47,6 +47,43 @@
 
     </div>
   </section>
+  <!-- 💬 Contact / Info Section -->
+<section class="w-full bg-secondary text-white px-6 py-16">
+  <div class="max-w-5xl mx-auto space-y-10">
+    <h2 class="text-4xl font-extrabold border-white/20 pb-4">Talk to Our Team</h2>
+
+    <p class="text-lg leading-relaxed text-white/90">
+      Thank you for your interest in <strong>Cadena Bitcoin</strong>.<br />
+      You can learn more about us by following us on <span class="italic">X</span>. If you have any questions about the transaction process, don’t hesitate to reach out for support.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Kevin Bell -->
+      <div class="bg-white/5 p-6 rounded-lg shadow-sm border border-white/10">
+        <p class="text-xl font-semibold mb-2">Kevin Bell</p>
+        <p class="text-sm text-white/70 mb-2">President</p>
+        <p><span class="font-medium">Email:</span> <a href="mailto:kevin@cadenabitcoin.com" class="underline hover:text-white">kevin@cadenabitcoin.com</a></p>
+        <p><span class="font-medium">Phone:</span> <a href="tel:+13058311410" class="underline hover:text-white">305-831-1410</a></p>
+      </div>
+
+      <!-- Sziller -->
+      <div class="bg-white/5 p-6 rounded-lg shadow-sm border border-white/10">
+        <p class="text-xl font-semibold mb-2">Sziller</p>
+        <p class="text-sm text-white/70 mb-2">Chief Technology Officer</p>
+        <p><span class="font-medium">Email:</span> <a href="mailto:sziller@cadenabitcoin.com" class="underline hover:text-white">sziller@cadenabitcoin.com</a></p>
+      </div>
+
+      <!-- General Inquiries -->
+      <div class="bg-white/5 p-6 rounded-lg shadow-sm border border-white/10 md:col-span-2">
+        <p class="text-xl font-semibold mb-2">General Questions</p>
+        <p class="mb-1"><span class="font-medium">Email:</span> <a href="mailto:info@cadenabitcoin.com" class="underline hover:text-white">info@cadenabitcoin.com</a></p>
+        <p><span class="font-medium">Phone:</span> <a href="tel:+13058311410" class="underline hover:text-white">305-831-1410</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 </template>
 
 <script setup>
