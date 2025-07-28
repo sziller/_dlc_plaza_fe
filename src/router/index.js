@@ -8,6 +8,9 @@ import Article2View from '../views/Article2view.vue';
 import Contact from '../views/Contact.vue';
 import FAQ from '../views/FAQ.vue';
 import TechnicalOverview from '../views/TechnicalOverview.vue';
+import Article3view from '../views/Article3view.vue';
+import Article4view from '../views/Article4view.vue';
+import Article5view from '../views/Article5view.vue';
 
 const routes = [
   { path: '/', component: Home },
@@ -23,6 +26,9 @@ const routes = [
    {path: '/contact', name: 'Contact', component: Contact},
    {path: '/faq', name: 'FAQ', component: FAQ},
    {path: '/technical-overview', name: 'TechnicalOverview', component: TechnicalOverview},
+   {path: '/article/cadena-empowering-financial-freedom', name: 'Article3', component: Article3view},
+   {path: '/article/cadena-loan-lifecycle', name: 'Article4', component: Article4view},
+   {path: '/article/cadena-bitcoin-security', name: 'Article5', component: Article5view},
 ];
 
 const router = createRouter({
