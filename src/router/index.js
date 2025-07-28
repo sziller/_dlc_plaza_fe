@@ -5,7 +5,7 @@ import Article1View from '../views/Article1view.vue';
 import BTCUSD from '../views/BTCUSD.vue';
 import Register from '../views/Register.vue';
 import Article2View from '../views/Article2view.vue';
-import Contact from '../views/contact.vue';
+import Contact from '../views/Contact.vue';
 import FAQ from '../views/FAQ.vue';
 import TechnicalOverview from '../views/TechnicalOverview.vue';
 
