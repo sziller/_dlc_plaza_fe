@@ -1,15 +1,23 @@
 <template>
   <nav class="w-full fixed top-0 z-50 bg-white text-black px-6 py-4 flex justify-between items-center shadow">
-    <!-- Logo & BTC Price Block -->
-    <div class="flex flex-col items-start space-y-1">
-      <div class="text-xl text-secondary font-bold tracking-wide leading-tight">Cadena Bitcoin</div>
-      <div class="text-sm font-medium flex items-center gap-1">
-  <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4 inline-block" />
-  BTCUSD:
-  <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
+   <!-- Logo & BTC Price Block -->
+<div class="flex items-center space-x-4">
+  <!-- Logo Image -->
+  <img :src="logo" alt="Cadena Bitcoin Logo" class="w-10 h-10 object-contain" />
+
+  <!-- Brand & Price Info -->
+  <div class="flex flex-col items-start space-y-1">
+    <div class="text-xl text-secondary font-bold tracking-wide leading-tight">Cadena Bitcoin</div>
+    <div class="text-sm font-medium flex items-center gap-1">
+      <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4 inline-block" />
+      BTCUSD:
+      <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
+    </div>
+  </div>
 </div>
 
-    </div>
+
+    
 
     <!-- Hamburger Menu Button -->
     <button
@@ -126,6 +134,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import logo from '../assets/logos/cadena_bitcoin_logo.png'
 
 const isMobileMenuOpen = ref(false)
 const btcPrice = ref('...')

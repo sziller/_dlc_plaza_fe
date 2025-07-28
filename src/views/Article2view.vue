@@ -23,8 +23,13 @@
 </template>
 
 <script setup>
-// No logic needed
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  window.scrollTo(0, 0)
+})
 </script>
+
 
 <style scoped>
 /* Ensure no padding/margin slips in from global styles */
