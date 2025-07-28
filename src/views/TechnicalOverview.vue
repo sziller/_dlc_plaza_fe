@@ -1,33 +1,21 @@
 <template>
-  <section class="min-h-screen w-full bg-primary text-white flex flex-col md:flex-row">
-    
-    <!-- 🌗 Sidebar (Title + TOC) -->
-    <aside
-      class="bg-secondary w-full md:max-w-xs p-8 md:pt-32 text-white sticky top-0 h-screen overflow-y-auto"
-    >
-      <h1 class="text-4xl md:text-5xl font-extrabold mb-8 leading-tight">
+  <section class="min-h-screen w-full bg-primary text-white px-6 pt-20 pb-12 md:pt-32">
+    <!-- 🧠 Top Title -->
+    <div class="max-w-5xl mx-auto text-center mb-16">
+      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
         Cadena: A Peer-to-Peer Electronic Credit System
       </h1>
-      <nav class="space-y-4 text-lg">
-        <a href="#overview" class="block hover:underline">1. Overview</a>
-        <a href="#introduction" class="block hover:underline">2. Introduction</a>
-        <a href="#loan" class="block hover:underline">3. What Is a Loan?</a>
-        <a href="#transactions" class="block hover:underline">4. Transactions</a>
-        <a href="#dlc" class="block hover:underline">5. DLC Protocol</a>
-        <a href="#adaptor" class="block hover:underline">6. Adaptor Signatures</a>
-        <a href="#oracle" class="block hover:underline">7. Oracle</a>
-        <a href="#conclusion" class="block hover:underline">8. Conclusion</a>
-      </nav>
-    </aside>
+      <p class="text-white/80 text-base sm:text-lg font-medium">
+        Kevin Bell &mdash; <a href="mailto:kevin@cadenabitcoin.com" class="underline">kevin@cadenabitcoin.com</a><br />
+        Ladanyi Szilard &mdash; <a href="mailto:sziller@cadenabitcoin.com" class="underline">sziller@cadenabitcoin.com</a>
+      </p>
+    </div>
 
     <!-- 📄 Main Content -->
-    <div class="flex-1 px-6 pt-24 pb-12 md:py-32 max-w-5xl mx-auto space-y-14">
-
-      <!-- 🧠 Authors & Overview -->
+    <div class="max-w-5xl mx-auto space-y-14 text-white/90 text-lg leading-relaxed">
+      <!-- 1. Overview -->
       <div id="overview">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">1. Overview</h2>
-        <p class="mb-2">Kevin Bell: <a href="mailto:kevin@cadenabitcoin.com" class="underline">kevin@cadenabitcoin.com</a></p>
-        <p class="mb-4">Ladanyi Szilard: <a href="mailto:sziller@cadenabitcoin.com" class="underline">sziller@cadenabitcoin.com</a></p>
         <p>
           A purely peer-to-peer electronic credit system enables borrowing and lending directly between peers, bypassing financial institutions.
           While digital signatures offer a partial solution, their benefits erode if a trusted third party is still needed for custody.
@@ -36,7 +24,7 @@
         </p>
       </div>
 
-      <!-- 🔍 Introduction -->
+      <!-- 2. Introduction -->
       <div id="introduction">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">2. Introduction</h2>
         <p>
@@ -54,7 +42,7 @@
         </p>
       </div>
 
-      <!-- 💸 What is a Loan -->
+      <!-- 3. What is a Loan -->
       <div id="loan">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">3. What Is a Loan?</h2>
         <p>
@@ -73,7 +61,7 @@
         </p>
       </div>
 
-      <!-- 🔁 Transactions -->
+      <!-- 4. Transactions -->
       <div id="transactions">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">4. Transactions</h2>
         <p>
@@ -92,13 +80,13 @@
         </p>
       </div>
 
-      <!-- 📜 DLC Protocol -->
+      <!-- 5. DLC Protocol -->
       <div id="dlc">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">5. DLC Protocol</h2>
         <p>
           In Cadena, contracts are represented by a single on-chain Transaction holding all funds until execution. Here’s how it works:
         </p>
-        <ul class="list-disc list-inside space-y-2 text-white/90 mt-4">
+        <ul class="list-disc list-inside space-y-2 mt-4">
           <li>Alice (lender) and Bob (borrower) agree on a funding transaction ID (txid) and interest rate.</li>
           <li>They pre-create child transactions that spend this (then future) output before it’s broadcast and confirmed.</li>
           <li>
@@ -113,7 +101,7 @@
         </p>
       </div>
 
-      <!-- 🔐 Adaptor Signatures -->
+      <!-- 6. Adaptor Signatures -->
       <div id="adaptor">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">6. Adaptor Signatures</h2>
         <p>
@@ -123,7 +111,7 @@
         <p>
           At contract inception:
         </p>
-        <ul class="list-disc list-inside space-y-2 text-white/90 mt-2">
+        <ul class="list-disc list-inside space-y-2 mt-2">
           <li>Signatures for every possible outcome are created and shared between borrower and lender.</li>
           <li>When the oracle attests Bitcoin’s price at maturity, it effectively “signs” the correct output.</li>
           <li>This enables either party to publish the correct execution-transaction on-chain—without needing further cooperation.</li>
@@ -131,7 +119,7 @@
         </ul>
       </div>
 
-      <!-- 📡 Oracle -->
+      <!-- 7. Oracle -->
       <div id="oracle">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">7. Oracle</h2>
         <p>
@@ -139,7 +127,7 @@
           and the use of Discreet Log Contracts. Rather than eliminating the oracle, Cadena constrains and disincentivizes its misuse
           while keeping it unaware of its own involvement.
         </p>
-        <ul class="list-disc list-inside space-y-2 text-white/90 mt-3">
+        <ul class="list-disc list-inside space-y-2 mt-3">
           <li><strong>Reliability:</strong> mirrored oracles, backups, and redundancy guarantee attestations. The technology is open source. If all fail, funds revert to their owners after a certain period as failsafe.</li>
           <li><strong>Incentives:</strong> Oracles are reputationally (and financially) motivated to publish unique and consistent attestations. They are blind to contract details, publish their attestations in the public domain, and provide an impartial and verifiable price feed for all users.</li>
         </ul>
@@ -148,7 +136,7 @@
         </p>
       </div>
 
-      <!-- 🧾 Conclusion -->
+      <!-- 8. Conclusion -->
       <div id="conclusion">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">8. Conclusion</h2>
         <p>
@@ -165,12 +153,10 @@
 
 <script setup>
 import { onMounted } from 'vue'
-
 onMounted(() => {
   window.scrollTo(0, 0)
 })
 </script>
-
 
 <style scoped>
 html {
