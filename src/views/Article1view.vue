@@ -1,7 +1,7 @@
 <template>
   <div class="bg-primary text-white">
     <!-- HERO TITLE SECTION (Smaller) -->
-    <section class="bg-secondary px-6 py-10 lg:py-14 text-center">
+    <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
           Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance
@@ -12,7 +12,7 @@
     </section>
 
     <!-- ARTICLE CONTENT -->
-    <section class="px-6 py-16 lg:py-24 max-w-[1000px] mx-auto space-y-10 text-lg leading-relaxed text-white/90">
+    <section class="px-10 py-5 lg:py-14 max-w-[1100px] mx-auto space-y-6 text-lg leading-relaxed text-white/90">
       <p>
         Cadena Bitcoin evolved as a solution to a personal problem. I wanted to borrow against Bitcoin, and when I explored 
         the market options, all the solutions involved centralization and trusting third parties.
@@ -58,11 +58,7 @@
         We want borrowers and investors to benefit from using decentralized financial services in a free market to achieve their goals.
       </p>
 
-      <!-- CTA styled to stand out -->
-      <p class="text-xl font-semibold leading-relaxed text-white">
-        Join us at <span class="text-secondary font-bold">Cadena Bitcoin</span> to experience decentralized peer-to-peer finance, 
-        powered by the Bitcoin blockchain.
-      </p>
+      
     </section>
     <section class="bg-secondary text-white py-20 px-6">
   <div class="max-w-4xl mx-auto text-center space-y-6">

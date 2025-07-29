@@ -1,7 +1,7 @@
 <template>
   <div class="bg-primary text-white">
     <!-- HERO TITLE SECTION -->
-    <section class="bg-secondary px-6 py-10 lg:py-14 text-center">
+    <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
           Cadena Bitcoin – Empowering Individual Financial Freedom
@@ -12,7 +12,7 @@
     </section>
 
     <!-- ARTICLE CONTENT -->
-    <section class="px-6 py-16 lg:py-24 max-w-[1000px] mx-auto space-y-10 text-lg leading-relaxed text-white/90">
+    <section class="px-10 py-5 lg:py-14 max-w-[1100px] mx-auto space-y-6 text-lg leading-relaxed text-white/90">
       <p>
         Cadena Bitcoin lets you use Bitcoin flexibly—whether you want to grow your
         Bitcoin holdings, access fiat without losing Bitcoin exposure, or generate 
