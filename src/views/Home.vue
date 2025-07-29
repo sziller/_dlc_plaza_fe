@@ -4,7 +4,7 @@ import LiveRatesImac from '../components/LiveRatesImac.vue'
 import TheFooter from '../components/TheFooter.vue'
 import article1Img from '../assets/images/article1.png'
 const videos = [
-  'https://www.youtube.com/embed/Psuh8mml91o?si=XRhe6RtETvYUOhEJ',
+  'https://www.youtube.com/embed/SsBfTfVnjGc?si=GrrW6LD5ffZQI2kZ',
   'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u',
   'https://www.youtube.com/embed/l_cy-tWM_lA?si=wDY0PSdvfX_ePYLW',
 ]
@@ -19,14 +19,6 @@ const articles = [
   },
   {
     id: 2,
-    title: 'How Cadena Bitcoin is improving Bitcoin Borrowing and Lending',
-    description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
-    image: article1Img,
-    link: '/article/cadena-improving-btc',
-    internal: false,
-  },
-  {
-    id: 3,
     title: 'Cadena Bitcoin - Empowering Individual Financial Freedom',
     description: ' Learn how Cadena Bitcoin lets you use Bitcoin flexibly.',
     image: article1Img,
@@ -34,21 +26,32 @@ const articles = [
     internal: true,
   },
   {
-    id: 4,
+    id: 3,
     title: 'Cadena Bitcoin: Security',
     description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles',
     image: article1Img,
     link: '/article/cadena-loan-lifecycle',
     internal: true,
-  },
+  }
+,
   {
-    id: 5,
-    title: 'How Does it Work?',
-    description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdownof the key actions.',
-    image: article1Img,
-    link: '/article/cadena-bitcoin-security',
-    internal: false,
-  },
+   id: 4,
+   title: 'How Does it Work?',
+   description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdownof the key actions.',
+   image: article1Img,
+   link: '/article/cadena-bitcoin-security',
+   internal: true,
+ }
+,
+  {
+   id: 5,
+   title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending',
+   description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
+   image: article1Img,
+   link: '/article/cadena-improving-btc',
+   internal: true,
+ }
+,
 ]
 
 const currentIndex = ref(0)
@@ -149,7 +152,7 @@ function scrollRight() {
         </button>
 
         <!-- Carousel Container -->
-        <div class="w-full max-w-5xl overflow-hidden">
+        <div class="w-full max-w-5xl overflow-visible px-2">
           <div class="flex justify-center transition-all duration-300 ease-in-out space-x-6">
             <component
               v-for="article in visibleArticles"
@@ -157,15 +160,18 @@ function scrollRight() {
               :is="article.internal ? 'router-link' : 'a'"
               :to="article.internal ? article.link : undefined"
               :href="!article.internal ? article.link : undefined"
-              class="flex-shrink-0 w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+              class="flex-shrink-0 w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer"
             >
-              <img :src="article.image" :alt="article.title" class="w-full h-48 object-cover" />
+              <img :src="article.image" :alt="article.title" class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90" />
               <div class="p-4">
-                <h3 class="text-xl font-semibold mb-2">{{ article.title }}</h3>
+                <h3 class="text-xl font-semibold mb-2 text-white hover:text-secondary transition-colors duration-300">
+                  {{ article.title }}
+                </h3>
                 <p class="text-white/80 text-sm">{{ article.description }}</p>
-                <span class="inline-block text-secondary font-medium mt-3">Read more →</span>
+                <span class="inline-block text-secondary font-medium mt-3 hover:underline">Read more →</span>
               </div>
             </component>
+
           </div>
         </div>
 

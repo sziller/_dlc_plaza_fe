@@ -1,52 +1,51 @@
 <template>
+      <main class="pt-20 md:pt-24 pb-24">
   <section class="w-full min-h-screen bg-primary text-white px-0 py-4">
-    <div class="flex flex-col md:flex-row items-stretch justify-center w-full">
+    <div class="flex justify-center w-full">
 
-      <!-- 📈 BTC/USD Chart -->
-      <div class="w-full md:w-1/2 md:pr-0 mt-4">
-        <div class="rounded-none md:rounded-l-xl border-y md:border-l border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
-
-          <!-- Title -->
-          <div class="text-2xl font-extrabold text-center mb-6">
-            BTCUSD Chart - {{ selectedTerm.label }}
-          </div>
-
-          <!-- Chart Container -->
-          <div class="flex-1 relative pb-6">
-            <canvas ref="btcChart" class="w-full h-full"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- 📊 Market Overview Table -->
-      <div class="w-full md:w-1/2 md:pl-0 mt-4">
-        <div class="rounded-none md:rounded-r-xl border-y md:border-r border-l md:border-l-0 border-secondary shadow-lg bg-dark p-4 h-[650px] flex flex-col">
+      <!-- 📊 Market Overview Table (Full Width) -->
+      <div class="w-full max-w-6xl mt-4">
+        <div class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-[650px] flex flex-col">
 
           <!-- Title -->
-          <div class="text-2xl font-extrabold text-center mb-6">
+          <div class="text-3xl font-extrabold text-center mb-6">
             BTCUSD Market Overview
           </div>
 
           <!-- Table -->
           <div class="overflow-x-auto flex-1">
-            <table class="w-full table-fixed border border-secondary rounded-xl h-full">
+            <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-6">
               <thead>
-                <tr class="bg-secondary text-white text-md">
-                  <th class="px-4 py-4 text-left border-b border-secondary">Term</th>
-                  <th class="px-6 py-4 text-center border-l border-r-4 border-b border-secondary whitespace-nowrap">50% LTV</th>
-                  <th class="px-8 py-4 text-center border-b border-secondary whitespace-nowrap">80% LTV</th>
+                <tr class="text-white text-md">
+                  <th class="px-4 py-4 text-left">Term</th>
+                  <th class="px-4 py-4 text-center bg-secondary rounded-md" colspan="2">50% LTV</th>
+                  <th class="px-8 py-4"></th>
+                  <th class="px-4 py-4 text-center bg-secondary rounded-md" colspan="2">80% LTV</th>
                 </tr>
               </thead>
               <tbody class="text-white/90 text-lg">
                 <tr
-                  v-for="term in terms"
+                  v-for="(term, index) in terms"
                   :key="term.label"
-                  @click="updateChart(term)"
-                  :class="['cursor-pointer transition duration-200', selectedTerm.label === term.label ? 'bg-secondary/20' : 'hover:bg-secondary/10']"
+                  class="transition duration-200"
                 >
-                  <td class="px-4 py-5 text-left border-r border-secondary">{{ term.label }}</td>
-                  <td class="px-6 py-5 text-center border-x-4 border-secondary">{{ term.ltv50 }}</td>
-                  <td class="px-8 py-5 text-center border-l border-secondary">{{ term.ltv80 }}</td>
+                  <td class="px-4 py-5 text-left font-semibold">{{ term.label }}</td>
+
+                  <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                    <span :class="flashActive.has(`${index}-50a`) ? 'text-secondary flash-text' : ''">{{ term.ltv50a }}</span>
+                  </td>
+                  <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                    <span :class="flashActive.has(`${index}-50b`) ? 'text-secondary flash-text' : ''">{{ term.ltv50b }}</span>
+                  </td>
+
+                  <td class="px-8"></td>
+
+                  <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                    <span :class="flashActive.has(`${index}-80a`) ? 'text-secondary flash-text' : ''">{{ term.ltv80a }}</span>
+                  </td>
+                  <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                    <span :class="flashActive.has(`${index}-80b`) ? 'text-secondary flash-text' : ''">{{ term.ltv80b }}</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -57,88 +56,74 @@
 
     </div>
   </section>
+</main>
+  <TheFooter/>
+    
 </template>
-
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import Chart from 'chart.js/auto'
 
-const btcChart = ref(null)
-let chartInstance = null
-
-// Available terms and their API day mapping
 const terms = [
-  { label: '1 Month', days: 30, ltv50: '5.1% – 5.2%', ltv80: '9.8% – 9.9%' },
-  { label: '3 Months', days: 90, ltv50: '6.2% – 6.3%', ltv80: '11.2% – 13.3%' },
-  { label: '6 Months', days: 180, ltv50: '7.2% – 7.5%', ltv80: '* – *' },
-  { label: '1 Year', days: 365, ltv50: '8.0% – 8.2%', ltv80: '* – *' }
+  { label: '1 Month', ltv50a: '5.1%', ltv50b: '5.2%', ltv80a: '9.8%', ltv80b: '9.9%' },
+  { label: '3 Months', ltv50a: '6.2%', ltv50b: '6.3%', ltv80a: '11.2%', ltv80b: '13.3%' },
+  { label: '6 Months', ltv50a: '7.2%', ltv50b: '7.5%', ltv80a: '*', ltv80b: '*' },
+  { label: '1 Year', ltv50a: '8.0%', ltv50b: '8.2%', ltv80a: '*', ltv80b: '*' },
 ]
 
-const selectedTerm = ref(terms[0]) // Default: 1 Month
+// Set of active flashing cell IDs like `"0-50a"`
+const flashActive = ref(new Set())
 
-const fetchAndRenderChart = async (days) => {
-  const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`)
-  const data = await res.json()
-
-  const labels = data.prices.map(p => new Date(p[0]).toLocaleDateString())
-  const prices = data.prices.map(p => p[1])
-
-  if (chartInstance) {
-    chartInstance.destroy()
+function pickRandomCells() {
+  const picks = []
+  for (let i = 0; i < terms.length; i++) {
+    ;['50a', '50b', '80a', '80b'].forEach((suffix) => {
+      if (Math.random() < 0.25) picks.push(`${i}-${suffix}`)
+    })
   }
-
-  chartInstance = new Chart(btcChart.value, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'BTC/USD',
-          data: prices,
-          borderColor: '#8387c3',
-          backgroundColor: 'rgba(131, 135, 195, 0.15)',
-          tension: 0.3,
-          fill: true,
-          pointRadius: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: {
-        padding: { bottom: 16 }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#fff' },
-          grid: { color: '#333' }
-        },
-        y: {
-          ticks: { color: '#fff' },
-          grid: { color: '#333' }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: { color: '#fff' }
-        }
-      }
-    }
-  })
+  // Ensure at least one flashes
+  if (picks.length === 0) picks.push(`0-50a`)
+  return picks
 }
 
-const updateChart = (term) => {
-  selectedTerm.value = term
-  fetchAndRenderChart(term.days)
+function tripleFlash() {
+  const targets = pickRandomCells()
+  const periods = 6 // on/off * 3 flashes
+  const interval = 180 // ms per state
+
+  for (let k = 0; k <= periods; k++) {
+    setTimeout(() => {
+      const next = new Set(flashActive.value)
+      targets.forEach((id) => {
+        if (next.has(id)) next.delete(id)
+        else next.add(id)
+      })
+      flashActive.value = next
+    }, k * interval)
+  }
+
+  // Make sure we end in OFF state
+  setTimeout(() => {
+    flashActive.value = new Set()
+  }, (periods + 1) * interval)
 }
 
 onMounted(() => {
-  fetchAndRenderChart(selectedTerm.value.days)
+  // initial delay then every ~30s
+  setTimeout(tripleFlash, 1000)
+  setInterval(tripleFlash, 30000)
 })
+import TheFooter from '../components/TheFooter.vue'
 </script>
 
 <style scoped>
-/* optional hover indicator, already handled in :class bindings */
+/* Text flash animation helper (subtle scale for pop) */
+.flash-text {
+  animation: flashPop 0.18s ease-in-out;
+}
+@keyframes flashPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
 </style>

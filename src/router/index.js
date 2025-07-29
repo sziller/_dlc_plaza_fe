@@ -25,7 +25,7 @@ const routes = [
    {path: '/article/cadena-improving-btc', name: 'Article2', component: Article2View},
    {path: '/contact', name: 'Contact', component: Contact},
    {path: '/faq', name: 'FAQ', component: FAQ},
-   {path: '/technical-overview', name: 'TechnicalOverview', component: TechnicalOverview},
+   {path: '/cadena-paper', name: 'CadenaPaper', component: TechnicalOverview},
    {path: '/article/cadena-empowering-financial-freedom', name: 'Article3', component: Article3view},
    {path: '/article/cadena-loan-lifecycle', name: 'Article4', component: Article4view},
    {path: '/article/cadena-bitcoin-security', name: 'Article5', component: Article5view},

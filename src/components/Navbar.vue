@@ -80,11 +80,10 @@
         </button>
 
         <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-          <router-link to="/faq" class="block px-4 py-2 hover:bg-gray-100 transition">FAQ</router-link>
-          <router-link to="/technical-overview" class="block px-4 py-2 hover:bg-gray-100 transition">Technical Overview</router-link>
-          <router-link to="/explore#technical-overview" class="block px-4 py-2 hover:bg-gray-100 transition">Cadena Paper</router-link>
+          <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-gray-100 transition">Cadena Paper</router-link>
           <router-link to="/explore#about-us" class="block px-4 py-2 hover:bg-gray-100 transition">About Us</router-link>
           <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">Contact</router-link>
+          <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">GitHub Resources</router-link>
         </div>
       </div>
     </div>
@@ -108,11 +107,10 @@
     <!-- Explore Cadena Mobile -->
     <div>
       <div class="text-gray-500 uppercase text-xs mb-1">Explore Cadena</div>
-      <router-link @click="isMobileMenuOpen = false" to="/faq" class="block pl-2 py-1 hover:text-secondary">FAQ</router-link>
-      <router-link @click="isMobileMenuOpen = false" to="/technical-overview" class="block pl-2 py-1 hover:text-secondary">Technical Overview</router-link>
-      <router-link @click="isMobileMenuOpen = false" to="/explore#technical-overview" class="block pl-2 py-1 hover:text-secondary">Cadena Paper</router-link>
+      <router-link @click="isMobileMenuOpen = false" to="/cadena-paper" class="block pl-2 py-1 hover:text-secondary">Cadena Paper</router-link>
       <router-link @click="isMobileMenuOpen = false" to="/explore#about-us" class="block pl-2 py-1 hover:text-secondary">About Us</router-link>
       <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-1 hover:text-secondary">Contact</router-link>
+       <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-1 hover:text-secondary">GitHub Resources</router-link>
     </div>
 
     <!-- Products and Services Mobile -->
