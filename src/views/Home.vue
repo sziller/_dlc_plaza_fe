@@ -3,6 +3,10 @@ import { ref, computed } from 'vue'
 import LiveRatesImac from '../components/LiveRatesImac.vue'
 import TheFooter from '../components/TheFooter.vue'
 import article1Img from '../assets/images/article1.png'
+import article2Img from '../assets/images/article2.png'
+import article3Img from '../assets/images/article3.png'
+import article4Img from '../assets/images/article4.png'
+import article5Img from '../assets/images/article5.png'
 const videos = [
   'https://www.youtube.com/embed/SsBfTfVnjGc?si=GrrW6LD5ffZQI2kZ',
   'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u',
@@ -21,7 +25,7 @@ const articles = [
     id: 2,
     title: 'Cadena Bitcoin - Empowering Individual Financial Freedom',
     description: ' Learn how Cadena Bitcoin lets you use Bitcoin flexibly.',
-    image: article1Img,
+    image: article2Img,
     link: '/article/cadena-empowering-financial-freedom',
     internal: true,
   },
@@ -29,7 +33,7 @@ const articles = [
     id: 3,
     title: 'Cadena Bitcoin: Security',
     description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles',
-    image: article1Img,
+    image: article3Img,
     link: '/article/cadena-loan-lifecycle',
     internal: true,
   }
@@ -38,19 +42,28 @@ const articles = [
    id: 4,
    title: 'How Does it Work?',
    description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdownof the key actions.',
-   image: article1Img,
+   image: article4Img,
    link: '/article/cadena-bitcoin-security',
    internal: true,
  }
 ,
   {
    id: 5,
+   title: 'We need to talk about KYC',
+   description: 'Identification is quietly becoming the default requirement for access to the internet.',
+   image: article1Img,
+   link: '/article/we-need-to-talk-about-kyc',
+   internal: true,
+ },
+ {
+   id: 6,
    title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending',
    description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
-   image: article1Img,
+   image: article5Img,
    link: '/article/cadena-improving-btc',
    internal: true,
  }
+
 ,
 ]
 
