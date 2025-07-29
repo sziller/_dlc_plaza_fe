@@ -21,7 +21,7 @@
 
       <!-- Bob Section -->
       <div class="space-y-4">
-        <h2 class="text-2xl font-bold text-white">Bob (Borrower)</h2>
+        <h2 class="text-2xl font-bold text-secondary">Bob (Borrower)</h2>
         <p>
           Bob wants more Bitcoin exposure without selling his stash. He uses his 
           Bitcoin as collateral to borrow additional Bitcoin via Cadena, allowing him 
@@ -35,7 +35,7 @@
 
       <!-- Alice Section -->
       <div class="space-y-4">
-        <h2 class="text-2xl font-bold text-white">Alice (Investor)</h2>
+        <h2 class="text-2xl font-bold text-secondary">Alice (Investor)</h2>
         <p>
           Alice seeks a high risk-adjusted fiat return, secured by Bitcoin collateral. 
           She’s okay with the risk of losing fiat if Bitcoin’s value drops beyond her 
@@ -76,6 +76,26 @@
         </div>
       </div>
     </section>
+    <section class="bg-secondary text-white py-20 px-6">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold">
+      Cadena Bitcoin Empowers Individual Financial Freedom
+    </h2>
+    <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+      Whether you are like Bob who leverages Bitcoin for growth or liquidity or like Alice who earns yield with secured risk, Cadena Bitcoin gives you full control with trustless on chain smart contracts.
+    </p>
+    <div class="flex justify-center mt-8">
+      <router-link
+        to="/register"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Get Started with Cadena Bitcoin
+      </router-link>
+    </div>
+  </div>
+</section>
+
+
 
     <!-- FOOTER -->
     <TheFooter />

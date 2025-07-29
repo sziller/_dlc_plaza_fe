@@ -66,6 +66,24 @@
     </ul>
   </div>
 </section>
+<section class="bg-secondary text-white py-20 px-6">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold">
+      Cadena Bitcoin Puts Security and Self Custody First
+    </h2>
+    <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+      You are in control of your keys your coins and your future. With Cadena Bitcoin there are no custodians no recovery loopholes and no compromises. Your email your password your encrypted seed phrase and your responsibility.
+    </p>
+    <div class="flex justify-center mt-8">
+      <router-link
+        to="/register"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Set Up Secure Access
+      </router-link>
+    </div>
+  </div>
+</section>
 
 
     <!-- FOOTER -->
