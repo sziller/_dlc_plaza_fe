@@ -96,10 +96,29 @@
 
       </div>
     </section>
+    <section class="bg-secondary text-white py-20 px-6">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold">
+      Cadena Bitcoin Makes Bitcoin Backed Loans Simple and Transparent
+    </h2>
+    <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+      Post or accept loan offers with preset terms and Bitcoin collateral. All transactions are on chain secured by Discreet Log Contracts and settled with a single execution based on a trusted Oracle price feed.
+    </p>
+    <div class="flex justify-center mt-8">
+      <router-link
+        to="/register"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Explore Cadena Bitcoin Contracts
+      </router-link>
+    </div>
+  </div>
+</section>
 
     <!-- FOOTER -->
     <TheFooter />
   </div>
+  
 </template>
 
 <script setup>
