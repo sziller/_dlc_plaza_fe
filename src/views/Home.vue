@@ -5,8 +5,8 @@ import TheFooter from '../components/TheFooter.vue'
 import article1Img from '../assets/images/article1.png'
 const videos = [
   'https://www.youtube.com/embed/Psuh8mml91o?si=XRhe6RtETvYUOhEJ',
-  'https://www.youtube.com/embed/XdyEtPCpIto?si=XAQd9Vo3jupFqh-z',
-  'https://www.youtube.com/embed/WIY28lp5iig?si=dbhrXZoHkOMwk2Rr',
+  'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u',
+  'https://www.youtube.com/embed/l_cy-tWM_lA?si=wDY0PSdvfX_ePYLW',
 ]
 const articles = [
   {
@@ -150,7 +150,7 @@ function scrollRight() {
 
         <!-- Carousel Container -->
         <div class="w-full max-w-5xl overflow-hidden">
-          <div class="flex transition-all duration-300 ease-in-out space-x-6">
+          <div class="flex justify-center transition-all duration-300 ease-in-out space-x-6">
             <component
               v-for="article in visibleArticles"
               :key="article.id"
