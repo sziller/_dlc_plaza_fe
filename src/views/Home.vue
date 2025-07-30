@@ -92,26 +92,28 @@ function scrollRight() {
 
   <!-- Hero Section -->
   <section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2">
-    <div class="flex items-center justify-center p-8 md:p-12 lg:px-16 lg:py-24">
-      <div class="w-full max-w-xl text-center sm:text-left">
-        <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
-          Unlock your Bitcoin's potential.
-        </h2>
-        <p class="mt-6 text-white text-lg leading-relaxed">
-          Get a Bitcoin loan for liquidity or to leverage your Bitcoin exposure. Give a Bitcoin loan to generate fiat yield. 
-          No KYC, no credit checks, no hassle. Just Bitcoin.
-        </p>
-        <div class="mt-10 flex justify-center sm:justify-start">
-          <router-link
-            to="/register"
-            class="inline-block rounded-full bg-secondary px-12 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
-          >
-            Get Started Today
-          </router-link>
-        </div>
+  <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
+    <div class="w-full max-w-2xl text-center sm:text-left">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+        Unlock your Bitcoin's potential.
+      </h2>
+      <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
+        Get a Bitcoin loan for liquidity or to leverage your Bitcoin exposure. Give a Bitcoin loan to generate fiat yield. 
+        No KYC, no credit checks, no hassle. Just Bitcoin.
+      </p>
+      <div class="mt-10 flex justify-center sm:justify-start">
+        <router-link
+          to="/register"
+          class="inline-block rounded-full bg-secondary px-14 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
+        >
+          Get Started Today
+        </router-link>
       </div>
     </div>
-    <div class="hidden sm:flex justify-center items-center bg-gradient-to-tr from-secondary/10 to-transparent px-6 py-12">
+  </div>
+  
+
+    <div class="hidden sm:flex justify-center items-center bg-primary from-secondary/10 to-transparent px-6 py-12">
       <LiveRatesImac />
     </div>
   </section>
@@ -148,7 +150,7 @@ function scrollRight() {
     </div>
   </section>
 
-   <section class="bg-primary text-white px-4 py-20 sm:px-6 lg:px-8">
+   <section class="bg-primary text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
       <div class="text-center mb-12">
         <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
@@ -199,32 +201,34 @@ function scrollRight() {
     </div>
   </section>
   <!-- Latest Videos -->
-  <section class="bg-primary text-white py-20 px-6">
-    <div class="max-w-6xl mx-auto space-y-12">
-      <div class="text-center space-y-4">
-        <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
-        <p class="text-white text-lg max-w-2xl mx-auto">
-          Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
-        </p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div
-          v-for="(video, index) in videos"
-          :key="index"
-          class="rounded-xl overflow-hidden shadow-lg border border-secondary aspect-w-16 aspect-h-9"
-        >
-          <iframe
-            :src="video"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            class="w-full h-full"
-          ></iframe>
-        </div>
+ <section class="bg-primary text-white pt-8 pb-8 px-6">
+  <div class="max-w-6xl mx-auto space-y-12">
+    <div class="text-center space-y-4">
+      <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
+      <p class="text-white text-lg max-w-2xl mx-auto">
+        Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div
+        v-for="(video, index) in videos"
+        :key="index"
+        class="rounded-xl overflow-hidden shadow-lg border border-secondary aspect-w-16 aspect-h-9"
+      >
+        <iframe
+          :src="video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          class="w-full h-full"
+        ></iframe>
       </div>
     </div>
-  </section>
-<section class="bg-primary text-white px-4 py-20 sm:px-6 lg:px-8">
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="bg-primary text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
   <div class="max-w-4xl mx-auto space-y-12">
     <!-- Heading -->
     <div class="text-center">
@@ -358,30 +362,31 @@ function scrollRight() {
 
   <!-- ... FAQ Section ... (unchanged) -->
 
-  <section class="bg-secondary text-white py-20 px-6">
-    <div class="max-w-4xl mx-auto text-center space-y-6">
-      <h2 class="text-3xl md:text-4xl font-extrabold">
-        Ready to Experience Decentralized Bitcoin Finance?
-      </h2>
-      <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-        Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-        <router-link
-          to="/register"
-          class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-        >
-          Borrow Bitcoin
-        </router-link>
-        <router-link
-          to="/register"
-          class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
-        >
-          Lend Bitcoin
-        </router-link>
-      </div>
+  <section class="bg-secondary text-white py-12 px-6">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold">
+      Ready to Experience Decentralized Bitcoin Finance?
+    </h2>
+    <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+      Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+      <router-link
+        to="/register"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Borrow Bitcoin
+      </router-link>
+      <router-link
+        to="/register"
+        class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
+      >
+        Lend Bitcoin
+      </router-link>
     </div>
-  </section>
+  </div>
+</section>
+
   
 
   <TheFooter />

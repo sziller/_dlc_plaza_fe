@@ -6,8 +6,8 @@
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
           Cadena Bitcoin: Security
         </h1>
-        <p class="text-white/80 text-base sm:text-lg font-medium mb-1">Kevin Bell, CFA</p>
-        <p class="text-white/80 text-base sm:text-lg font-medium">President, Cadena Bitcoin</p>
+        <p class="text-white/80 text-base sm:text-lg font-medium mb-1">Sziller</p>
+        <p class="text-white/80 text-base sm:text-lg font-medium">Chief Technology Officer, Cadena Bitcoin</p>
       </div>
     </section>
 

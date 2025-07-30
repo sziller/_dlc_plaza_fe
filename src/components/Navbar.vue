@@ -50,22 +50,22 @@
 </router-link>
 
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTCEUR
+      <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTCEUR (Coming Soon)
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTCJPY
+      <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTCJPY (Coming Soon)
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      🟡 BTC/XAU
+      🟡 BTC/XAU (Coming Soon)
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTCGBP
+      <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTCGBP (Coming Soon)
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTCCAD
+      <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTCCAD (Coming Soon)
     </div>
     <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-      <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTCAUD
+      <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTCAUD (Coming Soon)
     </div>
   </div>
 </div>
@@ -81,9 +81,9 @@
 
         <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
           <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-gray-100 transition">Cadena Paper</router-link>
-          <router-link to="/explore#about-us" class="block px-4 py-2 hover:bg-gray-100 transition">About Us</router-link>
-          <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">Contact</router-link>
           <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">GitHub Resources</router-link>
+          <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">Contact Us</router-link>
+          
         </div>
       </div>
     </div>
@@ -108,9 +108,9 @@
     <div>
       <div class="text-gray-500 uppercase text-xs mb-1">Explore Cadena</div>
       <router-link @click="isMobileMenuOpen = false" to="/cadena-paper" class="block pl-2 py-1 hover:text-secondary">Cadena Paper</router-link>
-      <router-link @click="isMobileMenuOpen = false" to="/explore#about-us" class="block pl-2 py-1 hover:text-secondary">About Us</router-link>
-      <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-1 hover:text-secondary">Contact</router-link>
-       <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-1 hover:text-secondary">GitHub Resources</router-link>
+      <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-1 hover:text-secondary">GitHub Resources</router-link>
+      <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-1 hover:text-secondary">Contact Us</router-link>
+       
     </div>
 
     <!-- Products and Services Mobile -->
