@@ -1,41 +1,47 @@
 <template>
   <div class="device device-imac mx-auto">
     <div class="device-frame">
-      <div class="device-content bg-dark text-white overflow-auto flex flex-col justify-between p-6 relative">
+      <div class="device-content bg-dark text-white flex items-center justify-center">
+        <!-- Constrained inner area so the table can't sprawl -->
+        <div class="imac-inner">
+          <table class="rates-table">
+            <colgroup>
+              <!-- Term | 50% LTV (2 cols) | spacer | 80% LTV (2 cols) -->
+              <col style="width: 26%">
+              <col style="width: 16%">
+              <col style="width: 16%">
+              <col style="width: 4%">
+              <col style="width: 16%">
+              <col style="width: 16%">
+            </colgroup>
 
-        <!-- 🔥 Rates Section -->
-        <div class="relative w-full min-h-[400px] flex justify-center items-center -mt-10">
-          
-          <!-- Custom-Length Fixed Divider -->
-          <div
-            class="hidden sm:block fixed top-[18px] bottom-[165px] w-[3px] bg-secondary left-1/2 transform -translate-x-1/2 z-10 pointer-events-none"
-          ></div>
+            <thead>
+              <tr>
+                <th class="th text-left">Term</th>
+                <th class="th text-center bg-secondary rounded">50% LTV</th>
+                <th class="th text-center bg-secondary rounded">—</th>
+                <th class="th"></th>
+                <th class="th text-center bg-secondary rounded">80% LTV</th>
+                <th class="th text-center bg-secondary rounded">—</th>
+              </tr>
+            </thead>
 
-          <!-- Rate Cards -->
-          <div class="flex flex-col sm:flex-row w-full max-w-5xl mx-auto z-20">
-            <!-- Lend -->
-            <div
-              class="rate-card flex-1 flex flex-col justify-center items-center text-center px-4 space-y-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:text-glow"
-              @click="$router.push('/btcusd')"
-            >
-              <p class="text-xl sm:text-2xl tracking-wide">Lend Rate</p>
-              <p class="text-5xl sm:text-6xl font-extrabold text-secondary transition-transform duration-300">8.16%</p>
-            </div>
-
-            <!-- Borrow -->
-            <div
-              class="rate-card flex-1 flex flex-col justify-center items-center text-center px-4 space-y-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:text-glow"
-              @click="$router.push('/btcusd')"
-            >
-              <p class="text-xl sm:text-2xl tracking-wide">Borrow Rate</p>
-              <p class="text-5xl sm:text-6xl font-extrabold text-secondary transition-transform duration-300">9.00%</p>
-            </div>
-          </div>
-
+            <tbody>
+              <tr v-for="term in terms" :key="term.label">
+                <td class="td text-left font-semibold">{{ term.label }}</td>
+                <td class="td text-center bg-white/10 rounded">{{ term.ltv50a }}</td>
+                <td class="td text-center bg-white/10 rounded">{{ term.ltv50b }}</td>
+                <td class="td spacer"></td>
+                <td class="td text-center bg-white/10 rounded">{{ term.ltv80a }}</td>
+                <td class="td text-center bg-white/10 rounded">{{ term.ltv80b }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
       </div>
     </div>
+
+    <!-- keep your shell bits -->
     <div class="device-stripe"></div>
     <div class="device-header"></div>
     <div class="device-sensors"></div>
@@ -44,14 +50,68 @@
   </div>
 </template>
 
+<script setup>
+const terms = [
+  { label: '1 Month',  ltv50a: '5.1%', ltv50b: '5.2%', ltv80a: '9.8%',  ltv80b: '9.9%' },
+  { label: '3 Months', ltv50a: '6.2%', ltv50b: '6.3%', ltv80a: '11.2%', ltv80b: '13.3%' },
+  { label: '6 Months', ltv50a: '7.2%', ltv50b: '7.5%', ltv80a: '*',    ltv80b: '*' },
+  { label: '1 Year',   ltv50a: '8.0%', ltv50b: '8.2%', ltv80a: '*',    ltv80b: '*' },
+]
+</script>
+
 <style scoped>
+/* Keep within the iMac screen */
 .device-content {
+  min-height: 220px;
+  max-height: 300px;
   border-radius: 6px;
-  position: relative;
+  overflow: hidden;
 }
 
-/* Glowing text effect */
-.hover\:text-glow:hover {
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.3), 0 0 12px rgba(255, 255, 255, 0.2);
+/* Hard cap the table width so cells don't fill the whole screen */
+.imac-inner {
+  max-width: 520px;          /* <— adjust to your iMac screen width */
+  width: 100%;
+  padding: 6px 8px;
 }
+
+/* Table sizing & behavior */
+.rates-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 6px 6px;   /* compact gaps */
+  table-layout: fixed;       /* enforce colgroup widths */
+  font-size: 11px;           /* small text */
+  line-height: 1.15;
+}
+
+/* Cells */
+.th {
+  padding: 6px 6px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+.td {
+  padding: 6px 6px;
+  text-align: center;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tiny spacer column */
+.spacer { padding: 0; background: transparent; }
+
+/* Minimal utility fallbacks (if Tailwind not present) */
+.bg-dark { background: #0b0d12; }
+.bg-secondary { background: #263549; }
+.bg-white\/10 { background: rgba(255,255,255,0.08); }
+.text-white { color: #fff; }
+.text-white\/90 { color: rgba(255,255,255,.9); }
+.rounded { border-radius: 4px; }
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.font-semibold { font-weight: 600; }
 </style>

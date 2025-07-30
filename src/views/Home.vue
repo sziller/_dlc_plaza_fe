@@ -92,63 +92,68 @@ function scrollRight() {
 
   <!-- Hero Section -->
   <section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2">
-  <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
-    <div class="w-full max-w-2xl text-center sm:text-left">
-      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-        Unlock your Bitcoin's potential.
-      </h2>
-      <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
-        Get a Bitcoin loan for liquidity or to leverage your Bitcoin exposure. Give a Bitcoin loan to generate fiat yield. 
-        No KYC, no credit checks, no hassle. Just Bitcoin.
-      </p>
-      <div class="mt-10 flex justify-center sm:justify-start">
-        <router-link
-          to="/register"
-          class="inline-block rounded-full bg-secondary px-14 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
-        >
-          Get Started Today
-        </router-link>
+    <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
+      <div class="w-full max-w-2xl text-center sm:text-left">
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+          Unlock your Bitcoin's potential.
+        </h2>
+        <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
+          Get a Bitcoin loan for liquidity or to leverage your Bitcoin exposure. Give a Bitcoin loan to generate fiat yield. 
+          No KYC, no credit checks, no hassle. Just Bitcoin.
+        </p>
+        <div class="mt-10 flex justify-center sm:justify-start">
+          <router-link
+            to="/register"
+            class="inline-block rounded-full bg-secondary px-14 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
+          >
+            Get Started Today
+          </router-link>
+        </div>
       </div>
     </div>
-  </div>
-  
 
     <div class="hidden sm:flex justify-center items-center bg-primary from-secondary/10 to-transparent px-6 py-12">
-      <LiveRatesImac />
+      <LiveRatesImac>
+  
+</LiveRatesImac>
+
     </div>
   </section>
 
   <!-- What is Cadena Bitcoin -->
   <section>
-    <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
-        <div>
-          <div class="max-w-3xl">
-            <h2 class="text-3xl sm:text-4xl font-bold text-white leading-tight">
-              What is Cadena Bitcoin?
-            </h2>
-            <p class="mt-6 text-white text-lg leading-relaxed">
-              Cadena Bitcoin’s product enables peer-to-peer lending and borrowing using Bitcoin as collateral through 
-              Discreet Log Contracts (DLCs). Cadena Bitcoin lets you use Bitcoin flexibly—whether you want to grow your
-              Bitcoin holdings, access fiat without losing Bitcoin exposure, or generate fiat returns secured by Bitcoin.
-            </p>
-          </div>
+  <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
+      <div>
+        <div class="max-w-3xl">
+          <h2 class="text-3xl sm:text-4xl md:text-[2.5rem] font-bold text-white leading-tight">
+            What is Cadena Bitcoin?
+          </h2>
+          <p class="mt-6 text-white text-lg md:text-xl leading-relaxed">
+            Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. 
+            Whether you want to grow your Bitcoin holdings or generate fiat returns secured by Bitcoin, Cadena's innovative technology 
+            allows <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/80">users to always maintain custody of their coins</span> with Bitcoin‑native smart contracts.
+          </p>
         </div>
-        <div>
-          <div class="rounded overflow-hidden aspect-w-16 aspect-h-9">
-            <iframe
-              src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt"
-              title="Cadena Bitcoin Video"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-              class="w-full h-full"
-            ></iframe>
-          </div>
+      </div>
+      <div>
+        <div class="rounded overflow-hidden aspect-w-16 aspect-h-9">
+          <iframe
+            src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt"
+            title="Cadena Bitcoin Video"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            class="w-full h-full"
+          ></iframe>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+
+
 
    <section class="bg-primary text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto">
