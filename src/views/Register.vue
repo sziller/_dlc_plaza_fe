@@ -148,6 +148,23 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+/**
+ * X (Twitter) primary conversion event
+ * - Put your real Event ID in .env.production as VITE_X_PRIMARY_EVENT_ID
+ * - Falls back to a placeholder if not set
+ */
+const X_PRIMARY_EVENT_ID =
+  import.meta.env.VITE_X_PRIMARY_EVENT_ID || 'tw-REPLACE-ME-EVENT-ID'
+
+let primarySent = false
+function firePrimaryConversion(payload = {}) {
+  if (primarySent) return
+  if (typeof window !== 'undefined' && window.twq && X_PRIMARY_EVENT_ID && X_PRIMARY_EVENT_ID !== 'tw-REPLACE-ME-EVENT-ID') {
+    window.twq('event', X_PRIMARY_EVENT_ID, payload)
+    primarySent = true
+  }
+}
+
 const step = ref(1)
 const email = ref('')
 const password = ref('')
@@ -163,9 +180,27 @@ const formValid = computed(() => {
   )
 })
 
-const submitForm = () => {
-  // Simulate sending confirmation email
-  console.log(`Sending confirmation link to: ${email.value}`)
-  step.value = 2
+const submitForm = async () => {
+  // TODO: replace with your real API call
+  // const ok = await registerUser({ email: email.value, password: password.value })
+  const ok = true
+
+  if (ok) {
+    // Move to Step 2 (email sent)
+    step.value = 2
+
+    // 🔥 Fire primary conversion ONCE
+    firePrimaryConversion({
+      content_id: 'register-email',
+      content_type: 'form',
+      // value: 0,
+      // currency: 'USD',
+      email: email.value, // include only if compliant with your privacy policy
+    })
+  } else {
+    // handle error UI
+    // ...
+  }
 }
 </script>
+

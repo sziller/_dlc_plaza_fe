@@ -8,9 +8,9 @@ import article3Img from '../assets/images/article3.png'
 import article4Img from '../assets/images/article4.png'
 import article5Img from '../assets/images/article5.png'
 const videos = [
-  'https://www.youtube.com/embed/SsBfTfVnjGc?si=GrrW6LD5ffZQI2kZ',
-  'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u',
-  'https://www.youtube.com/embed/l_cy-tWM_lA?si=wDY0PSdvfX_ePYLW',
+  'https://www.youtube.com/embed/SsBfTfVnjGc?si=GrrW6LD5ffZQI2kZ&rel=0&modestbranding=1&iv_load_policy=3',
+  'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u&rel=0&modestbranding=1&iv_load_policy=3',
+  'https://www.youtube.com/embed/l_cy-tWM_lA?si=wDY0PSdvfX_ePYLW&rel=0&modestbranding=1&iv_load_policy=3',
 ]
 const articles = [
   {
@@ -98,8 +98,9 @@ function scrollRight() {
           Unlock your Bitcoin's potential.
         </h2>
         <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
-          Get a Bitcoin loan for liquidity or to leverage your Bitcoin exposure. Give a Bitcoin loan to generate fiat yield. 
-          No KYC, no credit checks, no hassle. Just Bitcoin.
+           
+          Designed for individuals, businesses, family offices, and institutional investors to leverage digital assets. 
+          Access cash loans without selling your Bitcoin, earn yield, and Hodl strategically. 
         </p>
         <div class="mt-10 flex justify-center sm:justify-start">
           <router-link
@@ -113,9 +114,10 @@ function scrollRight() {
     </div>
 
     <div class="hidden sm:flex justify-center items-center bg-primary from-secondary/10 to-transparent px-6 py-12">
-      <LiveRatesImac>
+      <LiveRatesImac class="block pb-0 py-0" />
+
   
-</LiveRatesImac>
+
 
     </div>
   </section>
@@ -139,7 +141,7 @@ function scrollRight() {
       <div>
         <div class="rounded overflow-hidden aspect-w-16 aspect-h-9">
           <iframe
-            src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt"
+            src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt&rel=0&modestbranding=1&iv_load_policy=3"
             title="Cadena Bitcoin Video"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
