@@ -66,7 +66,7 @@
         </p>
         <div class="aspect-w-16 aspect-h-9 rounded overflow-hidden border border-white/10">
           <iframe
-            src="https://www.youtube.com/embed/Psuh8mml91o?si=aCZrv8pP61i7fwsU"
+            src="https://www.youtube.com/embed/Psuh8mml91o?si=aCZrv8pP61i7fwsU&rel=0&modestbranding=1&iv_load_policy=3"
             title="Cadena Loan Lifecycle Video"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
