@@ -91,36 +91,50 @@ function scrollRight() {
   <section class="py-12 bg-primary"></section>
 
   <!-- Hero Section -->
-  <section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2">
-    <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
-      <div class="w-full max-w-2xl text-center sm:text-left">
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-          Unlock your Bitcoin's potential.
-        </h2>
-        <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
-           
-          Designed for individuals, businesses, family offices, and institutional investors to leverage digital assets. 
-          Access cash loans without selling your Bitcoin, earn yield, and Hodl strategically. 
-        </p>
-        <div class="mt-10 flex justify-center sm:justify-start">
-          <router-link
-            to="/register"
-            class="inline-block rounded-full bg-secondary px-14 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
-          >
-            Get Started Today
-          </router-link>
-        </div>
+<section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2 pt-1">
+
+  <!-- Left: Text -->
+  <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
+    <div class="w-full max-w-2xl text-center sm:text-left">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+        Unlock your Bitcoin's potential.
+      </h2>
+      <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
+        Designed for individuals, businesses, family offices, and institutional investors to leverage digital assets. 
+        Access cash loans without selling your Bitcoin, earn yield, and Hodl strategically. 
+      </p>
+      <div class="mt-10 flex justify-center sm:justify-start">
+        <router-link
+          to="/register"
+          class="inline-block rounded-full bg-secondary px-14 py-4 text-lg md:text-xl font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
+        >
+          Get Started Today
+        </router-link>
       </div>
     </div>
+  </div>
 
-    <div class="hidden sm:flex justify-center items-center bg-primary from-secondary/10 to-transparent px-6 py-12">
-      <LiveRatesImac class="block pb-0 py-0" />
-
+  <!-- Right: iMac + Badge -->
+<div class="relative hidden sm:flex flex-col justify-center items-center bg-primary px-6 py-12 z-10">
   
-
-
+  <!-- Badge floats above iMac -->
+  <div class="absolute top-8 left-1/2 -translate-x-1/2 z-20 text-center">
+    <div class="bg-secondary backdrop-blur border border-white text-white text-sm md:text-base px-4 py-2 rounded-full shadow-md font-semibold">
+      Lowest rates in the industry!
     </div>
-  </section>
+    <div class="text-secondary text-xl mt-1 animate-bounce leading-none">↓</div>
+  </div>
+
+  <!-- iMac (anchor) -->
+  <div class="mt-16"> <!-- Pushes it below the badge -->
+    <LiveRatesImac class="block pb-0 py-0" />
+  </div>
+</div>
+
+
+</section>
+
+
 
   <!-- What is Cadena Bitcoin -->
   <section>
