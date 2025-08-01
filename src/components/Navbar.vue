@@ -44,27 +44,27 @@
   </button>
 
   <div class="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-    <router-link to="/btcusd" class="block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2">
-  <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" />
-  BTCUSD
+    <router-link to="/btcusd" class="block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2 whitespace-nowrap">
+      <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" />
+      BTCUSD
 </router-link>
 
-    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
       <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTCEUR (Coming Soon)
     </div>
-    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
       <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTCJPY (Coming Soon)
     </div>
-    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
       🟡 BTC/XAU (Coming Soon)
     </div>
-    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
       <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTCGBP (Coming Soon)
     </div>
-    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
       <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTCCAD (Coming Soon)
     </div>
-    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
+    <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed whitespace-nowrap">
       <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTCAUD (Coming Soon)
     </div>
   </div>
