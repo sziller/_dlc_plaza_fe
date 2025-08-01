@@ -1,61 +1,47 @@
 <template>
-<section
-  class="w-full bg-primary text-white"
-  aria-labelledby="onboarding-title"
->
-  <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 py-10 md:py-12 lg:py-16">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-      <!-- 🧾 Left: Title & Description (lowered) -->
-      <div class="space-y-5 mt-8 md:mt-12 lg:mt-24 xl:mt-28">
-        <h1 id="onboarding-title" class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-          Personalized Onboarding
-        </h1>
-        <p class="text-base md:text-lg lg:text-xl text-white/90 max-w-prose">
+  <!-- Onboarding Section -->
+  <section class="w-full bg-primary text-white pt-32" aria-labelledby="onboarding-title">
+    <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">
+      <!-- Title OUTSIDE the card -->
+      <h1 id="onboarding-title" class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-center lg:text-center">
+        Personalized Onboarding
+      </h1>
+
+      <div class="bg-white text-secondary rounded-2xl shadow-xl border border-white/10 p-8 sm:p-10 space-y-8 text-center">
+        <!-- Description INSIDE the card -->
+        <p class="text-base md:text-lg lg:text-xl text-secondary/80 max-w-2xl mx-auto">
           We simplify the onboarding process and are here to answer any questions.
           With Cadena Bitcoin, expert knowledge is always just a phone call away.
         </p>
-      </div>
 
-      <!-- 📅 Right: CTAs (already spaced from top) -->
-      <div
-        class="rounded-2xl bg-secondary backdrop-blur-sm border border-white/10 p-6 sm:p-8 lg:p-10 shadow-xl
-               mt-6 md:mt-8 lg:mt-20 xl:mt-24"
-        aria-labelledby="cta-title"
-      >
-        <h2 id="cta-title" class="text-2xl md:text-3xl font-semibold tracking-tight mb-6">
-          Get Started Today
-        </h2>
-
-        <div class="flex flex-col gap-4 md:gap-5">
-          <!-- Schedule with Calendly -->
+        <!-- CTA Buttons -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-6">
           <a
             href="https://calendly.com/YOUR-CALENDLY-SLUG"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center justify-center rounded-xl w-full py-4 px-6 font-semibold bg-white text-secondary shadow-lg ring-1 ring-black/5 transition
-                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            class="inline-flex items-center justify-center rounded-xl px-6 py-4 w-full md:w-auto font-semibold bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
+                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80"
             aria-label="Schedule via Calendly"
           >
             Schedule via Calendly
           </a>
 
-          <!-- Call Directly -->
           <a
             href="tel:+13058311410"
-            class="inline-flex items-center justify-center rounded-xl w-full py-4 px-6 font-semibold bg-white text-secondary shadow-lg ring-1 ring-black/5 transition
-                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            class="inline-flex items-center justify-center rounded-xl px-6 py-4 w-full md:w-auto font-semibold bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
+                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80"
             aria-label="Call us now at 305-831-1410"
           >
             Call Us Now: (305) 831-1410
           </a>
 
-          <!-- ✉️ Email CTA (copy to clipboard) -->
           <button
             type="button"
             @click="copyEmail"
             :disabled="copied"
-            class="inline-flex items-center justify-center gap-2 rounded-xl w-full py-4 px-6 font-semibold bg-white text-secondary shadow-lg ring-1 ring-black/5 transition
-                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:opacity-70 disabled:cursor-not-allowed"
+            class="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 w-full md:w-auto font-semibold bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
+                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80 disabled:opacity-70 disabled:cursor-not-allowed"
             :aria-label="copied ? 'Email copied to clipboard' : 'Copy email address to clipboard'"
           >
             <span v-if="!copied" class="inline-flex items-center gap-2">
@@ -67,23 +53,15 @@
               <span>Copied!</span>
             </span>
           </button>
-
-          
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-
-
-
- <!-- Who we serve Section (cards now white) -->
+  <!-- Who we serve Section -->
   <section class="w-full bg-primary text-white px-6 py-16">
     <div class="max-w-6xl mx-auto">
       <h2 class="text-4xl font-extrabold mb-12 text-center">Who we serve.</h2>
-
-      <!-- Row of audiences -->
       <div class="space-y-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-white text-secondary p-6 rounded-lg border border-white/10 text-center group shadow-sm">
@@ -99,8 +77,6 @@
             <p class="text-xl font-semibold">Institutional Investors</p>
           </div>
         </div>
-
-        <!-- Single shared description -->
         <div class="bg-white text-secondary p-8 rounded-lg border border-white/10 text-center shadow-sm">
           <p class="text-2xl text-secondary/90">
             Get expert support and competitive rates for Bitcoin borrowing and lending.
@@ -110,51 +86,29 @@
     </div>
   </section>
 
-  <!-- 💬 Contact / Info Section (boxes are white; removed General Questions box; socials big & centered) -->
+  <!-- Reach Out Section -->
   <section class="w-full bg-primary text-white px-6 py-0 pb-16">
     <div class="max-w-6xl mx-auto space-y-12">
       <h2 class="text-4xl font-extrabold text-center">Reach Out</h2>
-
-      <!-- Socials: single large centered card -->
       <div class="bg-white text-secondary p-10 rounded-lg border border-white/10 shadow-sm">
         <p class="text-2xl font-semibold mb-8 text-center">Find Us On Social Media</p>
         <div class="flex flex-wrap items-center justify-center gap-12">
-          <a
-            href="https://x.com/cadenabitcoin"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit us on X (Twitter)"
-            class="flex flex-col items-center transition hover:opacity-80"
-          >
+          <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener noreferrer" aria-label="Visit us on X (Twitter)" class="flex flex-col items-center transition hover:opacity-80">
             <i-simple-icons-x class="w-20 h-20 mb-3" aria-hidden="true" />
             <span class="text-base font-medium">X</span>
           </a>
-          <a
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit our GitHub"
-            class="flex flex-col items-center transition hover:opacity-80"
-          >
+          <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Visit our GitHub" class="flex flex-col items-center transition hover:opacity-80">
             <i-simple-icons-github class="w-20 h-20 mb-3" aria-hidden="true" />
             <span class="text-base font-medium">GitHub</span>
           </a>
-          <a
-            href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit our YouTube"
-            class="flex flex-col items-center transition hover:opacity-80"
-          >
+          <a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" target="_blank" rel="noopener noreferrer" aria-label="Visit our YouTube" class="flex flex-col items-center transition hover:opacity-80">
             <i-simple-icons-youtube class="w-20 h-20 mb-3" aria-hidden="true" />
             <span class="text-base font-medium">YouTube</span>
           </a>
         </div>
       </div>
 
-      <!-- Contacts -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Kevin Bell -->
         <div class="bg-white text-secondary p-6 rounded-lg shadow-sm border border-white/10">
           <p class="text-xl font-semibold mb-2">Kevin Bell</p>
           <p class="text-sm text-secondary/70 mb-2">President</p>
@@ -168,7 +122,6 @@
           </p>
         </div>
 
-        <!-- Sziller -->
         <div class="bg-white text-secondary p-6 rounded-lg shadow-sm border border-white/10">
           <p class="text-xl font-semibold mb-2">Sziller</p>
           <p class="text-sm text-secondary/70 mb-2">Chief Technology Officer</p>
@@ -181,13 +134,13 @@
     </div>
   </section>
 
-  <TheFooter/>
+  <TheFooter />
 </template>
 
 <script setup>
 import TheFooter from '../components/TheFooter.vue'
 import { onMounted, ref } from 'vue'
-import { User, Users, Building2, Copy, Check } from 'lucide-vue-next' // Social icons removed; using Iconify Simple Icons
+import { User, Users, Building2, Copy, Check } from 'lucide-vue-next'
 
 const copied = ref(false)
 
@@ -225,17 +178,8 @@ function fallbackCopy(text) {
 onMounted(() => {
   window.scrollTo(0, 0)
 })
-
-
-
-
 </script>
 
 <style scoped>
-/* Iconify icons inherit currentColor; adjust link color if you want brand hues per-platform.
-   Example (optional):
-   a[aria-label*="GitHub"] { color: #ffffff; }
-   a[aria-label*="YouTube"] { color: #ff0000; }
-   a[aria-label*="X (Twitter)"] { color: #000000; }
-*/
+/* Iconify icons inherit currentColor; customize colors here if needed */
 </style>
