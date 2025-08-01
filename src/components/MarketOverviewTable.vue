@@ -7,7 +7,7 @@
           {{ title }}
         </div>
 
-        <!-- Table -->
+        <!-- Table Wrapper -->
         <div class="overflow-auto flex-1 min-h-0">
           <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-6">
             <thead>
@@ -15,14 +15,14 @@
                 <th class="px-4 py-4 text-left">Term</th>
 
                 <!-- Left LTV group -->
-                <th class="px-4 py-4 text-center bg-secondary rounded-md" :colspan="2">
+                <th class="left-group-header px-4 py-4 text-center bg-secondary rounded-md" :colspan="2">
                   {{ leftGroupLabel }}
                 </th>
 
-                <th class="px-8 py-4"></th>
+                <th class="spacer px-8 py-4"></th>
 
                 <!-- Right LTV group -->
-                <th class="px-4 py-4 text-center bg-secondary rounded-md" :colspan="2">
+                <th class="right-group-header px-4 py-4 text-center bg-secondary rounded-md" :colspan="2">
                   {{ rightGroupLabel }}
                 </th>
               </tr>
@@ -34,29 +34,29 @@
                 :key="term.label"
                 class="transition duration-200"
               >
-                <td class="px-4 py-5 text-left font-semibold">{{ term.label }}</td>
+                <td class="px-2 sm:px-4 py-5 text-left font-semibold">{{ term.label }}</td>
 
                 <!-- Left group cells -->
-                <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
                   <span :class="flashActive.has(`${index}-${leftKeys[0]}`) ? 'text-secondary flash-text' : ''">
                     {{ term[leftKeys[0]] }}
                   </span>
                 </td>
-                <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
                   <span :class="flashActive.has(`${index}-${leftKeys[1]}`) ? 'text-secondary flash-text' : ''">
                     {{ term[leftKeys[1]] }}
                   </span>
                 </td>
 
-                <td class="px-8"></td>
+                <td class="px-2 sm:px-8 spacer"></td>
 
                 <!-- Right group cells -->
-                <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
                   <span :class="flashActive.has(`${index}-${rightKeys[0]}`) ? 'text-secondary flash-text' : ''">
                     {{ term[rightKeys[0]] }}
                   </span>
                 </td>
-                <td class="px-4 py-5 text-center bg-white/10 rounded-md">
+                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
                   <span :class="flashActive.has(`${index}-${rightKeys[1]}`) ? 'text-secondary flash-text' : ''">
                     {{ term[rightKeys[1]] }}
                   </span>
@@ -166,5 +166,27 @@ defineExpose({ startFlashing, stopFlashing })
   0% { transform: scale(1); }
   50% { transform: scale(1.07); }
   100% { transform: scale(1); }
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  table {
+    border-spacing: 0.25rem 0.75rem !important;
+    table-layout: fixed;
+  }
+  th, td {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    font-size: 0.8rem;
+  }
+  .left-group-header,
+  .right-group-header {
+    display: table-cell !important;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  .spacer {
+    display: none !important;
+  }
 }
 </style>

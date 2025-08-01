@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import LiveRatesImac from '../components/LiveRatesImac.vue'
 import TheFooter from '../components/TheFooter.vue'
 import article1Img from '../assets/images/article1.png'
@@ -7,11 +7,13 @@ import article2Img from '../assets/images/article2.png'
 import article3Img from '../assets/images/article3.png'
 import article4Img from '../assets/images/article4.png'
 import article5Img from '../assets/images/article5.png'
+
 const videos = [
   'https://www.youtube.com/embed/SsBfTfVnjGc?si=GrrW6LD5ffZQI2kZ&rel=0&modestbranding=1&iv_load_policy=3',
   'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u&rel=0&modestbranding=1&iv_load_policy=3',
   'https://www.youtube.com/embed/l_cy-tWM_lA?si=wDY0PSdvfX_ePYLW&rel=0&modestbranding=1&iv_load_policy=3',
 ]
+
 const articles = [
   {
     id: 1,
@@ -36,61 +38,76 @@ const articles = [
     image: article3Img,
     link: '/article/cadena-loan-lifecycle',
     internal: true,
-  }
-,
+  },
   {
-   id: 4,
-   title: 'How Does it Work?',
-   description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdownof the key actions.',
-   image: article4Img,
-   link: '/article/cadena-bitcoin-security',
-   internal: true,
- }
-,
+    id: 4,
+    title: 'How Does it Work?',
+    description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.',
+    image: article4Img,
+    link: '/article/cadena-bitcoin-security',
+    internal: true,
+  },
   {
-   id: 5,
-   title: 'We need to talk about KYC',
-   description: 'Identification is quietly becoming the default requirement for access to the internet.',
-   image: article1Img,
-   link: '/article/we-need-to-talk-about-kyc',
-   internal: true,
- },
- {
-   id: 6,
-   title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending',
-   description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
-   image: article5Img,
-   link: '/article/cadena-improving-btc',
-   internal: true,
- }
-
-,
+    id: 5,
+    title: 'We need to talk about KYC',
+    description: 'Identification is quietly becoming the default requirement for access to the internet.',
+    image: article1Img,
+    link: '/article/we-need-to-talk-about-kyc',
+    internal: true,
+  },
+  {
+    id: 6,
+    title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending',
+    description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
+    image: article5Img,
+    link: '/article/cadena-improving-btc',
+    internal: true,
+  },
 ]
 
 const currentIndex = ref(0)
-const visibleArticles = computed(() => {
-  const result = []
-  const len = articles.length
-  for (let i = 0; i < 3; i++) {
-    result.push(articles[(currentIndex.value + i) % len])
+const isMobile = ref(false)
+
+onMounted(() => {
+  const updateIsMobile = () => {
+    isMobile.value = window.innerWidth < 640
   }
-  return result
+  updateIsMobile()
+  window.addEventListener('resize', updateIsMobile)
+})
+
+const visibleArticles = computed(() => {
+  if (isMobile.value) {
+    // Show all articles on mobile
+    return articles
+  } else {
+    // Show rotating 3 on desktop
+    const result = []
+    const len = articles.length
+    for (let i = 0; i < 3; i++) {
+      result.push(articles[(currentIndex.value + i) % len])
+    }
+    return result
+  }
 })
 
 function scrollLeft() {
+  if (isMobile.value) return // Disable arrow click on mobile
   const len = articles.length
   currentIndex.value = (currentIndex.value - 1 + len) % len
 }
 
 function scrollRight() {
+  if (isMobile.value) return // Disable arrow click on mobile
   const len = articles.length
   currentIndex.value = (currentIndex.value + 1) % len
 }
 </script>
+
 <template>
   <section class="py-12 bg-primary"></section>
 
-  <!-- Hero Section -->
+    <!-- Hero Section -->
 <section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2 pt-1">
 
   <!-- Left: Text -->
@@ -171,55 +188,58 @@ function scrollRight() {
 
 
    <section class="bg-primary text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
-        <p class="mt-4 text-tertiary text-lg">Stay updated with our latest insights</p>
-      </div>
-
-      <div class="relative flex items-center justify-center">
-        <!-- Left Arrow -->
-        <button
-          @click="scrollLeft"
-          class="absolute left-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
-        >
-          ◀
-        </button>
-
-        <!-- Carousel Container -->
-        <div class="w-full max-w-5xl overflow-visible px-2">
-          <div class="flex justify-center transition-all duration-300 ease-in-out space-x-6">
-            <component
-              v-for="article in visibleArticles"
-              :key="article.id"
-              :is="article.internal ? 'router-link' : 'a'"
-              :to="article.internal ? article.link : undefined"
-              :href="!article.internal ? article.link : undefined"
-              class="flex-shrink-0 w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer"
-            >
-              <img :src="article.image" :alt="article.title" class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90" />
-              <div class="p-4">
-                <h3 class="text-xl font-semibold mb-2 text-white hover:text-secondary transition-colors duration-300">
-                  {{ article.title }}
-                </h3>
-                <p class="text-white/80 text-sm">{{ article.description }}</p>
-                <span class="inline-block text-secondary font-medium mt-3 hover:underline">Read more →</span>
-              </div>
-            </component>
-
-          </div>
-        </div>
-
-        <!-- Right Arrow -->
-        <button
-          @click="scrollRight"
-          class="absolute right-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
-        >
-          ▶
-        </button>
-      </div>
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
+      <p class="mt-4 text-tertiary text-lg">Stay updated with our latest insights</p>
     </div>
-  </section>
+
+    <div class="relative flex items-center justify-center">
+      <!-- Left Arrow (hidden on mobile) -->
+      <button
+        @click="scrollLeft"
+        class="hidden sm:flex absolute left-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
+      >
+        ◀
+      </button>
+
+      <!-- Carousel Scroll Wrapper (NO max-w limit here!) -->
+      <div class="w-full overflow-x-auto sm:overflow-visible px-2">
+        <div
+          class="flex space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-x snap-mandatory sm:snap-none"
+        >
+          <component
+            v-for="article in visibleArticles"
+            :key="article.id"
+            :is="article.internal ? 'router-link' : 'a'"
+            :to="article.internal ? article.link : undefined"
+            :href="!article.internal ? article.link : undefined"
+            class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
+          >
+            <img :src="article.image" :alt="article.title" class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90" />
+            <div class="p-4">
+              <h3 class="text-xl font-semibold mb-2 text-white hover:text-secondary transition-colors duration-300">
+                {{ article.title }}
+              </h3>
+              <p class="text-white/80 text-sm">{{ article.description }}</p>
+              <span class="inline-block text-secondary font-medium mt-3 hover:underline">Read more →</span>
+            </div>
+          </component>
+        </div>
+      </div>
+
+      <!-- Right Arrow (hidden on mobile) -->
+      <button
+        @click="scrollRight"
+        class="hidden sm:flex absolute right-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
+      >
+        ▶
+      </button>
+    </div>
+  </div>
+</section>
+
+
   <!-- Latest Videos -->
  <section class="bg-primary text-white pt-8 pb-8 px-6">
   <div class="max-w-6xl mx-auto space-y-12">
@@ -421,4 +441,15 @@ function scrollRight() {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+.scale-wrapper {
+  width: 100%;
+  transform-origin: top center;
+}
+
+@media (max-width: 640px) {
+  .scale-wrapper {
+    transform: scale(calc(100vw / 640));
+  }
+}
+
 </style>
