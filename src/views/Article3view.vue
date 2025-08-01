@@ -55,27 +55,7 @@
     </section>
 
     <!-- VIDEO SECTION -->
-    <section class="bg-dark px-6 py-16 lg:py-20">
-      <div class="max-w-4xl mx-auto text-center space-y-8">
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white">
-          Cadena Loan Lifecycle – Explained
-        </h2>
-        <p class="text-white/80 text-lg max-w-2xl mx-auto">
-          Watch our short explainer video that walks through the full lifecycle of a Cadena loan – 
-          from agreement to funding, settlement, and closing.
-        </p>
-        <div class="aspect-w-16 aspect-h-9 rounded overflow-hidden border border-white/10">
-          <iframe
-            src="https://www.youtube.com/embed/Psuh8mml91o?si=aCZrv8pP61i7fwsU&rel=0&modestbranding=1&iv_load_policy=3"
-            title="Cadena Loan Lifecycle Video"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            class="w-full h-full"
-          ></iframe>
-        </div>
-      </div>
-    </section>
+    
     <section class="bg-secondary text-white py-20 px-6">
   <div class="max-w-4xl mx-auto text-center space-y-6">
     <h2 class="text-3xl md:text-4xl font-extrabold">
