@@ -46,7 +46,7 @@
       <p>
         What Cadena does differently is that we're a 
         <span class="text-secondary font-semibold">decentralized peer-to-peer platform</span>. 
-        We match borrowers and investors and create smart contracts that are enforced on the Bitcoin blockchain.
+        We match borrowers and investors and create smart contracts that are funded and settled on the Bitcoin blockchain.
       </p>
 
       <p>

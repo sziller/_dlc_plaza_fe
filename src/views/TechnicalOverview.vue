@@ -96,7 +96,7 @@
       <div id="adaptor">
         <h2 class="text-2xl md:text-3xl font-bold mb-4">5. Adaptor Signatures</h2>
         <p>
-          Adaptor signatures are the cryptographic backbone of Cadena’s execution.. They allow the parties to pre-commit to every possible contract outcome,
+          Adaptor signatures are the cryptographic backbone of Cadena’s execution. They allow the parties to pre-commit to every possible contract outcome,
           with each signature becoming valid only when extended, thus unlocked by a matching oracle attestation.
         </p>
         <p>At contract inception:</p>
@@ -125,9 +125,67 @@
         </p>
       </div>
 
-      <!-- 7. Conclusion -->
+      <!-- 7. Example -->
+      <div id="example">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">7. Example</h2>
+        <p>
+          We show how Cadena works with a loan between Bob (borrower) and Alice (lender). Bob puts up 1 Bitcoin (100,000,000 sats) as collateral. Alice provides the loan’s discounted value at the start, with interest and fees deducted upfront.
+        </p>
+        <ul class="list-disc list-inside space-y-2 mt-2">
+          <li><strong>Collateral:</strong> 1 BTC (100,000,000 sats).</li>
+          <li><strong>Loan Size:</strong> 80% of the collateral’s fiat value, set by an oracle at inception.</li>
+          <li><strong>Interest:</strong> 9% annual rate, or 0.75% for the 30-day term (simple interest).</li>
+          <li><strong>Fee:</strong> Cadena charges 250,000 sats, covering network costs and support.</li>
+        </ul>
+        <p class="mt-4">
+          <strong>Proceeds:</strong> Bob receives the loan minus interest and fees. Calculation:
+        </p>
+        <ul class="list-disc list-inside space-y-2 mt-2">
+          <li>Repayment: 80,000,000 sats.</li>
+          <li>Discounted for interest: 80,000,000 ÷ 1.0075 = 79,404,467 sats.</li>
+          <li>Minus fee: 79,404,467 - 250,000 = 79,154,467 sats.</li>
+        </ul>
+        <p>
+          Bob keeps this amount from his own Bitcoin, avoiding the need to transfer collateral to Alice and back.
+        </p>
+        <p class="mt-4">
+          <strong>Oracle Role:</strong> An oracle attests Bitcoin’s price in USD at the end of the 30-day term.
+        </p>
+        <ul class="list-disc list-inside space-y-2 mt-2">
+          <li>Inception: Bitcoin is $100,000. The loan’s fiat value is 80% of 1 BTC, or $80,000. Bob receives 79,154,467 sats (as above).</li>
+          <li>Settlement: The oracle’s final price determines how the 1 BTC collateral splits. Alice gets $80,000 worth of Bitcoin; Bob gets the rest.</li>
+        </ul>
+        <p class="mt-4"><strong>Outcomes:</strong></p>
+        <ul class="list-disc list-inside space-y-2 mt-2">
+          <li>
+            <strong>Price rises to $120,000:</strong>
+            <br />Alice gets 66,666,667 sats ($80,000 ÷ $120,000 × 100,000,000).
+            <br />Bob gets 33,333,333 sats (100,000,000 - 66,666,667).
+          </li>
+          <li>
+            <strong>Price stays at $100,000:</strong>
+            <br />Alice gets 80,000,000 sats ($80,000 ÷ $100,000 × 100,000,000).
+            <br />Bob gets 20,000,000 sats.
+          </li>
+          <li>
+            <strong>Price falls to $90,000:</strong>
+            <br />Alice gets 88,888,889 sats ($80,000 ÷ $90,000 × 100,000,000).
+            <br />Bob gets 11,111,111 sats.
+          </li>
+          <li>
+            <strong>Price drops to $80,000 or below:</strong>
+            <br />Alice gets 100,000,000 sats (all collateral).
+            <br />Bob gets 0 sats.
+          </li>
+        </ul>
+        <p class="mt-4">
+          In each case, Alice’s fiat return is fixed at $80,000 worth of Bitcoin. Bob’s outcome depends on Bitcoin’s price movement.
+        </p>
+      </div>
+
+      <!-- 8. Conclusion -->
       <div id="conclusion">
-        <h2 class="text-2xl md:text-3xl font-bold mb-4">7. Conclusion</h2>
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">8. Conclusion</h2>
         <p>
           Bitcoin’s secure, verifiable network offers more than value transfer—it’s a foundation for decentralized credit.
           Cadena’s use of discreet log contracts, adaptor signatures, and oracles enables peer-to-peer lending without trusted third parties.

@@ -15,7 +15,7 @@
     <section class="px-4 py-10 lg:py-14 max-w-[1000px] mx-auto space-y-6 text-base sm:text-lg leading-snug text-white/90">
       <p>
         Cadena Bitcoin is a decentralized lending and borrowing product where 
-        users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown
+        users lock Bitcoin collateral in a Discreet Log Contracts (DLC) to facilitate loans. Here’s a breakdown
         of the key actions:
       </p>
 
@@ -49,7 +49,7 @@
 
       <!-- Financial Terms -->
       <div class="space-y-5">
-        <h2 class="text-2xl sm:text-3xl font-bold text-secondary mb-1">3. What Are the Financial Terms (MVP)?</h2>
+        
 
         <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Term</h4>
         <p>
@@ -58,7 +58,9 @@
 
         <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Interest</h4>
         <p>
-          Simple interest using a 30/360-day count convention (commonly used in USD debt). No compounding. The 360-day base slightly understates the true rate compared to a 365-day base.
+          Simple interest using a 30/360-day count convention (commonly used in USD debt). No compounding. For tenors 
+shorter than 1 year, the 360 day basis understates the true rate compared 
+to a 365-day base.
         </p>
 
         <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Loan Size</h4>
