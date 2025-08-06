@@ -55,11 +55,15 @@
         <!-- Register Button -->
         <button
           type="submit"
-          :disabled="!formValid"
+          :disabled="!formValid || loading"
           class="w-full bg-secondary hover:bg-secondary/90 text-white px-6 py-3 rounded-full font-semibold transition disabled:opacity-40"
         >
-          Register
+          <span v-if="loading">Registering...</span>
+          <span v-else>Register</span>
         </button>
+
+        <!-- Error Message -->
+        <div v-if="error" class="text-center text-red-400 font-semibold">{{ error }}</div>
 
         <!-- Centered Login Link -->
         <div class="text-center text-sm pt-4">
@@ -145,8 +149,24 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
+declare global {
+  interface Window {
+    twq?: (...args: any[]) => void
+  }
+}
+
 import { ref, computed } from 'vue'
+import { registerUser } from '../api/user'
+import type { AuthFace } from '../types/authFace'
+import type { UserFace } from '../types/userFace'
+const step = ref(1)
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const accepted = ref(false)
+const loading = ref(false)
+const error = ref<string | null>(null)
 
 /**
  * X (Twitter) primary conversion event
@@ -165,12 +185,6 @@ function firePrimaryConversion(payload = {}) {
   }
 }
 
-const step = ref(1)
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-const accepted = ref(false)
-
 const formValid = computed(() => {
   return (
     email.value &&
@@ -181,11 +195,15 @@ const formValid = computed(() => {
 })
 
 const submitForm = async () => {
-  // TODO: replace with your real API call
-  // const ok = await registerUser({ email: email.value, password: password.value })
-  const ok = true
+  error.value = null
+  loading.value = true
+  try {
+    // Call your real API
+    await registerUser({
+      email_address: email.value,
+      password: password.value
+    } as UserFace)
 
-  if (ok) {
     // Move to Step 2 (email sent)
     step.value = 2
 
@@ -193,13 +211,12 @@ const submitForm = async () => {
     firePrimaryConversion({
       content_id: 'register-email',
       content_type: 'form',
-      // value: 0,
-      // currency: 'USD',
       email: email.value, // include only if compliant with your privacy policy
     })
-  } else {
-    // handle error UI
-    // ...
+  } catch (err: any) {
+    error.value = err?.message || 'Registration failed.'
+  } finally {
+    loading.value = false
   }
 }
 </script>

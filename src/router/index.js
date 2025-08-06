@@ -14,7 +14,7 @@ import Article3view from '../views/Article3view.vue';
 import Article4view from '../views/Article4view.vue';
 import Article5view from '../views/Article5view.vue';
 import Article6view from '../views/Article6view.vue';
-
+import Login from '../views/Login.vue';
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
@@ -33,6 +33,7 @@ const routes = [
   { path: '/article/cadena-loan-lifecycle', name: 'Article4', component: Article4view },
   { path: '/article/cadena-bitcoin-security', name: 'Article5', component: Article5view },
   { path: '/article/we-need-to-talk-about-kyc', name: 'Article6', component: Article6view },
+  {path: '/login', name: 'Login', component: Login },
 ];
 
 const router = createRouter({
