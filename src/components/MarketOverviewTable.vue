@@ -11,19 +11,38 @@
         <div class="overflow-auto flex-1 min-h-0">
           <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-6">
             <thead>
-              <tr class="text-white text-md">
-                <th class="px-4 py-4 text-left">Term</th>
-
-                <!-- Left LTV group -->
-                <th class="left-group-header px-4 py-4 text-center bg-secondary rounded-md" :colspan="2">
+              <tr>
+                <th></th>
+                <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
                   {{ leftGroupLabel }}
                 </th>
-
-                <th class="spacer px-8 py-4"></th>
-
-                <!-- Right LTV group -->
-                <th class="right-group-header px-4 py-4 text-center bg-secondary rounded-md" :colspan="2">
+                <th class="spacer px-4"></th>
+                <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
                   {{ rightGroupLabel }}
+                </th>
+              </tr>
+              <tr class="text-white text-md">
+                <th class="px-4 py-4 text-left">Term</th>
+                <th class="px-4 py-4">
+                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    Lend
+                  </div>
+                </th>
+                <th class="px-4 py-4">
+                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    Borrow
+                  </div>
+                </th>
+                <th class="spacer px-4 py-4"></th>
+                <th class="px-4 py-4">
+                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    Lend
+                  </div>
+                </th>
+                <th class="px-4 py-4">
+                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    Borrow
+                  </div>
                 </th>
               </tr>
             </thead>
@@ -34,42 +53,62 @@
                 :key="term.label"
                 class="transition duration-200"
               >
-                <td class="px-2 sm:px-4 py-5 text-left font-semibold">{{ term.label }}</td>
+                <td class="px-4 py-4 text-left font-semibold">{{ term.label }}</td>
 
                 <!-- Left group cells -->
-                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
-                  <span :class="flashActive.has(`${index}-${leftKeys[0]}`) ? 'text-secondary flash-text' : ''">
-                    {{ term[leftKeys[0]] }}
-                  </span>
-                </td>
-                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
-                  <span :class="flashActive.has(`${index}-${leftKeys[1]}`) ? 'text-secondary flash-text' : ''">
-                    {{ term[leftKeys[1]] }}
-                  </span>
+                <td
+                  v-for="(key, keyIndex) in leftKeys"
+                  :key="key"
+                  class="px-4 py-4 text-center bg-white/10 rounded-md"
+                  style="min-width: 6rem;"
+                >
+                  <div>
+                    <span :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''">
+                      {{ term[key] }}
+                    </span>
+                    <template v-if="term.label !== '365 Days'">
+                      <div class="text-xs text-white/70 -mt-1">
+                        *annualized yield
+                      </div>
+                      <div class="text-sm text-white/90">
+                        ({{ annualizedYield(term[key], term.label) }} for {{ term.label }})
+                      </div>
+                    </template>
+                  </div>
                 </td>
 
-                <td class="px-2 sm:px-8 spacer"></td>
+                <td class="px-4 spacer"></td>
 
                 <!-- Right group cells -->
-                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
-                  <span :class="flashActive.has(`${index}-${rightKeys[0]}`) ? 'text-secondary flash-text' : ''">
-                    {{ term[rightKeys[0]] }}
-                  </span>
-                </td>
-                <td class="px-2 sm:px-4 py-5 text-center bg-white/10 rounded-md">
-                  <span :class="flashActive.has(`${index}-${rightKeys[1]}`) ? 'text-secondary flash-text' : ''">
-                    {{ term[rightKeys[1]] }}
-                  </span>
+                <td
+                  v-for="(key, keyIndex) in rightKeys"
+                  :key="key"
+                  class="px-4 py-4 text-center bg-white/10 rounded-md"
+                  style="min-width: 6rem;"
+                >
+                  <div>
+                    <span :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''">
+                      {{ term[key] }}
+                    </span>
+                    <template v-if="term.label !== '365 Days'">
+                      <div class="text-xs text-white/70 -mt-1">
+                        *annualized yield
+                      </div>
+                      <div class="text-sm text-white/90">
+                        ({{ annualizedYield(term[key], term.label) }} for {{ term.label }})
+                      </div>
+                    </template>
+                  </div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   </section>
 </template>
+
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, toRef } from 'vue'
@@ -79,18 +118,16 @@ const props = defineProps({
   terms: {
     type: Array,
     default: () => ([
-      { label: '1 Month', ltv50a: '5.1%', ltv50b: '5.2%', ltv80a: '9.8%', ltv80b: '9.9%' },
-      { label: '3 Months', ltv50a: '6.2%', ltv50b: '6.3%', ltv80a: '11.2%', ltv80b: '13.3%' },
-      { label: '6 Months', ltv50a: '7.2%', ltv50b: '7.5%', ltv80a: '*', ltv80b: '*' },
-      { label: '1 Year', ltv50a: '8.0%', ltv50b: '8.2%', ltv80a: '*', ltv80b: '*' },
+      { label: '30 Days', ltv50a: '5.1%', ltv50b: '5.2%', ltv80a: '9.8%', ltv80b: '9.9%' },
+      { label: '60 Days', ltv50a: '6.2%', ltv50b: '6.3%', ltv80a: '11.2%', ltv80b: '13.3%' },
+      { label: '90 Days', ltv50a: '7.2%', ltv50b: '7.5%', ltv80a: '*', ltv80b: '*' },
+      { label: '365 Days', ltv50a: '8.0%', ltv50b: '8.2%', ltv80a: '*', ltv80b: '*' },
     ])
   },
   leftGroupLabel: { type: String, default: '50% LTV' },
   rightGroupLabel: { type: String, default: '80% LTV' },
   leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
-
-  // Flash behavior
   initialDelayMs: { type: Number, default: 1000 },
   intervalMs: { type: Number, default: 30000 },
   flashProbability: { type: Number, default: 0.25 },
@@ -100,6 +137,17 @@ const props = defineProps({
 
 const termsRef = toRef(props, 'terms')
 const flashActive = ref(new Set())
+
+function annualizedYield(percentString, label) {
+  if (!percentString || percentString === '*') return '*';
+  const match = percentString.match(/([\d.]+)%/)
+  if (!match) return '*';
+  const rate = parseFloat(match[1])
+  const daysMatch = label.match(/(\d+)/)
+  const days = daysMatch ? parseInt(daysMatch[1]) : 0
+  if (days === 0) return '*';
+  return `${(rate * days / 365).toFixed(2)}%`
+}
 
 let intervalHandle = null
 let initialTimer = null
@@ -120,7 +168,7 @@ function pickRandomCells () {
 
 function tripleFlash () {
   const targets = pickRandomCells()
-  const periods = props.flashes * 2 // on/off pairs
+  const periods = props.flashes * 2
   const interval = props.perStateMs
 
   for (let k = 0; k <= periods; k++) {
@@ -168,7 +216,6 @@ defineExpose({ startFlashing, stopFlashing })
   100% { transform: scale(1); }
 }
 
-/* Mobile adjustments */
 @media (max-width: 640px) {
   table {
     border-spacing: 0.25rem 0.75rem !important;
@@ -187,6 +234,9 @@ defineExpose({ startFlashing, stopFlashing })
   }
   .spacer {
     display: none !important;
+  }
+  .-mt-1 {
+    margin-top: -0.25rem;
   }
 }
 </style>
