@@ -123,6 +123,7 @@ function scrollRight() {
 </script>
 
 <template>
+  
   <!-- Hero Section (no animation) -->
   <section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2 pt-1">
     <!-- Left: Text -->

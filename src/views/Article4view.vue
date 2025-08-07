@@ -64,15 +64,15 @@
 </section>
 
 <!-- CTA Section -->
-<section class="bg-secondary text-white py-12 px-6">
-  <div class="max-w-4xl mx-auto text-center space-y-4">
+<section class="bg-secondary text-white py-20 px-6 relative">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
     <h2 class="text-3xl md:text-4xl font-extrabold">
       Cadena Bitcoin Puts Security and Self Custody First
     </h2>
-    <p class="text-base sm:text-lg text-white/80 leading-snug max-w-2xl mx-auto">
+    <h4 class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
       You are in control of your keys, your coins, and your future. With Cadena Bitcoin, there are no custodians, no recovery loopholes, and no compromises. Your email, your password, your encrypted seed phrase, and your responsibility.
-    </p>
-    <div class="flex justify-center mt-6">
+    </h4>
+    <div class="flex justify-center mt-8">
       <router-link
         to="/register"
         class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
@@ -81,7 +81,34 @@
       </router-link>
     </div>
   </div>
+
+  <!-- 🔁 Prev Article -->
+  <div class="absolute top-1/2 left-4 transform -translate-y-1/2">
+    <router-link
+      to="/article/cadena-empowering-financial-freedom"
+      class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="text-2xl">←</span>
+      <span class="leading-tight">
+        Cadena Bitcoin - Empowering Individual Financial Freedom
+      </span>
+    </router-link>
+  </div>
+
+  <!-- 🔁 Next Article -->
+  <div class="absolute top-1/2 right-4 transform -translate-y-1/2 text-right">
+    <router-link
+      to="/article/cadena-bitcoin-security"
+      class="flex items-center justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="leading-tight">
+        How Does it Work?
+      </span>
+      <span class="text-2xl">→</span>
+    </router-link>
+  </div>
 </section>
+
 
 
 

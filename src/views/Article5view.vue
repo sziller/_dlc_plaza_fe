@@ -87,24 +87,51 @@ to a 365-day base.
     </section>
 
     <!-- CTA SECTION -->
-    <section class="bg-secondary text-white py-12 px-4">
-      <div class="max-w-4xl mx-auto text-center space-y-4">
-        <h2 class="text-3xl md:text-4xl font-extrabold">
-          Cadena Bitcoin Makes Bitcoin Backed Loans Simple and Transparent
-        </h2>
-        <p class="text-base sm:text-lg text-white/80 leading-snug max-w-2xl mx-auto">
-          Post or accept loan offers with preset terms and Bitcoin collateral. All transactions are on chain secured by Discreet Log Contracts and settled with a single execution based on a trusted Oracle price feed.
-        </p>
-        <div class="flex justify-center mt-6">
-          <router-link
-            to="/register"
-            class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-          >
-            Explore Cadena Bitcoin Contracts
-          </router-link>
-        </div>
-      </div>
-    </section>
+    <section class="bg-secondary text-white py-20 px-6 relative">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold">
+      Cadena Bitcoin Makes Bitcoin Backed Loans Simple and Transparent
+    </h2>
+    <h4 class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+      Post or accept loan offers with preset terms and Bitcoin collateral. All transactions are on chain secured by Discreet Log Contracts and settled with a single execution based on a trusted Oracle price feed.
+    </h4>
+    <div class="flex justify-center mt-8">
+      <router-link
+        to="/register"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Explore Cadena Bitcoin Contracts
+      </router-link>
+    </div>
+  </div>
+
+  <!-- 🔁 Prev Article -->
+  <div class="absolute top-1/2 left-4 transform -translate-y-1/2">
+    <router-link
+      to="/article/cadena-loan-lifecycle"
+      class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="text-2xl">←</span>
+      <span class="leading-tight">
+        Cadena Bitcoin: Security
+      </span>
+    </router-link>
+  </div>
+
+  <!-- 🔁 Next Article -->
+  <div class="absolute top-1/2 right-4 transform -translate-y-1/2 text-right">
+    <router-link
+      to="/article/we-need-to-talk-about-kyc"
+      class="flex items-center justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="leading-tight">
+        We need to talk about KYC
+      </span>
+      <span class="text-2xl">→</span>
+    </router-link>
+  </div>
+</section>
+
 
     <!-- FOOTER -->
     <TheFooter />
