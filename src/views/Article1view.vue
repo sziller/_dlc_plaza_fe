@@ -60,7 +60,7 @@
 
       
     </section>
-    <section class="bg-secondary text-white py-20 px-6">
+    <section class="bg-secondary text-white py-20 px-6 relative">
   <div class="max-w-4xl mx-auto text-center space-y-6">
     <h2 class="text-3xl md:text-4xl font-extrabold">
       Experience True Peer-to-Peer Bitcoin Finance
@@ -77,7 +77,35 @@
       </router-link>
     </div>
   </div>
+
+  <!-- 🔁 Prev Article -->
+  <div class="absolute top-1/2 left-4 transform -translate-y-1/2">
+    <router-link
+      to="/article/cadena-improving-btc"
+      class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="text-2xl">←</span>
+      <span class="leading-tight">
+        How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending
+      </span>
+    </router-link>
+  </div>
+
+  <!-- 🔁 Next Article -->
+  <div class="absolute top-1/2 right-4 transform -translate-y-1/2 text-right">
+    <router-link
+      to="/article/cadena-empowering-financial-freedom"
+      class="flex items-center justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="leading-tight">
+        Cadena Bitcoin - Empowering Individual Financial Freedom
+      </span>
+      <span class="text-2xl">→</span>
+    </router-link>
+  </div>
 </section>
+
+
 
     <!-- FOOTER -->
     <TheFooter />

@@ -55,27 +55,32 @@
               >
                 <td class="px-4 py-4 text-left font-semibold">{{ term.label }}</td>
 
-                <!-- Left group cells -->
                 <td
-                  v-for="(key, keyIndex) in leftKeys"
-                  :key="key"
-                  class="px-4 py-4 text-center bg-white/10 rounded-md"
-                  style="min-width: 6rem;"
-                >
+                    v-for="(key, keyIndex) in leftKeys"
+                    :key="key"
+                    @click="handleCellClick(term[key], key)"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
+                    style="min-width: 6rem;"
+                  >
+
                   <div>
-                    <span :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''">
+                    <span
+                      :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
+                      class="text-2xl font-bold leading-tight"
+                    >
                       {{ term[key] }}
                     </span>
                     <template v-if="term.label !== '365 Days'">
                       <div class="text-xs text-white/70 -mt-1">
                         *annualized yield
                       </div>
-                      <div class="text-sm text-white/90">
+                      <div class="text-xs text-white/90 mt-1">
                         ({{ annualizedYield(term[key], term.label) }} for {{ term.label }})
                       </div>
                     </template>
                   </div>
                 </td>
+
 
                 <td class="px-4 spacer"></td>
 
@@ -83,26 +88,40 @@
                 <td
                   v-for="(key, keyIndex) in rightKeys"
                   :key="key"
-                  class="px-4 py-4 text-center bg-white/10 rounded-md"
+                  @click="handleCellClick(term[key], key)"
+                  class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
                   style="min-width: 6rem;"
                 >
+
                   <div>
-                    <span :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''">
+                    <span
+                      :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
+                      class="text-2xl font-bold leading-tight"
+                    >
                       {{ term[key] }}
                     </span>
                     <template v-if="term.label !== '365 Days'">
                       <div class="text-xs text-white/70 -mt-1">
                         *annualized yield
                       </div>
-                      <div class="text-sm text-white/90">
+                      <div class="text-xs text-white/90 mt-1">
                         ({{ annualizedYield(term[key], term.label) }} for {{ term.label }})
                       </div>
                     </template>
                   </div>
                 </td>
+
               </tr>
             </tbody>
           </table>
+                  <OrderModal
+          v-if="showModal"
+          :rate="selectedRate"
+          :action-type="selectedAction"
+          @close="showModal = false"
+          @submit="handleOrderSubmit"
+        />
+
         </div>
       </div>
     </div>
@@ -112,6 +131,22 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, toRef } from 'vue'
+import OrderModal from './OrderModal.vue'
+
+const showModal = ref(false)
+const selectedRate = ref('')
+const selectedAction = ref('Lend')
+
+function handleCellClick(rate, key) {
+  selectedRate.value = rate
+  selectedAction.value = key.includes('a') ? 'Lend' : 'Borrow'
+  showModal.value = true
+}
+function handleOrderSubmit(data) {
+  console.log('Order submitted:', data)
+  // You could emit this up or send to your API here
+}
+
 
 const props = defineProps({
   title: { type: String, default: 'BTCUSD Market Overview' },
@@ -119,8 +154,8 @@ const props = defineProps({
     type: Array,
     default: () => ([
       { label: '30 Days', ltv50a: '5.1%', ltv50b: '5.2%', ltv80a: '9.8%', ltv80b: '9.9%' },
-      { label: '60 Days', ltv50a: '6.2%', ltv50b: '6.3%', ltv80a: '11.2%', ltv80b: '13.3%' },
-      { label: '90 Days', ltv50a: '7.2%', ltv50b: '7.5%', ltv80a: '*', ltv80b: '*' },
+      { label: '90 Days', ltv50a: '6.2%', ltv50b: '6.3%', ltv80a: '11.2%', ltv80b: '13.3%' },
+      { label: '180 Days', ltv50a: '7.2%', ltv50b: '7.5%', ltv80a: '*', ltv80b: '*' },
       { label: '365 Days', ltv50a: '8.0%', ltv50b: '8.2%', ltv80a: '*', ltv80b: '*' },
     ])
   },
@@ -146,7 +181,7 @@ function annualizedYield(percentString, label) {
   const daysMatch = label.match(/(\d+)/)
   const days = daysMatch ? parseInt(daysMatch[1]) : 0
   if (days === 0) return '*';
-  return `${(rate * days / 365).toFixed(2)}%`
+  return `${(rate * days / 360).toFixed(2)}%`
 }
 
 let intervalHandle = null

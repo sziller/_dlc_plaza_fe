@@ -30,6 +30,7 @@
               <tr
                 v-for="row in sortedData"
                 :key="row.dlcId"
+                @click="selectDlc(row)"
                 class="hover:bg-white/5 cursor-pointer transition border-b border-white/10"
               >
                 <td class="px-4 py-3">{{ row.dlcId }}</td>
@@ -45,11 +46,15 @@
         </div>
       </div>
     </div>
+
+    <!-- DLC Detail Modal -->
+    <DlcDetails v-if="selectedDlc" :dlc="selectedDlc" @close="selectedDlc = null" />
   </section>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import DlcDetails from './DLCDetails.vue' 
 
 const columns = [
   { label: 'DLC ID', key: 'dlcId' },
@@ -70,6 +75,7 @@ const rows = ref([
 
 const sortKey = ref('dlcId')
 const sortAsc = ref(true)
+const selectedDlc = ref(null)
 
 function sortBy(key) {
   if (sortKey.value === key) {
@@ -78,6 +84,10 @@ function sortBy(key) {
     sortKey.value = key
     sortAsc.value = true
   }
+}
+
+function selectDlc(dlc) {
+  selectedDlc.value = dlc
 }
 
 const sortedData = computed(() => {

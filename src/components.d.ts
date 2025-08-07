@@ -9,12 +9,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AutoScaleBox: typeof import('./components/AutoScaleBox.vue')['default']
+    DLCDetails: typeof import('./components/DLCDetails.vue')['default']
     ISimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']
     ISimpleIconsX: typeof import('~icons/simple-icons/x')['default']
     ISimpleIconsYoutube: typeof import('~icons/simple-icons/youtube')['default']
     LiveRatesImac: typeof import('./components/LiveRatesImac.vue')['default']
     MarketOverviewTable: typeof import('./components/MarketOverviewTable.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
+    OrderModal: typeof import('./components/OrderModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Table: typeof import('./components/Table.vue')['default']

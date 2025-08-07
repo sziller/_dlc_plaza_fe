@@ -54,26 +54,51 @@
     </section>
 
     <!-- PERSONALIZED CTA -->
-    <section class="bg-secondary text-white py-20 px-6">
-      <div class="max-w-4xl mx-auto text-center space-y-6">
-        <h2 class="text-3xl md:text-4xl font-extrabold">
-          Ready to build without KYC, {{ ctaName }}?
-        </h2>
-        <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-          Your keys. Your credit. Your choice. Experience decentralized, verifiable, on-chain lending and borrowing—no sidechains, no wrapping, no margin calls.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-          <router-link
-            to="/register"
-            class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-          >
-            Get Started with Cadena
-          </router-link>
-          
-        </div>
-        
-      </div>
-    </section>
+   <section class="bg-secondary text-white py-20 px-6 relative">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
+    <h2 class="text-3xl md:text-4xl font-extrabold">
+      Ready to build without KYC?
+    </h2>
+    <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+      Your keys. Your credit. Your choice. Experience decentralized, verifiable, on-chain lending and borrowing—no sidechains, no wrapping, no margin calls.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+      <router-link
+        to="/register"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Get Started with Cadena
+      </router-link>
+    </div>
+  </div>
+
+  <!-- 🔁 Prev Article -->
+  <div class="absolute top-1/2 left-4 transform -translate-y-1/2">
+    <router-link
+      to="/article/cadena-bitcoin-security"
+      class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="text-2xl">←</span>
+      <span class="leading-tight">
+        How Does it Work?
+      </span>
+    </router-link>
+  </div>
+
+  <!-- 🔁 Next Article -->
+  <div class="absolute top-1/2 right-4 transform -translate-y-1/2 text-right">
+    <router-link
+      to="/article/cadena-improving-btc"
+      class="flex items-center justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+    >
+      <span class="leading-tight">
+        How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending
+      </span>
+      <span class="text-2xl">→</span>
+    </router-link>
+  </div>
+</section>
+
 
     <!-- FOOTER -->
     <TheFooter />
