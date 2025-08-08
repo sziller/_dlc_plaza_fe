@@ -79,7 +79,20 @@
 
       <!-- CTA Buttons Desktop -->
       <div class="hidden md:flex items-center space-x-4">
-        <router-link to="/login" class="text-sm hover:text-secondary transition">Login</router-link>
+        <router-link
+          v-if="!isLoggedIn"
+          to="/login"
+          class="text-sm hover:text-secondary transition"
+        >Login</router-link>
+
+        <button
+          v-else
+          @click.prevent="logoutUser"
+          class="text-sm hover:text-secondary transition cursor-pointer"
+        >
+          Logout
+        </button>
+
         <router-link
           to="/register"
           class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
@@ -127,7 +140,23 @@
           <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-2 hover:text-secondary">Contact Us</router-link>
         </div>
 
-        <router-link @click="isMobileMenuOpen = false" to="/login" class="block text-lg font-semibold hover:text-secondary">Login</router-link>
+        <router-link
+          @click="isMobileMenuOpen = false"
+          v-if="!isLoggedIn"
+          to="/login"
+          class="block text-lg font-semibold hover:text-secondary"
+        >
+          Login
+        </router-link>
+
+        <button
+          v-else
+          @click.prevent="logoutUser(true)"
+          class="block text-left text-lg font-semibold hover:text-secondary cursor-pointer"
+        >
+          Logout
+        </button>
+
         <router-link
           to="/register"
           class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
@@ -140,11 +169,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo.png'
+import { getToken } from '../api/token'
+import { logout } from '../api/auth'
+
+const router = useRouter()
 
 const isMobileMenuOpen = ref(false)
 const btcPrice = ref('...')
+const isLoggedIn = ref(false)
+let priceIntervalId = null
 
 const fetchBTCPrice = async () => {
   try {
@@ -161,14 +197,45 @@ const fetchBTCPrice = async () => {
   }
 }
 
+const updateAuthState = () => {
+  isLoggedIn.value = !!getToken()
+}
+
 onMounted(() => {
+  // initial states
+  updateAuthState()
   fetchBTCPrice()
-  setInterval(fetchBTCPrice, 30000)
+  priceIntervalId = setInterval(fetchBTCPrice, 30000)
+
+  // react to our custom events + cross-tab changes + focus
+  window.addEventListener('auth-changed', updateAuthState)
+  window.addEventListener('storage', updateAuthState)
+  window.addEventListener('focus', updateAuthState)
+})
+
+onUnmounted(() => {
+  if (priceIntervalId) clearInterval(priceIntervalId)
+  window.removeEventListener('auth-changed', updateAuthState)
+  window.removeEventListener('storage', updateAuthState)
+  window.removeEventListener('focus', updateAuthState)
 })
 
 watch(isMobileMenuOpen, (isOpen) => {
   document.body.style.overflow = isOpen ? 'hidden' : ''
 })
+
+const logoutUser = async (fromMobile = false) => {
+  try {
+    await logout() // clears token/session
+    // announce to listeners (like this navbar)
+    window.dispatchEvent(new Event('auth-changed'))
+
+    if (fromMobile) isMobileMenuOpen.value = false
+    await router.push('/login')
+  } catch (e) {
+    console.error('Logout failed:', e)
+  }
+}
 </script>
 
 <style scoped>

@@ -49,23 +49,62 @@
         </div>
       </form>
     </div>
+
+    <div v-if="userProfile" class="text-center mt-10">
+  <h2 class="text-2xl font-bold">Welcome, {{ userProfile.name || 'User' }}!</h2>
+  <p>Email: {{ userProfile.email || 'N/A' }}</p>
+  <p>Member since: {{ userProfile.created_at || 'Unknown' }}</p>
+</div>
+
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
- // You need to implement this API function
+import { useRouter } from 'vue-router'
+import { getAuthToken } from '../api/auth'
+import { getUserProfile } from '../api/userProfile'
+import { useAuth } from '../composables/useAuth'
+
+const router = useRouter()
+const auth = useAuth()
 
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref<string | null>(null)
+const userProfile = ref<any>(null)
 
-const formValid = computed(() => {
-  return email.value && password.value
-})
+const formValid = computed(() => email.value && password.value)
 
 const submitLogin = async () => {
-  
+  error.value = null
+  loading.value = true
+  try {
+    const token = await getAuthToken(email.value, password.value)
+    const profileData = await getUserProfile()
+    userProfile.value = profileData.payload
+
+    // ✅ update global reactive state so Navbar updates instantly
+    auth.login(token, profileData.payload)
+
+    console.log('Logged in successfully:', userProfile.value)
+    window.dispatchEvent(new Event('auth-changed'))
+    // Redirect based on auth_code
+    const code = profileData.payload.auth_code
+    if (code === 2) {
+      router.push({ path: '/register', query: { step: '3' } })
+    } else if (code === 6) {
+      router.push('/btcusd')
+    } else {
+      router.push('/')
+    }
+  } catch (err: any) {
+    error.value = err?.message || 'Login failed.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
+
+
