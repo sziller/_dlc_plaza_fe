@@ -66,7 +66,7 @@ export interface PostOfferParams {
 
 export interface AcceptOfferParams {
   dlc_id: string;
-  status?: string;
+  status?: string; 
   ini_email?: string;
   tmp_cntr_id?: string;
   ini_role?: string;

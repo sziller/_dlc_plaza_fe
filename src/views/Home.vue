@@ -123,9 +123,13 @@ function scrollRight() {
 </script>
 
 <template>
-  
+   <!-- Page wrapper with global gradient background -->
+  <div class="relative min-h-screen text-white">
+    <!-- Full-page gradient layer -->
+    <div class="fixed inset-0 -z-10 bg-gradient-to-b from-primary via-primary to-secondary"></div>
+
   <!-- Hero Section (no animation) -->
-  <section class="overflow-hidden bg-primary text-white sm:grid sm:grid-cols-2 pt-1">
+  <section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
     <!-- Left: Text -->
     <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
       <div class="w-full max-w-2xl text-center sm:text-left">
@@ -156,7 +160,7 @@ function scrollRight() {
     </div>
 
     <!-- Right: iMac + Badge -->
-    <div class="relative hidden sm:flex flex-col justify-center items-center bg-primary px-6 py-24 z-10">
+    <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-24 z-10">
       <!-- Increased py-24 for more top/bottom space -->
       <LiveRatesImac class="block pb-0 py-0" />
     </div>
@@ -164,7 +168,7 @@ function scrollRight() {
 
   <!-- Satoshi Quote (animate in from left) -->
   <section
-    class="w-full bg-primary text-white py-12 px-6 sm:px-8 lg:px-12 text-center animated-section"
+    class="w-full bg-transparent text-white py-12 px-6 sm:px-8 lg:px-12 text-center animated-section"
     :class="sectionInView[0] ? 'animate-in-left' : ''"
   >
     <blockquote class="text-2xl md:text-3xl font-semibold leading-tight max-w-5xl mx-auto">
@@ -207,7 +211,7 @@ function scrollRight() {
 
   <!-- Featured Articles (animate in from right) -->
   <section
-    class="bg-primary text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8 animated-section"
+    class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8 animated-section"
     :class="sectionInView[1] ? 'animate-in-right' : ''"
   >
     <div class="max-w-7xl mx-auto">
@@ -263,7 +267,7 @@ function scrollRight() {
 
   <!-- Latest Videos (animate in from left) -->
   <section
-    class="bg-primary text-white pt-8 pb-8 px-6 animated-section"
+    class="bg-transparent text-white pt-8 pb-8 px-6 animated-section"
     :class="sectionInView[2] ? 'animate-in-left' : ''"
   >
     <div class="max-w-6xl mx-auto space-y-12">
@@ -292,7 +296,7 @@ function scrollRight() {
   </section>
 
   <!-- FAQ (no animation) -->
-  <section class="bg-primary text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
+  <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto space-y-12">
       <!-- Heading -->
       <div class="text-center">
@@ -452,6 +456,7 @@ year).</p>
   </section>
 
   <TheFooter />
+  </div>
 </template>
 
 <style scoped>
