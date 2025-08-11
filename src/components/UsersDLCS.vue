@@ -16,7 +16,7 @@
                   v-for="col in columns"
                   :key="col.key"
                   @click="sortBy(col.key)"
-                  class="px-4 py-2 cursor-pointer select-none hover:text-secondary transition"
+                  class="px-4 py-2 cursor-pointer select-none hover:text-secondary transition whitespace-nowrap"
                 >
                   {{ col.label }}
                   <span v-if="sortKey === col.key">
@@ -26,7 +26,7 @@
               </tr>
             </thead>
 
-            <tbody class="text-white/90 text-sm md:text-base">
+            <tbody v-if="!loading && !error" class="text-white/90 text-sm md:text-base">
               <tr
                 v-for="row in sortedData"
                 :key="row.dlcId"
@@ -41,6 +41,21 @@
                 <td class="px-4 py-3">{{ row.status }}</td>
                 <td class="px-4 py-3">{{ row.role }}</td>
               </tr>
+              <tr v-if="sortedData.length === 0">
+                <td class="px-4 py-6 text-white/70" colspan="7">No DLCs found.</td>
+              </tr>
+            </tbody>
+
+            <tbody v-else-if="loading">
+              <tr>
+                <td class="px-4 py-6 text-white/70" colspan="7">Loading…</td>
+              </tr>
+            </tbody>
+
+            <tbody v-else>
+              <tr>
+                <td class="px-4 py-6 text-red-400" colspan="7">{{ error }}</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -53,8 +68,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import DlcDetails from './DLCDetails.vue' 
+import { ref, computed, onMounted } from 'vue'
+import DlcDetails from './DLCDetails.vue'
+import { getUserDlcs } from '../api/userDlcs' // ← adjust path if needed
 
 const columns = [
   { label: 'DLC ID', key: 'dlcId' },
@@ -66,39 +82,101 @@ const columns = [
   { label: 'Role', key: 'role' },
 ]
 
-const rows = ref([
-  { dlcId: '001', oracle: 'oracle1.com', term: '30 Days', ltv: '50%', rate: '5.2%', status: 'Active', role: 'Lender' },
-  { dlcId: '002', oracle: 'oracle2.net', term: '60 Days', ltv: '80%', rate: '9.9%', status: 'Pending', role: 'Borrower' },
-  { dlcId: '003', oracle: 'oracle3.io', term: '90 Days', ltv: '50%', rate: '6.4%', status: 'Closed', role: 'Lender' },
-  { dlcId: '004', oracle: 'oracle4.org', term: '365 Days', ltv: '80%', rate: '10.1%', status: 'Active', role: 'Borrower' },
-])
-
+// state
+const apiDlcs = ref([])     // raw payload from API
+const rows = ref([])        // mapped for table
+const loading = ref(false)
+const error = ref(null)
 const sortKey = ref('dlcId')
 const sortAsc = ref(true)
 const selectedDlc = ref(null)
 
-function sortBy(key) {
-  if (sortKey.value === key) {
-    sortAsc.value = !sortAsc.value
-  } else {
-    sortKey.value = key
-    sortAsc.value = true
+// helpers
+const pct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
+const parseLtv = (pid) => {
+  const m = String(pid || '').match(/ltv-(\d{1,3})/i)
+  return m ? Number(m[1]) : null
+}
+const parseTermDays = (pid, duration) => {
+  const fromPid = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
+  if (fromPid) return Math.round(Number(fromPid[1]))
+  const d = Number(duration)
+  return Number.isFinite(d) && d > 0 ? Math.round(d) : null
+}
+const roleLabel = (ini_role) => (ini_role === 'lend' ? 'Lender' : ini_role === 'borrow' ? 'Borrower' : ini_role || '—')
+const statusLabel = (s) => s || '—'
+
+// map API item -> table row
+const toRow = (d) => {
+  const days = parseTermDays(d.product_id, d.duration)
+  const ltv = parseLtv(d.product_id)
+  return {
+    dlcId: d.dlc_id || d.tmp_cntr_id || '—',
+    oracle: d.orcl_id || '—',
+    term: days ? `${days} Days` : '—',
+    ltv: ltv != null ? `${ltv}%` : '—',
+    rate: pct2(Number(d.interest)), // term rate, 2 decimals
+    status: statusLabel(d.status),
+    role: roleLabel(d.ini_role),
   }
 }
 
-function selectDlc(dlc) {
-  selectedDlc.value = dlc
+// sorting
+function sortBy(key) {
+  if (sortKey.value === key) sortAsc.value = !sortAsc.value
+  else { sortKey.value = key; sortAsc.value = true }
 }
-
+const normForSort = (row, key) => {
+  const v = row[key]
+  if (v == null) return ''
+  if (key === 'term') {
+    const m = String(v).match(/(\d+)/); return m ? Number(m[1]) : 0
+  }
+  if (key === 'ltv') {
+    const m = String(v).match(/([\d.]+)/); return m ? Number(m[1]) : -1
+  }
+  if (key === 'rate') {
+    const m = String(v).match(/([\d.]+)/); return m ? Number(m[1]) : -1
+  }
+  return String(v).toLowerCase()
+}
 const sortedData = computed(() => {
   return [...rows.value].sort((a, b) => {
-    const valA = a[sortKey.value]
-    const valB = b[sortKey.value]
-    if (valA < valB) return sortAsc.value ? -1 : 1
-    if (valA > valB) return sortAsc.value ? 1 : -1
+    const A = normForSort(a, sortKey.value)
+    const B = normForSort(b, sortKey.value)
+    if (A < B) return sortAsc.value ? -1 : 1
+    if (A > B) return sortAsc.value ? 1 : -1
     return 0
   })
 })
+
+// selection
+function selectDlc(row) {
+  const raw = apiDlcs.value.find(d => (d.dlc_id || d.tmp_cntr_id) === row.dlcId)
+  selectedDlc.value = raw || null
+}
+
+// load
+async function load() {
+  loading.value = true
+  error.value = null
+  try {
+    // Use broad default filter set so pending/active/etc. show up
+    const statuses = ["offer_p","offer_dlc","sign_ini","sign_acc","signed","broadcast","active","attested","executed","settled","revoked","reset"]
+    const res = await getUserDlcs(statuses)
+    apiDlcs.value = Array.isArray(res?.payload) ? res.payload : []
+    rows.value = apiDlcs.value.map(toRow)
+  } catch (e) {
+    console.error(e)
+    error.value = e?.message || 'Failed to fetch user DLCs.'
+    apiDlcs.value = []
+    rows.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(load)
 </script>
 
 <style scoped>

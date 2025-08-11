@@ -1,73 +1,36 @@
-// src/composables/useAuth.ts
 import { ref, computed, onMounted } from 'vue'
-import { saveToken, getToken, removeToken } from '../api/token'
+import { getToken } from '../api/token'
 import { getUserProfile } from '../api/userProfile'
+import { logout as apiLogout } from '../api/auth' // ← use this
 
-function sanitizeToken(raw: unknown): string | null {
-  const t = typeof raw === 'string' ? raw.trim() : null
-  if (!t || t === 'undefined' || t === 'null') return null
-  return t
-}
-
-const token = ref<string | null>(sanitizeToken(getToken()))
+const token = ref<string | null>(getToken() || null)
 const user = ref<any>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
 export function useAuth() {
-  const isLoggedIn = computed(() => !!sanitizeToken(token.value))
+  const isLoggedIn = computed(() => !!(token.value && token.value.trim()))
 
-  async function setUserFromApi() {
-    if (!sanitizeToken(token.value)) {
-      user.value = null
-      return
-    }
-    try {
-      loading.value = true
-      const profile = await getUserProfile()
-      user.value = profile.payload
-    } catch (e: any) {
-      console.error('Failed to fetch profile:', e)
-      error.value = e?.message ?? 'Failed to fetch user profile'
-      // if token is invalid, consider logging out here if you want:
-      // logout()
-    } finally {
-      loading.value = false
-    }
-  }
+  async function setUserFromApi() { /* unchanged */ }
 
+  // login here should ONLY set reactive state; getAuthToken already saved token
   function login(newToken: string, profilePayload?: any) {
-    const clean = sanitizeToken(newToken)
-    token.value = clean
-    if (clean) saveToken(clean)
+    token.value = newToken || null
     user.value = profilePayload ?? null
+    window.dispatchEvent(new Event('auth-changed'))
   }
 
   function logout() {
+    apiLogout()            // clears storage + dispatches 'auth-changed'
     token.value = null
     user.value = null
-    removeToken()
-    // if your removeToken doesn't clear, you can also:
-    // sessionStorage.removeItem('token'); localStorage.removeItem('token');
   }
 
-  // Keep auth state in sync if storage changes (other tabs or code)
   onMounted(() => {
-    window.addEventListener('storage', () => {
-      token.value = sanitizeToken(getToken())
-    })
+    const sync = () => { token.value = getToken() || null }
+    window.addEventListener('storage', sync)
+    window.addEventListener('auth-changed', sync)
   })
 
-  return {
-    // state
-    token,
-    user,
-    isLoggedIn,
-    loading,
-    error,
-    // actions
-    login,
-    logout,
-    setUserFromApi,
-  }
+  return { token, user, isLoggedIn, loading, error, login, logout, setUserFromApi }
 }

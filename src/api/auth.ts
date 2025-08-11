@@ -73,6 +73,8 @@ export const getAuthToken = async (
 export const logout = () => {
   removeToken();
   sessionStorage.clear();
+  localStorage.removeItem('token');
+  window.dispatchEvent(new Event('auth-changed'));
   console.log('Token and user email removed');
 };
 

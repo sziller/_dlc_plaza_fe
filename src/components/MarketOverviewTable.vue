@@ -55,84 +55,87 @@
               >
                 <td class="px-4 py-4 text-left font-semibold">{{ term.label }}</td>
 
+                <!-- Left group cells -->
                 <td
-                    v-for="(key, keyIndex) in leftKeys"
-                    :key="key"
-                    @click="handleCellClick(term[key], key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
-                    style="min-width: 6rem;"
-                  >
-
-                  <div>
-                    <span
-                      :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                      class="text-2xl font-bold leading-tight"
-                    >
-                      {{ term[key] }}
-                    </span>
-                    <template v-if="term.label !== '365 Days'">
-                      <div class="text-xs text-white/70 -mt-1">
-                        *annualized yield
-                      </div>
-                      <div class="text-xs text-white/90 mt-1">
-                        ({{ annualizedYield(term[key], term.label) }} for {{ term.label }})
-                      </div>
-                    </template>
-                  </div>
-                </td>
-
-
-                <td class="px-4 spacer"></td>
-
-                <!-- Right group cells -->
-                <td
-                  v-for="(key, keyIndex) in rightKeys"
+                  v-for="(key) in leftKeys"
                   :key="key"
                   @click="handleCellClick(term[key], key)"
                   class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
                   style="min-width: 6rem;"
                 >
-
                   <div>
+                    <!-- BIG number = Annualized EAR from API -->
                     <span
                       :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                      class="text-2xl font-bold leading-tight"
+                      class="text-3xl font-bold leading-tight"
                     >
-                      {{ term[key] }}
+                      {{ getEar(term, key) }}
                     </span>
+
+                    <!-- Sub-lines: term yield for the term -->
                     <template v-if="term.label !== '365 Days'">
-                      <div class="text-xs text-white/70 -mt-1">
-                        *annualized yield
+                      <div class="text-[10px] text-white/70 -mt-1">
+                        Annualized yield
                       </div>
                       <div class="text-xs text-white/90 mt-1">
-                        ({{ annualizedYield(term[key], term.label) }} for {{ term.label }})
+                        {{ term[key] }} for {{ term.label }}
                       </div>
                     </template>
                   </div>
                 </td>
 
+                <td class="px-4 spacer"></td>
+
+                <!-- Right group cells -->
+                <td
+                  v-for="(key) in rightKeys"
+                  :key="key"
+                  @click="handleCellClick(term[key], key)"
+                  class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
+                  style="min-width: 6rem;"
+                >
+                  <div>
+                    <!-- BIG number = Annualized EAR from API -->
+                    <span
+                      :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
+                      class="text-3xl font-bold leading-tight"
+                    >
+                      {{ getEar(term, key) }}
+                    </span>
+
+                    <template v-if="term.label !== '365 Days'">
+                      <div class="text-[10px] text-white/70 -mt-1">
+                        Annualized yield
+                      </div>
+                      <div class="text-xs text-white/90 mt-1">
+                        {{ term[key] }} for {{ term.label }}
+                      </div>
+                    </template>
+                  </div>
+                </td>
               </tr>
             </tbody>
           </table>
-                  <OrderModal
-          v-if="showModal"
-          :rate="selectedRate"
-          :action-type="selectedAction"
-          @close="showModal = false"
-          @submit="handleOrderSubmit"
-        />
 
+          <OrderModal
+            v-if="showModal"
+            :rate="selectedRate"
+            :action-type="selectedAction"
+            @close="showModal = false"
+            @submit="handleOrderSubmit"
+          />
         </div>
       </div>
     </div>
   </section>
 </template>
 
-
 <script setup>
-import { ref, onMounted, onUnmounted, watch, toRef } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import OrderModal from './OrderModal.vue'
+import { getOffers } from '../api/offers'
 
+// ===== Modal state =====
 const showModal = ref(false)
 const selectedRate = ref('')
 const selectedAction = ref('Lend')
@@ -144,24 +147,14 @@ function handleCellClick(rate, key) {
 }
 function handleOrderSubmit(data) {
   console.log('Order submitted:', data)
-  // You could emit this up or send to your API here
 }
 
-
+// ===== Props (labels + flashing controls) =====
 const props = defineProps({
   title: { type: String, default: 'BTCUSD Market Overview' },
-  terms: {
-    type: Array,
-    default: () => ([
-      { label: '30 Days', ltv50a: '5.1%', ltv50b: '5.2%', ltv80a: '9.8%', ltv80b: '9.9%' },
-      { label: '90 Days', ltv50a: '6.2%', ltv50b: '6.3%', ltv80a: '11.2%', ltv80b: '13.3%' },
-      { label: '180 Days', ltv50a: '7.2%', ltv50b: '7.5%', ltv80a: '*', ltv80b: '*' },
-      { label: '365 Days', ltv50a: '8.0%', ltv50b: '8.2%', ltv80a: '*', ltv80b: '*' },
-    ])
-  },
   leftGroupLabel: { type: String, default: '50% LTV' },
   rightGroupLabel: { type: String, default: '80% LTV' },
-  leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
+  leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },  // a=Lend, b=Borrow
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
   initialDelayMs: { type: Number, default: 1000 },
   intervalMs: { type: Number, default: 30000 },
@@ -170,75 +163,161 @@ const props = defineProps({
   perStateMs: { type: Number, default: 180 },
 })
 
-const termsRef = toRef(props, 'terms')
-const flashActive = ref(new Set())
+// ===== Table rows (built from API) =====
+const terms = ref([
+  { label: '30 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
+  { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
+  { label: '180 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
+  { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
+])
 
-function annualizedYield(percentString, label) {
-  if (!percentString || percentString === '*') return '*';
-  const match = percentString.match(/([\d.]+)%/)
-  if (!match) return '*';
-  const rate = parseFloat(match[1])
-  const daysMatch = label.match(/(\d+)/)
-  const days = daysMatch ? parseInt(daysMatch[1]) : 0
-  if (days === 0) return '*';
-  return `${(rate * days / 360).toFixed(2)}%`
+// ===== Display helpers =====
+function getEar(row, key) {
+  const v = row[`${key}Ear`]
+  return v ?? '*'
 }
 
+// ===== Offer → table transform =====
+const DEFAULT_LTV = 80
+const DEFAULT_TERM = 30
+const TARGET_TERMS = [30, 90, 180, 365]
+
+function parseLtv(pid) {
+  const m = String(pid || '').match(/ltv-(\d{1,3})/i)
+  return m ? Number(m[1]) : DEFAULT_LTV
+}
+function parseTermFromPid(pid) {
+  const m = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
+  return m ? Math.round(Number(m[1])) : null
+}
+function normalizeTerm(pid, duration) {
+  const fromPid = parseTermFromPid(pid)
+  if (fromPid != null) return fromPid
+  const d = Number(duration)
+  if (Number.isFinite(d) && d >= 1) return Math.round(d)
+  return DEFAULT_TERM // treat missing/instant as 30d bucket
+}
+const fmtPct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
+function calcEarFallback(termPct, days) {
+  if (!Number.isFinite(termPct) || !days) return null
+  const r = termPct / 100
+  return (Math.pow(1 + r, 360 / days) - 1) * 100
+}
+
+function buildTermsFromOffers(offers) {
+  // best[term][ltv] = { lend: {term:number|null, ear:number|null}, borrow:{term:number|null, ear:number|null} }
+  const best = {}
+
+  for (const o of offers || []) {
+    const ltv = parseLtv(o.product_id)
+    const term = normalizeTerm(o.product_id, o.duration)
+    best[term] ??= {}
+    best[term][ltv] ??= { lend: { term: null, ear: null }, borrow: { term: null, ear: null } }
+
+    // Invert sides: borrower offer shows in LEND column; lender offer shows in BORROW column
+    const side = o.ini_role === 'borrow' ? 'lend' : o.ini_role === 'lend' ? 'borrow' : null
+    if (!side) continue
+
+    const earVal = Number.isFinite(o.interest_ear) && o.interest_ear > 0
+      ? o.interest_ear
+      : calcEarFallback(o.interest, term)
+
+    if (side === 'lend') {
+      // Lenders want the HIGHEST term rate
+      if (best[term][ltv].lend.term == null || o.interest > best[term][ltv].lend.term) {
+        best[term][ltv].lend.term = o.interest
+        best[term][ltv].lend.ear = earVal ?? null
+      }
+    } else {
+      // Borrowers want the LOWEST term rate
+      if (best[term][ltv].borrow.term == null || o.interest < best[term][ltv].borrow.term) {
+        best[term][ltv].borrow.term = o.interest
+        best[term][ltv].borrow.ear = earVal ?? null
+      }
+    }
+  }
+
+  return TARGET_TERMS.map((d) => {
+    const row = best[d] || {}
+    const l50 = row[50] || { lend: {term:null,ear:null}, borrow: {term:null,ear:null} }
+    const l80 = row[80] || { lend: {term:null,ear:null}, borrow: {term:null,ear:null} }
+    return {
+      label: `${d} Days`,
+      // 50% LTV
+      ltv50a: fmtPct2(l50.lend.term),   // Lend term rate, 2dp
+      ltv50aEar: fmtPct2(l50.lend.ear), // Lend EAR, 2dp
+      ltv50b: fmtPct2(l50.borrow.term),   // Borrow term rate, 2dp
+      ltv50bEar: fmtPct2(l50.borrow.ear), // Borrow EAR, 2dp
+      // 80% LTV
+      ltv80a: fmtPct2(l80.lend.term),
+      ltv80aEar: fmtPct2(l80.lend.ear),
+      ltv80b: fmtPct2(l80.borrow.term),
+      ltv80bEar: fmtPct2(l80.borrow.ear),
+    }
+  })
+}
+
+// ===== Load offers =====
+async function load() {
+  try {
+    const res = await getOffers('both')
+    if (!res || !Array.isArray(res.payload)) throw new Error('Bad payload')
+    terms.value = buildTermsFromOffers(res.payload)
+  } catch (e) {
+    console.error('Failed to load offers:', e)
+  }
+}
+
+// ===== Flashing =====
+const flashActive = ref(new Set())
 let intervalHandle = null
 let initialTimer = null
 
 function pickRandomCells () {
   const picks = []
-  for (let i = 0; i < termsRef.value.length; i++) {
+  for (let i = 0; i < terms.value.length; i++) {
     const candidates = [props.leftKeys[0], props.leftKeys[1], props.rightKeys[0], props.rightKeys[1]]
     candidates.forEach((key) => {
       if (Math.random() < props.flashProbability) picks.push(`${i}-${key}`)
     })
   }
-  if (picks.length === 0 && termsRef.value.length > 0) {
+  if (picks.length === 0 && terms.value.length > 0) {
     picks.push(`0-${props.leftKeys[0]}`)
   }
   return picks
 }
-
 function tripleFlash () {
   const targets = pickRandomCells()
   const periods = props.flashes * 2
   const interval = props.perStateMs
-
   for (let k = 0; k <= periods; k++) {
     setTimeout(() => {
       const next = new Set(flashActive.value)
-      targets.forEach((id) => {
-        if (next.has(id)) next.delete(id)
-        else next.add(id)
-      })
+      targets.forEach((id) => next.has(id) ? next.delete(id) : next.add(id))
       flashActive.value = next
     }, k * interval)
   }
-
-  setTimeout(() => {
-    flashActive.value = new Set()
-  }, (periods + 1) * interval)
+  setTimeout(() => { flashActive.value = new Set() }, (periods + 1) * interval)
 }
-
 function startFlashing () {
   stopFlashing()
   initialTimer = setTimeout(tripleFlash, props.initialDelayMs)
   intervalHandle = setInterval(tripleFlash, props.intervalMs)
 }
-
 function stopFlashing () {
   if (initialTimer) { clearTimeout(initialTimer); initialTimer = null }
   if (intervalHandle) { clearInterval(intervalHandle); intervalHandle = null }
   flashActive.value = new Set()
 }
 
-onMounted(startFlashing)
+onMounted(async () => {
+  startFlashing()
+  await load()
+})
 onUnmounted(stopFlashing)
-watch(termsRef, () => { startFlashing() })
+watch(terms, () => { startFlashing() })
 
-defineExpose({ startFlashing, stopFlashing })
+defineExpose({ startFlashing, stopFlashing, getEar })
 </script>
 
 <style scoped>

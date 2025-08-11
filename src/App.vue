@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-primary text-white min-h-screen">
+  <div class=" text-white min-h-screen">
     <Navbar />
    <router-view class="pt-20 px-4" />
   </div>

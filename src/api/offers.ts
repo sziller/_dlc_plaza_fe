@@ -20,7 +20,7 @@ export const getOffers = async (
     params: { ini_role },
     headers: {
       Accept: 'application/json',
-    },
+    }, 
   });
   if (response.data && Array.isArray(response.data.payload)) {
     return response.data;
