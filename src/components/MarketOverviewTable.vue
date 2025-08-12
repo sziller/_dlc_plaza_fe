@@ -59,12 +59,11 @@
                 <td
                   v-for="(key) in leftKeys"
                   :key="key"
-                  @click="handleCellClick(term[key], key)"
+                  @click="handleCellClick(term, key)"
                   class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
                   style="min-width: 6rem;"
                 >
                   <div>
-                    <!-- BIG number = Annualized EAR from API -->
                     <span
                       :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
                       class="text-3xl font-bold leading-tight"
@@ -72,7 +71,6 @@
                       {{ getEar(term, key) }}
                     </span>
 
-                    <!-- Sub-lines: term yield for the term -->
                     <template v-if="term.label !== '365 Days'">
                       <div class="text-[10px] text-white/70 -mt-1">
                         Annualized yield
@@ -90,12 +88,11 @@
                 <td
                   v-for="(key) in rightKeys"
                   :key="key"
-                  @click="handleCellClick(term[key], key)"
+                  @click="handleCellClick(term, key)"
                   class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
                   style="min-width: 6rem;"
                 >
                   <div>
-                    <!-- BIG number = Annualized EAR from API -->
                     <span
                       :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
                       class="text-3xl font-bold leading-tight"
@@ -121,6 +118,7 @@
             v-if="showModal"
             :rate="selectedRate"
             :action-type="selectedAction"
+            :term-days="selectedTermDays"
             @close="showModal = false"
             @submit="handleOrderSubmit"
           />
@@ -134,19 +132,51 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import OrderModal from './OrderModal.vue'
 import { getOffers } from '../api/offers'
+import { postOffer } from '../api/postOffer'
 
 // ===== Modal state =====
 const showModal = ref(false)
 const selectedRate = ref('')
 const selectedAction = ref('Lend')
+const selectedTermDays = ref(30)
+const selectedLtv = ref(80) // 50 or 80
 
-function handleCellClick(rate, key) {
-  selectedRate.value = rate
+function handleCellClick(row, key) {
+  selectedRate.value = row[key]
   selectedAction.value = key.includes('a') ? 'Lend' : 'Borrow'
+  const days = getDaysFromLabel(row.label)
+  selectedTermDays.value = days
+  selectedLtv.value = key.startsWith('ltv50') ? 50 : 80
   showModal.value = true
 }
+
 function handleOrderSubmit(data) {
-  console.log('Order submitted:', data)
+  if ((data.orderType || '').toLowerCase() !== 'limit') return
+
+  const interest = toNum(data.rate)
+  if (!Number.isFinite(interest)) { alert('Invalid rate'); return }
+
+  const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
+  const ltv = selectedLtv.value || 80
+  const product_id = buildProductId(days, ltv)
+  const tmp_cntr_id = genTmpCntrId()
+
+  const params = {
+    product_id,
+    tmp_cntr_id,
+    ini_role: String(data.action || '').toLowerCase(), // 'lend' | 'borrow'
+    interest,
+  }
+
+  ;(async () => {
+    try {
+      const res = await postOffer(params)
+      console.log('Offer posted:', res)
+      alert('Offer posted')
+    } catch (e) {
+      alert(e?.message || 'Offer failed')
+    }
+  })()
 }
 
 // ===== Props (labels + flashing controls) =====
@@ -154,7 +184,7 @@ const props = defineProps({
   title: { type: String, default: 'BTCUSD Market Overview' },
   leftGroupLabel: { type: String, default: '50% LTV' },
   rightGroupLabel: { type: String, default: '80% LTV' },
-  leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },  // a=Lend, b=Borrow
+  leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
   initialDelayMs: { type: Number, default: 1000 },
   intervalMs: { type: Number, default: 30000 },
@@ -165,10 +195,10 @@ const props = defineProps({
 
 // ===== Table rows (built from API) =====
 const terms = ref([
-  { label: '30 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
-  { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
-  { label: '180 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
-  { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*' },
+  { label: '30 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null },
+  { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null },
+  { label: '180 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null },
+  { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null },
 ])
 
 // ===== Display helpers =====
@@ -178,24 +208,18 @@ function getEar(row, key) {
 }
 
 // ===== Offer → table transform =====
-const DEFAULT_LTV = 80
-const DEFAULT_TERM = 30
 const TARGET_TERMS = [30, 90, 180, 365]
 
 function parseLtv(pid) {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
-  return m ? Number(m[1]) : DEFAULT_LTV
+  return m ? Number(m[1]) : null
 }
 function parseTermFromPid(pid) {
   const m = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
   return m ? Math.round(Number(m[1])) : null
 }
 function normalizeTerm(pid, duration) {
-  const fromPid = parseTermFromPid(pid)
-  if (fromPid != null) return fromPid
-  const d = Number(duration)
-  if (Number.isFinite(d) && d >= 1) return Math.round(d)
-  return DEFAULT_TERM // treat missing/instant as 30d bucket
+  return parseTermFromPid(pid) ?? (Number.isFinite(Number(duration)) ? Math.round(Number(duration)) : 30)
 }
 const fmtPct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
 function calcEarFallback(termPct, days) {
@@ -205,16 +229,16 @@ function calcEarFallback(termPct, days) {
 }
 
 function buildTermsFromOffers(offers) {
-  // best[term][ltv] = { lend: {term:number|null, ear:number|null}, borrow:{term:number|null, ear:number|null} }
   const best = {}
 
   for (const o of offers || []) {
     const ltv = parseLtv(o.product_id)
     const term = normalizeTerm(o.product_id, o.duration)
-    best[term] ??= {}
-    best[term][ltv] ??= { lend: { term: null, ear: null }, borrow: { term: null, ear: null } }
+    if (!ltv || !term) continue
 
-    // Invert sides: borrower offer shows in LEND column; lender offer shows in BORROW column
+    best[term] ??= {}
+    best[term][ltv] ??= { lend: { term: null, ear: null }, borrow: { term: null, ear: null }, pid: null }
+
     const side = o.ini_role === 'borrow' ? 'lend' : o.ini_role === 'lend' ? 'borrow' : null
     if (!side) continue
 
@@ -223,36 +247,36 @@ function buildTermsFromOffers(offers) {
       : calcEarFallback(o.interest, term)
 
     if (side === 'lend') {
-      // Lenders want the HIGHEST term rate
       if (best[term][ltv].lend.term == null || o.interest > best[term][ltv].lend.term) {
         best[term][ltv].lend.term = o.interest
         best[term][ltv].lend.ear = earVal ?? null
+        best[term][ltv].pid = o.product_id
       }
     } else {
-      // Borrowers want the LOWEST term rate
       if (best[term][ltv].borrow.term == null || o.interest < best[term][ltv].borrow.term) {
         best[term][ltv].borrow.term = o.interest
         best[term][ltv].borrow.ear = earVal ?? null
+        best[term][ltv].pid = best[term][ltv].pid || o.product_id
       }
     }
   }
 
   return TARGET_TERMS.map((d) => {
     const row = best[d] || {}
-    const l50 = row[50] || { lend: {term:null,ear:null}, borrow: {term:null,ear:null} }
-    const l80 = row[80] || { lend: {term:null,ear:null}, borrow: {term:null,ear:null} }
+    const l50 = row[50] || { lend: {term:null,ear:null}, borrow: {term:null,ear:null}, pid: null }
+    const l80 = row[80] || { lend: {term:null,ear:null}, borrow: {term:null,ear:null}, pid: null }
     return {
       label: `${d} Days`,
-      // 50% LTV
-      ltv50a: fmtPct2(l50.lend.term),   // Lend term rate, 2dp
-      ltv50aEar: fmtPct2(l50.lend.ear), // Lend EAR, 2dp
-      ltv50b: fmtPct2(l50.borrow.term),   // Borrow term rate, 2dp
-      ltv50bEar: fmtPct2(l50.borrow.ear), // Borrow EAR, 2dp
-      // 80% LTV
+      ltv50a: fmtPct2(l50.lend.term),
+      ltv50aEar: fmtPct2(l50.lend.ear),
+      ltv50b: fmtPct2(l50.borrow.term),
+      ltv50bEar: fmtPct2(l50.borrow.ear),
       ltv80a: fmtPct2(l80.lend.term),
       ltv80aEar: fmtPct2(l80.lend.ear),
       ltv80b: fmtPct2(l80.borrow.term),
       ltv80bEar: fmtPct2(l80.borrow.ear),
+      ltv50pid: l50.pid,
+      ltv80pid: l80.pid,
     }
   })
 }
@@ -316,6 +340,23 @@ onMounted(async () => {
 })
 onUnmounted(stopFlashing)
 watch(terms, () => { startFlashing() })
+
+// ===== Local helpers =====
+const PID_PREFIX = 'LendBorrowBTCUSD:'
+function buildProductId(days, ltv) {
+  return `${PID_PREFIX}ltv-${ltv}_d-${days}`
+}
+function getDaysFromLabel(label) {
+  const m = String(label || '').match(/(\d+)/)
+  return m ? Number(m[1]) : 30
+}
+function toNum(rateStr) {
+  const m = String(rateStr ?? '').match(/([\d.]+)/)
+  return m ? parseFloat(m[1]) : NaN
+}
+function genTmpCntrId() {
+  return `tmp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`
+}
 
 defineExpose({ startFlashing, stopFlashing, getEar })
 </script>

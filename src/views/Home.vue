@@ -174,7 +174,7 @@ function scrollRight() {
     <blockquote class="text-2xl md:text-3xl font-semibold leading-tight max-w-5xl mx-auto">
       “The main benefits are lost if a trusted third party is still required.”
     </blockquote>
-    <cite class="block mt-4 text-secondary text-lg">— Satoshi Nakamoto</cite>
+    <cite class="block mt-4 text-white text-lg">— Satoshi Nakamoto</cite>
   </section>
 
   <!-- What is Cadena Bitcoin (no animation) -->
@@ -244,11 +244,11 @@ function scrollRight() {
             >
               <img :src="article.image" :alt="article.title" class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90" />
               <div class="p-4">
-                <h3 class="text-xl font-semibold mb-2 text-white hover:text-secondary transition-colors duration-300">
+                <h3 class="text-xl font-semibold mb-2 text-white hover:text-white transition-colors duration-300">
                   {{ article.title }}
                 </h3>
                 <p class="text-white/80 text-sm">{{ article.description }}</p>
-                <span class="inline-block text-secondary font-medium mt-3 hover:underline">Read more →</span>
+                <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
               </div>
             </component>
           </div>
