@@ -79,6 +79,14 @@
 
       <!-- CTA Buttons Desktop -->
       <div class="hidden md:flex items-center space-x-4">
+        <a
+          href="/downloads/Cadena.apk"
+          download
+          class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
+        >
+          Download APK
+        </a>
+
         <router-link
           v-if="!isLoggedIn"
           to="/login"
@@ -156,6 +164,13 @@
         >
           Logout
         </button>
+        <a
+          href="/downloads/Cadena.apk"
+          download
+          class="block w-full border border-secondary text-secondary px-4 py-3 rounded-full text-sm font-semibold text-center transition"
+        >
+          Download APK
+        </a>
 
         <router-link
           to="/register"
