@@ -79,7 +79,7 @@
 
       <!-- CTA Buttons Desktop -->
       <div class="hidden md:flex items-center space-x-4">
-        <a href="/src/downloads/Cadena.apk" download>Download APK</a>
+        <a href="/src/downloads/update.apk" download>Download APK</a>
 
         <router-link
           v-if="!isLoggedIn"
@@ -158,7 +158,7 @@
         >
           Logout
         </button>
-        <a href="/src/downloads/Cadena.apk" download>Download APK</a>
+        <a href="/src/downloads/update.apk" download>Download APK</a>
 
         <router-link
           to="/register"
