@@ -17,9 +17,9 @@
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Company</p>
             <ul class="space-y-2">
-              <li><router-link to="/about" class="hover:text-black">About Us</router-link></li>
+              
               <li><router-link to="/faq" class="hover:text-black">FAQ</router-link></li>
-              <li><router-link to="/contact" class="hover:text-black">Contact</router-link></li>
+              <li><router-link to="/contact" class="hover:text-black">Contact Us</router-link></li>
             </ul>
           </div>
 
@@ -27,16 +27,16 @@
             <p class="text-base font-semibold text-secondary mb-4">Product</p>
             <ul class="space-y-2">
               <li><router-link to="/btcusd" class="hover:text-black">BTC/USD</router-link></li>
-              <li><router-link to="/technical-overview" class="hover:text-black">Technical Overview</router-link></li>
-              <li><router-link to="/explore" class="hover:text-black">Cadena Paper</router-link></li>
+         
+              <li><router-link to="/cadena-paper" class="hover:text-black">Cadena Paper</router-link></li>
             </ul>
           </div>
 
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Social Media</p>
             <ul class="space-y-2">
-              <li><router-link to="/support" class="hover:text-black">X</router-link></li>
-              <li><a href="mailto:info@cadenabitcoin.com" class="hover:text-black">Youtube</a></li>
+              <li><a href="https://x.com/cadenabitcoin" class="hover:text-black">X</a></li>
+              <li><a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" class="hover:text-black">Youtube</a></li>
               <li><a href="tel:+13058311410" class="hover:text-black">GitHub</a></li>
             </ul>
           </div>

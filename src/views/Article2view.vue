@@ -1,6 +1,6 @@
 <template>
   <!-- 🔹 Full Page Stack -->
-  <section class="w-screen bg-secondary text-white flex flex-col min-h-screen">
+  <section class="w-screen bg-secondary mt-20 text-white flex flex-col min-h-screen">
     
     <!-- 🔹 Header -->
     <div class="w-full bg-secondary py-8 px-4 text-center shadow-md z-10">
@@ -69,8 +69,9 @@
 </div>
 
     <!-- 🔻 Footer -->
-    <TheFooter />
+    
   </section>
+  <TheFooter />
 </template>
 
 <script setup>
