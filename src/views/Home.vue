@@ -124,7 +124,7 @@ function scrollRight() {
 
 <template>
    <!-- Page wrapper with global gradient background -->
-  <div class="relative min-h-screen text-white">
+  <div class="relative min-h-screen mt-20 text-white">
     <!-- Full-page gradient layer -->
     <div class="fixed inset-0 -z-10 bg-gradient-to-b from-primary via-primary to-secondary"></div>
 
@@ -138,7 +138,7 @@ function scrollRight() {
         </h2>
         <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
           Access loans without selling your Bitcoin or earn yield secured by 
-          Bitcoin.  Free Markets =  Better Rates. 
+          Bitcoin.  Better rates, your keys, no sidechains.
         </p>
         <!-- Longer email input field with smaller button below -->
         <div class="mt-8 flex flex-col items-center gap-4 w-full">
@@ -455,8 +455,9 @@ year).</p>
     </div>
   </section>
 
-  <TheFooter />
+  
   </div>
+  <TheFooter />
 </template>
 
 <style scoped>

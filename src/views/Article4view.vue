@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-primary text-white">
+  <div class="bg-primary mt-20 text-white">
     <!-- HERO TITLE SECTION -->
     <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">
@@ -113,8 +113,9 @@
 
 
     <!-- FOOTER -->
-    <TheFooter />
+    
   </div>
+  <TheFooter />
 </template>
 
 <script setup>

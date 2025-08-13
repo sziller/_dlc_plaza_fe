@@ -41,6 +41,17 @@
 
         <div><span class="font-semibold">Initiator collateral:</span> {{ satsToBtc(detail.ini_collateral_sats) }} BTC</div>
         <div><span class="font-semibold">Acceptor collateral:</span> {{ satsToBtc(detail.acc_collateral_sats) }} BTC</div>
+
+        <!-- Actions -->
+        <div v-if="isOwn" class="pt-4">
+          <button
+            class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60"
+            :disabled="deleting"
+            @click="confirmDelete"
+          >
+            {{ deleting ? 'Deleting…' : 'Delete DLC' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -49,24 +60,24 @@
 <script setup>
 import { ref, computed, onMounted, watchEffect } from 'vue'
 import { getDlcById } from '../api/dlcById' // adjust path if needed
+import { deleteDlc } from '../api/dlcDelete' // create this file with the provided code
 
 const props = defineProps({
-  // Can be the row object from the table; must include dlc_id or dlcId
-  dlc: {
-    type: Object,
-    required: true,
-  },
+  dlc: { type: Object, required: true },
+  isOwn: { type: Boolean, default: false }, // parent sets true if listing user's DLCs
 })
+
+const emit = defineEmits(['close', 'deleted'])
 
 const loading = ref(true)
 const error = ref(null)
 const detail = ref(null)
+const deleting = ref(false)
 
 const dlcId = computed(() => props.dlc?.dlc_id || props.dlc?.dlcId)
 
 onMounted(load)
 watchEffect(() => {
-  // if prop changes, refetch
   if (dlcId.value) load()
 })
 
@@ -82,6 +93,21 @@ async function load() {
     detail.value = null
   } finally {
     loading.value = false
+  }
+}
+
+async function confirmDelete() {
+  if (!dlcId.value) return
+  const ok = window.confirm(`Delete DLC ${dlcId.value}? This cannot be undone.`)
+  if (!ok) return
+  deleting.value = true
+  try {
+    await deleteDlc(String(dlcId.value))
+    emit('deleted')
+  } catch (e) {
+    alert(e?.message || 'Delete failed')
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -121,10 +147,6 @@ const roleText = computed(() => {
   if (r === 'lend') return 'Lender'
   if (r === 'borrow') return 'Borrower'
   return r || '—'
-})
-const feeText = computed(() => {
-  const fee = detail.value?.cntr_terms?.fee
-  return Number.isFinite(fee) ? `${Number(fee).toFixed(2)}%` : '—'
 })
 </script>
 

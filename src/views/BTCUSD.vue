@@ -1,5 +1,8 @@
 <template>
-  <main class="flex flex-col min-h-screen bg-primary text-white pt-20 md:pt-24">
+  <main class="flex flex-col min-h-screen text-white pt-20 md:pt-24 relative">
+    <!-- Gradient Background -->
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-primary via-primary to-secondary"></div>
+
     <!-- Content Section -->
     <section class="flex-1 px-4 py-4">
       <div class="w-full max-w-screen-xl mx-auto space-y-12 pb-10">
@@ -9,8 +12,9 @@
     </section>
 
     <!-- Footer -->
-    <TheFooter />
+    
   </main>
+  <TheFooter />
 </template>
 
 <script setup>

@@ -63,7 +63,13 @@
     </div>
 
     <!-- DLC Detail Modal -->
-    <DlcDetails v-if="selectedDlc" :dlc="selectedDlc" @close="selectedDlc = null" />
+    <DlcDetails
+      v-if="selectedDlc"
+      :dlc="selectedDlc"
+      :is-own="true"
+      @close="selectedDlc = null"
+      @deleted="onDeleted"
+    />
   </section>
 </template>
 
@@ -174,6 +180,11 @@ async function load() {
   } finally {
     loading.value = false
   }
+}
+
+function onDeleted() {
+  selectedDlc.value = null
+  load()
 }
 
 onMounted(load)

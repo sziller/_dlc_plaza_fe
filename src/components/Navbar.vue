@@ -77,31 +77,40 @@
         </div>
       </div>
 
-      <!-- CTA Buttons Desktop -->
-      <div class="hidden md:flex items-center space-x-4">
-        <a href="/downloads/update.apk" download>Download APK</a>
+        <!-- CTA Buttons Desktop -->
+    <div class="hidden md:flex items-center space-x-4">
+      <a href="/downloads/update.apk" download>Download APK</a>
 
-        <router-link
-          v-if="!isLoggedIn"
-          to="/login"
-          class="text-sm hover:text-secondary transition"
-        >Login</router-link>
+      <router-link
+        v-if="!isLoggedIn"
+        to="/login"
+        class="text-sm hover:text-secondary transition"
+      >Login</router-link>
 
-        <button
-          v-else
-          @click.prevent="logoutUser"
-          class="text-sm hover:text-secondary transition cursor-pointer"
-        >
-          Logout
-        </button>
+      <button
+        v-else
+        @click.prevent="logoutUser"
+        class="text-sm hover:text-secondary transition cursor-pointer"
+      >
+        Logout
+      </button>
 
-        <router-link
-          to="/register"
-          class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
-        >
-          Get Started
-        </router-link>
-      </div>
+      <router-link
+        v-if="!isLoggedIn"
+        to="/register"
+        class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
+      >
+        Get Started
+      </router-link>
+      <router-link
+        v-else
+        to="/my-profile"
+        class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
+      >
+        My Profile
+      </router-link>
+    </div>
+
     </nav>
 
     <!-- MOBILE MENU -->
@@ -142,30 +151,40 @@
           <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-2 hover:text-secondary">Contact Us</router-link>
         </div>
 
-        <router-link
-          @click="isMobileMenuOpen = false"
-          v-if="!isLoggedIn"
-          to="/login"
-          class="block text-lg font-semibold hover:text-secondary"
-        >
-          Login
-        </router-link>
+       <router-link
+        @click="isMobileMenuOpen = false"
+        v-if="!isLoggedIn"
+        to="/login"
+        class="block text-lg font-semibold hover:text-secondary"
+            >
+        Login
+      </router-link>
 
-        <button
-          v-else
-          @click.prevent="logoutUser(true)"
-          class="block text-left text-lg font-semibold hover:text-secondary cursor-pointer"
-        >
-          Logout
-        </button>
-        <a href="/downloads/update.apk" download>Download APK</a>
+      <button
+        v-else
+        @click.prevent="logoutUser(true)"
+        class="block text-left text-lg font-semibold hover:text-secondary cursor-pointer"
+      >
+        Logout
+      </button>
+      <a href="/downloads/update.apk" download>Download APK</a>
 
-        <router-link
-          to="/register"
-          class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
-        >
-          Get Started
-        </router-link>
+      <router-link
+        v-if="!isLoggedIn"
+        to="/register"
+        class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
+      >
+        Get Started
+      </router-link>
+      <router-link
+        v-else
+        @click="isMobileMenuOpen = false"
+        to="/my-profile"
+        class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
+      >
+        My Profile
+      </router-link>
+
       </div>
     </transition>
   </div>
