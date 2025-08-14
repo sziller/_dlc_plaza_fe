@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-screen text-white pt-[150px] px-6 pb-16 relative overflow-hidden">
     <!-- Gradient background -->
-    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-primary via-primary to-secondary"></div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-primary to-secondary"></div>
 
     <div class="max-w-7xl mx-auto space-y-8">
       <header class="flex items-center justify-between">

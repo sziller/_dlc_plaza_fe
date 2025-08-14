@@ -245,16 +245,26 @@ function getEar(row, key) {
 // ===== Offer → table transform =====
 const TARGET_TERMS = [30, 90, 180, 365]
 
+// backend uses 360, UI uses 365
+function mapDaysForUi(d) {
+  return d === 360 ? 365 : d
+}
+
 function parseLtv(pid) {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
   return m ? Number(m[1]) : null
 }
 function parseTermFromPid(pid) {
   const m = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
-  return m ? Math.round(Number(m[1])) : null
+  if (!m) return null
+  const raw = Math.round(Number(m[1]))
+  return mapDaysForUi(raw)
 }
 function normalizeTerm(pid, duration) {
-  return parseTermFromPid(pid) ?? (Number.isFinite(Number(duration)) ? Math.round(Number(duration)) : 30)
+  const fromPid = parseTermFromPid(pid)
+  if (fromPid) return fromPid
+  const d = Number(duration)
+  return Number.isFinite(d) ? mapDaysForUi(Math.round(d)) : 30
 }
 const fmtPct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
 function calcEarFallback(termPct, days) {
@@ -388,7 +398,9 @@ watch(terms, () => { startFlashing() })
 // ===== Local helpers =====
 const PID_PREFIX = 'LendBorrowBTCUSD:'
 function buildProductId(days, ltv) {
-  return `${PID_PREFIX}ltv-${ltv}_d-${days}`
+  // UI 365 posts as backend 360
+  const normalizedDays = days === 365 ? 360 : days
+  return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}`
 }
 function getDaysFromLabel(label) {
   const m = String(label || '').match(/(\d+)/)
@@ -404,7 +416,6 @@ function genTmpCntrId() {
 
 defineExpose({ startFlashing, stopFlashing, getEar })
 </script>
-
 
 <style scoped>
 .flash-text {
