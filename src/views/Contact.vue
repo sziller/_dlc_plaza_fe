@@ -1,6 +1,18 @@
 <template>
   <!-- Gradient Wrapper -->
-  <div class="min-h-screen text-white bg-gradient-to-b from-primary via-primary to-secondary">
+  <div class="min-h-screen text-white ">
+     <div
+  class="fixed inset-0 -z-10"
+  style="background: linear-gradient(
+    to bottom,
+    #000000 0%,
+    #000000 56%,
+    #0a051f 66%,
+    #1b0a3c 76%,
+    #35157a 88%,
+    #6738e4 100%
+  );">
+</div>
     <!-- Onboarding Section -->
     <section class="w-full pt-32" aria-labelledby="onboarding-title">
       <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">

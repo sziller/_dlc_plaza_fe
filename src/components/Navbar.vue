@@ -77,39 +77,39 @@
         </div>
       </div>
 
-        <!-- CTA Buttons Desktop -->
-    <div class="hidden md:flex items-center space-x-4">
-      <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
+      <!-- CTA Buttons Desktop -->
+      <div class="hidden md:flex items-center space-x-4">
+        <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
 
-      <router-link
-        v-if="!isLoggedIn"
-        to="/login"
-        class="text-sm hover:text-secondary transition"
-      >Login</router-link>
+        <router-link
+          v-if="!isLoggedIn"
+          to="/login"
+          class="text-sm hover:text-secondary transition"
+        >Login</router-link>
 
-      <button
-        v-else
-        @click.prevent="logoutUser"
-        class="text-sm hover:text-secondary transition cursor-pointer"
-      >
-        Logout
-      </button>
+        <button
+          v-else
+          @click.prevent="logoutUser"
+          class="text-sm hover:text-secondary transition cursor-pointer"
+        >
+          Logout
+        </button>
 
-      <router-link
-        v-if="!isLoggedIn"
-        to="/register"
-        class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
-      >
-        Get Started
-      </router-link>
-      <router-link
-        v-else
-        to="/my-profile"
-        class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
-      >
-        My Profile
-      </router-link>
-    </div>
+        <router-link
+          v-if="!isLoggedIn"
+          to="/register"
+          class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
+        >
+          Get Started
+        </router-link>
+        <router-link
+          v-else
+          to="/my-profile"
+          class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
+        >
+          My Profile
+        </router-link>
+      </div>
 
     </nav>
 
@@ -151,39 +151,39 @@
           <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-2 hover:text-secondary">Contact Us</router-link>
         </div>
 
-       <router-link
-        @click="isMobileMenuOpen = false"
-        v-if="!isLoggedIn"
-        to="/login"
-        class="block text-lg font-semibold hover:text-secondary"
-            >
-        Login
-      </router-link>
+        <router-link
+          @click="isMobileMenuOpen = false"
+          v-if="!isLoggedIn"
+          to="/login"
+          class="block text-lg font-semibold hover:text-secondary"
+        >
+          Login
+        </router-link>
 
-      <button
-        v-else
-        @click.prevent="logoutUser(true)"
-        class="block text-left text-lg font-semibold hover:text-secondary cursor-pointer"
-      >
-        Logout
-      </button>
-      <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
+        <button
+          v-else
+          @click.prevent="logoutUser(true)"
+          class="block text-left text-lg font-semibold hover:text-secondary cursor-pointer"
+        >
+          Logout
+        </button>
+        <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
 
-      <router-link
-        v-if="!isLoggedIn"
-        to="/register"
-        class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
-      >
-        Get Started
-      </router-link>
-      <router-link
-        v-else
-        @click="isMobileMenuOpen = false"
-        to="/my-profile"
-        class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
-      >
-        My Profile
-      </router-link>
+        <router-link
+          v-if="!isLoggedIn"
+          to="/register"
+          class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
+        >
+          Get Started
+        </router-link>
+        <router-link
+          v-else
+          @click="isMobileMenuOpen = false"
+          to="/my-profile"
+          class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
+        >
+          My Profile
+        </router-link>
 
       </div>
     </transition>
@@ -202,8 +202,11 @@ const router = useRouter()
 const isMobileMenuOpen = ref(false)
 const btcPrice = ref('...')
 const isLoggedIn = ref(false)
-let priceIntervalId = null
 
+let priceIntervalId = null
+let authIntervalId = null
+
+// ---- Price polling ----
 const fetchBTCPrice = async () => {
   try {
     const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
@@ -219,39 +222,88 @@ const fetchBTCPrice = async () => {
   }
 }
 
+// ---- Auth polling ----
+function getJwtExpMs(token) {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+    if (!payload || typeof payload.exp !== 'number') return null
+    return payload.exp * 1000
+  } catch {
+    return null
+  }
+}
+
 const updateAuthState = () => {
+  // Fallback: presence-only check
   isLoggedIn.value = !!getToken()
 }
 
-onMounted(() => {
-  // initial states
-  updateAuthState()
-  fetchBTCPrice()
-  priceIntervalId = setInterval(fetchBTCPrice, 30000)
+const pollAuth = async () => {
+  const token = getToken()
+  if (!token) {
+    if (isLoggedIn.value) isLoggedIn.value = false
+    return
+  }
+  // If JWT, expire locally
+  const expMs = getJwtExpMs(token)
+  if (expMs && Date.now() >= expMs) {
+    try {
+      await logout() // clear storage/cookies
+    } catch {}
+    window.dispatchEvent(new Event('auth-changed'))
+    return
+  }
+  // Token present and not locally expired
+  if (!isLoggedIn.value) isLoggedIn.value = true
+}
 
-  // react to our custom events + cross-tab changes + focus
-  window.addEventListener('auth-changed', updateAuthState)
-  window.addEventListener('storage', updateAuthState)
-  window.addEventListener('focus', updateAuthState)
+// ---- Lifecycle ----
+const onVisChange = () => {
+  if (!document.hidden) {
+    // Fast refresh on tab focus
+    pollAuth()
+    fetchBTCPrice()
+  }
+}
+
+onMounted(() => {
+  // Initial
+  updateAuthState()
+  pollAuth()
+  fetchBTCPrice()
+
+  // Timers
+  priceIntervalId = setInterval(fetchBTCPrice, 30000)   // 30s
+  authIntervalId = setInterval(pollAuth, 5000)        // 5s
+
+  // Events
+  window.addEventListener('auth-changed', pollAuth)
+  window.addEventListener('storage', pollAuth) // cross-tab
+  window.addEventListener('focus', pollAuth)
+  document.addEventListener('visibilitychange', onVisChange)
 })
 
 onUnmounted(() => {
   if (priceIntervalId) clearInterval(priceIntervalId)
-  window.removeEventListener('auth-changed', updateAuthState)
-  window.removeEventListener('storage', updateAuthState)
-  window.removeEventListener('focus', updateAuthState)
+  if (authIntervalId) clearInterval(authIntervalId)
+  window.removeEventListener('auth-changed', pollAuth)
+  window.removeEventListener('storage', pollAuth)
+  window.removeEventListener('focus', pollAuth)
+  document.removeEventListener('visibilitychange', onVisChange)
 })
 
+// UI
 watch(isMobileMenuOpen, (isOpen) => {
   document.body.style.overflow = isOpen ? 'hidden' : ''
 })
 
+// Logout
 const logoutUser = async (fromMobile = false) => {
   try {
-    await logout() // clears token/session
-    // announce to listeners (like this navbar)
+    await logout()
     window.dispatchEvent(new Event('auth-changed'))
-
     if (fromMobile) isMobileMenuOpen.value = false
     await router.push('/login')
   } catch (e) {

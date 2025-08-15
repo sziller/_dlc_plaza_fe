@@ -74,9 +74,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import DlcDetails from './DLCDetails.vue'
-import { getUserDlcs } from '../api/userDlcs' // ← adjust path if needed
+import { getUserDlcs } from '../api/userDlcs'
+
+const props = defineProps({
+  pollMs: { type: Number, default: 30000 } // 30s
+})
 
 const columns = [
   { label: 'DLC ID', key: 'dlcId' },
@@ -121,7 +125,7 @@ const toRow = (d) => {
     oracle: d.orcl_id || '—',
     term: days ? `${days} Days` : '—',
     ltv: ltv != null ? `${ltv}%` : '—',
-    rate: pct2(Number(d.interest)), // term rate, 2 decimals
+    rate: pct2(Number(d.interest)),
     status: statusLabel(d.status),
     role: roleLabel(d.ini_role),
   }
@@ -138,10 +142,7 @@ const normForSort = (row, key) => {
   if (key === 'term') {
     const m = String(v).match(/(\d+)/); return m ? Number(m[1]) : 0
   }
-  if (key === 'ltv') {
-    const m = String(v).match(/([\d.]+)/); return m ? Number(m[1]) : -1
-  }
-  if (key === 'rate') {
+  if (key === 'ltv' || key === 'rate') {
     const m = String(v).match(/([\d.]+)/); return m ? Number(m[1]) : -1
   }
   return String(v).toLowerCase()
@@ -162,32 +163,91 @@ function selectDlc(row) {
   selectedDlc.value = raw || null
 }
 
-// load
-async function load() {
-  loading.value = true
-  error.value = null
+// polling
+let pollId = null
+let isFetching = false
+let hasLoadedOnce = false
+
+const statuses = ["offer_p","offer_dlc","sign_ini","sign_acc","signed","broadcast","active","attested","executed","settled","revoked","reset"]
+
+function sameRows(a, b) {
+  // compare on stable keys only
+  const pick = r => ({
+    dlcId: r.dlcId, oracle: r.oracle, term: r.term, ltv: r.ltv, rate: r.rate, status: r.status, role: r.role
+  })
+  if (a.length !== b.length) return false
+  for (let i = 0; i < a.length; i++) {
+    const A = pick(a[i]); const B = pick(b[i])
+    if (A.dlcId !== B.dlcId || A.oracle !== B.oracle || A.term !== B.term ||
+        A.ltv !== B.ltv || A.rate !== B.rate || A.status !== B.status || A.role !== B.role) return false
+  }
+  return true
+}
+
+async function load(initial = false) {
+  if (isFetching) return
+  isFetching = true
+  if (initial) { loading.value = true; error.value = null }
   try {
-    // Use broad default filter set so pending/active/etc. show up
-    const statuses = ["offer_p","offer_dlc","sign_ini","sign_acc","signed","broadcast","active","attested","executed","settled","revoked","reset"]
     const res = await getUserDlcs(statuses)
-    apiDlcs.value = Array.isArray(res?.payload) ? res.payload : []
-    rows.value = apiDlcs.value.map(toRow)
+    const payload = Array.isArray(res?.payload) ? res.payload : []
+    const nextRows = payload.map(toRow)
+
+    // only update if changed
+    if (!sameRows(rows.value, nextRows)) {
+      apiDlcs.value = payload
+      rows.value = nextRows
+      // keep modal data fresh
+      if (selectedDlc.value) {
+        const id = selectedDlc.value.dlc_id || selectedDlc.value.tmp_cntr_id
+        const updated = payload.find(d => (d.dlc_id || d.tmp_cntr_id) === id)
+        if (updated) selectedDlc.value = updated
+      }
+    }
+    hasLoadedOnce = true
   } catch (e) {
-    console.error(e)
-    error.value = e?.message || 'Failed to fetch user DLCs.'
-    apiDlcs.value = []
-    rows.value = []
+    console.error('getUserDlcs failed:', e)
+    if (!hasLoadedOnce) {
+      error.value = e?.message || 'Failed to fetch user DLCs.'
+      apiDlcs.value = []
+      rows.value = []
+    }
   } finally {
-    loading.value = false
+    if (initial) loading.value = false
+    isFetching = false
   }
 }
 
-function onDeleted() {
-  selectedDlc.value = null
-  load()
+function onVisChange() {
+  if (!document.hidden) load(false)
+}
+function onFocus() {
+  load(false)
+}
+function onAuthChanged() {
+  load(false)
 }
 
-onMounted(load)
+// lifecycle
+onMounted(async () => {
+  await load(true)
+  pollId = setInterval(() => load(false), props.pollMs)
+  document.addEventListener('visibilitychange', onVisChange)
+  window.addEventListener('focus', onFocus)
+  window.addEventListener('auth-changed', onAuthChanged)
+})
+onUnmounted(() => {
+  if (pollId) clearInterval(pollId)
+  document.removeEventListener('visibilitychange', onVisChange)
+  window.removeEventListener('focus', onFocus)
+  window.removeEventListener('auth-changed', onAuthChanged)
+})
+
+// delete callback
+function onDeleted() {
+  selectedDlc.value = null
+  load(false)
+}
 </script>
 
 <style scoped>

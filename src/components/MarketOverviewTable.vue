@@ -129,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
 import { getOffers } from '../api/offers'
@@ -151,7 +151,7 @@ const selectedRate = ref('')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
 const selectedLtv = ref(80) // 50 or 80
-const selectedOfferId = ref(null) // <-- real offer id (dlc_id) for market accept
+const selectedOfferId = ref(null) // real offer id (dlc_id) for market accept
 
 function handleCellClick(row, key) {
   if (!isLoggedIn.value) { router.push('/login'); return }
@@ -214,18 +214,16 @@ function handleOrderSubmit(data) {
   })()
 }
 
-// ===== Props (labels + flashing controls) =====
+// ===== Props (labels + polling controls) =====
 const props = defineProps({
   title: { type: String, default: 'BTCUSD Market Overview' },
   leftGroupLabel: { type: String, default: '50% LTV' },
   rightGroupLabel: { type: String, default: '80% LTV' },
   leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
-  initialDelayMs: { type: Number, default: 1000 },
-  intervalMs: { type: Number, default: 30000 },
-  flashProbability: { type: Number, default: 0.25 },
-  flashes: { type: Number, default: 3 },
-  perStateMs: { type: Number, default: 180 },
+  // polling and flash tuning
+  offersPollMs: { type: Number, default: 30000 },     // fetch every 30s
+  changeFlashMs: { type: Number, default: 600 },      // flash duration per change
 })
 
 // ===== Table rows (built from API) =====
@@ -249,7 +247,6 @@ const TARGET_TERMS = [30, 90, 180, 365]
 function mapDaysForUi(d) {
   return d === 360 ? 365 : d
 }
-
 function parseLtv(pid) {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
   return m ? Number(m[1]) : null
@@ -329,71 +326,84 @@ function buildTermsFromOffers(offers) {
   })
 }
 
-// ===== Load offers =====
-async function load() {
+// ===== Polling + diff flashing =====
+const flashActive = ref(new Set())
+let offersIntervalId = null
+let isFetchingOffers = false
+
+function markFlashOnce(cellId) {
+  const next = new Set(flashActive.value)
+  next.add(cellId)
+  flashActive.value = next
+  setTimeout(() => {
+    const n2 = new Set(flashActive.value)
+    n2.delete(cellId)
+    flashActive.value = n2
+  }, props.changeFlashMs)
+}
+
+function diffAndFlash(oldRows, newRows) {
+  const keys = ['ltv50a', 'ltv50b', 'ltv80a', 'ltv80b'] // base keys
+  for (let i = 0; i < newRows.length; i++) {
+    for (const base of keys) {
+      const earKey = `${base}Ear`
+      const prev = oldRows?.[i]?.[earKey]
+      const next = newRows?.[i]?.[earKey]
+      // trigger on any actual change
+      if (prev !== next) {
+        markFlashOnce(`${i}-${base}`)
+      }
+    }
+  }
+}
+
+async function loadOffersOnce() {
+  if (isFetchingOffers) return
+  isFetchingOffers = true
   try {
     const res = await getOffers('both')
     if (!res || !Array.isArray(res.payload)) throw new Error('Bad payload')
-    terms.value = buildTermsFromOffers(res.payload)
+    const nextTerms = buildTermsFromOffers(res.payload)
+    diffAndFlash(terms.value, nextTerms)
+    terms.value = nextTerms
   } catch (e) {
     console.error('Failed to load offers:', e)
+  } finally {
+    isFetchingOffers = false
   }
 }
 
-// ===== Flashing =====
-const flashActive = ref(new Set())
-let intervalHandle = null
-let initialTimer = null
-
-function pickRandomCells () {
-  const picks = []
-  for (let i = 0; i < terms.value.length; i++) {
-    const candidates = [props.leftKeys[0], props.leftKeys[1], props.rightKeys[0], props.rightKeys[1]]
-    candidates.forEach((key) => { if (Math.random() < props.flashProbability) picks.push(`${i}-${key}`) })
+function onVisChange() {
+  if (!document.hidden) {
+    loadOffersOnce() // fast refresh on focus/visibility return
   }
-  if (picks.length === 0 && terms.value.length > 0) picks.push(`0-${props.leftKeys[0]}`)
-  return picks
-}
-function tripleFlash () {
-  const targets = pickRandomCells()
-  const periods = props.flashes * 2
-  const interval = props.perStateMs
-  for (let k = 0; k <= periods; k++) {
-    setTimeout(() => {
-      const next = new Set(flashActive.value)
-      targets.forEach((id) => next.has(id) ? next.delete(id) : next.add(id))
-      flashActive.value = next
-    }, k * interval)
-  }
-  setTimeout(() => { flashActive.value = new Set() }, (periods + 1) * interval)
-}
-function startFlashing () {
-  stopFlashing()
-  initialTimer = setTimeout(tripleFlash, props.initialDelayMs)
-  intervalHandle = setInterval(tripleFlash, props.intervalMs)
-}
-function stopFlashing () {
-  if (initialTimer) { clearTimeout(initialTimer); initialTimer = null }
-  if (intervalHandle) { clearInterval(intervalHandle); intervalHandle = null }
-  flashActive.value = new Set()
 }
 
+// ===== Lifecycle =====
 onMounted(async () => {
   updateAuthState()
   window.addEventListener('auth-changed', updateAuthState)
   window.addEventListener('storage', updateAuthState)
   window.addEventListener('focus', updateAuthState)
 
-  startFlashing()
-  await load()
+  document.addEventListener('visibilitychange', onVisChange)
+  window.addEventListener('focus', loadOffersOnce)
+
+  await loadOffersOnce()
+  offersIntervalId = setInterval(loadOffersOnce, props.offersPollMs)
 })
+
 onUnmounted(() => {
   window.removeEventListener('auth-changed', updateAuthState)
   window.removeEventListener('storage', updateAuthState)
   window.removeEventListener('focus', updateAuthState)
-  stopFlashing()
+
+  document.removeEventListener('visibilitychange', onVisChange)
+  window.removeEventListener('focus', loadOffersOnce)
+
+  if (offersIntervalId) clearInterval(offersIntervalId)
+  flashActive.value = new Set()
 })
-watch(terms, () => { startFlashing() })
 
 // ===== Local helpers =====
 const PID_PREFIX = 'LendBorrowBTCUSD:'
@@ -414,7 +424,7 @@ function genTmpCntrId() {
   return `tmp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`
 }
 
-defineExpose({ startFlashing, stopFlashing, getEar })
+defineExpose({ loadOffersOnce, getEar })
 </script>
 
 <style scoped>
