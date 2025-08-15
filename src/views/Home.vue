@@ -8,6 +8,7 @@ import article3Img from '../assets/images/article3.png'
 import article4Img from '../assets/images/article4.png'
 import article5Img from '../assets/images/article5.png'
 import article6Img from '../assets/images/article6.png'
+import iphoneImg from '../assets/images/iPhoneSC.png'
 const videos = [
   'https://www.youtube.com/embed/SsBfTfVnjGc?si=GrrW6LD5ffZQI2kZ&rel=0&modestbranding=1&iv_load_policy=3',
   'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u&rel=0&modestbranding=1&iv_load_policy=3',
@@ -126,7 +127,19 @@ function scrollRight() {
    <!-- Page wrapper with global gradient background -->
   <div class="relative min-h-screen mt-20 text-white">
     <!-- Full-page gradient layer -->
-    <div class="fixed inset-0 -z-10 bg-gradient-to-b from-primary via-primary to-secondary"></div>
+    <div
+  class="fixed inset-0 -z-10"
+  style="background: linear-gradient(
+    to bottom,
+    #000000 0%,
+    #000000 56%,
+    #0a051f 66%,
+    #1b0a3c 76%,
+    #35157a 88%,
+    #6738e4 100%
+  );">
+</div>
+
 
   <!-- Hero Section (no animation) -->
   <section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
@@ -159,11 +172,24 @@ function scrollRight() {
       </div>
     </div>
 
-    <!-- Right: iMac + Badge -->
-    <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-24 z-10">
-      <!-- Increased py-24 for more top/bottom space -->
-      <LiveRatesImac class="block pb-0 py-0" />
+   <!-- Right: iPhone mockup -->
+<div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10">
+  <div class="[perspective:1100px]">
+    <div
+      class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10"
+      style="transform: rotateX(0deg) rotateY(0deg)"
+    >
+      <img
+        :src="iphoneImg"
+        alt="App preview on iPhone"
+        class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
+        draggable="false"
+      />
     </div>
+  </div>
+</div>
+
+
   </section>
 
   <!-- Satoshi Quote (animate in from left) -->

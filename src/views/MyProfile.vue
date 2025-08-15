@@ -1,7 +1,18 @@
 <template>
   <main class="min-h-screen text-white pt-[150px] px-6 pb-16 relative overflow-hidden">
     <!-- Gradient background -->
-    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-primary to-secondary"></div>
+    <div
+  class="fixed inset-0 -z-10"
+  style="background: linear-gradient(
+    to bottom,
+    #000000 0%,
+    #000000 56%,
+    #0a051f 66%,
+    #1b0a3c 76%,
+    #35157a 88%,
+    #6738e4 100%
+  );">
+</div>
 
     <div class="max-w-7xl mx-auto space-y-8">
       <header class="flex items-center justify-between">
