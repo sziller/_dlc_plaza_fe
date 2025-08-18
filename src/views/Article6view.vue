@@ -64,7 +64,7 @@
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
       <router-link
-        to="/register"
+        :to="isLoggedIn ? '/btcusd' : '/register'"
         class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
       >
         Get Started with Cadena
@@ -119,8 +119,10 @@ const props = defineProps({
 
 // Fallback to a friendly generic if no name provided
 const ctaName = computed(() => props.userName?.trim() || 'friend')
-
+import { useAuth } from '../composables/useAuth'
+const { isLoggedIn, setUserFromApi } = useAuth()
 onMounted(() => {
+  setUserFromApi()
   window.scrollTo(0, 0)
 })
 

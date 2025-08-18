@@ -69,12 +69,13 @@
       No sidechains, no wrapping, no margin calls. Just decentralized, verifiable, on-chain lending and borrowing. The way Bitcoin was meant to work.
     </p>
     <div class="flex justify-center mt-8">
-      <router-link
-        to="/register"
-        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-      >
-        Get Started with Cadena
-      </router-link>
+        <router-link
+    :to="isLoggedIn ? '/btcusd' : '/register'"
+    class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+  >
+    Get Started with Cadena
+  </router-link>
+
     </div>
   </div>
 
@@ -116,10 +117,12 @@
 <script setup>
 import { onMounted } from 'vue'
 onMounted(() => {
+  setUserFromApi()
   window.scrollTo(0, 0)
 })
-
+const { isLoggedIn, setUserFromApi } = useAuth()
 import TheFooter from '../components/TheFooter.vue'
+import { useAuth } from '../composables/useAuth'
 </script>
 
 <style scoped>
