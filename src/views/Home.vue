@@ -9,8 +9,9 @@ import article4Img from '../assets/images/article4.png'
 import article5Img from '../assets/images/article5.png'
 import article6Img from '../assets/images/article6.png'
 import iphoneImg from '../assets/images/iPhoneSC.png'
+import { useAuth } from '../composables/useAuth'
 const videos = [
-  'https://www.youtube.com/embed/SsBfTfVnjGc?si=GrrW6LD5ffZQI2kZ&rel=0&modestbranding=1&iv_load_policy=3',
+  'https://www.youtube.com/embed/Psuh8mml91o?si=fY-RQdz1o7GTfE-w&rel=0&modestbranding=1&iv_load_policy=3',
   'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u&rel=0&modestbranding=1&iv_load_policy=3',
   'https://www.youtube.com/embed/l_cy-tWM_lA?si=wDY0PSdvfX_ePYLW&rel=0&modestbranding=1&iv_load_policy=3',
 ]
@@ -65,7 +66,7 @@ const articles = [
     internal: true,
   },
 ]
-
+const { isLoggedIn, setUserFromApi } = useAuth()
 const currentIndex = ref(0)
 const isMobile = ref(false)
 const ctaEmail = ref('')
@@ -85,6 +86,7 @@ function handleScroll() {
 }
 
 onMounted(() => {
+  setUserFromApi()
   const updateIsMobile = () => {
     isMobile.value = window.innerWidth < 640
   }
@@ -465,18 +467,20 @@ year).</p>
         Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-        <router-link
-          to="/register"
-          class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-        >
-          Borrow Bitcoin
-        </router-link>
-        <router-link
-          to="/register"
-          class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
-        >
-          Lend Bitcoin
-        </router-link>
+              <router-link
+        :to="isLoggedIn ? '/btcusd' : '/register'"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Borrow Bitcoin
+      </router-link>
+
+      <router-link
+        :to="isLoggedIn ? '/btcusd' : '/register'"
+        class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
+      >
+        Lend Bitcoin
+      </router-link>
+
       </div>
     </div>
   </section>

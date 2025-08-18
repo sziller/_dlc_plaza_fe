@@ -97,7 +97,7 @@ to a 365-day base.
     </h4>
     <div class="flex justify-center mt-8">
       <router-link
-        to="/register"
+       :to="isLoggedIn ? '/btcusd' : '/register'"
         class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
       >
         Explore Cadena Bitcoin Contracts
@@ -142,8 +142,10 @@ to a 365-day base.
 <script setup>
 import { onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
-
+import { useAuth } from '../composables/useAuth'
+const { isLoggedIn, setUserFromApi } = useAuth()
 onMounted(() => {
+  setUserFromApi()
   window.scrollTo(0, 0)
 })
 </script>

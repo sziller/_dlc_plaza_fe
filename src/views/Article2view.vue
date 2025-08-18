@@ -11,7 +11,7 @@
     </div>
 
     <!-- 🖼️ Image (scaled down) -->
-<div class="flex-grow w-full flex items-center justify-center px-4 py-8">
+<div class="flex-grow w-full flex items-center justify-center px-4 py-8 bg-primary">
   <img
     src="../assets/images/Infographic Comparison 1 and 2.jpg"
     alt="Infographic Comparison"
@@ -33,7 +33,7 @@
     </p>
     <div class="flex justify-center mt-8">
       <router-link
-        to="/register"
+        :to="isLoggedIn ? '/btcusd' : '/register'"
         class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
       >
         Start a Bitcoin-Only Loan
@@ -77,9 +77,11 @@
 <script setup>
 import { onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
-
+import { useAuth } from '../composables/useAuth'
+const { isLoggedIn, setUserFromApi } = useAuth()
 onMounted(() => {
   window.scrollTo(0, 0)
+  setUserFromApi() 
 })
 </script>
 
