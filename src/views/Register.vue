@@ -204,7 +204,7 @@ import { getUserQR } from '../api/qr'
 import { getToken } from '../api/token'
 import type { UserFace } from '../types/userFace'
 import type { QRCodeUserResponse } from '../types/common/qrFace'
-
+import { useReferral } from '../composables/useReferral';
 const route = useRoute()
 const router = useRouter()
 
@@ -216,7 +216,7 @@ const confirmPassword = ref('')
 const accepted = ref(false)
 const loading = ref(false)
 const error = ref<string | null>(null)
-
+const { track } = useReferral();
 // QR display + meta
 const qrCode = ref<string | null>(null)          // data URI for <img :src="qrCode" />
 const qrJsonString = ref<string | null>(null)    // payload.string from API (raw JSON string)
@@ -242,7 +242,7 @@ const submitForm = async () => {
       email_address: email.value,
       password: password.value
     } as UserFace)
-
+    track('signup', { email: email.value });
     // Move to Step 2 (email sent) and reflect in URL
     step.value = 2
     await router.replace({ query: { ...route.query, step: '2' } })

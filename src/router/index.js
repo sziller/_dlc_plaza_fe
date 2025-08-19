@@ -16,6 +16,9 @@ import Article5view from '../views/Article5view.vue';
 import Article6view from '../views/Article6view.vue';
 import Login from '../views/Login.vue';
 import MyProfile from '../views/MyProfile.vue';
+import Terms from '../views/Terms.vue';
+import Privacy from '../views/Privacy.vue';
+import path from 'path';
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
@@ -36,6 +39,8 @@ const routes = [
   { path: '/article/we-need-to-talk-about-kyc', name: 'Article6', component: Article6view },
   {path: '/login', name: 'Login', component: Login },
   {path: '/my-profile', name: 'MyProfile', component: MyProfile },
+  {path: '/terms', name: 'Terms', component: Terms },
+  {path: '/privacy', name: 'Privacy', component: Privacy },
 ];
 
 const router = createRouter({
