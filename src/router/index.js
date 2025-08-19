@@ -18,7 +18,8 @@ import Login from '../views/Login.vue';
 import MyProfile from '../views/MyProfile.vue';
 import Terms from '../views/Terms.vue';
 import Privacy from '../views/Privacy.vue';
-import path from 'path';
+//import ReferralLanding from '../views/ReferralLanding.vue';
+//import { useReferral } from '../composables/useReferral';import path from 'path';
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
@@ -41,6 +42,7 @@ const routes = [
   {path: '/my-profile', name: 'MyProfile', component: MyProfile },
   {path: '/terms', name: 'Terms', component: Terms },
   {path: '/privacy', name: 'Privacy', component: Privacy },
+// { path: '/ref/:code', name: 'Referral', component: ReferralLanding },
 ];
 
 const router = createRouter({
