@@ -156,21 +156,7 @@ function scrollRight() {
           Bitcoin.  Better rates, your keys, no sidechains.
         </p>
         <!-- Longer email input field with smaller button below -->
-        <div class="mt-8 flex flex-col items-center gap-4 w-full">
-          <input
-            v-model="ctaEmail"
-            type="email"
-            placeholder="Enter your email address"
-            class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
-          />
-          <router-link
-            :to="ctaEmail ? `/register?email=${encodeURIComponent(ctaEmail)}` : '/register'"
-            class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2"
-            style="width: auto; min-width: 180px; max-width: 300px;"
-          >
-            Get Started Today
-          </router-link>
-        </div>
+        
       </div>
     </div>
 
