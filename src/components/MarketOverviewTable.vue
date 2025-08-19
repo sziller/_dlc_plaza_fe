@@ -421,7 +421,7 @@ function toNum(rateStr) {
   return m ? parseFloat(m[1]) : NaN
 }
 function genTmpCntrId() {
-  return `tmp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,10)}`
+  return ``
 }
 
 defineExpose({ loadOffersOnce, getEar })
