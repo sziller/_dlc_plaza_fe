@@ -59,14 +59,11 @@
 
 <script setup>
 import { ref, computed, onMounted, watchEffect } from 'vue'
-import { getDlcById } from '../api/dlcById' // adjust path if needed
-import { deleteDlc } from '../api/dlcDelete' // create this file with the provided code
 
 const props = defineProps({
   dlc: { type: Object, required: true },
-  isOwn: { type: Boolean, default: false }, // parent sets true if listing user's DLCs
+  isOwn: { type: Boolean, default: false },
 })
-
 const emit = defineEmits(['close', 'deleted'])
 
 const loading = ref(true)
@@ -74,41 +71,54 @@ const error = ref(null)
 const detail = ref(null)
 const deleting = ref(false)
 
-const dlcId = computed(() => props.dlc?.dlc_id || props.dlc?.dlcId)
+const dlcId = computed(() => props.dlc?.dlc_id || props.dlc?.dlcId || props.dlc?.tmp_cntr_id)
+
+// Normalize + defaults (front-end only)
+function normalize(d) {
+  const nowSec = Math.floor(Date.now() / 1000)
+  const defaults = {
+    dlc_id: dlcId.value || 'DLC-DEMO-001',
+    orcl_id: 'orcl-demo-btcusd',
+    product_id: 'ltv-50_d-30',
+    duration: 30,
+    interest: 10.0,
+    interest_ear: 10.47,
+    status: 'active',
+    ini_role: 'lend',
+    ini_email: 'demo@example.com',
+    ini_collateral_sats: 2500000,
+    acc_collateral_sats: 2500000,
+    offered_at: nowSec - 3600,
+    created_at: nowSec - 3600,
+  }
+  return { ...defaults, ...(d || {}) }
+}
+
+async function load() {
+  loading.value = true
+  error.value = null
+  // Simulate a tiny delay to show loading state (optional)
+  await new Promise(r => setTimeout(r, 150))
+  detail.value = normalize(props.dlc)
+  loading.value = false
+}
 
 onMounted(load)
 watchEffect(() => {
-  if (dlcId.value) load()
+  // re-hydrate if parent passes a different dlc
+  if (props.dlc) load()
 })
-
-async function load() {
-  if (!dlcId.value) return
-  loading.value = true
-  error.value = null
-  try {
-    const res = await getDlcById(dlcId.value)
-    detail.value = res?.payload || null
-  } catch (e) {
-    error.value = e?.message || 'Failed to load DLC.'
-    detail.value = null
-  } finally {
-    loading.value = false
-  }
-}
 
 async function confirmDelete() {
   if (!dlcId.value) return
   const ok = window.confirm(`Delete DLC ${dlcId.value}? This cannot be undone.`)
   if (!ok) return
   deleting.value = true
-  try {
-    await deleteDlc(String(dlcId.value))
-    emit('deleted')
-  } catch (e) {
-    alert(e?.message || 'Delete failed')
-  } finally {
-    deleting.value = false
-  }
+  // Simulate delete delay
+  await new Promise(r => setTimeout(r, 250))
+  deleting.value = false
+  emit('deleted')
+  emit('close')
 }
 
 /** ---------- formatters / derived ---------- */
@@ -152,8 +162,6 @@ const roleText = computed(() => {
 
 <style scoped>
 @media (max-width: 640px) {
-  .max-w-2xl {
-    max-width: 90%;
-  }
+  .max-w-2xl { max-width: 90%; }
 }
 </style>

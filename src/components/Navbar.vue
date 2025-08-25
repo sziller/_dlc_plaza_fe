@@ -110,7 +110,6 @@
           My Profile
         </router-link>
       </div>
-
     </nav>
 
     <!-- MOBILE MENU -->
@@ -167,6 +166,7 @@
         >
           Logout
         </button>
+
         <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
 
         <router-link
@@ -184,7 +184,6 @@
         >
           My Profile
         </router-link>
-
       </div>
     </transition>
   </div>
@@ -194,24 +193,25 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo.png'
-import { getToken } from '../api/token'
-import { logout } from '../api/auth'
+import { useAuth } from '../composables/useAuth' // keep this path consistent everywhere
 
 const router = useRouter()
+const { isLoggedIn, logout } = useAuth()
 
 const isMobileMenuOpen = ref(false)
 const btcPrice = ref('...')
-const isLoggedIn = ref(false)
 
 let priceIntervalId = null
-let authIntervalId = null
 
 // ---- Price polling ----
 const fetchBTCPrice = async () => {
   try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'
+    )
     const data = await res.json()
-    btcPrice.value = data.bitcoin.usd.toLocaleString(undefined, {
+    const usd = data && data.bitcoin && data.bitcoin.usd
+    btcPrice.value = (typeof usd === 'number' ? usd : 0).toLocaleString(undefined, {
       style: 'decimal',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -222,76 +222,14 @@ const fetchBTCPrice = async () => {
   }
 }
 
-// ---- Auth polling ----
-function getJwtExpMs(token) {
-  try {
-    const parts = token.split('.')
-    if (parts.length !== 3) return null
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
-    if (!payload || typeof payload.exp !== 'number') return null
-    return payload.exp * 1000
-  } catch {
-    return null
-  }
-}
-
-const updateAuthState = () => {
-  // Fallback: presence-only check
-  isLoggedIn.value = !!getToken()
-}
-
-const pollAuth = async () => {
-  const token = getToken()
-  if (!token) {
-    if (isLoggedIn.value) isLoggedIn.value = false
-    return
-  }
-  // If JWT, expire locally
-  const expMs = getJwtExpMs(token)
-  if (expMs && Date.now() >= expMs) {
-    try {
-      await logout() // clear storage/cookies
-    } catch {}
-    window.dispatchEvent(new Event('auth-changed'))
-    return
-  }
-  // Token present and not locally expired
-  if (!isLoggedIn.value) isLoggedIn.value = true
-}
-
 // ---- Lifecycle ----
-const onVisChange = () => {
-  if (!document.hidden) {
-    // Fast refresh on tab focus
-    pollAuth()
-    fetchBTCPrice()
-  }
-}
-
 onMounted(() => {
-  // Initial
-  updateAuthState()
-  pollAuth()
   fetchBTCPrice()
-
-  // Timers
-  priceIntervalId = setInterval(fetchBTCPrice, 30000)   // 30s
-  authIntervalId = setInterval(pollAuth, 5000)        // 5s
-
-  // Events
-  window.addEventListener('auth-changed', pollAuth)
-  window.addEventListener('storage', pollAuth) // cross-tab
-  window.addEventListener('focus', pollAuth)
-  document.addEventListener('visibilitychange', onVisChange)
+  priceIntervalId = setInterval(fetchBTCPrice, 30000) // 30s
 })
 
 onUnmounted(() => {
   if (priceIntervalId) clearInterval(priceIntervalId)
-  if (authIntervalId) clearInterval(authIntervalId)
-  window.removeEventListener('auth-changed', pollAuth)
-  window.removeEventListener('storage', pollAuth)
-  window.removeEventListener('focus', pollAuth)
-  document.removeEventListener('visibilitychange', onVisChange)
 })
 
 // UI
@@ -299,11 +237,10 @@ watch(isMobileMenuOpen, (isOpen) => {
   document.body.style.overflow = isOpen ? 'hidden' : ''
 })
 
-// Logout
+// Logout (uses composable; it clears storage and dispatches events)
 const logoutUser = async (fromMobile = false) => {
   try {
-    await logout()
-    window.dispatchEvent(new Event('auth-changed'))
+    logout()
     if (fromMobile) isMobileMenuOpen.value = false
     await router.push('/login')
   } catch (e) {
@@ -312,24 +249,3 @@ const logoutUser = async (fromMobile = false) => {
 }
 </script>
 
-<style scoped>
-.fade-slide-enter-active, .fade-slide-leave-active {
-  transition: all 0.3s ease;
-}
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-.fade-slide-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
-.fade-slide-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-</style>

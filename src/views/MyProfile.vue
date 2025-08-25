@@ -2,17 +2,17 @@
   <main class="min-h-screen text-white pt-[150px] px-6 pb-16 relative overflow-hidden">
     <!-- Gradient background -->
     <div
-  class="fixed inset-0 -z-10"
-  style="background: linear-gradient(
-    to bottom,
-    #000000 0%,
-    #000000 56%,
-    #0a051f 66%,
-    #1b0a3c 76%,
-    #35157a 88%,
-    #6738e4 100%
-  );">
-</div>
+      class="fixed inset-0 -z-10"
+      style="background: linear-gradient(
+        to bottom,
+        #000000 0%,
+        #000000 56%,
+        #0a051f 66%,
+        #1b0a3c 76%,
+        #35157a 88%,
+        #6738e4 100%
+      );">
+    </div>
 
     <div class="max-w-7xl mx-auto space-y-8">
       <header class="flex items-center justify-between">
@@ -73,17 +73,13 @@
                 {{ copied ? 'Copied' : 'Copy' }}
               </button>
             </div>
-<!-- QR SVG -->
-<div class="flex justify-center">
-  <div class="qr-box rounded-lg bg-white text-black w-1/2 aspect-square overflow-hidden">
-    <div class="w-full h-full" v-html="qrSvgProcessed"></div>
-  </div>
-</div>
 
-
-
-
-
+            <!-- QR SVG -->
+            <div class="flex justify-center">
+              <div class="qr-box rounded-lg bg-white text-black w-1/2 aspect-square overflow-hidden">
+                <div class="w-full h-full" v-html="qrSvgProcessed"></div>
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -92,33 +88,73 @@
   <TheFooter/>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getUserProfile } from '../api/userProfile'
-import { getTopupAddressQR } from '../api/qr' // adjust path
-import type { UserProfileResponse } from '../types/userFace'
-import type { QRCodeAddressResponse } from '../types/common/qrFace'
-import { computed } from 'vue'
+<script setup>
+import { ref, onMounted, computed } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
+
+/** -------------------- MOCK DATA -------------------- **/
+const DEMO_PROFILE = {
+  payload: {
+    email: 'demo@cadena.bitcoin',
+    xpub: 'xpub6C4dENa-DEMO-ONLY-DoNotUseInProd-1234567890',
+    auth_code: 6,
+    balance_derived: 245000000, // sats
+    balance_onchain: 1255000000, // sats
+  }
+}
+
+const DEMO_ADDRESS = 'bc1qd3m0addr3sspl4c3h0ld3r7y2q8ux9y6wq5a9h0k0j'
+const DEMO_QR_SVG = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <rect width="180" height="180" fill="#fff"/>
+  <g fill="#000">
+    <!-- finder patterns -->
+    <rect x="12" y="12" width="48" height="48"/>
+    <rect x="24" y="24" width="24" height="24" fill="#fff"/>
+    <rect x="30" y="30" width="12" height="12"/>
+    <rect x="120" y="12" width="48" height="48"/>
+    <rect x="132" y="24" width="24" height="24" fill="#fff"/>
+    <rect x="138" y="30" width="12" height="12"/>
+    <rect x="12" y="120" width="48" height="48"/>
+    <rect x="24" y="132" width="24" height="24" fill="#fff"/>
+    <rect x="30" y="138" width="12" height="12"/>
+    <!-- a few filler modules to look QR-ish -->
+    <rect x="84" y="12" width="12" height="12"/>
+    <rect x="72" y="48" width="12" height="12"/>
+    <rect x="96" y="72" width="12" height="12"/>
+    <rect x="60" y="84" width="12" height="12"/>
+    <rect x="84" y="108" width="12" height="12"/>
+    <rect x="108" y="96" width="12" height="12"/>
+    <rect x="72" y="132" width="12" height="12"/>
+    <rect x="96" y="144" width="12" height="12"/>
+  </g>
+</svg>`;
+
+/** -------------------- STATE -------------------- **/
+const profile = ref(null)
+const loading = ref(false)
+const error = ref(null)
+
+const address = ref('')
+const qrSvg = ref('')
+const addrLoading = ref(false)
+const addrError = ref(null)
+const copied = ref(false)
+
+/** -------------------- QR PROCESSOR -------------------- **/
 // Make the SVG responsive by stripping fixed width/height and injecting styles
 const qrSvgProcessed = computed(() => {
   if (!qrSvg.value) return ''
   const orig = qrSvg.value
-
-  // Extract intrinsic size before stripping
   const w = (orig.match(/\bwidth="(\d+)"/) || [,'0'])[1]
   const h = (orig.match(/\bheight="(\d+)"/) || [,'0'])[1]
-
   let s = orig
-  // Remove fixed width/height so CSS can drive size
   s = s.replace(/\s(width|height)="[^"]*"/g, '')
-  // Ensure a viewBox so it can scale. If missing, synthesize from width/height or default square.
   if (!/viewBox=/.test(s)) {
     const vw = Number(w) > 0 ? Number(w) : 100
     const vh = Number(h) > 0 ? Number(h) : vw
     s = s.replace('<svg', `<svg viewBox="0 0 ${vw} ${vh}"`)
   }
-  // Make it fill its box
   if (!/preserveAspectRatio=/.test(s)) {
     s = s.replace('<svg', '<svg preserveAspectRatio="xMidYMid meet"')
   }
@@ -128,22 +164,14 @@ const qrSvgProcessed = computed(() => {
   return s
 })
 
-
-const profile = ref<UserProfileResponse | null>(null)
-const loading = ref(false)
-const error = ref<string | null>(null)
-
-const address = ref<string>('')
-const qrSvg = ref<string>('')
-const addrLoading = ref(false)
-const addrError = ref<string | null>(null)
-const copied = ref(false)
-
+/** -------------------- MOCK LOADERS -------------------- **/
 async function load() {
   loading.value = true
   error.value = null
   try {
-    profile.value = await getUserProfile()
+    // tiny delay to show the loading state (optional)
+    await new Promise(r => setTimeout(r, 150))
+    profile.value = DEMO_PROFILE
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
     profile.value = null
@@ -158,11 +186,10 @@ async function fetchTopup() {
   address.value = ''
   qrSvg.value = ''
   copied.value = false
-
   try {
-    const res: QRCodeAddressResponse = await getTopupAddressQR(-1)
-    address.value = String(res?.payload?.string || '')
-    qrSvg.value = String(res?.payload?.qr_code || '')
+    await new Promise(r => setTimeout(r, 150)) // simulate latency
+    address.value = DEMO_ADDRESS
+    qrSvg.value = DEMO_QR_SVG
     if (!address.value || !qrSvg.value) {
       addrError.value = 'Invalid response: missing address or QR code.'
     }
@@ -173,6 +200,7 @@ async function fetchTopup() {
   }
 }
 
+/** -------------------- UTILS -------------------- **/
 async function copyAddress() {
   try {
     await navigator.clipboard.writeText(address.value)
@@ -188,16 +216,17 @@ async function copyAddress() {
     setTimeout(() => { copied.value = false }, 1500)
   }
 }
-
-function formatBtc(sats: number) {
+function formatBtc(sats) {
   return (Number(sats) / 1e8).toFixed(8)
 }
 
+/** -------------------- MOUNT -------------------- **/
 onMounted(() => {
   load()
   fetchTopup()
 })
 </script>
+
 <style scoped>
 /* Force embedded QR SVG to fill its container */
 div[v-html] svg {
@@ -210,6 +239,4 @@ div[v-html] svg {
   height: 100% !important;
   display: block;
 }
-
-
 </style>

@@ -76,10 +76,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import DlcDetails from './DLCDetails.vue'
-import { getUserDlcs } from '../api/userDlcs'
 
 const props = defineProps({
-  pollMs: { type: Number, default: 30000 } // 30s
+  pollMs: { type: Number, default: 30000 } // 30s (still here, harmless)
 })
 
 const columns = [
@@ -92,8 +91,47 @@ const columns = [
   { label: 'Role', key: 'role' },
 ]
 
+// --------- PLACEHOLDER DATA (no API) ----------
+function getPlaceholderDlcs() {
+  return [
+    {
+      dlc_id: 'DLC-001-ABC',
+      tmp_cntr_id: null,
+      orcl_id: 'orcl-btcusd',
+      product_id: 'ltv-50_d-30',
+      duration: 30,
+      interest: 9.5,
+      status: 'active',
+      ini_role: 'lend',
+      ini_email: 'alice@example.com',
+    },
+    {
+      dlc_id: null,
+      tmp_cntr_id: 'TMP-987',
+      orcl_id: 'orcl-btcusd',
+      product_id: 'ltv-80_d-90',
+      duration: 90,
+      interest: 12.25,
+      status: 'offer_p',
+      ini_role: 'borrow',
+      ini_email: '--- hidden ---',
+    },
+    {
+      dlc_id: 'DLC-777-XYZ',
+      tmp_cntr_id: null,
+      orcl_id: 'orcl-btcusd',
+      product_id: 'ltv-50_d-180',
+      duration: 180,
+      interest: 5.0,
+      status: 'settled',
+      ini_role: 'lend',
+      ini_email: 'bob@example.com',
+    },
+  ]
+}
+
 // state
-const apiDlcs = ref([])     // raw payload from API
+const apiDlcs = ref([])     // raw payload (placeholder)
 const rows = ref([])        // mapped for table
 const loading = ref(false)
 const error = ref(null)
@@ -170,59 +208,24 @@ function selectDlc(row) {
   selectedDlc.value = raw || null
 }
 
-// polling
+// polling (kept, but just reloads placeholders)
 let pollId = null
-let isFetching = false
-let hasLoadedOnce = false
 
-const statuses = ["offer_p","offer_dlc","sign_ini","sign_acc","signed","broadcast","active","attested","executed","settled","revoked","reset"]
-
-function sameRows(a, b) {
-  // compare on stable keys only
-  const pick = r => ({
-    dlcId: r.dlcId, oracle: r.oracle, term: r.term, ltv: r.ltv, rate: r.rate, status: r.status, role: r.role
-  })
-  if (a.length !== b.length) return false
-  for (let i = 0; i < a.length; i++) {
-    const A = pick(a[i]); const B = pick(b[i])
-    if (A.dlcId !== B.dlcId || A.oracle !== B.oracle || A.term !== B.term ||
-        A.ltv !== B.ltv || A.rate !== B.rate || A.status !== B.status || A.role !== B.role) return false
-  }
-  return true
-}
-
-async function load(initial = false) {
-  if (isFetching) return
-  isFetching = true
+function load(initial = false) {
   if (initial) { loading.value = true; error.value = null }
-  try {
-    const res = await getUserDlcs(statuses)
-    const payload = Array.isArray(res?.payload) ? res.payload : []
-    const nextRows = payload.map(toRow)
+  const payload = getPlaceholderDlcs()
+  const nextRows = payload.map(toRow)
 
-    // only update if changed
-    if (!sameRows(rows.value, nextRows)) {
-      apiDlcs.value = payload
-      rows.value = nextRows
-      // keep modal data fresh
-      if (selectedDlc.value) {
-        const id = selectedDlc.value.dlc_id || selectedDlc.value.tmp_cntr_id
-        const updated = payload.find(d => (d.dlc_id || d.tmp_cntr_id) === id)
-        if (updated) selectedDlc.value = updated
-      }
-    }
-    hasLoadedOnce = true
-  } catch (e) {
-    console.error('getUserDlcs failed:', e)
-    if (!hasLoadedOnce) {
-      error.value = e?.message || 'Failed to fetch user DLCs.'
-      apiDlcs.value = []
-      rows.value = []
-    }
-  } finally {
-    if (initial) loading.value = false
-    isFetching = false
+  apiDlcs.value = payload
+  rows.value = nextRows
+
+  if (selectedDlc.value) {
+    const id = selectedDlc.value.dlc_id || selectedDlc.value.tmp_cntr_id
+    const updated = payload.find(d => (d.dlc_id || d.tmp_cntr_id) === id)
+    if (updated) selectedDlc.value = updated
   }
+
+  if (initial) loading.value = false
 }
 
 function onVisChange() {
@@ -236,8 +239,8 @@ function onAuthChanged() {
 }
 
 // lifecycle
-onMounted(async () => {
-  await load(true)
+onMounted(() => {
+  load(true)
   pollId = setInterval(() => load(false), props.pollMs)
   document.addEventListener('visibilitychange', onVisChange)
   window.addEventListener('focus', onFocus)

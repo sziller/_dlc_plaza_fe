@@ -16,7 +16,7 @@
           />
         </label>
 
-        <!-- Password -->
+        <!-- Password (ignored in mock) -->
         <label>
           <span class="block mb-1 font-semibold">Password</span>
           <input
@@ -28,7 +28,6 @@
           />
         </label>
 
-        <!-- Login Button -->
         <button
           type="submit"
           :disabled="!formValid || loading"
@@ -38,10 +37,8 @@
           <span v-else>Sign In</span>
         </button>
 
-        <!-- Error Message -->
         <div v-if="error" class="text-center text-red-400 font-semibold">{{ error }}</div>
 
-        <!-- Centered Register Link -->
         <div class="text-center text-sm pt-4">
           <router-link to="/register" class="text-secondary hover:underline font-medium">
             Don't have an account? Register
@@ -51,19 +48,16 @@
     </div>
 
     <div v-if="userProfile" class="text-center mt-10">
-  <h2 class="text-2xl font-bold">Welcome, {{ userProfile.name || 'User' }}!</h2>
-  <p>Email: {{ userProfile.email || 'N/A' }}</p>
-  <p>Member since: {{ userProfile.created_at || 'Unknown' }}</p>
-</div>
-
+      <h2 class="text-2xl font-bold">Welcome, {{ userProfile.name || 'User' }}!</h2>
+      <p>Email: {{ userProfile.email || 'N/A' }}</p>
+      <p>Member since: {{ userProfile.created_at || 'Unknown' }}</p>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAuthToken } from '../api/auth'
-import { getUserProfile } from '../api/userProfile'
 import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
@@ -75,36 +69,24 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 const userProfile = ref<any>(null)
 
-const formValid = computed(() => email.value && password.value)
+const formValid = computed(() => !!email.value && !!password.value)
 
 const submitLogin = async () => {
   error.value = null
   loading.value = true
-  try {
-    const token = await getAuthToken(email.value, password.value)
-    const profileData = await getUserProfile()
-    userProfile.value = profileData.payload
 
-    // ✅ update global reactive state so Navbar updates instantly
-    auth.login(token, profileData.payload)
-
-    console.log('Logged in successfully:', userProfile.value)
-    window.dispatchEvent(new Event('auth-changed'))
-    // Redirect based on auth_code
-    const code = profileData.payload.auth_code
-    if (code === 2) {
-      router.push({ path: '/register', query: { step: '3' } })
-    } else if (code === 6) {
-      router.push('/btcusd')
-    } else {
-      router.push('/')
-    }
-  } catch (err: any) {
-    error.value = err?.message || 'Login failed.'
-  } finally {
-    loading.value = false
+  // 🔹 Pure front-end mock profile (no API)
+  const mockProfile = {
+    name: email.value.split('@')[0] || 'User',
+    email: email.value || 'user@example.com',
+    created_at: new Date().toISOString(),
+    auth_code: 6, // send them to /btcusd
   }
+
+  auth.login('dev-token', mockProfile)   // sets global state + localStorage + dispatches event
+  userProfile.value = mockProfile
+
+  loading.value = false
+  router.push('/btcusd')                 // or branch on auth_code if you want
 }
 </script>
-
-
