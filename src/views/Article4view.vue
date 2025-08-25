@@ -82,8 +82,8 @@
     </div>
   </div>
 
-  <!-- 🔁 Prev Article -->
-  <div class="absolute top-1/2 left-4 transform -translate-y-1/2">
+  <!-- Prev: stacks under CTA on mobile; absolute on md+ -->
+  <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
     <router-link
       to="/article/cadena-empowering-financial-freedom"
       class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
@@ -95,11 +95,11 @@
     </router-link>
   </div>
 
-  <!-- 🔁 Next Article -->
-  <div class="absolute top-1/2 right-4 transform -translate-y-1/2 text-right">
+  <!-- Next: follows prev on mobile; absolute on md+ -->
+  <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
     <router-link
       to="/article/cadena-bitcoin-security"
-      class="flex items-center justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+      class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
     >
       <span class="leading-tight">
         How Does it Work?

@@ -119,6 +119,8 @@
             :rate="selectedRate"
             :action-type="selectedAction"
             :term-days="selectedTermDays"
+            :loading="modalLoading"
+            :notice="modalNotice"
             @close="showModal = false"
             @submit="handleOrderSubmit"
           />
@@ -152,8 +154,11 @@ const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
 const selectedLtv = ref(80) // 50 or 80
 const selectedOfferId = ref(null) // real offer id (dlc_id) for market accept
+const modalLoading = ref(false)
+const modalNotice  = ref({ type: '', text: '' }) // type: 'success' | 'error' | ''
 
 function handleCellClick(row, key) {
+  modalNotice.value = { type: '', text: '' }
   if (!isLoggedIn.value) { router.push('/login'); return }
 
   selectedRate.value = row[key]
@@ -168,28 +173,38 @@ function handleCellClick(row, key) {
   showModal.value = true
 }
 
-function handleOrderSubmit(data) {
+async function handleOrderSubmit(data) {
   const type = (data.orderType || '').toLowerCase()
-
+  modalNotice.value = { type: '', text: '' }
+   modalLoading.value = true
   // MARKET: accept existing best offer by id
   if (type === 'market') {
-    if (!selectedOfferId.value) { alert('Missing offer id'); return }
-    ;(async () => {
-      try {
-        const res = await acceptOffer({ dlc_id: String(selectedOfferId.value) })
-        console.log('Offer accepted:', res)
-        alert('Market order accepted')
-      } catch (e) {
-        alert(e?.message || 'Accept failed')
-      }
-    })()
+   if (!selectedOfferId.value) {
+      modalLoading.value = false
+      modalNotice.value = { type: 'error', text: 'Missing offer id' }
+      return
+    }
+   try {
+     const res = await acceptOffer({ dlc_id: String(selectedOfferId.value) })
+      console.log('Offer accepted:', res)
+      modalNotice.value = { type: 'success', text: 'Market order accepted.' }
+    } catch (e) {
+      const msg = e?.response?.data?.detail || e?.message || 'Accept failed.'
+      modalNotice.value = { type: 'error', text: msg }
+    } finally {
+      modalLoading.value = false
+    }
     return
   }
 
   // LIMIT: post a new offer
   if (type !== 'limit') return
   const interest = toNum(data.rate)
-  if (!Number.isFinite(interest)) { alert('Invalid rate'); return }
+  if (!Number.isFinite(interest)) {
+    modalLoading.value = false
+    modalNotice.value = { type: 'error', text: 'Invalid rate.' }
+    return
+  }
 
   const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
   const ltv = selectedLtv.value || 80
@@ -203,15 +218,17 @@ function handleOrderSubmit(data) {
     interest,
   }
 
-  ;(async () => {
-    try {
-      const res = await postOffer(params)
-      console.log('Offer posted:', res)
-      alert('Limit offer posted')
-    } catch (e) {
-      alert(e?.message || 'Offer failed')
-    }
-  })()
+  try {
+    const res = await postOffer(params)
+    console.log('Offer posted:', res)
+    const apiMsg = res?.message || res?.payload?.message
+    modalNotice.value = { type: 'success', text: 'Limit order posted' }
+  } catch (e) {
+    const msg = e?.response?.data?.detail || e?.message || 'Offer failed.'
+    modalNotice.value = { type: 'error', text: msg }
+  } finally {
+    modalLoading.value = false
+  }
 }
 
 // ===== Props (labels + polling controls) =====
@@ -222,7 +239,7 @@ const props = defineProps({
   leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
   // polling and flash tuning
-  offersPollMs: { type: Number, default: 30000 },     // fetch every 30s
+  offersPollMs: { type: Number, default: 5000 },     // fetch every 5s
   changeFlashMs: { type: Number, default: 600 },      // flash duration per change
 })
 
