@@ -2,13 +2,17 @@
   <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
     <div class="bg-dark text-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-6 relative">
       <!-- Close Button -->
-      <button @click="$emit('close')" class="absolute top-4 right-4 text-white hover:text-secondary text-xl font-bold">×</button>
+      <button @click="$emit('close')" :disabled="props.loading" class="absolute top-4 right-4 text-white hover:text-secondary text-xl font-bold disabled:opacity-50">×</button>
 
       <!-- Step 1: Order Entry -->
       <div v-if="step === 1">
         <h2 class="text-2xl font-bold text-center mb-4">
           Leave an order to {{ actionType }} Bitcoin
         </h2>
+        <div v-if="props.notice?.text" :class="props.notice?.type === 'error' ? 'bg-red-500/15 border-red-500/40' : 'bg-green-500/15 border-green-500/40'"
+          class="border rounded p-3 text-sm mb-3">
+          {{ props.notice.text }}
+        </div>
 
         <!-- Order Type -->
         <div v-if="marketIsZeroish">
@@ -35,7 +39,7 @@
 
         <!-- Rate Control -->
         <div class="mt-4">
-          <label class="block mb-1 font-semibold">Rate</label>
+          <label class="block mb-1 font-semibold">Rate for term</label>
 
           <!-- Market: show current rate only -->
           <div
@@ -84,7 +88,8 @@
         <div class="text-center mt-6">
           <button
             @click="step = 2"
-            class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold"
+            :disabled="props.loading"
+            class=" bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Review Order
           </button>
@@ -94,6 +99,10 @@
       <!-- Step 2: Review -->
       <div v-else>
         <h2 class="text-2xl font-bold text-center mb-4">Review Your Order</h2>
+        <div v-if="props.notice?.text" :class="props.notice?.type === 'error' ? 'bg-red-500/15 border-red-500/40' : 'bg-green-500/15 border-green-500/40'"
+          class="border rounded p-3 text-sm mb-3">
+          {{ props.notice.text }}
+        </div>
         <ul class="space-y-2 text-sm text-white/90">
           <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
           <li><span class="font-semibold text-white">Amount:</span> 0.1 BTC</li>
@@ -106,8 +115,25 @@
         </ul>
 
         <div class="flex justify-between items-center mt-6">
-          <button @click="step = 1" class="text-white hover:text-secondary text-sm underline">Back</button>
-          <button @click="submitOrder" class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold">Submit Order</button>
+          <button @click="step = 1" :disabled="props.loading" class="text-white hover:text-secondary text-sm underline disabled:opacity-50 disabled:cursor-not-allowed">Back</button>
+          <button
+          v-if="!isSuccess"
+          @click="submitOrder"
+          :disabled="props.loading"
+          class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span v-if="!props.loading">Submit Order</span>
+          <span v-else class="inline-flex items-center gap-2">
+            <span class="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+            Submitting…
+          </span>
+        </button>
+        </div>
+      </div>
+      <div v-if="props.loading" class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl">
+        <div class="flex flex-col items-center gap-3">
+          <div class="h-8 w-8 rounded-full border-4 border-white/30 border-t-white animate-spin"></div>
+          <div class="text-sm text-white/80">Submitting…</div>
         </div>
       </div>
     </div>
@@ -121,13 +147,15 @@ const props = defineProps({
   rate: String,
   actionType: String,
   termDays: { type: Number, default: 90 },
+  loading: { type: Boolean, default: false },
+  notice:  { type: Object,  default: () => ({ type: '', text: '' }) },
 })
 const emit = defineEmits(['close', 'submit'])
 
 const orderType = ref('market')
 const step = ref(1)
 const isBorrower = computed(() => (props.actionType || '').toLowerCase() === 'borrow')
-
+const isSuccess = computed(() => props.notice?.type === 'success')
 // Helpers
 function toNum(rateStr) {
   const m = rateStr?.match(/([\d.]+)/)
@@ -246,7 +274,8 @@ function annualizedYield(rateStr, days) {
   const m = rateStr.match(/([\d.]+)%/)
   if (!m) return '*'
   const r = parseFloat(m[1])
-  return `${(r * 360 / days).toFixed(2)}%`
+  if (days!=365) return `${(100 *(1+ r * 0.01) **  (360 / days)-100).toFixed(2)}%`
+  return rateStr
 }
 
 // Submit
@@ -264,6 +293,6 @@ function submitOrder () {
     collateralContribution: (props.actionType === 'Lend') ? '0%' : '100%',
     fees: '0.25%',
   })
-  emit('close')
+  
 }
 </script>
