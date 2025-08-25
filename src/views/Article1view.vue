@@ -68,19 +68,20 @@
     <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
       No sidechains, no wrapping, no margin calls. Just decentralized, verifiable, on-chain lending and borrowing. The way Bitcoin was meant to work.
     </p>
-    <div class="flex justify-center mt-8">
-        <router-link
-    :to="isLoggedIn ? '/btcusd' : '/register'"
-    class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-  >
-    Get Started with Cadena
-  </router-link>
 
+    <!-- CTA -->
+    <div class="flex justify-center mt-8">
+      <router-link
+        :to="isLoggedIn ? '/btcusd' : '/register'"
+        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+      >
+        Get Started with Cadena
+      </router-link>
     </div>
   </div>
 
-  <!-- 🔁 Prev Article -->
-  <div class="absolute top-1/2 left-4 transform -translate-y-1/2">
+  <!-- Prev Article (stacks under CTA on mobile, absolute on md+) -->
+  <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
     <router-link
       to="/article/cadena-improving-btc"
       class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
@@ -92,11 +93,11 @@
     </router-link>
   </div>
 
-  <!-- 🔁 Next Article -->
-  <div class="absolute top-1/2 right-4 transform -translate-y-1/2 text-right">
+  <!-- Next Article (stacks after prev on mobile, absolute on md+) -->
+  <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
     <router-link
       to="/article/cadena-empowering-financial-freedom"
-      class="flex items-center justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+      class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
     >
       <span class="leading-tight">
         Cadena Bitcoin - Empowering Individual Financial Freedom
@@ -105,6 +106,7 @@
     </router-link>
   </div>
 </section>
+
 
 
 

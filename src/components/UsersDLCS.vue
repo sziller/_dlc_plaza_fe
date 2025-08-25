@@ -113,7 +113,14 @@ const parseTermDays = (pid, duration) => {
   const d = Number(duration)
   return Number.isFinite(d) && d > 0 ? Math.round(d) : null
 }
-const roleLabel = (ini_role) => (ini_role === 'lend' ? 'Lender' : ini_role === 'borrow' ? 'Borrower' : ini_role || '—')
+const isHiddenEmail = (s) => String(s ?? '').trim() === '--- hidden ---'
+const roleLabel = (ini_role, ini_email) => {
+  if (ini_role === 'lend' && !isHiddenEmail(ini_email)) return 'Lender'
+  if (ini_role === 'lend' && isHiddenEmail(ini_email)) return 'Borrower'
+  if (ini_role === 'borrow' && !isHiddenEmail(ini_email)) return 'Borrower'
+  if (ini_role === 'borrow' && isHiddenEmail(ini_email)) return 'Lender'
+  return '—'
+}
 const statusLabel = (s) => s || '—'
 
 // map API item -> table row
@@ -127,7 +134,7 @@ const toRow = (d) => {
     ltv: ltv != null ? `${ltv}%` : '—',
     rate: pct2(Number(d.interest)),
     status: statusLabel(d.status),
-    role: roleLabel(d.ini_role),
+    role: roleLabel(d.ini_role, d.ini_email),
   }
 }
 
