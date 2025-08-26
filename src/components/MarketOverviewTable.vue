@@ -153,7 +153,7 @@ const props = defineProps({
   terms: {
     type: Array,
     default: () => ([
-      { label: '30 Days', ltv50a: '8.00%', ltv50b: '8.05%', ltv80a: '18.0%', ltv80b: '18.05%' },
+      { label: '30 Days', ltv50a: '8.00%', ltv50b: '8.05%', ltv80a: '18.00%', ltv80b: '18.05%' },
       { label: '90 Days', ltv50a: '8.50%', ltv50b: '8.55%', ltv80a: '17.50%', ltv80b: '17.55%' },
       { label: '180 Days', ltv50a: '9.00%', ltv50b: '9.05%', ltv80a: '17.00%', ltv80b: '17.05' },
       { label: '365 Days', ltv50a: '10.00%', ltv50b: '10.05%', ltv80a: '16.00%', ltv80b: '16.05%' },
