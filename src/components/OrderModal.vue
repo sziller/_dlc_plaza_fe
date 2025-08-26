@@ -106,7 +106,7 @@
         <ul class="space-y-2 text-sm text-white/90">
           <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
           <li><span class="font-semibold text-white">Amount:</span> 0.1 BTC</li>
-          <li><span class="font-semibold text-white">Commission/Fees:</span> 0.25%</li>
+          <li><span class="font-semibold text-white">Commission/Fees:</span> 0.50%</li>
           <li><span class="font-semibold text-white">Maturity Date:</span> {{ maturityDate }}</li>
           <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ orderType === 'market' ? marketRateStr : fmt(rateNum) }}</li>
           <li><span class="font-semibold text-white">Annualized Yield:</span> {{ annualizedYield(orderType === 'market' ? marketRateStr : fmt(rateNum), termDays) }}</li>
@@ -291,7 +291,7 @@ function submitOrder () {
     annualizedYield: annualizedYield(finalRateStr, props.termDays),
     amount: '0.1 BTC',
     collateralContribution: (props.actionType === 'Lend') ? '0%' : '100%',
-    fees: '0.25%',
+    fees: '0.50%',
   })
   
 }

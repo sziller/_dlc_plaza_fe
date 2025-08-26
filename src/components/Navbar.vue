@@ -34,7 +34,7 @@
         <div class="relative group">
           <button class="flex items-center space-x-1 hover:text-secondary transition">
             <span>Products and Services</span>
-            <svg class="w-4 h-4 text-gray-500 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 text-gray-500 transition" xmlns="https://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
               <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
             </svg>
           </button>
@@ -65,7 +65,7 @@
         <div class="relative group">
           <button class="flex items-center space-x-1 hover:text-secondary transition">
             <span>Explore Cadena</span>
-            <svg class="w-4 h-4 text-gray-500 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 text-gray-500 transition" xmlns="https://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
               <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
             </svg>
           </button>
