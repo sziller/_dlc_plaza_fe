@@ -340,7 +340,7 @@ function scrollRight() {
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">What is the loan amount?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -351,7 +351,7 @@ function scrollRight() {
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">Can I repay my loan early?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -363,7 +363,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">Are there monthly payments?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -374,7 +374,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">What is the Loan To Value?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -385,7 +385,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">How is collateral managed?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -399,7 +399,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">What currency can I get my loan in?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -410,7 +410,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">How do I get a Bitcoin-backed loan?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -421,7 +421,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">How long does it take to get a loan?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -434,7 +434,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">What happens if my collateral drops in value?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
@@ -447,7 +447,7 @@ year).</p>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">Is there a credit check?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </summary>

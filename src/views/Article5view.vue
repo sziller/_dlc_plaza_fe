@@ -72,7 +72,7 @@ to a 365-day base.
 
         <p>
           <span class="font-semibold text-secondary">Borrower Loan:</span>
-          Borrower provides 0.1 BTC plus 0.25% service fee minus lender’s contribution.
+          Borrower provides 0.1 BTC plus 0.50% service fee minus lender’s contribution.
         </p>
 
         <p>
