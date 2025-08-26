@@ -93,7 +93,7 @@
           <li>Contract Sum: 0.1 BTC</li>
           <li>Base Loan: 80% of the contract sum (0.08 BTC)</li>
           <li>Lender Contribution: <code class="bg-white/10 px-1 rounded">free_loan = base_loan / (1.0 + interest / 100)</code></li>
-          <li>Borrower Contribution: 0.1 BTC + 0.25% fee − lender amount</li>
+          <li>Borrower Contribution: 0.1 BTC + 0.50% fee − lender amount</li>
           <li>BTC/USD O/C Ratio: Open to Close price ratio determines final split</li>
         </ul>
       </div>

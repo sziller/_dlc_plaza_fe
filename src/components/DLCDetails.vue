@@ -30,7 +30,7 @@
         <div><span class="font-semibold">Term:</span> {{ termText }}</div>
         <div><span class="font-semibold">Interest (for term):</span> {{ pct2(detail.interest) }}</div>
         <div><span class="font-semibold">Annualized yield:</span> {{ pct2(detail.interest_ear) }}</div>
-        <div><span class="font-semibold">Fee:</span> 0.25%</div>
+        <div><span class="font-semibold">Fee:</span> 0.50%</div>
 
         <div class="h-px bg-white/10 my-2"></div>
 
