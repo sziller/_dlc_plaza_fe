@@ -11,14 +11,36 @@
     </div>
 
     <!-- 🖼️ Image (scaled down) -->
+<!-- 🖼️ Image (scaled down) -->
 <div class="flex-grow w-full flex items-center justify-center px-4 py-8 bg-primary">
-  <img
-    src="../assets/images/Infographic Comparison 1 and 2.jpg"
-    alt="Infographic Comparison"
-    class="max-w-full max-h-[800px] w-auto h-auto object-contain"
-    loading="lazy"
-  />
+  <picture>
+    <source
+      type="image/avif"
+      srcset="
+        /img/Infographic-Comparison-1-and-2-640.avif 640w,
+        /img/Infographic-Comparison-1-and-2-960.avif 960w,
+        /img/Infographic-Comparison-1-and-2-1280.avif 1280w" />
+    <source
+      type="image/webp"
+      srcset="
+        /img/Infographic-Comparison-1-and-2-640.webp 640w,
+        /img/Infographic-Comparison-1-and-2-960.webp 960w,
+        /img/Infographic-Comparison-1-and-2-1280.webp 1280w" />
+    <img
+      src="/img/Infographic-Comparison-1-and-2-960.webp"
+      srcset="
+        /img/Infographic-Comparison-1-and-2-640.webp 640w,
+        /img/Infographic-Comparison-1-and-2-960.webp 960w,
+        /img/Infographic-Comparison-1-and-2-1280.webp 1280w"
+      sizes="(max-width: 768px) 92vw, (max-width: 1280px) 88vw, 70vw"
+      width="1280" height="800"       
+      loading="lazy" decoding="async"
+      class="max-w-full max-h-[800px] w-auto h-auto object-contain"
+      alt="Infographic Comparison"
+    />
+  </picture>
 </div>
+
 
 
    <div class="w-full bg-secondary text-white py-20 px-6 relative">

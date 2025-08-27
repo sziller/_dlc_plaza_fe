@@ -21,7 +21,7 @@ const articles = [
     id: 1,
     title: 'Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance',
     description: 'Understand what sets Cadena Bitcoin apart from other platforms.',
-    image: article1Img,
+    imageBase: 'article1',
     link: '/article/cadena-vs-others',
     internal: true,
   },
@@ -29,7 +29,7 @@ const articles = [
     id: 2,
     title: 'Cadena Bitcoin - Empowering Individual Financial Freedom',
     description: ' Learn how Cadena Bitcoin lets you use Bitcoin flexibly.',
-    image: article2Img,
+    imageBase: 'article2',
     link: '/article/cadena-empowering-financial-freedom',
     internal: true,
   },
@@ -37,7 +37,7 @@ const articles = [
     id: 3,
     title: 'Cadena Bitcoin: Security',
     description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles',
-    image: article3Img,
+    imageBase: 'article3',
     link: '/article/cadena-loan-lifecycle',
     internal: true,
   },
@@ -45,7 +45,7 @@ const articles = [
     id: 4,
     title: 'How Does it Work?',
     description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.',
-    image: article4Img,
+    imageBase: 'article4',
     link: '/article/cadena-bitcoin-security',
     internal: true,
   },
@@ -53,7 +53,7 @@ const articles = [
     id: 5,
     title: 'We need to talk about KYC',
     description: 'Identification is quietly becoming the default requirement for access to the internet.',
-    image: article6Img,
+    imageBase: 'article6',
     link: '/article/we-need-to-talk-about-kyc',
     internal: true,
   },
@@ -61,7 +61,7 @@ const articles = [
     id: 6,
     title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending',
     description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
-    image: article5Img,
+    imageBase: 'article5',
     link: '/article/cadena-improving-btc',
     internal: true,
   },
@@ -181,12 +181,24 @@ function scrollRight() {
       class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10"
       style="transform: rotateX(0deg) rotateY(0deg)"
     >
-      <img
-        :src="iphoneImg"
-        alt="App preview on iPhone"
-        class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
-        draggable="false"
-      />
+      <picture>
+        <source
+          type="image/avif"
+          srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w, /img/iPhoneSC-1280.avif 1280w" />
+        <source
+          type="image/webp"
+          srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w, /img/iPhoneSC-1280.webp 1280w" />
+        <img
+          src="/img/iPhoneSC-960.webp"
+          srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w, /img/iPhoneSC-1280.webp 1280w"
+          sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
+          width="420" height="840"
+          fetchpriority="high" loading="eager" decoding="async"
+          class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
+          alt="App preview on iPhone"
+          draggable="false"
+        />
+  </picture>
     </div>
   </div>
 </div>
@@ -258,29 +270,67 @@ function scrollRight() {
         </button>
 
         <!-- Carousel Scroll Wrapper (NO max-w limit here!) -->
-        <div class="w-full overflow-x-auto sm:overflow-visible px-2">
-          <div
-            class="flex space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-x snap-mandatory sm:snap-none"
-          >
-            <component
-              v-for="article in visibleArticles"
-              :key="article.id"
-              :is="article.internal ? 'router-link' : 'a'"
-              :to="article.internal ? article.link : undefined"
-              :href="!article.internal ? article.link : undefined"
-              class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
-            >
-              <img :src="article.image" :alt="article.title" class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90" />
-              <div class="p-4">
-                <h3 class="text-xl font-semibold mb-2 text-white hover:text-white transition-colors duration-300">
-                  {{ article.title }}
-                </h3>
-                <p class="text-white/80 text-sm">{{ article.description }}</p>
-                <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
-              </div>
-            </component>
-          </div>
+<div class="w-full overflow-x-auto sm:overflow-visible px-2">
+  <div class="flex space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-x snap-mandatory sm:snap-none">
+
+    <template v-for="article in visibleArticles" :key="article.id">
+      <!-- internal -->
+      <router-link
+        v-if="article.internal"
+        :to="article.link"
+        class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
+      >
+        <picture>
+          <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
+          <source type="image/webp" :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`" />
+          <img
+            :src="`/img/${article.imageBase}-480.webp`"
+            :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`"
+            sizes="(max-width: 640px) 280px, 300px"
+            width="300" height="192"
+            loading="lazy" decoding="async"
+            class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90"
+            :alt="article.title"
+          />
+        </picture>
+        <div class="p-4">
+          <h3 class="text-xl font-semibold mb-2 text-white">{{ article.title }}</h3>
+          <p class="text-white/80 text-sm">{{ article.description }}</p>
+          <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
         </div>
+      </router-link>
+
+      <!-- external (must be immediately after the v-if, with nothing in between) -->
+      <a
+        v-else
+        :href="article.link"
+        target="_blank" rel="noopener"
+        class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
+      >
+        <picture>
+          <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
+          <source type="image/webp" :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`" />
+          <img
+            :src="`/img/${article.imageBase}-480.webp`"
+            :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`"
+            sizes="(max-width: 640px) 280px, 300px"
+            width="300" height="192"
+            loading="lazy" decoding="async"
+            class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90"
+            :alt="article.title"
+          />
+        </picture>
+        <div class="p-4">
+          <h3 class="text-xl font-semibold mb-2 text-white">{{ article.title }}</h3>
+          <p class="text-white/80 text-sm">{{ article.description }}</p>
+          <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
+        </div>
+      </a>
+    </template>
+
+  </div>
+</div>
+
 
         <!-- Right Arrow (hidden on mobile) -->
         <button
