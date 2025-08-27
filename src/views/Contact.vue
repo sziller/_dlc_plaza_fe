@@ -14,72 +14,59 @@
   );">
 </div>
     <!-- Onboarding Section -->
-    <section class="w-full pt-32" aria-labelledby="onboarding-title">
-      <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">
-        <!-- Title OUTSIDE the card -->
-        <h1
-          id="onboarding-title"
-          class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-center lg:text-center"
+   <section class="w-full pt-32" aria-labelledby="onboarding-title">
+  <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-8">
+    <!-- Title -->
+    <h1
+      id="onboarding-title"
+      class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-center"
+    >
+      Personalized Onboarding
+    </h1>
+
+    <!-- Card 1: Description -->
+    <div class="bg-white text-secondary rounded-2xl shadow-xl border border-white/10 p-6 sm:p-10 text-center">
+      <p class="text-base md:text-lg lg:text-xl text-secondary/80 max-w-4xl mx-auto">
+        As a Cadena Bitcoin client, expert knowledge is always just a chat, email, or phone call away.
+        We simplify complexity and are available 24/7 for personalized onboarding and strategies to
+        borrow Bitcoin or generate yield from Bitcoin.
+      </p>
+    </div>
+
+    <!-- Card 2 + Card 3: Call and Email -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Call box -->
+      <div class="bg-white text-secondary rounded-2xl shadow-xl border border-white/10 p-6 sm:p-10 text-center">
+        <h4 class="text-2xl font-semibold mb-4">Call</h4>
+        <a
+          href="tel:+13058311410"
+          class="inline-flex items-center gap-2 rounded-xl px-5 py-3 bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
+                 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80 whitespace-nowrap"
+          aria-label="Call (305) 831-1410"
         >
-          Personalized Onboarding
-        </h1>
-
-        <div
-          class="bg-white text-secondary rounded-2xl shadow-xl border border-white/10 p-8 sm:p-10 space-y-8 text-center"
-        >
-          <!-- Description INSIDE the card -->
-          <p
-            class="text-base md:text-lg lg:text-xl text-secondary/80 max-w-2xl mx-auto"
-          >
-            We simplify the onboarding process and are here to answer any questions.
-            With Cadena Bitcoin, expert knowledge is always just a phone call away.
-          </p>
-
-          <!-- CTA Buttons -->
-          <div
-            class="flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-6"
-          >
-            <a
-              href="https://calendly.com/cadenabitcoin-info"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center justify-center rounded-xl px-6 py-4 w-full md:w-auto font-semibold bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
-                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80"
-              aria-label="Schedule via Calendly"
-            >
-              Schedule via Calendly
-            </a>
-
-            <a
-              href="tel:+13058311410"
-              class="inline-flex items-center justify-center rounded-xl px-6 py-4 w-full md:w-auto font-semibold bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
-                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80"
-              aria-label="Call us now at 305-831-1410"
-            >
-              Call Us Now: (305) 831-1410
-            </a>
-
-            <button
-              type="button"
-              @click="copyEmail"
-              :disabled="copied"
-              class="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-4 w-full md:w-auto font-semibold bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
-                   hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80 disabled:opacity-70 disabled:cursor-not-allowed"
-              :aria-label="copied ? 'Email copied to clipboard' : 'Copy email address to clipboard'"
-            >
-              <span v-if="!copied" class="inline-flex items-center gap-2">
-                <span>Email us: info@cadenabitcoin.com</span>
-                <Copy class="w-5 h-5" aria-hidden="true" />
-              </span>
-              <span v-else class="inline-flex items-center gap-2">
-                <Check class="w-5 h-5" aria-hidden="true" />
-                <span>Copied!</span>
-              </span>
-            </button>
-          </div>
-        </div>
+          <Phone class="w-5 h-5" aria-hidden="true" />
+          <span class="font-semibold">(305) 831-1410</span>
+        </a>
       </div>
-    </section>
+
+      <!-- Email box -->
+      <div class="bg-white text-secondary rounded-2xl shadow-xl border border-white/10 p-6 sm:p-10 text-center">
+        <h4 class="text-2xl font-semibold mb-4">Email</h4>
+        <a
+          href="mailto:info@cadenabitcoin.com"
+          class="inline-flex items-center gap-2 rounded-xl px-5 py-3 bg-secondary text-white shadow-lg ring-1 ring-black/5 transition
+                 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/80 whitespace-nowrap"
+          aria-label="Email info@cadenabitcoin.com"
+        >
+          <Mail class="w-5 h-5" aria-hidden="true" />
+          <span class="font-semibold">info@cadenabitcoin.com</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 
     <!-- Who we serve Section -->
     <section class="w-full px-6 py-16">
@@ -167,7 +154,7 @@
 import TheFooter from '../components/TheFooter.vue'
 import { onMounted, ref } from 'vue'
 import { User, Users, Building2, Copy, Check } from 'lucide-vue-next'
-
+import { Phone, Mail } from 'lucide-vue-next'
 const copied = ref(false)
 
 function copyEmail() {
