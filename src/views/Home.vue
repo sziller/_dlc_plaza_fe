@@ -245,7 +245,7 @@ function scrollRight() {
     <div class="max-w-7xl mx-auto">
       <div class="text-center mb-12">
         <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
-        <p class="mt-4 text-tertiary text-lg">Stay updated with our latest insights</p>
+        <p class="mt-4 text-white text-lg">Stay updated with our latest insights</p>
       </div>
 
       <div class="relative flex items-center justify-center">
@@ -329,7 +329,7 @@ function scrollRight() {
       <!-- Heading -->
       <div class="text-center">
         <h2 class="text-3xl md:text-4xl font-extrabold">Frequently Asked Questions</h2>
-        <p class="mt-4 text-tertiary text-lg">
+        <p class="mt-4 text-white text-lg">
           Everything you need to know about Cadena Bitcoin’s loan product.
         </p>
       </div>
