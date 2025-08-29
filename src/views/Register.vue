@@ -204,6 +204,8 @@ import { getUserQR } from '../api/qr'
 import { getToken } from '../api/token'
 import type { UserFace } from '../types/userFace'
 import type { QRCodeUserResponse } from '../types/common/qrFace'
+import { ensureDefaultIfEmpty, getRefCookie, clearRefCookie } from '../lib/referral.js'
+
 //import { useReferral } from '../composables/useReferral';
 const route = useRoute()
 const router = useRouter()
@@ -238,12 +240,27 @@ const submitForm = async () => {
   error.value = null
   loading.value = true
   try {
-    await registerUser({
+    // grab the code (either from ?r= earlier or default we set in onMounted)
+    const ref = getRefCookie()
+
+    // keep TS simple; adjust to your real API type later
+    const payload: Record<string, any> = {
       email_address: email.value,
-      password: password.value
-    } as UserFace)
-   // track('signup', { email: email.value });
-    // Move to Step 2 (email sent) and reflect in URL
+      password: password.value,
+      ...(ref?.code ? { referral_code: ref.code } : {}),
+    }
+
+    // while API isn't live, this helps you confirm wiring
+    console.group('[REGISTER PAYLOAD]')
+    console.log(payload)
+    console.log('ref cookie ->', ref)
+    console.groupEnd()
+
+    await registerUser(payload as any)
+
+    // optional policy: clear the cookie after a successful registration
+    // clearRefCookie()
+
     step.value = 2
     await router.replace({ query: { ...route.query, step: '2' } })
   } catch (err: any) {
@@ -252,6 +269,7 @@ const submitForm = async () => {
     loading.value = false
   }
 }
+
 
 /**
  * Build a valid <img src> for SVG coming from the API.
@@ -361,6 +379,7 @@ watch(
 )
 
 onMounted(async () => {
+  ensureDefaultIfEmpty()
   syncStepFromRoute()
   if (step.value === 3) await loadQrCode()
 })

@@ -18,16 +18,14 @@ import Login from '../views/Login.vue';
 import MyProfile from '../views/MyProfile.vue';
 import Terms from '../views/Terms.vue';
 import Privacy from '../views/Privacy.vue';
-//import ReferralLanding from '../views/ReferralLanding.vue';
-//import { useReferral } from '../composables/useReferral';import path from 'path';
+
+
+import { maybeCaptureFromQuery } from '../lib/referral';
+
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
-  {
-    path: '/article/cadena-vs-others',
-    name: 'Article1',
-    component: Article1View,
-  },
+  { path: '/article/cadena-vs-others', name: 'Article1', component: Article1View },
   { path: '/btcusd', name: 'BTCUSD', component: BTCUSD },
   { path: '/register', name: 'Register', component: Register },
   { path: '/article/cadena-improving-btc', name: 'Article2', component: Article2View },
@@ -38,36 +36,46 @@ const routes = [
   { path: '/article/cadena-loan-lifecycle', name: 'Article4', component: Article4view },
   { path: '/article/cadena-bitcoin-security', name: 'Article5', component: Article5view },
   { path: '/article/we-need-to-talk-about-kyc', name: 'Article6', component: Article6view },
-  {path: '/login', name: 'Login', component: Login },
-  {path: '/my-profile', name: 'MyProfile', component: MyProfile },
-  {path: '/terms', name: 'Terms', component: Terms },
-  {path: '/privacy', name: 'Privacy', component: Privacy },
-// { path: '/ref/:code', name: 'Referral', component: ReferralLanding },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/my-profile', name: 'MyProfile', component: MyProfile },
+  { path: '/terms', name: 'Terms', component: Terms },
+  { path: '/privacy', name: 'Privacy', component: Privacy },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  // Optional: scroll to top on route change
-  scrollBehavior() {
-    return { top: 0 };
-  },
+  scrollBehavior() { return { top: 0 }; },
 });
 
-/**
- * SPA PageView tracking for X/Twitter Pixel
- * - Requires the base pixel in index.html (twq loader + twq('config', 'YOUR_ID'))
- * - Fires PageView on every client-side navigation
- * - Controlled by VITE_ENABLE_X_PIXEL (default: only in production)
- */
+// --- Referral guard (only when logged out) ---
+function isLoggedIn() {
+  return !!localStorage.getItem('auth_token'); // swap with your real check later
+}
+
+const referralsEnabled =
+  (import.meta.env.VITE_REF_ENABLED ??
+    (import.meta.env.PROD ? 'true' : 'true')) === 'true';
+
+router.beforeEach((to, _from, next) => {
+  if (referralsEnabled && !isLoggedIn()) {
+    // Vue Router gives a plain object for "to.query"
+    console.log('[referral] beforeEach fired', { path: to.fullPath, query: to.query });
+
+    maybeCaptureFromQuery(to.query);
+  }
+  next();
+});
+
+// --- Your existing Pixel tracking (JS-safe) ---
 const shouldTrackPageViews =
   (import.meta.env.VITE_ENABLE_X_PIXEL ??
-    // default to true in production builds, false otherwise
     (import.meta.env.PROD ? 'true' : 'false')) === 'true';
 
 router.afterEach(() => {
-  if (shouldTrackPageViews && typeof window !== 'undefined' && window.twq) {
-    window.twq('event', 'PageView');
+  const twq = window && window.twq;
+  if (shouldTrackPageViews && twq) {
+    twq('event', 'PageView');
   }
 });
 
