@@ -92,33 +92,30 @@
   <TheFooter/>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
+<script setup>
+import { ref, computed, onMounted } from 'vue'
 import { getUserProfile } from '../api/userProfile'
 import { getTopupAddressQR } from '../api/qr' // adjust path
-import type { UserProfileResponse } from '../types/userFace'
-import type { QRCodeAddressResponse } from '../types/common/qrFace'
-import { computed } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
-// Make the SVG responsive by stripping fixed width/height and injecting styles
+
+// ---- QR SVG: make responsive ----
+const qrSvg = ref('')
 const qrSvgProcessed = computed(() => {
   if (!qrSvg.value) return ''
   const orig = qrSvg.value
 
-  // Extract intrinsic size before stripping
-  const w = (orig.match(/\bwidth="(\d+)"/) || [,'0'])[1]
-  const h = (orig.match(/\bheight="(\d+)"/) || [,'0'])[1]
+  const wMatch = orig.match(/\bwidth="(\d+)"/)
+  const hMatch = orig.match(/\bheight="(\d+)"/)
+  const w = wMatch ? wMatch[1] : '0'
+  const h = hMatch ? hMatch[1] : '0'
 
   let s = orig
-  // Remove fixed width/height so CSS can drive size
   s = s.replace(/\s(width|height)="[^"]*"/g, '')
-  // Ensure a viewBox so it can scale. If missing, synthesize from width/height or default square.
   if (!/viewBox=/.test(s)) {
     const vw = Number(w) > 0 ? Number(w) : 100
     const vh = Number(h) > 0 ? Number(h) : vw
     s = s.replace('<svg', `<svg viewBox="0 0 ${vw} ${vh}"`)
   }
-  // Make it fill its box
   if (!/preserveAspectRatio=/.test(s)) {
     s = s.replace('<svg', '<svg preserveAspectRatio="xMidYMid meet"')
   }
@@ -128,24 +125,24 @@ const qrSvgProcessed = computed(() => {
   return s
 })
 
-
-const profile = ref<UserProfileResponse | null>(null)
+// ---- State ----
+const profile = ref(null)
 const loading = ref(false)
-const error = ref<string | null>(null)
+const error = ref(null)
 
-const address = ref<string>('')
-const qrSvg = ref<string>('')
+const address = ref('')
 const addrLoading = ref(false)
-const addrError = ref<string | null>(null)
+const addrError = ref(null)
 const copied = ref(false)
 
+// ---- Actions ----
 async function load() {
   loading.value = true
   error.value = null
   try {
     profile.value = await getUserProfile()
   } catch (e) {
-    error.value = e instanceof Error ? e.message : String(e)
+    error.value = e && e.message ? e.message : String(e)
     profile.value = null
   } finally {
     loading.value = false
@@ -160,14 +157,14 @@ async function fetchTopup() {
   copied.value = false
 
   try {
-    const res: QRCodeAddressResponse = await getTopupAddressQR(-1)
+    const res = await getTopupAddressQR(-1)
     address.value = String(res?.payload?.string || '')
     qrSvg.value = String(res?.payload?.qr_code || '')
     if (!address.value || !qrSvg.value) {
       addrError.value = 'Invalid response: missing address or QR code.'
     }
   } catch (e) {
-    addrError.value = e instanceof Error ? e.message : String(e)
+    addrError.value = e && e.message ? e.message : String(e)
   } finally {
     addrLoading.value = false
   }
@@ -189,7 +186,7 @@ async function copyAddress() {
   }
 }
 
-function formatBtc(sats: number) {
+function formatBtc(sats) {
   return (Number(sats) / 1e8).toFixed(8)
 }
 
@@ -198,6 +195,7 @@ onMounted(() => {
   fetchTopup()
 })
 </script>
+
 <style scoped>
 /* Force embedded QR SVG to fill its container */
 div[v-html] svg {
