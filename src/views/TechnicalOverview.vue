@@ -20,8 +20,9 @@
       ></iframe>
     </div>
 
-    <TheFooter class="mt-12" />
+   
   </main>
+   <TheFooter class="mt-12" />
 </template>
 
 <script setup>

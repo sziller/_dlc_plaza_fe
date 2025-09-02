@@ -82,6 +82,15 @@
               Tick: {{ STEP.toFixed(2) }}%.
             </p>
           </div>
+
+          <!-- NEW: Live rate summary (term + annualized) -->
+          <div class="mt-3  grid-cols-2 gap-3">
+            
+            <div class="rounded bg-white/5 border border-white/15 p-3">
+              <div class="text-xs text-center text-white/70">Annualized yield</div>
+              <div class="mt-1 font-semibold text-center tabular-nums">{{ annualizedYield(termRateStr, termDays) }}</div>
+            </div>
+          </div>
         </div>
 
         <!-- Review Button -->
@@ -96,7 +105,7 @@
         </div>
       </div>
 
-      <!-- Step 2: Review -->
+      <!-- Step 2: Review (unchanged) -->
       <div v-else>
         <h2 class="text-2xl font-bold text-center mb-4">Review Your Order</h2>
         <div v-if="props.notice?.text" :class="props.notice?.type === 'error' ? 'bg-red-500/15 border-red-500/40' : 'bg-green-500/15 border-green-500/40'"
@@ -108,8 +117,8 @@
           <li><span class="font-semibold text-white">Amount:</span> 0.1 BTC</li>
           <li><span class="font-semibold text-white">Commission/Fees:</span> 0.50%</li>
           <li><span class="font-semibold text-white">Maturity Date:</span> {{ maturityDate }}</li>
-          <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ orderType === 'market' ? marketRateStr : fmt(rateNum) }}</li>
-          <li><span class="font-semibold text-white">Annualized Yield:</span> {{ annualizedYield(orderType === 'market' ? marketRateStr : fmt(rateNum), termDays) }}</li>
+          <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ termRateStr }}</li>
+          <li><span class="font-semibold text-white">Annualized Yield:</span> {{ annualizedYield(termRateStr, termDays) }}</li>
           <li><span class="font-semibold text-white">Role:</span> {{ actionType }}</li>
           <li><span class="font-semibold text-white">Collateral Contribution:</span> {{ collateralContribution }}</li>
         </ul>
@@ -117,19 +126,20 @@
         <div class="flex justify-between items-center mt-6">
           <button @click="step = 1" :disabled="props.loading" class="text-white hover:text-secondary text-sm underline disabled:opacity-50 disabled:cursor-not-allowed">Back</button>
           <button
-          v-if="!isSuccess"
-          @click="submitOrder"
-          :disabled="props.loading"
-          class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span v-if="!props.loading">Submit Order</span>
-          <span v-else class="inline-flex items-center gap-2">
-            <span class="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
-            Submitting…
-          </span>
-        </button>
+            v-if="!isSuccess"
+            @click="submitOrder"
+            :disabled="props.loading"
+            class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span v-if="!props.loading">Submit Order</span>
+            <span v-else class="inline-flex items-center gap-2">
+              <span class="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+              Submitting…
+            </span>
+          </button>
         </div>
       </div>
+
       <div v-if="props.loading" class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl">
         <div class="flex flex-col items-center gap-3">
           <div class="h-8 w-8 rounded-full border-4 border-white/30 border-t-white animate-spin"></div>
@@ -156,6 +166,7 @@ const orderType = ref('market')
 const step = ref(1)
 const isBorrower = computed(() => (props.actionType || '').toLowerCase() === 'borrow')
 const isSuccess = computed(() => props.notice?.type === 'success')
+
 // Helpers
 function toNum(rateStr) {
   const m = rateStr?.match(/([\d.]+)/)
@@ -223,9 +234,9 @@ function decrementBy(delta) {
   }
 }
 
-// Press-and-hold acceleration
-const HOLD_START_DELAY = 300   // ms before repeat starts
-const HOLD_INTERVAL = 50       // ms between repeats
+/** ===== Slower press-and-hold ===== **/
+const HOLD_START_DELAY = 500   // slower start
+const HOLD_INTERVAL = 120      // slower repeat
 let holdTimer = null
 let holdInfo = { dir: 0, startedAt: 0 }
 
@@ -241,8 +252,7 @@ function startHold(dir) {
 }
 function tickHold() {
   const heldMs = Date.now() - holdInfo.startedAt
-  // accelerate step size over time
-  const mult = heldMs >= 3000 ? 100 : heldMs >= 1500 ? 20 : heldMs >= 500 ? 5 : 1
+  const mult = heldMs >= 3500 ? 4 : heldMs >= 1800 ? 2 : 1 // gentler acceleration
   const delta = STEP * mult
   if (holdInfo.dir > 0) {
     incrementBy(delta)
@@ -268,19 +278,22 @@ const maturityDate = computed(() => {
   return d.toLocaleDateString()
 })
 
-// Yield
+// Selected rate for the term (used in both steps)
+const termRateStr = computed(() => orderType.value === 'market' ? marketRateStr.value : fmt(rateNum.value))
+
+// Annualized yield (percentage string)
 function annualizedYield(rateStr, days) {
   if (!rateStr || rateStr === '*' || !Number.isFinite(days) || days <= 0) return '*'
   const m = rateStr.match(/([\d.]+)%/)
   if (!m) return '*'
   const r = parseFloat(m[1])
-  if (days!=365) return `${(100 *(1+ r * 0.01) **  (360 / days)-100).toFixed(2)}%`
+  if (days !== 365) return `${(100 * (1 + r * 0.01) ** (360 / days) - 100).toFixed(2)}%`
   return rateStr
 }
 
 // Submit
 function submitOrder () {
-  const finalRateStr = orderType.value === 'market' ? marketRateStr.value : fmt(rateNum.value)
+  const finalRateStr = termRateStr.value
   emit('submit', {
     action: props.actionType,
     orderType: orderType.value,
@@ -293,6 +306,5 @@ function submitOrder () {
     collateralContribution: (props.actionType === 'Lend') ? '0%' : '100%',
     fees: '0.50%',
   })
-  
 }
 </script>
