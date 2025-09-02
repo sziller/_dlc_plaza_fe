@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "prebuild": "node scripts/gen-seo-files.mjs",
+    "build:staging": "cross-env VITE_NOINDEX=1 SITE_BASE=https://staging.purabitcoin.com vite build",
+     "build:prod": "cross-env VITE_NOINDEX=0 SITE_BASE=https://cadenabitcoin.com vite build",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
