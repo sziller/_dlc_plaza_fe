@@ -20,111 +20,107 @@
          style="inset:10% -10% auto auto; width:40rem; height:18rem; background:radial-gradient(40% 60% at 50% 50%, #16b1ff44, transparent 70%)"></div>
 
     <!-- Onboarding Section -->
-    <!-- Onboarding Section -->
-<section class="w-full pt-28 md:pt-32" aria-labelledby="onboarding-title">
-  <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">
+    <section class="w-full pt-28 md:pt-32" aria-labelledby="onboarding-title">
+      <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">
 
-    <!-- Eyebrow + Title + Lead -->
-    <div class="text-center" v-reveal>
-      <div class="mx-auto inline-flex items-center gap-2 rounded-full px-4 py-1.5 bg-white/8 ring-1 ring-white/15">
-        <span class="h-2 w-2 rounded-full bg-green-400/80"></span>
-        <span class="text-xs font-medium tracking-wide text-white/80">Concierge onboarding • 24/7 availability</span>
-      </div>
+        <!-- Eyebrow + Title + Lead -->
+        <div class="text-center" v-reveal>
+          
 
-      <h1 id="onboarding-title" class="mt-4 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-        Personalized Onboarding
-      </h1>
+          <h1 id="onboarding-title" class="mt-4 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
+            Personalized Onboarding
+          </h1>
 
-      <p class="mt-4 text-base md:text-lg lg:text-xl text-white/80 max-w-4xl mx-auto">
-        As a Cadena Bitcoin client, expert knowledge is always just a chat, email, or phone call away.
-        We simplify complexity and are available 24/7 for personalized onboarding and strategies to
-        borrow Bitcoin or generate yield from Bitcoin.
-      </p>
-    </div>
+          <p class="mt-4 text-base md:text-lg lg:text-xl text-white/80 max-w-4xl mx-auto">
+            As a Cadena Bitcoin client, expert knowledge is always just a chat, email, or phone call away.
+            We simplify complexity and are available 24/7 for personalized onboarding and strategies to
+            borrow Bitcoin or generate yield from Bitcoin.
+          </p>
+        </div>
 
-    <!-- Contact Options -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Contact Options -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      <!-- Call -->
-      <div class="pro-card group" v-reveal="{ delay: 60 }">
-        <div class="flex items-start gap-4">
-          <div class="icon-wrap">
-            <Phone class="w-5 h-5" aria-hidden="true" />
-          </div>
-          <div class="flex-1">
-            <h4 class="text-2xl font-semibold">Call</h4>
-            <p class="text-sm text-white/70 mt-1">Speak to our team anytime.</p>
+          <!-- Call -->
+          <div class="pro-card group" v-reveal="{ delay: 60 }">
+            <div class="flex items-start gap-4">
+              <div class="icon-wrap">
+                <Phone class="w-5 h-5" aria-hidden="true" />
+              </div>
+              <div class="flex-1">
+                <h4 class="text-2xl font-semibold">Call</h4>
+                <p class="text-sm text-white/70 mt-1">Speak to our team anytime.</p>
 
-            <div class="mt-5 flex flex-wrap items-center gap-3">
-              <a
-                href="tel:+13058311410"
-                class="btn-primary"
-                aria-label="Call (305) 831-1410"
-              >
-                (305) 831-1410
-              </a>
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+                  <a
+                    href="tel:+13058311410"
+                    class="btn-primary"
+                    aria-label="Call (305) 831-1410"
+                  >
+                    (305) 831-1410
+                  </a>
 
-              <button
-                @click="copyPhone"
-                class="btn-ghost"
-                :aria-label="copiedPhone ? 'Copied phone number' : 'Copy phone number'"
-              >
-                <component :is="copiedPhone ? Check : Copy" class="w-4 h-4" />
-                <span class="text-sm font-medium">{{ copiedPhone ? 'Copied' : 'Copy' }}</span>
-              </button>
-            </div>
+                  <button
+                    @click="copyPhone"
+                    class="btn-ghost"
+                    :aria-label="copiedPhone ? 'Copied phone number' : 'Copy phone number'"
+                  >
+                    <component :is="copiedPhone ? Check : Copy" class="w-4 h-4" />
+                    <span class="text-sm font-medium">{{ copiedPhone ? 'Copied' : 'Copy' }}</span>
+                  </button>
+                </div>
 
-            <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
-              <span class="inline-flex items-center gap-1">
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400/80"></span> Live support
-              </span>
-              <span>Response time: &lt; 24h</span>
+                <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
+                  <span class="inline-flex items-center gap-1">
+                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400/80"></span> Live support
+                  </span>
+                  <span>Response time: &lt; 24h</span>
+                </div>
+              </div>
             </div>
           </div>
+
+          <!-- Email -->
+          <div class="pro-card group" v-reveal="{ delay: 100 }">
+            <div class="flex items-start gap-4">
+              <div class="icon-wrap">
+                <Mail class="w-5 h-5" aria-hidden="true" />
+              </div>
+              <div class="flex-1">
+                <h4 class="text-2xl font-semibold">Email</h4>
+                <p class="text-sm text-white/70 mt-1">Send us your questions or request onboarding.</p>
+
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+                  <a
+                    href="mailto:info@cadenabitcoin.com"
+                    class="btn-primary"
+                    aria-label="Email info@cadenabitcoin.com"
+                  >
+                    info@cadenabitcoin.com
+                  </a>
+
+                  <button
+                    @click="copyEmail"
+                    class="btn-ghost"
+                    :aria-label="copiedEmail ? 'Copied email' : 'Copy email'"
+                  >
+                    <component :is="copiedEmail ? Check : Copy" class="w-4 h-4" />
+                    <span class="text-sm font-medium">{{ copiedEmail ? 'Copied' : 'Copy' }}</span>
+                  </button>
+                </div>
+
+                <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
+                  <span>Dedicated onboarding specialist</span>
+                  <span aria-hidden="true">•</span>
+                  <span>Secure &amp; private</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-
-      <!-- Email -->
-      <div class="pro-card group" v-reveal="{ delay: 100 }">
-        <div class="flex items-start gap-4">
-          <div class="icon-wrap">
-            <Mail class="w-5 h-5" aria-hidden="true" />
-          </div>
-          <div class="flex-1">
-            <h4 class="text-2xl font-semibold">Email</h4>
-            <p class="text-sm text-white/70 mt-1">Send us your questions or request onboarding.</p>
-
-            <div class="mt-5 flex flex-wrap items-center gap-3">
-              <a
-                href="mailto:info@cadenabitcoin.com"
-                class="btn-primary"
-                aria-label="Email info@cadenabitcoin.com"
-              >
-                info@cadenabitcoin.com
-              </a>
-
-              <button
-                @click="copyEmail"
-                class="btn-ghost"
-                :aria-label="copiedEmail ? 'Copied email' : 'Copy email'"
-              >
-                <component :is="copiedEmail ? Check : Copy" class="w-4 h-4" />
-                <span class="text-sm font-medium">{{ copiedEmail ? 'Copied' : 'Copy' }}</span>
-              </button>
-            </div>
-
-            <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
-              <span>Dedicated onboarding specialist</span>
-              <span aria-hidden="true">•</span>
-              <span>Secure &amp; private</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
+    </section>
 
     <!-- Who we serve -->
     <section class="w-full px-6 py-16 md:py-20">
@@ -133,15 +129,15 @@
 
         <div class="space-y-8">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="reveal glass-tile text-center group" v-reveal="{ delay: 40 }">
+            <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 40 }">
               <User class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
               <p class="text-xl font-semibold">Private Clients</p>
             </div>
-            <div class="reveal glass-tile text-center group" v-reveal="{ delay: 90 }">
+            <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 90 }">
               <Users class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
               <p class="text-xl font-semibold">Family Offices</p>
             </div>
-            <div class="reveal glass-tile text-center group" v-reveal="{ delay: 140 }">
+            <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 140 }">
               <Building2 class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
               <p class="text-xl font-semibold">Institutional Investors</p>
             </div>
@@ -293,29 +289,25 @@ const vReveal = {
 }
 </script>
 
-
 <style scoped>
-/* ===== Glass surfaces ===== */
-.glass-card {
-  @apply bg-white/10 backdrop-blur-md rounded-2xl shadow-xl border border-white/15 p-6 sm:p-10;
-}
-.glass-tile {
-  @apply bg-white/10 backdrop-blur-md rounded-xl border border-white/15 p-6 shadow-sm transition
-         hover:-translate-y-0.5 hover:shadow-lg hover:bg-white/15;
-}
-
-/* ===== Premium contact cards ===== */
-.pro-card {
+/* ===== Unify all boxes to the pro-card look ===== */
+.pro-card,
+.glass-card,
+.glass-tile,
+.social-tile {
   position: relative;
   border-radius: 1.25rem; /* ~rounded-2xl */
-  padding: 1.25rem;       /* content padding */
-  background: rgba(255,255,255,0.08);
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }
-.pro-card::before {
+.pro-card::before,
+.glass-card::before,
+.glass-tile::before,
+.social-tile::before {
   /* gradient ring */
   content: "";
   position: absolute; inset: 0;
@@ -332,13 +324,16 @@ const vReveal = {
     linear-gradient(#000 0 0);
   pointer-events: none;
 }
-.pro-card:hover {
+.pro-card:hover,
+.glass-card:hover,
+.glass-tile:hover,
+.social-tile:hover {
   transform: translateY(-2px);
-  background: rgba(255,255,255,0.10);
-  box-shadow: 0 16px 36px rgba(0,0,0,0.28);
+  background: rgba(255, 255, 255, 0.10);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
-/* Icon puck */
+/* Icon puck (lifts on any card hover) */
 .icon-wrap {
   display: inline-flex;
   align-items: center;
@@ -349,12 +344,15 @@ const vReveal = {
   border: 1px solid rgba(255,255,255,0.18);
   transition: transform .18s ease, background .18s ease;
 }
-.pro-card:hover .icon-wrap {
+.pro-card:hover .icon-wrap,
+.glass-card:hover .icon-wrap,
+.glass-tile:hover .icon-wrap,
+.social-tile:hover .icon-wrap {
   transform: translateY(-1px);
   background: rgba(255,255,255,0.16);
 }
 
-/* ===== Buttons ===== */
+/* Primary + ghost buttons */
 .btn-primary {
   display: inline-flex; align-items: center; justify-content: center;
   padding: .625rem 1rem; border-radius: .75rem;
@@ -374,11 +372,17 @@ const vReveal = {
 }
 .btn-ghost:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); }
 
-/* ===== Social tiles ===== */
+/* Social tiles keep vertical layout with same shell */
 .social-tile {
-  @apply flex flex-col items-center gap-3 px-6 py-5 rounded-xl bg-white/5 border border-white/10
-         transition hover:bg-white/10 hover:-translate-y-0.5 hover:shadow-lg;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  text-align: center;
 }
+
+/* Tighter padding option for small tiles */
+.card-tight { padding: 1rem; }
 
 /* ===== Scroll reveal ===== */
 .reveal {
