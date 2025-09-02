@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+  (function () {
+    var h = location.hostname;
+    if (h === 'www.cadenabitcoin.com') {
+      location.replace(location.href.replace('//www.', '//'));
+    }
+  })();
+  </script>
     <link rel="preload" as="image"
   href="/img/iphone-sc-960.avif"
   imagesrcset="/img/iphone-sc-640.avif 640w, /img/iphone-sc-960.avif 960w, /img/iphone-sc-1280.avif 1280w"
