@@ -169,21 +169,26 @@
         </button>
         <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
 
+       <!-- Get Started (mobile) -->
         <router-link
+          @click="isMobileMenuOpen = false"
           v-if="!isLoggedIn"
           to="/register"
           class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
         >
           Get Started
         </router-link>
+
+        <!-- My Profile (mobile) -->
         <router-link
-          v-else
           @click="isMobileMenuOpen = false"
+          v-else
           to="/my-profile"
           class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
         >
           My Profile
         </router-link>
+
 
       </div>
     </transition>
