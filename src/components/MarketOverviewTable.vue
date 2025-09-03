@@ -7,113 +7,210 @@
           {{ title }}
         </div>
 
-        <!-- Table Wrapper -->
+        <!-- Content Wrapper -->
         <div class="overflow-auto flex-1 min-h-0">
-          <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-6">
-            <thead>
-              <tr>
-                <th></th>
-                <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
+
+          <!-- ✅ Desktop/Tablet (unchanged look) -->
+          <div class="hidden sm:block">
+            <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-6">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
+                    {{ leftGroupLabel }}
+                  </th>
+                  <th class="spacer px-4"></th>
+                  <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
+                    {{ rightGroupLabel }}
+                  </th>
+                </tr>
+                <tr class="text-white text-md">
+                  <th class="px-4 py-4 text-left">Term</th>
+                  <th class="px-4 py-4">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                      Lend
+                    </div>
+                  </th>
+                  <th class="px-4 py-4">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                      Borrow
+                    </div>
+                  </th>
+                  <th class="spacer px-4 py-4"></th>
+                  <th class="px-4 py-4">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                      Lend
+                    </div>
+                  </th>
+                  <th class="px-4 py-4">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                      Borrow
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody class="text-white/90 text-lg">
+                <tr
+                  v-for="(term, index) in terms"
+                  :key="term.label"
+                  class="transition duration-200"
+                >
+                  <td class="px-4 py-4 text-left font-semibold">{{ term.label }}</td>
+
+                  <!-- Left group cells -->
+                  <td
+                    v-for="(key) in leftKeys"
+                    :key="key"
+                    @click="handleCellClick(term, key)"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
+                    style="min-width: 6rem;"
+                  >
+                    <div>
+                      <span
+                        :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
+                        class="text-3xl font-bold leading-tight"
+                      >
+                        {{ getEar(term, key) }}
+                      </span>
+
+                      <template v-if="term.label !== '365 Days'">
+                        <div class="text-[10px] text-white/70 -mt-1">
+                          Annualized yield
+                        </div>
+                        <div class="text-xs text-white/90 mt-1">
+                          {{ term[key] }} for {{ term.label }}
+                        </div>
+                      </template>
+                    </div>
+                  </td>
+
+                  <td class="px-4 spacer"></td>
+
+                  <!-- Right group cells -->
+                  <td
+                    v-for="(key) in rightKeys"
+                    :key="key"
+                    @click="handleCellClick(term, key)"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
+                    style="min-width: 6rem;"
+                  >
+                    <div>
+                      <span
+                        :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
+                        class="text-3xl font-bold leading-tight"
+                      >
+                        {{ getEar(term, key) }}
+                      </span>
+
+                      <template v-if="term.label !== '365 Days'">
+                        <div class="text-[10px] text-white/70 -mt-1">
+                          Annualized yield
+                        </div>
+                        <div class="text-xs text-white/90 mt-1">
+                          {{ term[key] }} for {{ term.label }}
+                        </div>
+                      </template>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 📱 Mobile: stacked blocks (50% on top, 80% below) -->
+          <div class="sm:hidden space-y-4">
+            <div
+              v-for="(term, index) in terms"
+              :key="`m-${term.label}`"
+              class="rounded-lg bg-white/5 p-3"
+            >
+              <!-- Term -->
+              <div class="text-base font-semibold text-white mb-2">{{ term.label }}</div>
+
+              <!-- 50% LTV block -->
+              <div class="rounded-md bg-white/5 p-3 mb-3">
+                <div class="text-[11px] tracking-wide uppercase text-white/70 mb-2 font-semibold">
                   {{ leftGroupLabel }}
-                </th>
-                <th class="spacer px-4"></th>
-                <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    v-for="key in leftKeys"
+                    :key="`m-${term.label}-${key}`"
+                    type="button"
+                    @click="handleCellClick(term, key)"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                    style="min-width: 6rem;"
+                  >
+                    <div class="space-y-1">
+                      <!-- 🔹 Lend/Borrow label -->
+                      <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+                        {{ key.includes('a') ? 'Lend' : 'Borrow' }}
+                      </div>
+
+                      <span
+                        :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
+                        class="text-2xl font-bold leading-tight"
+                      >
+                        {{ getEar(term, key) }}
+                      </span>
+
+                      <template v-if="term.label !== '365 Days'">
+                        <div class="text-[10px] text-white/70 -mt-0.5">
+                          Annualized yield
+                        </div>
+                        <div class="text-[11px] text-white/90 mt-0.5">
+                          {{ term[key] }} for {{ term.label }}
+                        </div>
+                      </template>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 80% LTV block -->
+              <div class="rounded-md bg-white/5 p-3">
+                <div class="text-[11px] tracking-wide uppercase text-white/70 mb-2 font-semibold">
                   {{ rightGroupLabel }}
-                </th>
-              </tr>
-              <tr class="text-white text-md">
-                <th class="px-4 py-4 text-left">Term</th>
-                <th class="px-4 py-4">
-                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
-                    Lend
-                  </div>
-                </th>
-                <th class="px-4 py-4">
-                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
-                    Borrow
-                  </div>
-                </th>
-                <th class="spacer px-4 py-4"></th>
-                <th class="px-4 py-4">
-                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
-                    Lend
-                  </div>
-                </th>
-                <th class="px-4 py-4">
-                  <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
-                    Borrow
-                  </div>
-                </th>
-              </tr>
-            </thead>
-
-            <tbody class="text-white/90 text-lg">
-              <tr
-                v-for="(term, index) in terms"
-                :key="term.label"
-                class="transition duration-200"
-              >
-                <td class="px-4 py-4 text-left font-semibold">{{ term.label }}</td>
-
-                <!-- Left group cells -->
-                <td
-                  v-for="(key) in leftKeys"
-                  :key="key"
-                  @click="handleCellClick(term, key)"
-                  class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
-                  style="min-width: 6rem;"
-                >
-                  <div>
-                    <span
-                      :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                      class="text-3xl font-bold leading-tight"
-                    >
-                      {{ getEar(term, key) }}
-                    </span>
-
-                    <template v-if="term.label !== '365 Days'">
-                      <div class="text-[10px] text-white/70 -mt-1">
-                        Annualized yield
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    v-for="key in rightKeys"
+                    :key="`m-${term.label}-${key}`"
+                    type="button"
+                    @click="handleCellClick(term, key)"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                    style="min-width: 6rem;"
+                  >
+                    <div class="space-y-1">
+                      <!-- 🔹 Lend/Borrow label -->
+                      <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+                        {{ key.includes('a') ? 'Lend' : 'Borrow' }}
                       </div>
-                      <div class="text-xs text-white/90 mt-1">
-                        {{ term[key] }} for {{ term.label }}
-                      </div>
-                    </template>
-                  </div>
-                </td>
 
-                <td class="px-4 spacer"></td>
+                      <span
+                        :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
+                        class="text-2xl font-bold leading-tight"
+                      >
+                        {{ getEar(term, key) }}
+                      </span>
 
-                <!-- Right group cells -->
-                <td
-                  v-for="(key) in rightKeys"
-                  :key="key"
-                  @click="handleCellClick(term, key)"
-                  class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
-                  style="min-width: 6rem;"
-                >
-                  <div>
-                    <span
-                      :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                      class="text-3xl font-bold leading-tight"
-                    >
-                      {{ getEar(term, key) }}
-                    </span>
+                      <template v-if="term.label !== '365 Days'">
+                        <div class="text-[10px] text-white/70 -mt-0.5">
+                          Annualized yield
+                        </div>
+                        <div class="text-[11px] text-white/90 mt-0.5">
+                          {{ term[key] }} for {{ term.label }}
+                        </div>
+                      </template>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-                    <template v-if="term.label !== '365 Days'">
-                      <div class="text-[10px] text-white/70 -mt-1">
-                        Annualized yield
-                      </div>
-                      <div class="text-xs text-white/90 mt-1">
-                        {{ term[key] }} for {{ term.label }}
-                      </div>
-                    </template>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
+          <!-- Modal -->
           <OrderModal
             v-if="showModal"
             :rate="selectedRate"
@@ -176,16 +273,17 @@ function handleCellClick(row, key) {
 async function handleOrderSubmit(data) {
   const type = (data.orderType || '').toLowerCase()
   modalNotice.value = { type: '', text: '' }
-   modalLoading.value = true
+  modalLoading.value = true
+
   // MARKET: accept existing best offer by id
   if (type === 'market') {
-   if (!selectedOfferId.value) {
+    if (!selectedOfferId.value) {
       modalLoading.value = false
       modalNotice.value = { type: 'error', text: 'Missing offer id' }
       return
     }
-   try {
-     const res = await acceptOffer({ dlc_id: String(selectedOfferId.value) })
+    try {
+      const res = await acceptOffer({ dlc_id: String(selectedOfferId.value) })
       console.log('Offer accepted:', res)
       modalNotice.value = { type: 'success', text: 'Market order accepted.' }
     } catch (e) {
@@ -240,7 +338,7 @@ const props = defineProps({
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
   // polling and flash tuning
   offersPollMs: { type: Number, default: 5000 },     // fetch every 5s
-  changeFlashMs: { type: Number, default: 600 },      // flash duration per change
+  changeFlashMs: { type: Number, default: 600 },     // flash duration per change
 })
 
 // ===== Table rows (built from API) =====
@@ -366,7 +464,6 @@ function diffAndFlash(oldRows, newRows) {
       const earKey = `${base}Ear`
       const prev = oldRows?.[i]?.[earKey]
       const next = newRows?.[i]?.[earKey]
-      // trigger on any actual change
       if (prev !== next) {
         markFlashOnce(`${i}-${base}`)
       }
@@ -454,6 +551,7 @@ defineExpose({ loadOffersOnce, getEar })
   100% { transform: scale(1); }
 }
 
+/* Keep desktop table spacing tweaks for small screens if ever rendered */
 @media (max-width: 640px) {
   table {
     border-spacing: 0.25rem 0.75rem !important;
