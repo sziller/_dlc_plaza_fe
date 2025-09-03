@@ -1,7 +1,10 @@
 {
   "rewrites": [
     { "source": "/downloads/(.*)", "destination": "/downloads/$1" },
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/(.*)", "destination": "/" },
+     { "source": "/pdfjs/(.*)", "destination": "/pdfjs/$1" },
+    { "source": "/whitepaper.pdf", "destination": "/whitepaper.pdf" },
+    { "source": "/((?!pdfjs/|whitepaper\\.pdf).*)", "destination": "/index.html" }
   ],
 
   "headers": [
