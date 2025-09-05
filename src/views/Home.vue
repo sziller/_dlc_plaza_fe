@@ -1,20 +1,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import LiveRatesImac from '../components/LiveRatesImac.vue'
 import TheFooter from '../components/TheFooter.vue'
-import article1Img from '../assets/images/article1.png'
-import article2Img from '../assets/images/article2.png'
-import article3Img from '../assets/images/article3.png'
-import article4Img from '../assets/images/article4.png'
-import article5Img from '../assets/images/article5.png'
-import article6Img from '../assets/images/article6.png'
-import iphoneImg from '../assets/images/iPhoneSC.png'
 import { useAuth } from '../composables/useAuth'
+
 const videos = [
-  'https://www.youtube.com/embed/Psuh8mml91o?si=fY-RQdz1o7GTfE-w&rel=0&modestbranding=1&iv_load_policy=3',
-  'https://www.youtube.com/embed/D7HDDxh0Wjo?si=yevbggjIbKbycl1u&rel=0&modestbranding=1&iv_load_policy=3',
-  'https://www.youtube.com/embed/l_cy-tWM_lA?si=wDY0PSdvfX_ePYLW&rel=0&modestbranding=1&iv_load_policy=3',
+  'Psuh8mml91o',
+  'D7HDDxh0Wjo',
+  'l_cy-tWM_lA',
 ]
+
 
 const articles = [
   {
@@ -66,19 +60,17 @@ const articles = [
     internal: true,
   },
 ]
+
 const { isLoggedIn, setUserFromApi } = useAuth()
 const currentIndex = ref(0)
 const isMobile = ref(false)
 const ctaEmail = ref('')
-
-// Animation state for each section
 const sectionInView = ref([false, false, false])
 
 function handleScroll() {
   const sections = document.querySelectorAll('.animated-section')
   sections.forEach((section, idx) => {
     const rect = section.getBoundingClientRect()
-    // Only animate in when scrolling down and section enters viewport
     if (!sectionInView.value[idx] && rect.top < window.innerHeight - 100) {
       sectionInView.value[idx] = true
     }
@@ -93,16 +85,13 @@ onMounted(() => {
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
   window.addEventListener('scroll', handleScroll)
-  // Initial check
   handleScroll()
 })
 
 const visibleArticles = computed(() => {
   if (isMobile.value) {
-    // Show all articles on mobile
     return articles
   } else {
-    // Show rotating 3 on desktop
     const result = []
     const len = articles.length
     for (let i = 0; i < 3; i++) {
@@ -113,17 +102,18 @@ const visibleArticles = computed(() => {
 })
 
 function scrollLeft() {
-  if (isMobile.value) return // Disable arrow click on mobile
+  if (isMobile.value) return
   const len = articles.length
   currentIndex.value = (currentIndex.value - 1 + len) % len
 }
 
 function scrollRight() {
-  if (isMobile.value) return // Disable arrow click on mobile
+  if (isMobile.value) return
   const len = articles.length
   currentIndex.value = (currentIndex.value + 1) % len
 }
 </script>
+
 
 <template>
    <!-- Page wrapper with global gradient background -->
@@ -177,28 +167,24 @@ function scrollRight() {
    <!-- Right: iPhone mockup -->
 <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10">
   <div class="[perspective:1100px]">
-    <div
-      class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10"
-      style="transform: rotateX(0deg) rotateY(0deg)"
-    >
+    <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
       <picture>
-        <source
-          type="image/avif"
-          srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w, /img/iPhoneSC-1280.avif 1280w" />
-        <source
-          type="image/webp"
-          srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w, /img/iPhoneSC-1280.webp 1280w" />
-        <img
-          src="/img/iPhoneSC-960.webp"
-          srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w, /img/iPhoneSC-1280.webp 1280w"
-          sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
-          width="420" height="840"
-          fetchpriority="high" loading="eager" decoding="async"
-          class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
-          alt="App preview on iPhone"
-          draggable="false"
-        />
-  </picture>
+  <source
+    type="image/avif"
+    srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
+  <source
+    type="image/webp"
+    srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
+  <img
+    src="/img/iPhoneSC-960.webp"
+    srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
+    sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
+    width="420" height="840"
+    fetchpriority="high" loading="eager" decoding="async"
+    class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
+    alt="App preview on iPhone" draggable="false"
+  />
+</picture>
     </div>
   </div>
 </div>
@@ -218,36 +204,31 @@ function scrollRight() {
   </section>
 
   <!-- What is Cadena Bitcoin (no animation) -->
-  <section>
-    <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
-        <div>
-          <div class="max-w-3xl">
-            <h2 class="text-3xl sm:text-4xl md:text-[2.5rem] font-bold text-white leading-tight">
-              What is Cadena Bitcoin?
-            </h2>
-            <p class="mt-6 text-white text-lg md:text-xl leading-relaxed">
-              Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. 
-              Whether you want to grow your Bitcoin holdings or generate fiat returns secured by Bitcoin, Cadena's innovative technology 
-              allows <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/80">users to always maintain custody of their Bitcoin</span>
-            </p>
-          </div>
-        </div>
-        <div>
-          <div class="rounded overflow-hidden aspect-w-16 aspect-h-9">
-            <iframe
-              src="https://www.youtube.com/embed/0v_okPUvHvQ?si=JnqpZ5rSgdyengyt&rel=0&modestbranding=1&iv_load_policy=3"
-              title="Cadena Bitcoin Video"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-              class="w-full h-full"
-            ></iframe>
-          </div>
+<section>
+  <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
+      <div>
+        <div class="max-w-3xl">
+          <h2 class="text-3xl sm:text-4xl md:text-[2.5rem] font-bold text-white leading-tight">
+            What is Cadena Bitcoin?
+          </h2>
+          <p class="mt-6 text-white text-lg md:text-xl leading-relaxed">
+            Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Whether you want to grow your Bitcoin holdings or generate fiat returns secured by Bitcoin, Cadena's innovative technology allows
+            <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/80">users to always maintain custody of their Bitcoin</span>
+          </p>
         </div>
       </div>
+      <div>
+        <!-- ✅ only the ID, not a full URL -->
+        <lite-youtube
+          videoid="0v_okPUvHvQ"
+          playlabel="Watch overview"
+          params="rel=0&modestbranding=1&iv_load_policy=3">
+        </lite-youtube>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Featured Articles (animate in from right) -->
   <section
@@ -345,34 +326,27 @@ function scrollRight() {
 
   <!-- Latest Videos (animate in from left) -->
   <section
-    class="bg-transparent text-white pt-8 pb-8 px-6 animated-section"
-    :class="sectionInView[2] ? 'animate-in-left' : ''"
-  >
-    <div class="max-w-6xl mx-auto space-y-12">
-      <div class="text-center space-y-4">
-        <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
-        <p class="text-white text-lg max-w-2xl mx-auto">
-          Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
-        </p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div
-          v-for="(video, index) in videos"
-          :key="index"
-          class="rounded-xl overflow-hidden shadow-lg border border-secondary aspect-w-16 aspect-h-9"
-        >
-          <iframe
-            :src="video"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            class="w-full h-full"
-          ></iframe>
-        </div>
-      </div>
+  class="bg-transparent text-white pt-8 pb-8 px-6 animated-section"
+  :class="sectionInView[2] ? 'animate-in-left' : ''"
+>
+  <div class="max-w-6xl mx-auto space-y-12">
+    <div class="text-center space-y-4">
+      <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
+      <p class="text-white text-lg max-w-2xl mx-auto">
+        Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
+      </p>
     </div>
-  </section>
-
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <lite-youtube
+        v-for="video in videos"
+        :key="video"
+        :videoid="video"
+        playlabel="Watch now"
+        params="rel=0&modestbranding=1"
+      />
+    </div>
+  </div>
+</section>
   <!-- FAQ (no animation) -->
   <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto space-y-12">

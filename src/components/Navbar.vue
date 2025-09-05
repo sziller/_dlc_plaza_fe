@@ -4,11 +4,26 @@
     <nav class="w-full fixed top-0 z-50 bg-white text-black px-6 py-4 flex justify-between items-center shadow">
       <!-- Logo & BTC Price Block -->
       <div class="flex items-center space-x-4">
-        <img :src="logo" alt="Cadena Bitcoin Logo" class="w-10 h-10 object-contain" />
+        <!-- Optimized logo: AVIF/WebP with 1x/2x density, CLS-safe dims -->
+        <picture class="block w-10 h-10">
+          <source type="image/avif" srcset="/img/logo-120.avif 1x, /img/logo-240.avif 2x" />
+          <source type="image/webp" srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x" />
+          <img
+            src="/img/logo-120.webp"
+            srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x"
+            alt="Cadena Bitcoin Logo"
+            width="40"
+            height="40"
+            decoding="async"
+            loading="eager"
+            class="w-10 h-10 object-contain"
+          />
+        </picture>
+
         <div class="flex flex-col items-start space-y-1">
           <div class="text-xl text-secondary font-bold tracking-wide leading-tight">Cadena Bitcoin</div>
           <div class="text-sm font-medium flex items-center gap-1">
-            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4 inline-block" />
+            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4 inline-block" width="16" height="16" />
             BTCUSD:
             <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
           </div>
@@ -40,23 +55,23 @@
           </button>
           <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
             <router-link to="/btcusd" class="block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2">
-              <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" /> BTCUSD
+              <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="16" /> BTCUSD
             </router-link>
             <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTCEUR (Coming Soon)
+              <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="16" /> BTCEUR (Coming Soon)
             </div>
             <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTCJPY (Coming Soon)
+              <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="16" /> BTCJPY (Coming Soon)
             </div>
             <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">🟡 BTC/XAU (Coming Soon)</div>
             <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTCGBP (Coming Soon)
+              <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="16" /> BTCGBP (Coming Soon)
             </div>
             <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTCCAD (Coming Soon)
+              <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="16" /> BTCCAD (Coming Soon)
             </div>
             <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTCAUD (Coming Soon)
+              <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="16" /> BTCAUD (Coming Soon)
             </div>
           </div>
         </div>
@@ -124,23 +139,23 @@
         <div>
           <div class="text-gray-500 uppercase text-xs mb-2">Products and Services</div>
           <router-link @click="isMobileMenuOpen = false" to="/btcusd" class="block pl-2 py-2 hover:text-secondary flex items-center gap-2">
-            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" /> BTCUSD
+            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="16" /> BTCUSD
           </router-link>
           <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" /> BTCEUR (Coming Soon)
+            <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="16" /> BTCEUR (Coming Soon)
           </div>
           <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" /> BTCJPY (Coming Soon)
+            <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="16" /> BTCJPY (Coming Soon)
           </div>
           <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">🟡 BTC/XAU (Coming Soon)</div>
           <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" /> BTCGBP (Coming Soon)
+            <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="16" /> BTCGBP (Coming Soon)
           </div>
           <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" /> BTCCAD (Coming Soon)
+            <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="16" /> BTCCAD (Coming Soon)
           </div>
           <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" /> BTCAUD (Coming Soon)
+            <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="16" /> BTCAUD (Coming Soon)
           </div>
         </div>
 
@@ -198,7 +213,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import logo from '../assets/logos/cadena_bitcoin_logo.png'
 import { getToken } from '../api/token'
 import { logout } from '../api/auth'
 

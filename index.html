@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!-- index.html -->
+<link
+  rel="preload"
+  as="image"
+  type="image/avif"
+  href="/img/iPhoneSC-960.avif"
+  imagesrcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w"
+  imagesizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
+  media="(min-width: 640px)"
+  fetchpriority="high">
+
+
     <meta name="google-site-verification" content="81xpQITcxAT4xgtnYpryWPenzO-SgpUAtDAGLrOLGWg" />
     <script>
   (function () {
@@ -10,25 +22,24 @@
     }
   })();
   </script>
-    <link rel="preload" as="image"
-  href="/img/iphone-sc-960.avif"
-  imagesrcset="/img/iphone-sc-640.avif 640w, /img/iphone-sc-960.avif 960w, /img/iphone-sc-1280.avif 1280w"
-  imagesizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
-  fetchpriority="high">
+   <meta charset="UTF-8" />
+  <!-- Tell bots they CAN index this page -->
+<meta name="robots"
+      content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
 
-    <meta charset="UTF-8" />
+<!-- Canonical for the homepage -->
+<link rel="canonical" href="https://cadenabitcoin.com/" />
+
+<!-- Required by Lighthouse: meta description (150–160 chars ideal) -->
+<meta name="description"
+      content="Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains." />
+
+
+
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cadena Bitcoin</title>
-    <!-- X (Twitter) Pixel: base -->
-      <script>
-      !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
-      },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
-      a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
-      twq('config','prcqf');        // <-- your Pixel ID
-      twq('event','PageView');      // <-- initial page view
-      </script>
-      <!-- /X Pixel: base -->
-
+    
   </head>
   <body class="bg-primary text-white">
     <div id="app"></div>

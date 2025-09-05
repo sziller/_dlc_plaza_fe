@@ -6,7 +6,8 @@ if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
 } else if (host === 'staging.purabitcoin.com') {
   API_URL = import.meta.env.VITE_STAGING_API_URL
 } else {
-  API_URL = import.meta.env.VITE_STAGING_API_URL // default to staging for unknown hosts
+    API_URL = 'https://staging.purabitcoin.com'
+  //API_URL = import.meta.env.VITE_STAGING_API_URL // default to staging for unknown hosts
 }
 export{ API_URL };
 const CLIENT_ID = 'string';

@@ -1,0 +1,1 @@
+import{x as e,A as o}from"./index-DOOEPxDx.js";const r=async t=>{const a=await e.get(`${o}/app/dlcp/v0/cadena-defaults`,{params:{topic:t},headers:{Accept:"application/json"}});if(a.data&&a.data.payload&&typeof a.data.payload.text=="string")return a.data.payload.text;throw new Error("Invalid response format")};export{r as g};

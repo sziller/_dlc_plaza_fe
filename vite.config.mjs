@@ -7,13 +7,19 @@ import IconsResolver from 'unplugin-icons/resolver'
 
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          // 👇 Tell Vue to ignore <lite-youtube> as a native custom element
+          isCustomElement: (tag) => tag === 'lite-youtube',
+        },
+      },
+    }),
     Components({
       // Auto-register components like <i-simple-icons-x />
       resolvers: [IconsResolver({ componentPrefix: 'i' })],
-      // optional: generate d.ts for auto-imported components
       dts: 'src/components.d.ts',
     }),
-    Icons(), // pulls icon data from @iconify/json
+    Icons(),
   ],
 })
