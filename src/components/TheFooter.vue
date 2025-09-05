@@ -54,6 +54,7 @@
       <!-- 📎 Footer Bottom -->
       <div class="mt-12 border-t border-gray-200 pt-6 text-sm text-center text-secondary/60">
         &copy; {{ new Date().getFullYear() }} Cadena Bitcoin. All rights reserved.
+        <p>Cadena Bitcoin is operated by Cadena Bitcoin S.A. de C.V. an El Salvador liscenced Bitcoin Service provider. Address: Calle Llama del Bosque Poniente, Urbanización Madre Selva III, Edificio Avante, Local 3-13, Antiguo Cuscatlán, La Libertad, El Salvador</p>
       </div>
     </div>
   </footer>
