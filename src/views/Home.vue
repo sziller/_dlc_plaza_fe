@@ -3,12 +3,12 @@ import { ref, computed, onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 
+
 const videos = [
   'Psuh8mml91o',
   'D7HDDxh0Wjo',
   'l_cy-tWM_lA',
 ]
-
 
 const articles = [
   {
@@ -79,9 +79,7 @@ function handleScroll() {
 
 onMounted(() => {
   setUserFromApi()
-  const updateIsMobile = () => {
-    isMobile.value = window.innerWidth < 640
-  }
+  const updateIsMobile = () => { isMobile.value = window.innerWidth < 640 }
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
   window.addEventListener('scroll', handleScroll)
@@ -89,16 +87,11 @@ onMounted(() => {
 })
 
 const visibleArticles = computed(() => {
-  if (isMobile.value) {
-    return articles
-  } else {
-    const result = []
-    const len = articles.length
-    for (let i = 0; i < 3; i++) {
-      result.push(articles[(currentIndex.value + i) % len])
-    }
-    return result
-  }
+  if (isMobile.value) return articles
+  const result = []
+  const len = articles.length
+  for (let i = 0; i < 3; i++) result.push(articles[(currentIndex.value + i) % len])
+  return result
 })
 
 function scrollLeft() {
@@ -114,221 +107,202 @@ function scrollRight() {
 }
 </script>
 
-
 <template>
-   <!-- Page wrapper with global gradient background -->
+  <!-- Page wrapper with global gradient background -->
   <div class="relative min-h-screen mt-20 text-white">
-    <!-- Full-page gradient layer -->
-    <div
-  class="fixed inset-0 -z-10"
-  style="background: linear-gradient(
-    to bottom,
-    #000000 0%,
-    #000000 56%,
-    #0a051f 66%,
-    #1b0a3c 76%,
-    #35157a 88%,
-    #6738e4 100%
-  );">
-</div>
+    <!-- Full-page gradient layer (moved to CSS class) -->
+    <div class="fixed inset-0 -z-10 bg-page-gradient"></div>
 
-
-  <!-- Hero Section (no animation) -->
-  <section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
-    <!-- Left: Text -->
-    <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
-      <div class="w-full max-w-2xl text-center sm:text-left">
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-          Unlock your Bitcoin's potential.
-        </h2>
-        <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
-          Access loans without selling your Bitcoin or earn yield secured by 
-          Bitcoin.  Better rates, your keys, no sidechains.
-        </p>
-        <!-- Longer email input field with smaller button below -->
-        <div class="mt-8 flex flex-col items-center gap-4 w-full">
-          <input
-            v-model="ctaEmail"
-            type="email"
-            placeholder="Enter your email address"
-            class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
-          />
-          <router-link
-            :to="ctaEmail ? `/register?email=${encodeURIComponent(ctaEmail)}` : '/register'"
-            class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2"
-            style="width: auto; min-width: 180px; max-width: 300px;"
-          >
-            Get Started Today
-          </router-link>
-        </div>
-      </div>
-    </div>
-
-   <!-- Right: iPhone mockup -->
-<div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10">
-  <div class="[perspective:1100px]">
-    <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
-      <picture>
-  <source
-    type="image/avif"
-    srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
-  <source
-    type="image/webp"
-    srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
-  <img
-    src="/img/iPhoneSC-960.webp"
-    srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
-    sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
-    width="420" height="840"
-    fetchpriority="high" loading="eager" decoding="async"
-    class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
-    alt="App preview on iPhone" draggable="false"
-  />
-</picture>
-    </div>
-  </div>
-</div>
-
-
-  </section>
-
-  <!-- Satoshi Quote (animate in from left) -->
-  <section
-    class="w-full bg-transparent text-white py-12 px-6 sm:px-8 lg:px-12 text-center animated-section"
-    :class="sectionInView[0] ? 'animate-in-left' : ''"
-  >
-    <blockquote class="text-2xl md:text-3xl font-semibold leading-tight max-w-5xl mx-auto">
-      “The main benefits are lost if a trusted third party is still required.”
-    </blockquote>
-    <cite class="block mt-4 text-white text-lg">— Satoshi Nakamoto</cite>
-  </section>
-
-  <!-- What is Cadena Bitcoin (no animation) -->
-<section>
-  <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
-      <div>
-        <div class="max-w-3xl">
-          <h2 class="text-3xl sm:text-4xl md:text-[2.5rem] font-bold text-white leading-tight">
-            What is Cadena Bitcoin?
+    <!-- Hero Section (no animation) -->
+    <section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
+      <!-- Left: Text -->
+      <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
+        <div class="w-full max-w-2xl text-center sm:text-left">
+          <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+            Unlock your Bitcoin's potential.
           </h2>
-          <p class="mt-6 text-white text-lg md:text-xl leading-relaxed">
-            Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Whether you want to grow your Bitcoin holdings or generate fiat returns secured by Bitcoin, Cadena's innovative technology allows
-            <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/80">users to always maintain custody of their Bitcoin</span>
+          <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
+            Access loans without selling your Bitcoin or earn yield secured by 
+            Bitcoin.  Better rates, your keys, no sidechains.
           </p>
+          <!-- Longer email input field with smaller button below -->
+          <div class="mt-8 flex flex-col items-center gap-4 w-full">
+            <input
+              v-model="ctaEmail"
+              type="email"
+              placeholder="Enter your email address"
+              class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
+            />
+            <router-link
+              :to="ctaEmail ? `/register?email=${encodeURIComponent(ctaEmail)}` : '/register'"
+              class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
+            >
+              Get Started Today
+            </router-link>
+          </div>
         </div>
       </div>
-      <div>
-        <!-- ✅ only the ID, not a full URL -->
-        <lite-youtube
-          videoid="0v_okPUvHvQ"
-          playlabel="Watch overview"
-          params="rel=0&modestbranding=1&iv_load_policy=3">
-        </lite-youtube>
-      </div>
-    </div>
-  </div>
-</section>
 
-  <!-- Featured Articles (animate in from right) -->
-  <section
-    class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8 animated-section"
-    :class="sectionInView[1] ? 'animate-in-right' : ''"
-  >
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
-        <p class="mt-4 text-white text-lg">Stay updated with our latest insights</p>
-      </div>
-
-      <div class="relative flex items-center justify-center">
-        <!-- Left Arrow (hidden on mobile) -->
-        <button
-          @click="scrollLeft"
-          class="hidden sm:flex absolute left-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
-        >
-          ◀
-        </button>
-
-        <!-- Carousel Scroll Wrapper (NO max-w limit here!) -->
-<div class="w-full overflow-x-auto sm:overflow-visible px-2">
-  <div class="flex space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-x snap-mandatory sm:snap-none">
-
-    <template v-for="article in visibleArticles" :key="article.id">
-      <!-- internal -->
-      <router-link
-        v-if="article.internal"
-        :to="article.link"
-        class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
-      >
-        <picture>
-          <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
-          <source type="image/webp" :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`" />
-          <img
-            :src="`/img/${article.imageBase}-480.webp`"
-            :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`"
-            sizes="(max-width: 640px) 280px, 300px"
-            width="300" height="192"
-            loading="lazy" decoding="async"
-            class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90"
-            :alt="article.title"
-          />
-        </picture>
-        <div class="p-4">
-          <h3 class="text-xl font-semibold mb-2 text-white">{{ article.title }}</h3>
-          <p class="text-white/80 text-sm">{{ article.description }}</p>
-          <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
+      <!-- Right: iPhone mockup (kept clean; glow can be done with CSS ::before if you want) -->
+      <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10 phone-col">
+        <div class="[perspective:1100px]">
+          <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
+            <picture>
+              <source type="image/avif" srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
+              <source type="image/webp" srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
+              <img
+                src="/img/iPhoneSC-960.webp"
+                srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
+                sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
+                width="420" height="840"
+                fetchpriority="high" loading="eager" decoding="async"
+                class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
+                alt="App preview on iPhone" draggable="false"
+              />
+            </picture>
+          </div>
         </div>
-      </router-link>
+      </div>
+    </section>
 
-      <!-- external (must be immediately after the v-if, with nothing in between) -->
-      <a
-        v-else
-        :href="article.link"
-        target="_blank" rel="noopener"
-        class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
-      >
-        <picture>
-          <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
-          <source type="image/webp" :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`" />
-          <img
-            :src="`/img/${article.imageBase}-480.webp`"
-            :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`"
-            sizes="(max-width: 640px) 280px, 300px"
-            width="300" height="192"
-            loading="lazy" decoding="async"
-            class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90"
-            :alt="article.title"
-          />
-        </picture>
-        <div class="p-4">
-          <h3 class="text-xl font-semibold mb-2 text-white">{{ article.title }}</h3>
-          <p class="text-white/80 text-sm">{{ article.description }}</p>
-          <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
-        </div>
-      </a>
-    </template>
+    <!-- Satoshi Quote (animate in from left) -->
+    <section
+      class="w-full bg-transparent text-white py-12 px-6 sm:px-8 lg:px-12 text-center animated-section"
+      :class="sectionInView[0] ? 'animate-in-left' : ''"
+    >
+      <blockquote class="text-2xl md:text-3xl font-semibold leading-tight max-w-5xl mx-auto">
+        “The main benefits are lost if a trusted third party is still required.”
+      </blockquote>
+      <cite class="block mt-4 text-white text-lg">— Satoshi Nakamoto</cite>
+    </section>
 
+    <!-- What is Cadena Bitcoin (no animation) -->
+    <section>
+      <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
+          <div>
+            <div class="max-w-3xl">
+              <h2 class="text-3xl sm:text-4xl md:text-[2.5rem] font-bold text-white leading-tight">
+                What is Cadena Bitcoin?
+              </h2>
+              <p class="mt-6 text-white text-lg md:text-xl leading-relaxed">
+                Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Whether you want to grow your Bitcoin holdings or generate fiat returns secured by Bitcoin, Cadena's innovative technology allows
+                <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/80">users to always maintain custody of their Bitcoin</span>
+              </p>
+            </div>
+          </div>
+          <div>
+  <div class="yt">
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/0v_okPUvHvQ?rel=0&modestbranding=1&playsinline=1"
+      title="What is Cadena Bitcoin?"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+    ></iframe>
   </div>
 </div>
 
-
-        <!-- Right Arrow (hidden on mobile) -->
-        <button
-          @click="scrollRight"
-          class="hidden sm:flex absolute right-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
-        >
-          ▶
-        </button>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Latest Videos (animate in from left) -->
-  <section
-  class="bg-transparent text-white pt-8 pb-8 px-6 animated-section"
-  :class="sectionInView[2] ? 'animate-in-left' : ''"
->
+    <!-- Featured Articles (animate in from right) -->
+    <section
+      class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8 animated-section"
+      :class="sectionInView[1] ? 'animate-in-right' : ''"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
+          <p class="mt-4 text-white text-lg">Stay updated with our latest insights</p>
+        </div>
+
+        <div class="relative flex items-center justify-center">
+          <!-- Left Arrow (hidden on mobile) -->
+          <button
+            @click="scrollLeft"
+            class="hidden sm:flex absolute left-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
+          >
+            ◀
+          </button>
+
+          <!-- Carousel Scroll Wrapper (NO max-w limit here!) -->
+          <div class="w-full overflow-x-auto sm:overflow-visible px-2">
+            <div class="flex space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-x snap-mandatory sm:snap-none">
+              <template v-for="article in visibleArticles" :key="article.id">
+                <!-- internal -->
+                <router-link
+                  v-if="article.internal"
+                  :to="article.link"
+                  class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
+                >
+                  <picture>
+                    <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
+                    <source type="image/webp" :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`" />
+                    <img
+                      :src="`/img/${article.imageBase}-480.webp`"
+                      :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`"
+                      sizes="(max-width: 640px) 280px, 300px"
+                      width="300" height="192"
+                      loading="lazy" decoding="async"
+                      class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90"
+                      :alt="article.title"
+                    />
+                  </picture>
+                  <div class="p-4">
+                    <h3 class="text-xl font-semibold mb-2 text-white">{{ article.title }}</h3>
+                    <p class="text-white/80 text-sm">{{ article.description }}</p>
+                    <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
+                  </div>
+                </router-link>
+
+                <!-- external -->
+                <a
+                  v-else
+                  :href="article.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
+                >
+                  <picture>
+                    <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
+                    <source type="image/webp" :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`" />
+                    <img
+                      :src="`/img/${article.imageBase}-480.webp`"
+                      :srcset="`/img/${article.imageBase}-320.webp 320w, /img/${article.imageBase}-480.webp 480w, /img/${article.imageBase}-640.webp 640w`"
+                      sizes="(max-width: 640px) 280px, 300px"
+                      width="300" height="192"
+                      loading="lazy" decoding="async"
+                      class="w-full h-48 object-cover transition-opacity duration-300 hover:opacity-90"
+                      :alt="article.title"
+                    />
+                  </picture>
+                  <div class="p-4">
+                    <h3 class="text-xl font-semibold mb-2 text-white">{{ article.title }}</h3>
+                    <p class="text-white/80 text-sm">{{ article.description }}</p>
+                    <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
+                  </div>
+                </a>
+              </template>
+            </div>
+          </div>
+
+          <!-- Right Arrow (hidden on mobile) -->
+          <button
+            @click="scrollRight"
+            class="hidden sm:flex absolute right-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
+          >
+            ▶
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest Videos (animate in from left) -->
+   <!-- Latest Videos -->
+<section class="bg-transparent text-white pt-8 pb-8 px-6 animated-section" :class="sectionInView[2] ? 'animate-in-left' : ''">
   <div class="max-w-6xl mx-auto space-y-12">
     <div class="text-center space-y-4">
       <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
@@ -336,30 +310,33 @@ function scrollRight() {
         Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
       </p>
     </div>
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <lite-youtube
-        v-for="video in videos"
-        :key="video"
-        :videoid="video"
-        playlabel="Watch now"
-        params="rel=0&modestbranding=1"
-      />
+      <div v-for="id in videos" :key="id" class="yt">
+        <iframe
+          :src="`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1`"
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>
     </div>
   </div>
 </section>
-  <!-- FAQ (no animation) -->
-  <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto space-y-12">
-      <!-- Heading -->
-      <div class="text-center">
-        <h2 class="text-3xl md:text-4xl font-extrabold">Frequently Asked Questions</h2>
-        <p class="mt-4 text-white text-lg">
-          Everything you need to know about Cadena Bitcoin’s loan product.
-        </p>
-      </div>
 
-      <!-- FAQ Accordion -->
-      <div class="space-y-4">
+    <!-- FAQ (no animation) -->
+    <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto space-y-4">
+        <div class="text-center">
+          <h2 class="text-3xl md:text-4xl font-extrabold">Frequently Asked Questions</h2>
+          <p class="mt-4 text-white text-lg">
+            Everything you need to know about Cadena Bitcoin’s loan product.
+          </p>
+        </div>
+
+        <!-- (FAQ items unchanged) -->
         <details class="group [&_summary::-webkit-details-marker]:hidden" open>
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">What is the loan amount?</h2>
@@ -456,19 +433,6 @@ year).</p>
 
         <details class="group [&_summary::-webkit-details-marker]:hidden">
           <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">What happens if my collateral drops in value?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">
-            Nothing happens with the collateral until it is divided on final settlement.
-          </p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
             <h2 class="text-lg font-medium">Is there a credit check?</h2>
             <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
                  xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -478,43 +442,99 @@ year).</p>
           <p class="px-4 pt-4 text-white">No. Your bitcoin is your credit.</p>
         </details>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Final CTA Section (no animation for footer) -->
-  <section class="bg-secondary text-white py-12 px-6">
-    <div class="max-w-4xl mx-auto text-center space-y-6">
-      <h2 class="text-3xl md:text-4xl font-extrabold">
-        Ready to Experience Decentralized Bitcoin Finance?
-      </h2>
-      <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-        Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-              <router-link
-        :to="isLoggedIn ? '/btcusd' : '/register'"
-        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-      >
-        Borrow Bitcoin
-      </router-link>
+    <!-- Final CTA Section (no animation for footer) -->
+    <section class="bg-secondary text-white py-12 px-6">
+      <div class="max-w-4xl mx-auto text-center space-y-6">
+        <h2 class="text-3xl md:text-4xl font-extrabold">
+          Ready to Experience Decentralized Bitcoin Finance?
+        </h2>
+        <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+          Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+          <router-link
+            :to="isLoggedIn ? '/btcusd' : '/register'"
+            class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+          >
+            Borrow Bitcoin
+          </router-link>
 
-      <router-link
-        :to="isLoggedIn ? '/btcusd' : '/register'"
-        class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
-      >
-        Lend Bitcoin
-      </router-link>
-
+          <router-link
+            :to="isLoggedIn ? '/btcusd' : '/register'"
+            class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
+          >
+            Lend Bitcoin
+          </router-link>
+        </div>
       </div>
-    </div>
-  </section>
-
-  
+    </section>
   </div>
+
   <TheFooter />
 </template>
 
 <style scoped>
+/* ===== No inline styles; CSP-friendly ===== */
+
+/* Page gradient moved from style= to a class */
+.bg-page-gradient{
+  background-color: #000; /* solid black base */
+  background-image:
+    radial-gradient(
+      125% 75% at 50% 100%,      /* big ellipse, anchored at bottom center */
+      rgba(103,56,228,0.58) 0%,  /* #6738e4, strongest near bottom */
+      rgba(103,56,228,0.36) 26%,
+      rgba(103,56,228,0.16) 52%,
+      rgba(0,0,0,0) 76%          /* fade to transparent -> pure black */
+    );
+}
+
+/* Smoother math when OKLCH is available, but same hue (#6738e4) */
+@supports (background: radial-gradient(in oklch, black, white)) {
+  .bg-page-gradient{
+    background-color: oklch(0 0 0);
+    background-image:
+      radial-gradient(
+        in oklch 125% 75% at 50% 100%,
+        oklch(from #6738e4 l c h / 0.60) 0%,
+        oklch(from #6738e4 l c h / 0.36) 26%,
+        oklch(from #6738e4 l c h / 0.16) 52%,
+        oklch(0 0 0 / 0) 76%
+      );
+  }
+}
+
+/* Keep the glow lower on short screens so it doesn't climb mid-page */
+@media (max-height: 800px){
+  .bg-page-gradient{
+    background-image:
+      radial-gradient(
+        120% 60% at 50% 100%,
+        rgba(103,56,228,0.52) 0%,
+        rgba(103,56,228,0.30) 24%,
+        rgba(103,56,228,0.12) 48%,
+        rgba(0,0,0,0) 70%
+      );
+  }
+}
+
+/* Optional: soft glow behind the phone - pure CSS, no inline */
+.phone-col::before{
+  content:"";
+  position:absolute; inset:0; margin:auto;
+  width:560px; height:560px; border-radius:9999px;
+  filter:blur(80px); opacity:.85;
+  background: radial-gradient(55% 55% at 50% 50%,
+    rgba(103,56,228,.70) 0%,
+    rgba(103,56,228,.40) 35%,
+    rgba(53,21,122,.30) 60%,
+    rgba(0,0,0,0) 75%);
+  pointer-events:none;
+}
+@media (min-width:1024px){ .phone-col::before{ width:680px; height:680px; } }
+
 /* Animation classes */
 .animated-section {
   opacity: 0;
@@ -536,48 +556,35 @@ year).</p>
   transform: translateX(0);
   animation: slideInRight 1.2s cubic-bezier(.77,0,.18,1);
 }
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-180px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(180px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-180px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(180px); } to { opacity: 1; transform: translateX(0); } }
 
 /* Optional: hide scrollbar if needed */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scale-wrapper {
-  width: 100%;
-  transform-origin: top center;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+.scale-wrapper { width: 100%; transform-origin: top center; }
 @media (max-width: 640px) {
-  .scale-wrapper {
-    transform: scale(calc(100vw / 640));
-  }
+  .scale-wrapper { transform: scale(calc(100vw / 640)); }
 }
 
 /* Fix for top cut-off: add top padding to main container, not body */
-section.bg-primary {
-  padding-top: 5.5rem !important; /* Adjust as needed for your navbar height */
+section.bg-primary { padding-top: 5.5rem !important; }
+.yt{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.yt iframe{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
 }
 </style>
