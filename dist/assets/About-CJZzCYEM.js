@@ -1,1 +1,0 @@
-import{_ as s,a,b as o,d as t}from"./index-DOOEPxDx.js";const n={};function r(l,e){return o(),a("div",null,[...e[0]||(e[0]=[t("h1",{class:"text-2xl font-bold text-tertiary"},"About Page",-1),t("p",null,"This is a sample second page.",-1)])])}const d=s(n,[["render",r]]);export{d as default};
