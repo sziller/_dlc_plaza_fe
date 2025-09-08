@@ -65,7 +65,7 @@ to a 365-day base.
 
         <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Loan Size</h4>
         <p>
-          Base loan value is 0.1 BTC. The borrower receives 80% of the contract sum (0.08 BTC).
+          Base loan value is 0.1 BTC. 
         </p>
 
         <p><span class="font-semibold text-secondary">Lender contribution:</span> Base Loan / (1.0 + interest / 100)</p>
@@ -80,9 +80,7 @@ to a 365-day base.
           A single Contract Execution Transaction (CET) splits collateral based on BTCUSD price at maturity.
         </p>
 
-        <p>
-          The lender receives 0.08 BTC × (BTC price at acceptance ÷ price at maturity). The borrower receives the remainder.
-        </p>
+        
       </div>
     </section>
 
