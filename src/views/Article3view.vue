@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-primary  mt-20 text-white">
+  <div class="bg-black mt-20 text-white overflow-x-hidden">
     <!-- HERO TITLE SECTION -->
     <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">
@@ -11,8 +11,8 @@
       </div>
     </section>
 
-    <!-- ARTICLE CONTENT -->
-    <section class="px-10 py-5 lg:py-14 max-w-[1100px] mx-auto space-y-6 text-lg leading-relaxed text-white/90">
+    <!-- ARTICLE CONTENT (now on black) -->
+    <section class="bg-black px-10 py-5 lg:py-14 max-w-[1100px] mx-auto space-y-6 text-lg leading-relaxed text-white/90">
       <p>
         Cadena Bitcoin lets you use Bitcoin flexibly—whether you want to grow your
         Bitcoin holdings, access fiat without losing Bitcoin exposure, or generate 
@@ -54,60 +54,53 @@
       </p>
     </section>
 
-    <!-- VIDEO SECTION -->
-    
-   <section class="bg-secondary text-white py-20 px-6 relative">
-  <div class="max-w-4xl mx-auto text-center space-y-6">
-    <h2 class="text-3xl md:text-4xl font-extrabold">
-      Cadena Bitcoin Empowers Individual Financial Freedom
-    </h2>
-    <h4 class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-      Looking for Leverage or Yield?
-    </h4>
-    <div class="flex justify-center mt-8">
-      <router-link
-        :to="isLoggedIn ? '/btcusd' : '/register'"
-        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-      >
-        Get Started with Cadena Bitcoin
-      </router-link>
-    </div>
+    <!-- CTA SECTION (stays purple) -->
+    <section class="bg-secondary text-white py-20 px-6 relative">
+      <div class="max-w-4xl mx-auto text-center space-y-6">
+        <h2 class="text-3xl md:text-4xl font-extrabold">
+          Cadena Bitcoin Empowers Individual Financial Freedom
+        </h2>
+        <h4 class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+          Looking for Leverage or Yield?
+        </h4>
+        <div class="flex justify-center mt-8">
+          <router-link
+            :to="isLoggedIn ? '/btcusd' : '/register'"
+            class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+          >
+            Get Started with Cadena Bitcoin
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Prev: stacks under CTA on mobile; absolute on md+ -->
+      <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
+        <router-link
+          to="/article/cadena-vs-others"
+          class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+        >
+          <span class="text-2xl">←</span>
+          <span class="leading-tight">
+            Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance
+          </span>
+        </router-link>
+      </div>
+
+      <!-- Next: follows prev on mobile; absolute on md+ -->
+      <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
+        <router-link
+          to="/article/cadena-loan-lifecycle"
+          class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+        >
+          <span class="leading-tight">
+            Cadena Bitcoin: Security
+          </span>
+          <span class="text-2xl">→</span>
+        </router-link>
+      </div>
+    </section>
   </div>
 
-  <!-- Prev: stacks under CTA on mobile; absolute on md+ -->
-  <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
-    <router-link
-      to="/article/cadena-vs-others"
-      class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
-    >
-      <span class="text-2xl">←</span>
-      <span class="leading-tight">
-        Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance
-      </span>
-    </router-link>
-  </div>
-
-  <!-- Next: follows prev on mobile; absolute on md+ -->
-  <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
-    <router-link
-      to="/article/cadena-loan-lifecycle"
-      class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
-    >
-      <span class="leading-tight">
-        Cadena Bitcoin: Security
-      </span>
-      <span class="text-2xl">→</span>
-    </router-link>
-  </div>
-</section>
-
-
-
-
-
-    <!-- FOOTER -->
-    
-  </div>
   <TheFooter />
 </template>
 
@@ -115,7 +108,9 @@
 import { onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
+
 const { isLoggedIn, setUserFromApi } = useAuth()
+
 onMounted(() => {
   setUserFromApi()
   window.scrollTo(0, 0)
@@ -123,12 +118,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+/* optional scrollbar styling */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 4px;

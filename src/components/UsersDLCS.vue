@@ -15,12 +15,24 @@
                 <th
                   v-for="col in columns"
                   :key="col.key"
-                  @click="sortBy(col.key)"
-                  class="px-4 py-2 cursor-pointer select-none hover:text-secondary transition whitespace-nowrap"
+                  scope="col"
+                  class="px-4 py-2 whitespace-nowrap"
+                  :aria-sort="sortKey === col.key ? (sortAsc ? 'ascending' : 'descending') : 'none'"
                 >
-                  {{ col.label }}
-                  <span v-if="sortKey === col.key">
-                    {{ sortAsc ? '↑' : '↓' }}
+                  <button
+                    type="button"
+                    class="cursor-pointer select-none hover:text-secondary transition inline-flex items-center gap-1"
+                    @click="sortBy(col.key)"
+                    @keydown.enter.prevent="sortBy(col.key)"
+                    @keydown.space.prevent="sortBy(col.key)"
+                  >
+                    <span>{{ col.label }}</span>
+                    <span v-if="sortKey === col.key" aria-hidden="true">
+                      {{ sortAsc ? '↑' : '↓' }}
+                    </span>
+                  </button>
+                  <span v-if="sortKey === col.key" class="sr-only">
+                    (sorted {{ sortAsc ? 'ascending' : 'descending' }})
                   </span>
                 </th>
               </tr>
@@ -31,6 +43,10 @@
                 v-for="row in sortedData"
                 :key="row.dlcId"
                 @click="selectDlc(row)"
+                @keydown.enter.prevent="selectDlc(row)"
+                @keydown.space.prevent="selectDlc(row)"
+                role="button"
+                tabindex="0"
                 class="hover:bg-white/5 cursor-pointer transition border-b border-white/10"
               >
                 <td class="px-4 py-3">{{ row.dlcId }}</td>
@@ -82,7 +98,7 @@ const props = defineProps({
   pollMs: { type: Number, default: 30000 } // 30s
 })
 
-const columns = [
+const columns = Object.freeze([
   { label: 'DLC ID', key: 'dlcId' },
   { label: 'Oracle', key: 'oracle' },
   { label: 'Term', key: 'term' },
@@ -90,7 +106,7 @@ const columns = [
   { label: 'Rate', key: 'rate' },
   { label: 'Status', key: 'status' },
   { label: 'Role', key: 'role' },
-]
+])
 
 // state
 const apiDlcs = ref([])     // raw payload from API
@@ -116,9 +132,9 @@ const parseTermDays = (pid, duration) => {
 const isHiddenEmail = (s) => String(s ?? '').trim() === '--- hidden ---'
 const roleLabel = (ini_role, ini_email) => {
   if (ini_role === 'lend' && !isHiddenEmail(ini_email)) return 'Lender'
-  if (ini_role === 'lend' && isHiddenEmail(ini_email)) return 'Borrower'
+  if (ini_role === 'lend' && isHiddenEmail(ini_email))  return 'Borrower'
   if (ini_role === 'borrow' && !isHiddenEmail(ini_email)) return 'Borrower'
-  if (ini_role === 'borrow' && isHiddenEmail(ini_email)) return 'Lender'
+  if (ini_role === 'borrow' && isHiddenEmail(ini_email))  return 'Lender'
   return '—'
 }
 const statusLabel = (s) => s || '—'
@@ -175,7 +191,10 @@ let pollId = null
 let isFetching = false
 let hasLoadedOnce = false
 
-const statuses = ["offer_p","offer_dlc","sign_ini","sign_acc","signed","broadcast","active","attested","executed","settled","revoked","reset"]
+const statuses = Object.freeze([
+  "offer_p","offer_dlc","sign_ini","sign_acc","signed",
+  "broadcast","active","attested","executed","settled","revoked","reset"
+])
 
 function sameRows(a, b) {
   // compare on stable keys only
@@ -193,6 +212,9 @@ function sameRows(a, b) {
 
 async function load(initial = false) {
   if (isFetching) return
+  // Skip background polling when tab is hidden (saves battery/network)
+  if (!initial && document.hidden) return
+
   isFetching = true
   if (initial) { loading.value = true; error.value = null }
   try {
@@ -238,7 +260,7 @@ function onAuthChanged() {
 // lifecycle
 onMounted(async () => {
   await load(true)
-  pollId = setInterval(() => load(false), props.pollMs)
+  pollId = setInterval(() => { if (!document.hidden) load(false) }, props.pollMs)
   document.addEventListener('visibilitychange', onVisChange)
   window.addEventListener('focus', onFocus)
   window.addEventListener('auth-changed', onAuthChanged)
@@ -266,5 +288,12 @@ tbody tr:hover {
 }
 th {
   user-select: none;
+}
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
 }
 </style>

@@ -27,23 +27,23 @@
                 <tr class="text-white text-md">
                   <th class="px-4 py-4 text-left">Term</th>
                   <th class="px-4 py-4">
-                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center min-w-[6rem]">
                       Lend
                     </div>
                   </th>
                   <th class="px-4 py-4">
-                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center min-w-[6rem]">
                       Borrow
                     </div>
                   </th>
                   <th class="spacer px-4 py-4"></th>
                   <th class="px-4 py-4">
-                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center min-w-[6rem]">
                       Lend
                     </div>
                   </th>
                   <th class="px-4 py-4">
-                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center" style="min-width: 6rem;">
+                    <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center min-w-[6rem]">
                       Borrow
                     </div>
                   </th>
@@ -63,8 +63,7 @@
                     v-for="(key) in leftKeys"
                     :key="key"
                     @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
-                    style="min-width: 6rem;"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer min-w-[6rem]"
                   >
                     <div>
                       <span
@@ -92,8 +91,7 @@
                     v-for="(key) in rightKeys"
                     :key="key"
                     @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer"
-                    style="min-width: 6rem;"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer min-w-[6rem]"
                   >
                     <div>
                       <span
@@ -139,11 +137,9 @@
                     :key="`m-${term.label}-${key}`"
                     type="button"
                     @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                    style="min-width: 6rem;"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-w-[6rem]"
                   >
                     <div class="space-y-1">
-                      <!-- 🔹 Lend/Borrow label -->
                       <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                         {{ key.includes('a') ? 'Lend' : 'Borrow' }}
                       </div>
@@ -179,11 +175,9 @@
                     :key="`m-${term.label}-${key}`"
                     type="button"
                     @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                    style="min-width: 6rem;"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-w-[6rem]"
                   >
                     <div class="space-y-1">
-                      <!-- 🔹 Lend/Borrow label -->
                       <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                         {{ key.includes('a') ? 'Lend' : 'Borrow' }}
                       </div>
@@ -238,6 +232,15 @@ import { getToken } from '../api/token'
 
 const router = useRouter()
 
+// dev-only logging (nothing leaks in prod)
+function logDev(...args) {
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+      console.log(...args)
+    }
+  } catch {}
+}
+
 // ===== Auth state =====
 const isLoggedIn = ref(false)
 function updateAuthState() {
@@ -263,7 +266,6 @@ function handleCellClick(row, key) {
   selectedTermDays.value = getDaysFromLabel(row.label)
   selectedLtv.value = key.startsWith('ltv50') ? 50 : 80
 
-  // map "ltv50a" -> "ltv50aId" etc.
   const idKey = `${key}Id`
   selectedOfferId.value = row[idKey] || null
 
@@ -275,7 +277,6 @@ async function handleOrderSubmit(data) {
   modalNotice.value = { type: '', text: '' }
   modalLoading.value = true
 
-  // MARKET: accept existing best offer by id
   if (type === 'market') {
     if (!selectedOfferId.value) {
       modalLoading.value = false
@@ -284,7 +285,7 @@ async function handleOrderSubmit(data) {
     }
     try {
       const res = await acceptOffer({ dlc_id: String(selectedOfferId.value) })
-      console.log('Offer accepted:', res)
+      logDev('Offer accepted:', res)
       modalNotice.value = { type: 'success', text: 'Market order accepted.' }
     } catch (e) {
       const msg = e?.response?.data?.detail || e?.message || 'Accept failed.'
@@ -295,7 +296,6 @@ async function handleOrderSubmit(data) {
     return
   }
 
-  // LIMIT: post a new offer
   if (type !== 'limit') return
   const interest = toNum(data.rate)
   if (!Number.isFinite(interest)) {
@@ -318,8 +318,7 @@ async function handleOrderSubmit(data) {
 
   try {
     const res = await postOffer(params)
-    console.log('Offer posted:', res)
-    const apiMsg = res?.message || res?.payload?.message
+    logDev('Offer posted:', res)
     modalNotice.value = { type: 'success', text: 'Limit order posted' }
   } catch (e) {
     const msg = e?.response?.data?.detail || e?.message || 'Offer failed.'
@@ -336,9 +335,8 @@ const props = defineProps({
   rightGroupLabel: { type: String, default: '80% LTV' },
   leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
-  // polling and flash tuning
-  offersPollMs: { type: Number, default: 5000 },     // fetch every 5s
-  changeFlashMs: { type: Number, default: 600 },     // flash duration per change
+  offersPollMs: { type: Number, default: 5000 },
+  changeFlashMs: { type: Number, default: 600 },
 })
 
 // ===== Table rows (built from API) =====
@@ -358,14 +356,8 @@ function getEar(row, key) {
 // ===== Offer → table transform =====
 const TARGET_TERMS = [30, 90, 180, 365]
 
-// backend uses 360, UI uses 365
-function mapDaysForUi(d) {
-  return d === 360 ? 365 : d
-}
-function parseLtv(pid) {
-  const m = String(pid || '').match(/ltv-(\d{1,3})/i)
-  return m ? Number(m[1]) : null
-}
+function mapDaysForUi(d) { return d === 360 ? 365 : d }
+function parseLtv(pid) { const m = String(pid || '').match(/ltv-(\d{1,3})/i); return m ? Number(m[1]) : null }
 function parseTermFromPid(pid) {
   const m = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
   if (!m) return null
@@ -387,7 +379,6 @@ function calcEarFallback(termPct, days) {
 
 function buildTermsFromOffers(offers) {
   const best = {}
-
   for (const o of offers || []) {
     const ltv = parseLtv(o.product_id)
     const term = normalizeTerm(o.product_id, o.duration)
@@ -458,15 +449,13 @@ function markFlashOnce(cellId) {
 }
 
 function diffAndFlash(oldRows, newRows) {
-  const keys = ['ltv50a', 'ltv50b', 'ltv80a', 'ltv80b'] // base keys
+  const keys = ['ltv50a', 'ltv50b', 'ltv80a', 'ltv80b']
   for (let i = 0; i < newRows.length; i++) {
     for (const base of keys) {
       const earKey = `${base}Ear`
       const prev = oldRows?.[i]?.[earKey]
       const next = newRows?.[i]?.[earKey]
-      if (prev !== next) {
-        markFlashOnce(`${i}-${base}`)
-      }
+      if (prev !== next) markFlashOnce(`${i}-${base}`)
     }
   }
 }
@@ -488,9 +477,7 @@ async function loadOffersOnce() {
 }
 
 function onVisChange() {
-  if (!document.hidden) {
-    loadOffersOnce() // fast refresh on focus/visibility return
-  }
+  if (!document.hidden) loadOffersOnce()
 }
 
 // ===== Lifecycle =====
@@ -522,7 +509,6 @@ onUnmounted(() => {
 // ===== Local helpers =====
 const PID_PREFIX = 'LendBorrowBTCUSD:'
 function buildProductId(days, ltv) {
-  // UI 365 posts as backend 360
   const normalizedDays = days === 365 ? 360 : days
   return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}`
 }
@@ -534,8 +520,11 @@ function toNum(rateStr) {
   const m = String(rateStr ?? '').match(/([\d.]+)/)
   return m ? parseFloat(m[1]) : NaN
 }
+/** cryptographically-strong tmp id (CSP-safe) */
 function genTmpCntrId() {
-  return ``
+  const bytes = new Uint8Array(16)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
 }
 
 defineExpose({ loadOffersOnce, getEar })

@@ -1,29 +1,35 @@
 <template>
   <div class="relative">
     <!-- NAVBAR -->
-    <nav class="w-full fixed top-0 z-50 bg-white text-black px-6 py-4 flex justify-between items-center shadow">
+    <nav
+      class="w-full fixed top-0 z-50 bg-white text-black px-6 py-4 flex justify-between items-center shadow"
+      role="navigation"
+      aria-label="Main"
+    >
       <!-- Logo & BTC Price Block -->
       <div class="flex items-center space-x-4">
-        <!-- Optimized logo: AVIF/WebP with 1x/2x density, CLS-safe dims -->
-        <picture class="block w-10 h-10">
-          <source type="image/avif" srcset="/img/logo-120.avif 1x, /img/logo-240.avif 2x" />
-          <source type="image/webp" srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x" />
-          <img
-            src="/img/logo-120.webp"
-            srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x"
-            alt="Cadena Bitcoin Logo"
-            width="40"
-            height="40"
-            decoding="async"
-            loading="eager"
-            class="w-10 h-10 object-contain"
-          />
-        </picture>
-
+        <img
+          :src="logo"
+          alt="Cadena Bitcoin Logo"
+          class="w-10 h-10 object-contain"
+          decoding="async"
+          loading="eager"
+          draggable="false"
+          referrerpolicy="no-referrer"
+        />
         <div class="flex flex-col items-start space-y-1">
           <div class="text-xl text-secondary font-bold tracking-wide leading-tight">Cadena Bitcoin</div>
           <div class="text-sm font-medium flex items-center gap-1">
-            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4 inline-block" width="16" height="16" />
+            <img
+              src="https://flagcdn.com/us.svg"
+              alt="US Flag"
+              class="w-4 h-4 inline-block"
+              width="16" height="12"
+              decoding="async"
+              loading="lazy"
+              draggable="false"
+              referrerpolicy="no-referrer"
+            />
             BTCUSD:
             <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
           </div>
@@ -32,8 +38,12 @@
 
       <!-- Hamburger Menu Button -->
       <button
-        @click="isMobileMenuOpen = !isMobileMenuOpen"
+        @click="toggleMobileMenu"
+        @keyup.esc="closeMobileMenu"
         class="md:hidden text-black focus:outline-none"
+        :aria-expanded="isMobileMenuOpen ? 'true' : 'false'"
+        aria-controls="mobile-menu"
+        aria-label="Toggle menu"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
           viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -47,54 +57,60 @@
 
         <!-- Products and Services Dropdown -->
         <div class="relative group">
-          <button class="flex items-center space-x-1 hover:text-secondary transition">
+          <button class="flex items-center space-x-1 hover:text-secondary transition" aria-haspopup="menu" aria-expanded="false">
             <span>Products and Services</span>
-            <svg class="w-4 h-4 text-gray-500 transition" xmlns="https://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 text-gray-500 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
             </svg>
           </button>
-          <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-            <router-link to="/btcusd" class="block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2">
-              <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="16" /> BTCUSD
+          <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200" role="menu">
+            <router-link to="/btcusd" class="block px-4 py-2 hover:bg-gray-100 transition flex items-center gap-2" role="menuitem">
+              <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+              BTCUSD
             </router-link>
-            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="16" /> BTCEUR (Coming Soon)
+            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+              <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+              BTCEUR (Coming Soon)
             </div>
-            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="16" /> BTCJPY (Coming Soon)
+            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+              <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+              BTCJPY (Coming Soon)
             </div>
-            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">🟡 BTC/XAU (Coming Soon)</div>
-            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="16" /> BTCGBP (Coming Soon)
+            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">🟡 BTC/XAU (Coming Soon)</div>
+            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+              <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+              BTCGBP (Coming Soon)
             </div>
-            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="16" /> BTCCAD (Coming Soon)
+            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+              <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+              BTCCAD (Coming Soon)
             </div>
-            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-              <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="16" /> BTCAUD (Coming Soon)
+            <div class="block px-4 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+              <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+              BTCAUD (Coming Soon)
             </div>
           </div>
         </div>
 
         <!-- Explore Cadena Dropdown -->
         <div class="relative group">
-          <button class="flex items-center space-x-1 hover:text-secondary transition">
+          <button class="flex items-center space-x-1 hover:text-secondary transition" aria-haspopup="menu" aria-expanded="false">
             <span>Explore Cadena</span>
-            <svg class="w-4 h-4 text-gray-500 transition" xmlns="https://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 text-gray-500 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
             </svg>
           </button>
-          <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-            <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-gray-100 transition">Cadena Paper</router-link>
-            <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">GitHub Resources</router-link>
-            <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition">Contact Us</router-link>
+          <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200" role="menu">
+            <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">Cadena Paper</router-link>
+            <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">GitHub Resources</router-link>
+            <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">Contact Us</router-link>
           </div>
         </div>
       </div>
 
       <!-- CTA Buttons Desktop -->
       <div class="hidden md:flex items-center space-x-4">
-        <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
+        <a href="/downloads/Cadena(notify).apk" download type="application/vnd.android.package-archive" class="hover:text-secondary transition">Download APK</a>
 
         <router-link
           v-if="!isLoggedIn"
@@ -125,49 +141,56 @@
           My Profile
         </router-link>
       </div>
-
     </nav>
 
     <!-- MOBILE MENU -->
     <transition name="fade-slide">
       <div
         v-if="isMobileMenuOpen"
+        id="mobile-menu"
         class="fixed inset-0 bg-white text-black px-6 pt-[96px] pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-lg"
+        @keyup.esc="closeMobileMenu"
       >
-        <router-link @click="isMobileMenuOpen = false" to="/" class="block text-lg font-semibold hover:text-secondary">Home</router-link>
+        <router-link @click="closeMobileMenu" to="/" class="block text-lg font-semibold hover:text-secondary">Home</router-link>
 
         <div>
           <div class="text-gray-500 uppercase text-xs mb-2">Products and Services</div>
-          <router-link @click="isMobileMenuOpen = false" to="/btcusd" class="block pl-2 py-2 hover:text-secondary flex items-center gap-2">
-            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="16" /> BTCUSD
+          <router-link @click="closeMobileMenu" to="/btcusd" class="block pl-2 py-2 hover:text-secondary flex items-center gap-2">
+            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+            BTCUSD
           </router-link>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="16" /> BTCEUR (Coming Soon)
+          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+            <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+            BTCEUR (Coming Soon)
           </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="16" /> BTCJPY (Coming Soon)
+          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+            <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+            BTCJPY (Coming Soon)
           </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">🟡 BTC/XAU (Coming Soon)</div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="16" /> BTCGBP (Coming Soon)
+          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">🟡 BTC/XAU (Coming Soon)</div>
+          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+            <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+            BTCGBP (Coming Soon)
           </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="16" /> BTCCAD (Coming Soon)
+          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+            <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+            BTCCAD (Coming Soon)
           </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed">
-            <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="16" /> BTCAUD (Coming Soon)
+          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
+            <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
+            BTCAUD (Coming Soon)
           </div>
         </div>
 
         <div>
           <div class="text-gray-500 uppercase text-xs mt-6 mb-2">Explore Cadena</div>
-          <router-link @click="isMobileMenuOpen = false" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
-          <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-2 hover:text-secondary">GitHub Resources</router-link>
-          <router-link @click="isMobileMenuOpen = false" to="/contact" class="block pl-2 py-2 hover:text-secondary">Contact Us</router-link>
+          <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
+          <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">GitHub Resources</router-link>
+          <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">Contact Us</router-link>
         </div>
 
         <router-link
-          @click="isMobileMenuOpen = false"
+          @click="closeMobileMenu"
           v-if="!isLoggedIn"
           to="/login"
           class="block text-lg font-semibold hover:text-secondary"
@@ -182,29 +205,25 @@
         >
           Logout
         </button>
-        <a href="/downloads/CadenaBitcoin-15Aug-1.apk" download>Download APK</a>
 
-       <!-- Get Started (mobile) -->
+        <a href="/downloads/Cadena(notify).apk" download type="application/vnd.android.package-archive" class="block hover:text-secondary transition">Download APK</a>
+
         <router-link
-          @click="isMobileMenuOpen = false"
           v-if="!isLoggedIn"
           to="/register"
           class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
+          @click="closeMobileMenu"
         >
           Get Started
         </router-link>
-
-        <!-- My Profile (mobile) -->
         <router-link
-          @click="isMobileMenuOpen = false"
           v-else
           to="/my-profile"
           class="block w-full bg-secondary hover:bg-secondary text-white px-4 py-3 rounded-full text-sm font-semibold text-center transition"
+          @click="closeMobileMenu"
         >
           My Profile
         </router-link>
-
-
       </div>
     </transition>
   </div>
@@ -213,142 +232,103 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { getToken } from '../api/token'
-import { logout } from '../api/auth'
+import logo from '../assets/logos/cadena_bitcoin_logo.png'
+import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
+const { isLoggedIn, logout } = useAuth()
 
 const isMobileMenuOpen = ref(false)
 const btcPrice = ref('...')
-const isLoggedIn = ref(false)
 
 let priceIntervalId = null
-let authIntervalId = null
+let abortCtrl = null
 
-// ---- Price polling ----
+// Poll BTC price with safer fetch settings and abort on unmount
 const fetchBTCPrice = async () => {
   try {
-    const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+    abortCtrl?.abort()
+    abortCtrl = new AbortController()
+    const res = await fetch(
+      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+      {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-store',
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer',
+        signal: abortCtrl.signal,
+        headers: { 'accept': 'application/json' },
+      }
+    )
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
-    btcPrice.value = data.bitcoin.usd.toLocaleString(undefined, {
+    const usd = data?.bitcoin?.usd
+    btcPrice.value = (typeof usd === 'number' ? usd : 0).toLocaleString(undefined, {
       style: 'decimal',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
   } catch (err) {
-    console.error('Error fetching BTC price:', err)
+    // silent degrade to N/A to avoid leaking details
     btcPrice.value = 'N/A'
   }
 }
 
-// ---- Auth polling ----
-function getJwtExpMs(token) {
-  try {
-    const parts = token.split('.')
-    if (parts.length !== 3) return null
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
-    if (!payload || typeof payload.exp !== 'number') return null
-    return payload.exp * 1000
-  } catch {
-    return null
-  }
-}
-
-const updateAuthState = () => {
-  // Fallback: presence-only check
-  isLoggedIn.value = !!getToken()
-}
-
-const pollAuth = async () => {
-  const token = getToken()
-  if (!token) {
-    if (isLoggedIn.value) isLoggedIn.value = false
-    return
-  }
-  // If JWT, expire locally
-  const expMs = getJwtExpMs(token)
-  if (expMs && Date.now() >= expMs) {
-    try {
-      await logout() // clear storage/cookies
-    } catch {}
-    window.dispatchEvent(new Event('auth-changed'))
-    return
-  }
-  // Token present and not locally expired
-  if (!isLoggedIn.value) isLoggedIn.value = true
-}
-
-// ---- Lifecycle ----
-const onVisChange = () => {
-  if (!document.hidden) {
-    // Fast refresh on tab focus
-    pollAuth()
-    fetchBTCPrice()
-  }
-}
-
-onMounted(() => {
-  // Initial
-  updateAuthState()
-  pollAuth()
+function startPricePolling() {
   fetchBTCPrice()
+  clearInterval(priceIntervalId)
+  priceIntervalId = setInterval(fetchBTCPrice, 30000)
+}
+function stopPricePolling() {
+  clearInterval(priceIntervalId)
+  priceIntervalId = null
+  abortCtrl?.abort()
+}
 
-  // Timers
-  priceIntervalId = setInterval(fetchBTCPrice, 30000)   // 30s
-  authIntervalId = setInterval(pollAuth, 5000)        // 5s
+// Pause polling when tab is hidden (saves battery & requests)
+const onVis = () => (document.hidden ? stopPricePolling() : startPricePolling())
 
-  // Events
-  window.addEventListener('auth-changed', pollAuth)
-  window.addEventListener('storage', pollAuth) // cross-tab
-  window.addEventListener('focus', pollAuth)
-  document.addEventListener('visibilitychange', onVisChange)
+// Toggle mobile menu without inline styles; use body class (CSP-friendly)
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+function closeMobileMenu() {
+  isMobileMenuOpen.value = false
+}
+
+watch(isMobileMenuOpen, (open) => {
+  document.body.classList.toggle('overflow-hidden', open)
 })
 
-onUnmounted(() => {
-  if (priceIntervalId) clearInterval(priceIntervalId)
-  if (authIntervalId) clearInterval(authIntervalId)
-  window.removeEventListener('auth-changed', pollAuth)
-  window.removeEventListener('storage', pollAuth)
-  window.removeEventListener('focus', pollAuth)
-  document.removeEventListener('visibilitychange', onVisChange)
-})
-
-// UI
-watch(isMobileMenuOpen, (isOpen) => {
-  document.body.style.overflow = isOpen ? 'hidden' : ''
-})
+// Close menu on route change
+const unregAfterEach = router.afterEach(() => { closeMobileMenu() })
 
 // Logout
 const logoutUser = async (fromMobile = false) => {
   try {
-    await logout()
-    window.dispatchEvent(new Event('auth-changed'))
-    if (fromMobile) isMobileMenuOpen.value = false
+    logout()
+    if (fromMobile) closeMobileMenu()
     await router.push('/login')
-  } catch (e) {
-    console.error('Logout failed:', e)
+  } catch {
+    /* swallow */
   }
 }
-</script>
 
-<style scoped>
-.fade-slide-enter-active, .fade-slide-leave-active {
-  transition: all 0.3s ease;
+onMounted(() => {
+  startPricePolling()
+  document.addEventListener('visibilitychange', onVis)
+  window.addEventListener('keydown', onEscClose, { passive: true })
+})
+
+onUnmounted(() => {
+  stopPricePolling()
+  document.removeEventListener('visibilitychange', onVis)
+  window.removeEventListener('keydown', onEscClose)
+  unregAfterEach && unregAfterEach()
+})
+
+function onEscClose(e) {
+  if (e.key === 'Escape') closeMobileMenu()
 }
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-.fade-slide-enter-to {
-  opacity: 1;
-  transform: translateY(0);
-}
-.fade-slide-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-</style>
+</script>

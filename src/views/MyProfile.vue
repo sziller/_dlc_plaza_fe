@@ -1,25 +1,15 @@
 <template>
   <main class="min-h-screen text-white pt-[150px] px-6 pb-16 relative overflow-hidden">
-    <!-- Gradient background -->
-    <div
-  class="fixed inset-0 -z-10"
-  style="background: linear-gradient(
-    to bottom,
-    #000000 0%,
-    #000000 56%,
-    #0a051f 66%,
-    #1b0a3c 76%,
-    #35157a 88%,
-    #6738e4 100%
-  );">
-</div>
+    <!-- Gradient background (local class, no inline styles) -->
+    <div class="fixed inset-0 -z-10 page-gradient"></div>
 
     <div class="max-w-7xl mx-auto space-y-8">
       <header class="flex items-center justify-between">
         <h1 class="text-5xl font-bold">My Profile</h1>
         <button
-          class="px-3 py-2 rounded-lg bg-white/10 border border-white/20 hover:bg-white/15"
+          class="px-3 py-2 rounded-lg bg-white/10 border border-white/20 hover:bg-white/15 disabled:opacity-50"
           :disabled="loading"
+          :aria-busy="loading ? 'true' : 'false'"
           @click="load"
         >
           {{ loading ? 'Refreshing…' : 'Refresh' }}
@@ -63,27 +53,29 @@
           <div v-else-if="addrLoading" class="text-white/80 text-sm">Fetching top-up address…</div>
 
           <div v-else-if="address" class="space-y-3">
-            <div class="flex items-center gap-2">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
               <span class="font-semibold">Address:</span>
               <code class="px-2 py-1 rounded bg-black/30 border border-white/10 break-all text-xs sm:text-sm">{{ address }}</code>
               <button
-                class="ml-auto sm:ml-0 px-3 py-1 rounded bg-white/10 border border-white/20 hover:bg-white/15 text-sm"
+                class="sm:ml-auto px-3 py-1 rounded bg-white/10 border border-white/20 hover:bg-white/15 text-sm"
                 @click="copyAddress"
+                :aria-label="copied ? 'Address copied' : 'Copy address'"
               >
                 {{ copied ? 'Copied' : 'Copy' }}
               </button>
             </div>
-<!-- QR SVG -->
-<div class="flex justify-center">
-  <div class="qr-box rounded-lg bg-white text-black w-1/2 aspect-square overflow-hidden">
-    <div class="w-full h-full" v-html="qrSvgProcessed"></div>
-  </div>
-</div>
 
-
-
-
-
+            <!-- QR (sanitized SVG rendered as a data URL in an <img>) -->
+            <div class="flex justify-center">
+              <div class="qr-box rounded-lg bg-white text-black w-1/2 aspect-square overflow-hidden">
+                <img
+                  v-if="qrDataUrl"
+                  :src="qrDataUrl"
+                  alt="QR code for your top-up address"
+                  class="w-full h-full block"
+                />
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -95,35 +87,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getUserProfile } from '../api/userProfile'
-import { getTopupAddressQR } from '../api/qr' // adjust path
+import { getTopupAddressQR } from '../api/qr'
 import TheFooter from '../components/TheFooter.vue'
-
-// ---- QR SVG: make responsive ----
-const qrSvg = ref('')
-const qrSvgProcessed = computed(() => {
-  if (!qrSvg.value) return ''
-  const orig = qrSvg.value
-
-  const wMatch = orig.match(/\bwidth="(\d+)"/)
-  const hMatch = orig.match(/\bheight="(\d+)"/)
-  const w = wMatch ? wMatch[1] : '0'
-  const h = hMatch ? hMatch[1] : '0'
-
-  let s = orig
-  s = s.replace(/\s(width|height)="[^"]*"/g, '')
-  if (!/viewBox=/.test(s)) {
-    const vw = Number(w) > 0 ? Number(w) : 100
-    const vh = Number(h) > 0 ? Number(h) : vw
-    s = s.replace('<svg', `<svg viewBox="0 0 ${vw} ${vh}"`)
-  }
-  if (!/preserveAspectRatio=/.test(s)) {
-    s = s.replace('<svg', '<svg preserveAspectRatio="xMidYMid meet"')
-  }
-  if (!/style=/.test(s)) {
-    s = s.replace('<svg', '<svg style="width:100%;height:100%;display:block"')
-  }
-  return s
-})
 
 // ---- State ----
 const profile = ref(null)
@@ -135,7 +100,7 @@ const addrLoading = ref(false)
 const addrError = ref(null)
 const copied = ref(false)
 
-// ---- Actions ----
+// ---- Load profile ----
 async function load() {
   loading.value = true
   error.value = null
@@ -149,19 +114,24 @@ async function load() {
   }
 }
 
+// ---- QR: fetch & sanitize -> data URL for <img> ----
+const qrRawSvg = ref('')
+
 async function fetchTopup() {
   addrError.value = null
   addrLoading.value = true
   address.value = ''
-  qrSvg.value = ''
+  qrRawSvg.value = ''
   copied.value = false
 
   try {
     const res = await getTopupAddressQR(-1)
     address.value = String(res?.payload?.string || '')
-    qrSvg.value = String(res?.payload?.qr_code || '')
-    if (!address.value || !qrSvg.value) {
+    const svg = String(res?.payload?.qr_code || '')
+    if (!address.value || !svg) {
       addrError.value = 'Invalid response: missing address or QR code.'
+    } else {
+      qrRawSvg.value = svg
     }
   } catch (e) {
     addrError.value = e && e.message ? e.message : String(e)
@@ -170,11 +140,74 @@ async function fetchTopup() {
   }
 }
 
+// Very small allowlist sanitizer for QR SVGs
+function sanitizeSvg(svgText) {
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(svgText, 'image/svg+xml')
+    const allowedTags = new Set(['svg', 'g', 'path', 'rect'])
+    const allowedAttrs = new Set([
+      'viewBox', 'xmlns', 'version', 'fill', 'stroke', 'd', 'x', 'y', 'width', 'height',
+      'rx', 'ry', 'transform', 'shape-rendering', 'stroke-width'
+    ])
+
+    const walker = document.createTreeWalker(doc, NodeFilter.SHOW_ELEMENT, null)
+    const toRemove = []
+
+    // walk & prune
+    let node = walker.nextNode()
+    while (node) {
+      const el = node
+      const tag = el.tagName?.toLowerCase?.()
+      if (!allowedTags.has(tag)) {
+        toRemove.push(el)
+      } else {
+        // remove disallowed attributes (incl. any on*)
+        for (const attr of Array.from(el.attributes)) {
+          const name = attr.name
+          if (name.startsWith('on') || name === 'style' || name === 'href' || name === 'xlink:href') {
+            el.removeAttribute(name)
+            continue
+          }
+          if (!allowedAttrs.has(name)) el.removeAttribute(name)
+        }
+      }
+      node = walker.nextNode()
+    }
+    for (const n of toRemove) n.parentNode?.removeChild(n)
+
+    // make responsive: strip width/height on root, ensure viewBox + preserveAspectRatio
+    const root = doc.documentElement
+    root.removeAttribute('width')
+    root.removeAttribute('height')
+    if (!root.getAttribute('viewBox')) {
+      // fallback viewBox if missing; QR is square
+      root.setAttribute('viewBox', '0 0 50 50')
+    }
+    root.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+   
+
+    // serialize
+    return new XMLSerializer().serializeToString(doc)
+  } catch {
+    return ''
+  }
+}
+
+const qrDataUrl = computed(() => {
+  if (!qrRawSvg.value) return ''
+  const clean = sanitizeSvg(qrRawSvg.value)
+  if (!clean) return ''
+  // Encode to base64 data URL for <img>
+  const b64 = btoa(unescape(encodeURIComponent(clean)))
+  return `data:image/svg+xml;base64,${b64}`
+})
+
+// ---- Copy address ----
 async function copyAddress() {
   try {
     await navigator.clipboard.writeText(address.value)
     copied.value = true
-    setTimeout(() => { copied.value = false }, 1500)
   } catch {
     const ta = document.createElement('textarea')
     ta.value = address.value
@@ -182,6 +215,7 @@ async function copyAddress() {
     ta.select()
     try { document.execCommand('copy'); copied.value = true } catch {}
     document.body.removeChild(ta)
+  } finally {
     setTimeout(() => { copied.value = false }, 1500)
   }
 }
@@ -197,17 +231,56 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Force embedded QR SVG to fill its container */
-div[v-html] svg {
-  width: 100% !important;
-  height: 100% !important;
+/* Gradient background (local, CSP-safe; purple glow from bottom) */
+.page-gradient{
+  background-color: #000;
+  background-image:
+    radial-gradient(
+      125% 75% at 50% 100%,
+      rgba(103,56,228,0.58) 0%,
+      rgba(103,56,228,0.36) 26%,
+      rgba(103,56,228,0.16) 52%,
+      rgba(0,0,0,0) 76%
+    );
 }
-/* Force embedded QR SVG to fill the square */
-:deep(.qr-box svg) {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
+@supports (background: radial-gradient(in oklch, black, white)) {
+  .page-gradient{
+    background-color: oklch(0 0 0);
+    background-image:
+      radial-gradient(
+        in oklch 125% 75% at 50% 100%,
+        oklch(from #6738e4 l c h / 0.60) 0%,
+        oklch(from #6738e4 l c h / 0.36) 26%,
+        oklch(from #6738e4 l c h / 0.16) 52%,
+        oklch(0 0 0 / 0) 76%
+      );
+  }
+}
+@media (max-height: 800px){
+  .page-gradient{
+    background-image:
+      radial-gradient(
+        120% 60% at 50% 100%,
+        rgba(103,56,228,0.52) 0%,
+        rgba(103,56,228,0.30) 24%,
+        rgba(103,56,228,0.12) 48%,
+        rgba(0,0,0,0) 70%
+      );
+  }
 }
 
+
+.qr-box{
+  display: grid;
+  place-items: center;   /* center the image box */
+}
+
+ .qr-box img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;   /* keep aspect, no crop */
+  object-position: center;
+  display: block;
+}
 
 </style>

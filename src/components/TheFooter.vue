@@ -7,26 +7,25 @@
           <div class="text-xl font-extrabold text-secondary mb-2">Cadena Bitcoin</div>
 
           <!-- Optimized logo: AVIF/WebP, density srcset, lazy -->
-          <picture class="block">
-            <source
-              type="image/avif"
-              srcset="/img/logo-120.avif 1x, /img/logo-240.avif 2x" />
-            <source
-              type="image/webp"
-              srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x" />
-            <img
-              src="/img/logo-120.webp"
-              srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x"
-              alt="Cadena Bitcoin Logo"
-              loading="lazy"
-              decoding="async"
-              class="w-32 sm:w-36 md:w-40 h-auto object-contain"
-            />
-          </picture>
+          <router-link to="/" aria-label="Go to homepage" class="block">
+            <picture>
+              <source type="image/avif" srcset="/img/logo-120.avif 1x, /img/logo-240.avif 2x" />
+              <source type="image/webp" srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x" />
+              <img
+                src="/img/logo-120.webp"
+                srcset="/img/logo-120.webp 1x, /img/logo-240.webp 2x"
+                alt="Cadena Bitcoin Logo"
+                loading="lazy"
+                decoding="async"
+                width="120" height="120"
+                class="w-32 sm:w-36 md:w-40 h-auto object-contain"
+              />
+            </picture>
+          </router-link>
         </div>
 
         <!-- 📚 Quick Links -->
-        <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:col-span-2 text-sm text-secondary">
+        <nav class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:col-span-2 text-sm text-secondary" aria-label="Footer">
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Company</p>
             <ul class="space-y-2">
@@ -46,10 +45,22 @@
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Social Media</p>
             <ul class="space-y-2">
-              <li><a href="https://x.com/cadenabitcoin" class="hover:text-black" rel="noopener noreferrer" target="_blank">X</a></li>
-              <li><a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" class="hover:text-black" rel="noopener noreferrer" target="_blank">YouTube</a></li>
-              <!-- Keep as-is if intentional; otherwise replace with your real GitHub URL -->
-              <li><a href="tel:+13058311410" class="hover:text-black">GitHub</a></li>
+              <li>
+                <a href="https://x.com/cadenabitcoin" class="hover:text-black" rel="noopener noreferrer" target="_blank">
+                  X <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" class="hover:text-black" rel="noopener noreferrer" target="_blank">
+                  YouTube <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              </li>
+              <li>
+                <!-- Replace with your real GitHub org/user URL -->
+                <a href="https://github.com/cadenabitcoin" class="hover:text-black" rel="noopener noreferrer" target="_blank">
+                  GitHub <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -60,20 +71,25 @@
               <li><router-link to="/privacy" class="hover:text-black">Privacy</router-link></li>
             </ul>
           </div>
-        </div>
+        </nav>
       </div>
 
       <!-- 📎 Footer Bottom -->
       <div class="mt-12 border-t border-gray-200 pt-6 text-sm text-center text-secondary">
-        &copy; {{ new Date().getFullYear() }} Cadena Bitcoin. All rights reserved.
-        <p>Cadena Bitcoin is operated by Cadena Bitcoin S.A. de C.V. an El Salvador liscenced Bitcoin Service provider. Address: Calle Llama del Bosque Poniente, Urbanización Madre Selva III, Edificio Avante, Local 3-13, Antiguo Cuscatlán, La Libertad, El Salvador</p>
+        <small>&copy; {{ year }} Cadena Bitcoin. All rights reserved.</small>
+        <address class="not-italic mt-2">
+          Cadena Bitcoin is operated by Cadena Bitcoin S.A. de C.V., an El Salvador–licensed Bitcoin service provider.
+          Address: Calle Llama del Bosque Poniente, Urbanización Madre Selva III, Edificio Avante, Local 3-13,
+          Antiguo Cuscatlán, La Libertad, El Salvador.
+        </address>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup>
-// no script needed
+import { computed } from 'vue'
+const year = computed(() => new Date().getFullYear())
 </script>
 
 <style scoped>

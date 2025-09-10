@@ -12,7 +12,6 @@ declare module 'vue' {
     ISimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']
     ISimpleIconsX: typeof import('~icons/simple-icons/x')['default']
     ISimpleIconsYoutube: typeof import('~icons/simple-icons/youtube')['default']
-    LiveRatesImac: typeof import('./components/LiveRatesImac.vue')['default']
     MarketOverviewTable: typeof import('./components/MarketOverviewTable.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
     OrderModal: typeof import('./components/OrderModal.vue')['default']

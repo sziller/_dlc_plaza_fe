@@ -1,17 +1,20 @@
 <template>
-  <section class="min-h-screen w-full bg-primary text-white px-6 pt-20 pb-12 md:pt-32">
-    
+  <main class="min-h-screen w-full text-white pt-20 md:pt-32 relative">
+    <!-- Background: same as Home -->
+    <div class="absolute inset-0 -z-10 bg-page-gradient"></div>
+
     <!-- 🧠 Top Title -->
-    <div class="max-w-4xl mx-auto text-center mb-16">
+    <div class="max-w-4xl mx-auto text-center mb-16 px-6">
       <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
         Cadena Bitcoin FAQ
       </h1>
-      <p class="text-tertiary text-lg">Common questions about how Cadena works, financial terms, and user security</p>
+      <p class="text-tertiary text-lg">
+        Common questions about how Cadena works, financial terms, and user security
+      </p>
     </div>
 
     <!-- 📄 Main Content -->
-    <div class="max-w-5xl mx-auto space-y-14 text-white/90 text-lg leading-relaxed">
-
+    <section class="max-w-5xl mx-auto space-y-14 text-white/90 text-lg leading-relaxed px-6 pb-12">
       <!-- ✅ Intro -->
       <div class="text-tertiary space-y-4">
         <p>
@@ -128,13 +131,14 @@
       <!-- 📎 Footer -->
       <div class="text-center pt-8 border-t border-secondary/30">
         <p class="text-white/80">
-          For more details, check our <a href="#" class="underline hover:text-white">Technical Overview</a> or explore 
-          <a href="#" class="underline hover:text-white"> our GitHub</a>.
+          For more details, check our
+          <a href="#" class="underline hover:text-white">Technical Overview</a>
+          or explore
+          <a href="#" class="underline hover:text-white">our GitHub</a>.
         </p>
       </div>
-
-    </div>
-  </section>
+    </section>
+  </main>
 </template>
 
 <script setup>
@@ -146,7 +150,48 @@ onMounted(() => {
 </script>
 
 <style scoped>
-html {
-  scroll-behavior: smooth;
+/* Page background: black base + bottom-anchored purple glow */
+.bg-page-gradient{
+  background-color: #000;
+  background-image:
+    radial-gradient(
+      125% 75% at 50% 100%,
+      rgba(103,56,228,0.58) 0%,
+      rgba(103,56,228,0.36) 26%,
+      rgba(103,56,228,0.16) 52%,
+      rgba(0,0,0,0) 76%
+    );
 }
+
+@supports (background: radial-gradient(in oklch, black, white)) {
+  .bg-page-gradient{
+    background-color: oklch(0 0 0);
+    background-image:
+      radial-gradient(
+        in oklch 125% 75% at 50% 100%,
+        oklch(from #6738e4 l c h / 0.60) 0%,
+        oklch(from #6738e4 l c h / 0.36) 26%,
+        oklch(from #6738e4 l c h / 0.16) 52%,
+        oklch(0 0 0 / 0) 76%
+      );
+  }
+}
+
+@media (max-height: 800px){
+  .bg-page-gradient{
+    background-image:
+      radial-gradient(
+        120% 60% at 50% 100%,
+        rgba(103,56,228,0.52) 0%,
+        rgba(103,56,228,0.30) 24%,
+        rgba(103,56,228,0.12) 48%,
+        rgba(0,0,0,0) 70%
+      );
+  }
+}
+</style>
+
+<!-- smooth scroll must be global, not scoped -->
+<style>
+html { scroll-behavior: smooth; }
 </style>

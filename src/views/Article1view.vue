@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-primary mt-20 text-white">
+  <div class="min-h-screen mt-20 text-white relative overflow-hidden bg-black">
     <!-- HERO TITLE SECTION (Smaller) -->
     <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">
@@ -23,7 +23,8 @@
         <a 
           href="https://bitcoin.org/bitcoin.pdf" 
           target="_blank" 
-          rel="noopener noreferrer"
+          rel="noopener noreferrer nofollow"
+          referrerpolicy="no-referrer"
           class="text-secondary underline hover:text-secondary/80 transition"
         >
           White Paper
@@ -57,84 +58,115 @@
       <p>
         We want borrowers and investors to benefit from using decentralized financial services in a free market to achieve their goals.
       </p>
-
-      
     </section>
+
     <section class="bg-secondary text-white py-20 px-6 relative">
-  <div class="max-w-4xl mx-auto text-center space-y-6">
-    <h2 class="text-3xl md:text-4xl font-extrabold">
-      Experience True Peer-to-Peer Bitcoin Finance
-    </h2>
-    <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-      No sidechains, no wrapping, no margin calls. Just decentralized, verifiable, on-chain lending and borrowing. The way Bitcoin was meant to work.
-    </p>
+      <div class="max-w-4xl mx-auto text-center space-y-6">
+        <h2 class="text-3xl md:text-4xl font-extrabold">
+          Experience True Peer-to-Peer Bitcoin Finance
+        </h2>
+        <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+          No sidechains, no wrapping, no margin calls. Just decentralized, verifiable, on-chain lending and borrowing. The way Bitcoin was meant to work.
+        </p>
 
-    <!-- CTA -->
-    <div class="flex justify-center mt-8">
-      <router-link
-        :to="isLoggedIn ? '/btcusd' : '/register'"
-        class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-      >
-        Get Started with Cadena
-      </router-link>
-    </div>
+        <!-- CTA -->
+        <div class="flex justify-center mt-8">
+          <router-link
+            :to="isLoggedIn ? '/btcusd' : '/register'"
+            class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+          >
+            Get Started with Cadena
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Prev Article (stacks under CTA on mobile, absolute on md+) -->
+      <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
+        <router-link
+          to="/article/cadena-improving-btc"
+          class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+        >
+          <span class="text-2xl">←</span>
+          <span class="leading-tight">
+            How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending
+          </span>
+        </router-link>
+      </div>
+
+      <!-- Next Article (stacks after prev on mobile, absolute on md+) -->
+      <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
+        <router-link
+          to="/article/cadena-empowering-financial-freedom"
+          class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+        >
+          <span class="leading-tight">
+            Cadena Bitcoin - Empowering Individual Financial Freedom
+          </span>
+          <span class="text-2xl">→</span>
+        </router-link>
+      </div>
+    </section>
   </div>
 
-  <!-- Prev Article (stacks under CTA on mobile, absolute on md+) -->
-  <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
-    <router-link
-      to="/article/cadena-improving-btc"
-      class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
-    >
-      <span class="text-2xl">←</span>
-      <span class="leading-tight">
-        How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending
-      </span>
-    </router-link>
-  </div>
-
-  <!-- Next Article (stacks after prev on mobile, absolute on md+) -->
-  <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
-    <router-link
-      to="/article/cadena-empowering-financial-freedom"
-      class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
-    >
-      <span class="leading-tight">
-        Cadena Bitcoin - Empowering Individual Financial Freedom
-      </span>
-      <span class="text-2xl">→</span>
-    </router-link>
-  </div>
-</section>
-
-
-
-
-    <!-- FOOTER -->
-   
-  </div> 
   <TheFooter />
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
+import TheFooter from '../components/TheFooter.vue'
+import { useAuth } from '../composables/useAuth'
+
+const { isLoggedIn, setUserFromApi } = useAuth()
+
 onMounted(() => {
   setUserFromApi()
   window.scrollTo(0, 0)
 })
-const { isLoggedIn, setUserFromApi } = useAuth()
-import TheFooter from '../components/TheFooter.vue'
-import { useAuth } from '../composables/useAuth'
 </script>
 
 <style scoped>
-/* Optional Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
+/* Match Home’s bottom-anchored purple glow */
+.bg-page-gradient{
+  background-color: #000; /* solid black base */
+  background-image:
+    radial-gradient(
+      125% 75% at 50% 100%,      /* big ellipse, anchored at bottom center */
+      rgba(103,56,228,0.58) 0%,  /* #6738e4 strongest near bottom */
+      rgba(103,56,228,0.36) 26%,
+      rgba(103,56,228,0.16) 52%,
+      rgba(0,0,0,0) 76%          /* fade to transparent -> pure black */
+    );
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+@supports (background: radial-gradient(in oklch, black, white)) {
+  .bg-page-gradient{
+    background-color: oklch(0 0 0);
+    background-image:
+      radial-gradient(
+        in oklch 125% 75% at 50% 100%,
+        oklch(from #6738e4 l c h / 0.60) 0%,
+        oklch(from #6738e4 l c h / 0.36) 26%,
+        oklch(from #6738e4 l c h / 0.16) 52%,
+        oklch(0 0 0 / 0) 76%
+      );
+  }
 }
+/* Keep the glow lower on short screens */
+@media (max-height: 800px){
+  .bg-page-gradient{
+    background-image:
+      radial-gradient(
+        120% 60% at 50% 100%,
+        rgba(103,56,228,0.52) 0%,
+        rgba(103,56,228,0.30) 24%,
+        rgba(103,56,228,0.12) 48%,
+        rgba(0,0,0,0) 70%
+      );
+  }
+}
+
+/* Optional Scrollbar Styling (safe; no inline JS) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 4px;

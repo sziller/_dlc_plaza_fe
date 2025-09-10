@@ -1,23 +1,9 @@
 <template>
   <!-- Gradient Wrapper -->
-  <div class="min-h-screen text-white relative overflow-hidden">
-    <!-- Background gradient + soft glows -->
-    <div
-      class="fixed inset-0 -z-10"
-      style="background: linear-gradient(
-        to bottom,
-        #000000 0%,
-        #000000 56%,
-        #0a051f 66%,
-        #1b0a3c 76%,
-        #35157a 88%,
-        #6738e4 100%
-      );">
-    </div>
-    <div class="pointer-events-none absolute -z-10 blur-3xl opacity-50"
-         style="inset:auto auto 10% -10%; width:50rem; height:20rem; background:radial-gradient(40% 60% at 50% 50%, #7c5cff55, transparent 70%)"></div>
-    <div class="pointer-events-none absolute -z-10 blur-3xl opacity-40"
-         style="inset:10% -10% auto auto; width:40rem; height:18rem; background:radial-gradient(40% 60% at 50% 50%, #16b1ff44, transparent 70%)"></div>
+  <div class="min-h-screen text-white relative overflow-hidden bg-page-gradient">
+    <!-- Soft glows (no inline styles; CSP-safe) -->
+    <div class="glow-purple" aria-hidden="true"></div>
+    <div class="glow-cyan" aria-hidden="true"></div>
 
     <!-- Onboarding Section -->
     <section class="w-full pt-28 md:pt-32" aria-labelledby="onboarding-title">
@@ -25,8 +11,6 @@
 
         <!-- Eyebrow + Title + Lead -->
         <div class="text-center" v-reveal>
-          
-
           <h1 id="onboarding-title" class="mt-4 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
             Personalized Onboarding
           </h1>
@@ -161,21 +145,39 @@
         <div class="reveal glass-card" v-reveal="{ delay: 60 }">
           <p class="text-2xl font-semibold mb-8 text-center">Find Us On Social Media</p>
           <div class="flex flex-wrap items-center justify-center gap-10 md:gap-12">
-            <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener noreferrer"
-               aria-label="Visit us on X (Twitter)"
-               class="social-tile">
+            <a
+              href="https://x.com/cadenabitcoin"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              referrerpolicy="no-referrer"
+              aria-label="Visit us on X (Twitter)"
+              class="social-tile"
+            >
               <i-simple-icons-x class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true" />
               <span class="text-base font-medium">X</span>
             </a>
-            <a href="#" target="_blank" rel="noopener noreferrer"
-               aria-label="Visit our GitHub"
-               class="social-tile">
+
+            <!-- Use your real GitHub org/user if available -->
+            <a
+              href="https://github.com/"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              referrerpolicy="no-referrer"
+              aria-label="Visit our GitHub"
+              class="social-tile"
+            >
               <i-simple-icons-github class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true" />
               <span class="text-base font-medium">GitHub</span>
             </a>
-            <a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" target="_blank" rel="noopener noreferrer"
-               aria-label="Visit our YouTube"
-               class="social-tile">
+
+            <a
+              href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              referrerpolicy="no-referrer"
+              aria-label="Visit our YouTube"
+              class="social-tile"
+            >
               <i-simple-icons-youtube class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true" />
               <span class="text-base font-medium">YouTube</span>
             </a>
@@ -221,11 +223,10 @@ import { User, Users, Building2, Copy, Check, Phone, Mail } from 'lucide-vue-nex
 /** Copy states */
 const copiedEmail = ref(false)
 const copiedPhone = ref(false)
-
 /** Legacy single-flag (kept for backward compatibility if another part of the page uses it) */
 const copied = ref(false)
 
-/** Copy helpers */
+/** Copy helpers (no eval/innerHTML, clipboard feature-detected) */
 function copyEmail() {
   copyToClipboard('info@cadenabitcoin.com', copiedEmail)
 }
@@ -256,7 +257,6 @@ function fallbackCopy(text, flagRef) {
     document.body.removeChild(ta)
   }
 }
-/** Flip both the granular flag and the legacy 'copied' for 1.5s */
 function flash(flagRef) {
   flagRef.value = true
   copied.value = true
@@ -270,13 +270,13 @@ onMounted(() => {
   window.scrollTo(0, 0)
 })
 
-/** Intersection-based reveal directive (stagger-friendly)
- *  Usage: v-reveal or v-reveal="{ delay: 120 }"
- */
+/** Intersection-based reveal directive (static delays only) */
 const vReveal = {
   mounted(el, binding) {
     el.classList.add('reveal')
-    const delay = binding?.value?.delay ?? 0
+    const d = Number(binding?.value?.delay ?? 0)
+    // clamp & sanitize delay (defense-in-depth)
+    const delay = Number.isFinite(d) && d >= 0 && d <= 2000 ? d : 0
     el.style.transitionDelay = `${delay}ms`
     const io = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
@@ -290,6 +290,69 @@ const vReveal = {
 </script>
 
 <style scoped>
+/* ===== Page background (matches Home) ===== */
+.bg-page-gradient{
+  background-color: #000; /* solid black base */
+  background-image:
+    radial-gradient(
+      125% 75% at 50% 100%,
+      rgba(103,56,228,0.58) 0%,
+      rgba(103,56,228,0.36) 26%,
+      rgba(103,56,228,0.16) 52%,
+      rgba(0,0,0,0) 76%
+    );
+}
+@supports (background: radial-gradient(in oklch, black, white)) {
+  .bg-page-gradient{
+    background-color: oklch(0 0 0);
+    background-image:
+      radial-gradient(
+        in oklch 125% 75% at 50% 100%,
+        oklch(from #6738e4 l c h / 0.60) 0%,
+        oklch(from #6738e4 l c h / 0.36) 26%,
+        oklch(from #6738e4 l c h / 0.16) 52%,
+        oklch(0 0 0 / 0) 76%
+      );
+  }
+}
+@media (max-height: 800px){
+  .bg-page-gradient{
+    background-image:
+      radial-gradient(
+        120% 60% at 50% 100%,
+        rgba(103,56,228,0.52) 0%,
+        rgba(103,56,228,0.30) 24%,
+        rgba(103,56,228,0.12) 48%,
+        rgba(0,0,0,0) 70%
+      );
+  }
+}
+
+/* Soft glow accents (moved from inline -> classes for CSP) */
+.glow-purple,
+.glow-cyan{
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(48px);
+}
+.glow-purple{
+  left: -10%;
+  bottom: 10%;
+  width: 50rem;
+  height: 20rem;
+  opacity: .5;
+  background: radial-gradient(40% 60% at 50% 50%, rgba(124,92,255,0.33), transparent 70%);
+}
+.glow-cyan{
+  right: -10%;
+  top: 10%;
+  width: 40rem;
+  height: 18rem;
+  opacity: .4;
+  background: radial-gradient(40% 60% at 50% 50%, rgba(22,177,255,0.27), transparent 70%);
+}
+
 /* ===== Unify all boxes to the pro-card look ===== */
 .pro-card,
 .glass-card,
@@ -300,6 +363,7 @@ const vReveal = {
   padding: 1.25rem;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.18);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
@@ -308,12 +372,11 @@ const vReveal = {
 .glass-card::before,
 .glass-tile::before,
 .social-tile::before {
-  /* gradient ring */
   content: "";
   position: absolute; inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08));
+  background: linear-gradient(135deg, rgba(151, 107, 217, 0.28), rgba(255,255,255,0.08));
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -333,13 +396,13 @@ const vReveal = {
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
-/* Icon puck (lifts on any card hover) */
+/* Icon puck */
 .icon-wrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px; height: 44px;
-  border-radius: 0.875rem; /* rounded-xl */
+  border-radius: 0.875rem;
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.18);
   transition: transform .18s ease, background .18s ease;
@@ -352,7 +415,7 @@ const vReveal = {
   background: rgba(255,255,255,0.16);
 }
 
-/* Primary + ghost buttons */
+/* Buttons */
 .btn-primary {
   display: inline-flex; align-items: center; justify-content: center;
   padding: .625rem 1rem; border-radius: .75rem;
@@ -372,7 +435,7 @@ const vReveal = {
 }
 .btn-ghost:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); }
 
-/* Social tiles keep vertical layout with same shell */
+/* Social tiles */
 .social-tile {
   display: flex;
   flex-direction: column;
@@ -381,7 +444,7 @@ const vReveal = {
   text-align: center;
 }
 
-/* Tighter padding option for small tiles */
+/* Tighter padding option */
 .card-tight { padding: 1rem; }
 
 /* ===== Scroll reveal ===== */
@@ -401,12 +464,12 @@ const vReveal = {
   filter: none;
 }
 
-/* Respect reduced motion */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition: none; opacity: 1; transform: none; filter: none; }
   .pro-card, .btn-primary, .btn-ghost, .social-tile, .icon-wrap { transition: none; }
 }
 
-/* Tweak default gradient shadows for legibility */
+/* Neutralize text glow */
 :deep(h1), :deep(h2), :deep(p), :deep(a), :deep(span) { text-shadow: 0 0 0 transparent; }
 </style>
