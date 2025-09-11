@@ -1,6 +1,6 @@
 {
   "name": "custom-vue-dashboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "prebuild": "node scripts/gen-seo-files.mjs && node scripts/copy-pdfjs.mjs",
