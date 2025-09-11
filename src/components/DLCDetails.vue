@@ -49,7 +49,7 @@
         <div><span class="font-semibold">Loan to Value:</span> {{ ltvText }}</div>
         <div><span class="font-semibold">Term:</span> {{ termText }}</div>
         <div><span class="font-semibold">Interest (for term):</span> {{ pct2(detail.interest) }}</div>
-        <div><span class="font-semibold">Annualized yield:</span> {{ pct2(detail.interest_ear) }}</div>
+        <div><span class="font-semibold">Annualized yield:</span> {{ annualizedYieldText }}</div>
         <div><span class="font-semibold">Fee:</span> 0.50%</div>
 
         <div class="h-px bg-white/10 my-2"></div>
@@ -180,7 +180,6 @@ watch(dlcId, (n, o) => {
 /* ---------- actions ---------- */
 async function confirmDelete() {
   if (!dlcId.value) return
-  // Native confirm is fine (no style change, no XSS risk).
   const ok = window.confirm(`Delete DLC ${dlcId.value}? This cannot be undone.`)
   if (!ok) return
   deleting.value = true
@@ -188,14 +187,13 @@ async function confirmDelete() {
     await deleteDlc(String(dlcId.value))
     emit('deleted')
   } catch (e) {
-    // Avoid rendering arbitrary strings in HTML: alert is fine here.
     alert(e?.message || 'Delete failed')
   } finally {
     deleting.value = false
   }
 }
 
-/* ---------- formatters ---------- */
+/* ---------- formatters & derived ---------- */
 function pct2(n) {
   const x = Number(n)
   return Number.isFinite(x) ? `${x.toFixed(2)}%` : '—'
@@ -222,14 +220,32 @@ const ltvText = computed(() => {
   return m ? `${Number(m[1]).toFixed(0)}%` : '—'
 })
 const termText = computed(() => {
-  const d = Number(detail.value?.duration)
-  return Number.isFinite(d) ? `${Math.round(d)} Days` : '—'
+  const raw = Number(detail.value?.duration)
+  if (!Number.isFinite(raw)) return '—'
+  const uiDays = raw === 360 ? 365 : Math.round(raw)
+  return `${uiDays} Days`
 })
+
 const roleText = computed(() => {
   const r = detail.value?.ini_role
   if (r === 'lend') return 'Lender'
   if (r === 'borrow') return 'Borrower'
   return r || '—'
+})
+
+/** Calculate EAR locally from term rate + duration (map 360→365 for display only). */
+function calcAnnualizedYield(interest, days) {
+  const r = Number(interest)
+  const d = Number(days)
+  if (!Number.isFinite(r) || !Number.isFinite(d) || d <= 0) return '—'
+  if (d === 365) return `${r.toFixed(2)}%`
+  const ear = (Math.pow(1 + r / 100, 360 / d) - 1) * 100
+  return `${ear.toFixed(2)}%`
+}
+
+const annualizedYieldText = computed(() => {
+  const d = Number(detail.value?.duration)
+  return calcAnnualizedYield(detail.value?.interest, Number.isFinite(d) ? d : NaN)
 })
 </script>
 

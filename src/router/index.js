@@ -1,6 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
-import { maybeCaptureFromQuery } from '../lib/referral';
+
 
 // Lazy-loaded views (code-split)
 const Home               = () => import('../views/Home.vue');
@@ -148,11 +148,7 @@ const referralsEnabled =
     (import.meta.env.PROD ? 'true' : 'true')) === 'true';
 
 router.beforeEach((to, _from, next) => {
-  if (referralsEnabled && !isLoggedIn()) {
-    // Vue Router gives a plain object for "to.query"
-    // console.log('[referral] beforeEach fired', { path: to.fullPath, query: to.query });
-    maybeCaptureFromQuery(to.query);
-  }
+  
   next();
 });
 

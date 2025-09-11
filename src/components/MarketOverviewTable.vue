@@ -9,7 +9,6 @@
 
         <!-- Content Wrapper -->
         <div class="overflow-auto flex-1 min-h-0">
-
           <!-- ✅ Desktop/Tablet (unchanged look) -->
           <div class="hidden sm:block">
             <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-6">
@@ -261,6 +260,7 @@ function handleCellClick(row, key) {
   modalNotice.value = { type: '', text: '' }
   if (!isLoggedIn.value) { router.push('/login'); return }
 
+  // NOTE: modal gets the *term* rate (not annualized)
   selectedRate.value = row[key]
   selectedAction.value = key.includes('a') ? 'Lend' : 'Borrow'
   selectedTermDays.value = getDaysFromLabel(row.label)
@@ -358,34 +358,45 @@ const TARGET_TERMS = [30, 90, 180, 365]
 
 function mapDaysForUi(d) { return d === 360 ? 365 : d }
 function parseLtv(pid) { const m = String(pid || '').match(/ltv-(\d{1,3})/i); return m ? Number(m[1]) : null }
-function parseTermFromPid(pid) {
+
+// raw 'd-xxx' from product_id without mapping to 365
+function parseTermRawFromPid(pid) {
   const m = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
-  if (!m) return null
-  const raw = Math.round(Number(m[1]))
-  return mapDaysForUi(raw)
+  return m ? Math.round(Number(m[1])) : null
 }
-function normalizeTerm(pid, duration) {
-  const fromPid = parseTermFromPid(pid)
+function normalizeRawDays(pid, duration) {
+  const fromPid = parseTermRawFromPid(pid)
   if (fromPid) return fromPid
   const d = Number(duration)
-  return Number.isFinite(d) ? mapDaysForUi(Math.round(d)) : 30
+  return Number.isFinite(d) ? Math.round(d) : 30
 }
+function normalizeDisplayDays(pid, duration) {
+  const raw = normalizeRawDays(pid, duration)
+  return mapDaysForUi(raw)
+}
+
+// Format helpers
 const fmtPct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
-function calcEarFallback(termPct, days) {
+
+// === Annualized calculation (replace API ear):
+// We *ignore* API-provided interest_ear and compute our own annualized figure.
+// Convention: simple annualization on a 360-day basis (no compounding).
+// Example: 2.83% for 90d → 2.83 * (360/90) = 11.32%
+function annualize360(termPct, days) {
   if (!Number.isFinite(termPct) || !days) return null
-  const r = termPct / 100
-  return (Math.pow(1 + r, 360 / days) - 1) * 100
+  return termPct * (360 / days)
 }
 
 function buildTermsFromOffers(offers) {
   const best = {}
   for (const o of offers || []) {
     const ltv = parseLtv(o.product_id)
-    const term = normalizeTerm(o.product_id, o.duration)
-    if (!ltv || !term) continue
+    const rawDays = normalizeRawDays(o.product_id, o.duration) // e.g., 30, 90, 180, 360
+    const uiDays  = normalizeDisplayDays(o.product_id, o.duration) // e.g., 30, 90, 180, 365 (mapped)
+    if (!ltv || !rawDays || !uiDays) continue
 
-    best[term] ??= {}
-    best[term][ltv] ??= {
+    best[uiDays] ??= {}
+    best[uiDays][ltv] ??= {
       lend: { term: null, ear: null, id: null },
       borrow: { term: null, ear: null, id: null },
       pid: null
@@ -394,23 +405,21 @@ function buildTermsFromOffers(offers) {
     const side = o.ini_role === 'borrow' ? 'lend' : o.ini_role === 'lend' ? 'borrow' : null
     if (!side) continue
 
-    const earVal = Number.isFinite(o.interest_ear) && o.interest_ear > 0
-      ? o.interest_ear
-      : calcEarFallback(o.interest, term)
+    const earVal = annualize360(o.interest, rawDays)
 
     if (side === 'lend') {
-      if (best[term][ltv].lend.term == null || o.interest > best[term][ltv].lend.term) {
-        best[term][ltv].lend.term = o.interest
-        best[term][ltv].lend.ear  = earVal ?? null
-        best[term][ltv].lend.id   = o.dlc_id
-        best[term][ltv].pid       = o.product_id
+      if (best[uiDays][ltv].lend.term == null || o.interest > best[uiDays][ltv].lend.term) {
+        best[uiDays][ltv].lend.term = o.interest
+        best[uiDays][ltv].lend.ear  = earVal ?? null
+        best[uiDays][ltv].lend.id   = o.dlc_id
+        best[uiDays][ltv].pid       = o.product_id
       }
     } else {
-      if (best[term][ltv].borrow.term == null || o.interest < best[term][ltv].borrow.term) {
-        best[term][ltv].borrow.term = o.interest
-        best[term][ltv].borrow.ear  = earVal ?? null
-        best[term][ltv].borrow.id   = o.dlc_id
-        best[term][ltv].pid         = best[term][ltv].pid || o.product_id
+      if (best[uiDays][ltv].borrow.term == null || o.interest < best[uiDays][ltv].borrow.term) {
+        best[uiDays][ltv].borrow.term = o.interest
+        best[uiDays][ltv].borrow.ear  = earVal ?? null
+        best[uiDays][ltv].borrow.id   = o.dlc_id
+        best[uiDays][ltv].pid         = best[uiDays][ltv].pid || o.product_id
       }
     }
   }
@@ -466,7 +475,7 @@ async function loadOffersOnce() {
   try {
     const res = await getOffers('both')
     if (!res || !Array.isArray(res.payload)) throw new Error('Bad payload')
-    const nextTerms = buildTermsFromOffers(res.payload)
+    const nextTerms = buildTermsFromOffers(res.payload) // <-- annualized computed locally
     diffAndFlash(terms.value, nextTerms)
     terms.value = nextTerms
   } catch (e) {

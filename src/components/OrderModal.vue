@@ -234,7 +234,6 @@ let lastFocus = null
 onMounted(() => {
   lastFocus = document.activeElement
   document.body.classList.add('overflow-hidden')
-  // focus first focusable in dialog
   setTimeout(() => {
     const el = dialogRef.value
     const target = el && el.querySelector(focusSel)
@@ -371,7 +370,6 @@ function tickHold() {
 function stopHold() {
   if (holdTimer) { clearTimeout(holdTimer); holdTimer = null }
 }
-
 onUnmounted(stopHold)
 
 // Duration and dates
@@ -387,17 +385,25 @@ const termRateStr = computed(() =>
   orderType.value === 'market' ? marketRateStr.value : fmt(rateNum.value)
 )
 
-// Annualized yield (percentage string)
+/** ========= Annualized Yield (local calc; ignore API) =========
+ * Simple 360-day basis, no compounding:
+ * annualized = term_rate_pct * (360 / term_days)
+ * Examples:
+ *  - 30d @ 1.00%  → 12.00%
+ *  - 90d @ 2.83%  → 11.32%
+ *  - 180d @ 5.79% → 11.58%
+ * For 365-day term, we just show the term rate.
+ */
 function annualizedYield(rateStr, days) {
   if (!rateStr || rateStr === '*' || !Number.isFinite(days) || days <= 0) return '*'
   const m = rateStr.match(/([\d.]+)%/)
   if (!m) return '*'
   const r = parseFloat(m[1])
-  if (days !== 365) return `${(100 * (1 + r * 0.01) ** (360 / days) - 100).toFixed(2)}%`
-  return rateStr
+  if (days === 365) return `${r.toFixed(2)}%`
+  const annual = r * (360 / days)
+  return `${annual.toFixed(2)}%`
 }
 
-// Submit
 function submitOrder () {
   const finalRateStr = termRateStr.value
   emit('submit', {

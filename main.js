@@ -6,6 +6,13 @@ import './src/index.css';
 import { installSeo } from './src/plugins/seo.js'
 import 'lite-youtube-embed';
 import 'lite-youtube-embed/src/lite-yt-embed.css'
+import {
+  captureReferralFromURL,
+  purgeLegacyReferralCookies,
+} from './src/lib/referral.ts';
+
+purgeLegacyReferralCookies();
+captureReferralFromURL({ keys: ['ref', 'r', 'referral'], cleanURL: true });
 const app = createApp(App)
 app.use(router)
 installSeo(router)

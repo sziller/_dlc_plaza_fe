@@ -1,16 +1,17 @@
 // src/lib/referral.ts
-export type RefCookie = {
-  code: string;
-  setAt: string;                   // ISO timestamp
-  source: 'url' | 'manual' | 'default';
-};
+/**
+ * Referral cookie utilities.
+ * - Cookie name: referral_code
+ * - Sent via Cookie header only (do NOT add to JSON payload)
+ * - Works on localhost and on *.purabitcoin.com / *.cadenabitcoin.com
+ */
 
-const REF_COOKIE = 'cb_ref';
+export const REFERRAL_COOKIE = 'referral_code';
+const KNOWN_ROOTS = ['purabitcoin.com', 'cadenabitcoin.com'];
+const DEFAULT_TTL_DAYS = Number(import.meta.env.VITE_REF_TTL_DAYS ?? 90);
 
-const ttlMs = () =>
-  Number(import.meta.env.VITE_REF_TTL_DAYS ?? 30) * 24 * 60 * 60 * 1000;
-
-function isLocalhost(host: string) {
+/** true for localhost / 127.0.0.1 / ::1 / raw IPs */
+function isLocalHostLike(host: string): boolean {
   return (
     host === 'localhost' ||
     host === '127.0.0.1' ||
@@ -19,76 +20,122 @@ function isLocalhost(host: string) {
   );
 }
 
-function getCookieDomain(): string | null {
-  const configured = (import.meta.env.VITE_COOKIE_DOMAIN || '').trim();
+/** registrable root from host (best-effort) */
+function registrableRoot(host: string): string {
+  const parts = host.split('.');
+  return parts.length >= 2 ? parts.slice(-2).join('.') : host;
+}
+
+/** Decide cookie Domain attribute.
+ * Priority:
+ * 1) VITE_COOKIE_DOMAIN (e.g. ".purabitcoin.com") if set and not localhost
+ * 2) Auto: .purabitcoin.com / .cadenabitcoin.com when on those roots
+ * 3) Omit Domain on localhost/dev
+ */
+function cookieDomainAttr(): string {
   const host = typeof window !== 'undefined' ? window.location.hostname : '';
-  if (!configured || isLocalhost(host)) return null; // don’t set Domain= on localhost/IP
-  return configured;
-}
+  if (!host) return '';
 
-function writeCookie(name: string, value: string, msToLive: number): void {
-  const parts = [
-    `${name}=${value}`,
-    `Expires=${new Date(Date.now() + msToLive).toUTCString()}`,
-    'Path=/',
-    'SameSite=Lax',
-  ];
-  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    parts.push('Secure');
+  // respect explicit override
+  const cfg = (import.meta.env.VITE_COOKIE_DOMAIN || '').trim();
+  if (cfg && !isLocalHostLike(host)) {
+    const dom = cfg.startsWith('.') ? cfg : `.${cfg}`;
+    return `; Domain=${dom}`;
   }
-  const domain = getCookieDomain();
-  if (domain) parts.push(`Domain=${domain}`);
-  document.cookie = parts.join('; ');
+
+  // auto for known roots
+  const root = registrableRoot(host);
+  if (!isLocalHostLike(host) && KNOWN_ROOTS.includes(root)) {
+    return `; Domain=.${root}`;
+  }
+
+  // host-only (localhost)
+  return '';
 }
 
-export function getRefCookie(): RefCookie | null {
-  const m = document.cookie.split('; ').find(c => c.startsWith(`${REF_COOKIE}=`));
-  if (!m) return null;
-  try {
-    return JSON.parse(decodeURIComponent(m.split('=')[1])) as RefCookie;
-  } catch {
-    return null;
+/** Compose cookie attributes based on environment */
+function cookieAttrs(ttlDays = DEFAULT_TTL_DAYS): string {
+  const exp = new Date(Date.now() + ttlDays * 864e5).toUTCString();
+  const isHttps =
+    typeof window !== 'undefined' && window.location.protocol === 'https:';
+  const secure = isHttps ? '; Secure' : '';
+  // Lax is fine for same-site (subdomains count as same-site)
+  return `; Path=/; Expires=${exp}; SameSite=Lax${secure}${cookieDomainAttr()}`;
+}
+
+/** Low-level write */
+function writeCookie(name: string, value: string, ttlDays?: number): void {
+  document.cookie = `${name}=${value}${cookieAttrs(ttlDays)}`;
+}
+
+/** Low-level delete (attempts multiple domains to be safe) */
+function deleteCookieAllScopes(name: string): void {
+  const base = `${name}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/`;
+  const isHttps =
+    typeof window !== 'undefined' && window.location.protocol === 'https:';
+  const sec = isHttps ? '; Secure' : '';
+  const host = typeof window !== 'undefined' ? window.location.hostname : '';
+  const root = registrableRoot(host);
+
+  // host-only
+  document.cookie = `${base}; SameSite=Lax${sec}`;
+  // known roots
+  KNOWN_ROOTS.forEach((r) => {
+    document.cookie = `${base}; SameSite=Lax; Domain=.${r}${sec}`;
+  });
+  // current root guess
+  if (root && KNOWN_ROOTS.includes(root)) {
+    document.cookie = `${base}; SameSite=Lax; Domain=.${root}${sec}`;
   }
 }
 
-export function setRefCookie(
-  code: string,
-  source: RefCookie['source'] = 'url'
-): void {
-  const payload: RefCookie = { code, setAt: new Date().toISOString(), source };
-  writeCookie(REF_COOKIE, encodeURIComponent(JSON.stringify(payload)), ttlMs());
+/** Public API **/
+
+export function setReferralCookie(code: string, ttlDays?: number): void {
+  // light sanity-check; tweak if your codes differ
+  if (!/^[A-Za-z0-9_-]{4,128}$/.test(code)) return;
+  writeCookie(REFERRAL_COOKIE, encodeURIComponent(code), ttlDays);
 }
 
-export function clearRefCookie(): void {
-  const base =
-    `${REF_COOKIE}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; SameSite=Lax`;
-  const sec =
-    typeof window !== 'undefined' && window.location.protocol === 'https:'
-      ? '; Secure'
-      : '';
-  const domain = getCookieDomain();
-  document.cookie = domain ? `${base}; Domain=${domain}${sec}` : `${base}${sec}`;
+export function getReferralCookie(): string | null {
+  const m = document.cookie.match(
+    new RegExp(`(?:^|;\\s*)${REFERRAL_COOKIE}=([^;]+)`)
+  );
+  return m ? decodeURIComponent(m[1]) : null;
 }
 
-function qVal(q: Record<string, any>, k: string): string | undefined {
-  const v = q?.[k];
-  return typeof v === 'string' ? v : Array.isArray(v) ? v[0] : undefined;
+export function clearReferralCookie(): void {
+  deleteCookieAllScopes(REFERRAL_COOKIE);
 }
 
-export function maybeCaptureFromQuery(q: Record<string, any>): void {
-  const code = (qVal(q, 'r') ?? qVal(q, 'ref') ?? qVal(q, 'referral'))?.trim();
+/** Capture ?ref=... (or ?r=... / ?referral=...) and store as cookie. */
+export function captureReferralFromURL(opts?: {
+  keys?: string[]; // default ['ref','r','referral']
+  cleanURL?: boolean; // default true
+  ttlDays?: number;
+}): void {
+  const keys = opts?.keys ?? ['ref', 'r', 'referral'];
+  const params = new URLSearchParams(window.location.search);
+  let code: string | null = null;
+  for (const k of keys) {
+    const v = params.get(k);
+    if (v?.trim()) {
+      code = v.trim();
+      break;
+    }
+  }
   if (!code) return;
-  const force = (qVal(q, 'r_force') ?? '').toLowerCase() === '1';
-  const existing = getRefCookie();
-  if (existing && !force) return; // first touch wins
-  setRefCookie(code, 'url');
+
+  setReferralCookie(code, opts?.ttlDays);
+
+  if (opts?.cleanURL !== false && window.history.replaceState) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+  }
 }
 
-export function ensureDefaultIfEmpty(): RefCookie | null {
-  const existing = getRefCookie();
-  if (existing) return existing;
-  const def = (import.meta.env.VITE_REF_DEFAULT || '').trim();
-  if (!def) return null;
-  setRefCookie(def, 'default');
-  return getRefCookie();
+/** Clean up legacy/bad cookies so only referral_code remains. */
+export function purgeLegacyReferralCookies(): void {
+  // Nukes: cb_ref (JSON) and misspelled refferal_code
+  deleteCookieAllScopes('cb_ref');
+  deleteCookieAllScopes('refferal_code');
 }
