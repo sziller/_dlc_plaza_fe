@@ -11,11 +11,11 @@
 
         <!-- Eyebrow + Title + Lead -->
         <div class="text-center" v-reveal>
-          <h1 id="onboarding-title" class="mt-4 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
+          <h1 id="onboarding-title" class="section-title">
             Personalized Onboarding
           </h1>
 
-          <p class="mt-4 text-base md:text-lg lg:text-xl text-white/80 max-w-4xl mx-auto">
+          <p class="lead max-w-4xl mx-auto">
             As a Cadena Bitcoin client, expert knowledge is always just a chat, email, or phone call away.
             We simplify complexity and are available 24/7 for personalized onboarding and strategies to
             borrow Bitcoin or generate yield from Bitcoin.
@@ -53,6 +53,7 @@
                     <span class="text-sm font-medium">{{ copiedPhone ? 'Copied' : 'Copy' }}</span>
                   </button>
                 </div>
+
 
                 <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
                   <span class="inline-flex items-center gap-1">
@@ -93,6 +94,7 @@
                   </button>
                 </div>
 
+
                 <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
                   <span>Dedicated onboarding specialist</span>
                   <span aria-hidden="true">•</span>
@@ -109,13 +111,13 @@
     <!-- Who we serve -->
     <section class="w-full px-6 py-16 md:py-20">
       <div class="max-w-6xl mx-auto">
-        <h2 class="reveal text-4xl font-extrabold mb-12 text-center" v-reveal>Who we serve.</h2>
+        <h2 class="section-title text-center" v-reveal>Who we serve.</h2>
 
         <div class="space-y-8">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 40 }">
               <User class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
-              <p class="text-xl font-semibold">Private Clients</p>
+              <p class="text-xl font-semibold">Individual Investors</p>
             </div>
             <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 90 }">
               <Users class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
@@ -139,7 +141,12 @@
     <!-- Reach Out -->
     <section class="w-full px-6 pb-16 md:pb-24">
       <div class="max-w-6xl mx-auto space-y-12">
-        <h2 class="reveal text-4xl font-extrabold text-center" v-reveal>Reach Out</h2>
+        <h2 class="section-title text-center" v-reveal>Reach Out</h2>
+
+        <!-- Helpful prompt / CTA copy -->
+        <div class="reveal glass-card text-center" v-reveal="{ delay: 40 }">
+         
+        </div>
 
         <!-- Socials -->
         <div class="reveal glass-card" v-reveal="{ delay: 60 }">
@@ -187,25 +194,62 @@
         <!-- Contacts -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="reveal glass-card" v-reveal="{ delay: 80 }">
-            <p class="text-xl font-semibold mb-2">Kevin Bell</p>
-            <p class="text-sm text-white/70 mb-2">President</p>
-            <p>
-              <span class="font-medium">Email:</span>
-              <a href="mailto:kevin@cadenabitcoin.com" class="underline hover:opacity-80">kevin@cadenabitcoin.com</a>
+            <div class="avatar-wrap mb-3">
+              <img
+                src="/img/kevinb-640.avif"
+                srcset="/img/kevinb-640.avif 640w, /img/kevinb-960.avif 960w, /img/kevinb-1280.avif 1280w"
+                sizes="(min-width: 768px) 192px, 160px"
+                alt="Kevin Bell headshot"
+                class="headshot"
+                width="160" height="160"
+                loading="lazy" decoding="async"
+              />
+            </div>
+            <p class="text-xl font-semibold mb-1">Kevin Bell</p>
+            <p class="text-sm text-white/70">President • CFA</p>
+            <p class="mt-3 text-white/80 text-sm leading-relaxed">
+              Kevin Bell, CFA — tradfi graduate, capital markets veteran, debt and currency dealer, and numbers ninja.
+              Passionate about building efficient financial solutions that promote Bitcoin, freedom, decentralization,
+              and individual empowerment.
             </p>
-            <p class="mt-1">
-              <span class="font-medium">Phone:</span>
-              <a href="tel:+13058311410" class="underline hover:opacity-80">305-831-1410</a>
-            </p>
+            <div class="mt-4 space-y-1">
+              <p>
+                <span class="font-medium">Email:</span>
+                <a href="mailto:kevin@cadenabitcoin.com" class="underline hover:opacity-80">kevin@cadenabitcoin.com</a>
+              </p>
+              <p>
+                <span class="font-medium">Phone:</span>
+                <a href="tel:+13058311410" class="underline hover:opacity-80">305-831-1410</a>
+              </p>
+            </div>
           </div>
 
           <div class="reveal glass-card" v-reveal="{ delay: 120 }">
-            <p class="text-xl font-semibold mb-2">Sziller</p>
-            <p class="text-sm text-white/70 mb-2">Chief Technology Officer</p>
-            <p>
-              <span class="font-medium">Email:</span>
-              <a href="mailto:sziller@cadenabitcoin.com" class="underline hover:opacity-80">sziller@cadenabitcoin.com</a>
+            <div class="avatar-wrap mb-3">
+              <img
+                src="/img/Sz-640.avif"
+                srcset="/img/Sz-640.avif 640w, /img/Sz-960.avif 960w, /img/Sz-1280.avif 1280w"
+                sizes="(min-width: 768px) 192px, 160px"
+                alt="Sziller headshot"
+                class="headshot"
+                width="160" height="160"
+                loading="lazy" decoding="async"
+              />
+            </div>
+            <p class="text-xl font-semibold mb-1">Sziller</p>
+            <p class="text-sm text-white/70">Chief Technology Officer</p>
+            <p class="mt-3 text-white/80 text-sm leading-relaxed">
+              Sziller, an Engineer and M.Sc. Architect with decentralization and self-sufficiency on my mind.
+              I’m interested in Engineering solutions for real-life problems accessible to anyone, with skunkswork
+              philosophy. I strive to achieve optimal redundancy by cutting out as many middle-men as possible.
+              I love solutions that work, even if rough on the edges.
             </p>
+            <div class="mt-4 space-y-1">
+              <p>
+                <span class="font-medium">Email:</span>
+                <a href="mailto:sziller@cadenabitcoin.com" class="underline hover:opacity-80">sziller@cadenabitcoin.com</a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -353,6 +397,20 @@ const vReveal = {
   background: radial-gradient(40% 60% at 50% 50%, rgba(22,177,255,0.27), transparent 70%);
 }
 
+/* ===== Typographic polish ===== */
+.section-title{
+  margin-top: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-size: clamp(2rem, 4vw + 1rem, 3.5rem);
+}
+.lead{
+  margin-top: 1rem;
+  font-size: clamp(1rem, 0.5vw + 0.9rem, 1.25rem);
+  color: rgba(255,255,255,0.8);
+}
+
 /* ===== Unify all boxes to the pro-card look ===== */
 .pro-card,
 .glass-card,
@@ -362,11 +420,11 @@ const vReveal = {
   border-radius: 1.25rem; /* ~rounded-2xl */
   padding: 1.25rem;
   background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: saturate(120%) blur(10px);
+  -webkit-backdrop-filter: saturate(120%) blur(10px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
 }
 .pro-card::before,
 .glass-card::before,
@@ -393,6 +451,7 @@ const vReveal = {
 .social-tile:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255,255,255,0.22);
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
@@ -405,7 +464,7 @@ const vReveal = {
   border-radius: 0.875rem;
   background: rgba(255,255,255,0.12);
   border: 1px solid rgba(255,255,255,0.18);
-  transition: transform .18s ease, background .18s ease;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
 .pro-card:hover .icon-wrap,
 .glass-card:hover .icon-wrap,
@@ -413,6 +472,7 @@ const vReveal = {
 .social-tile:hover .icon-wrap {
   transform: translateY(-1px);
   background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.24);
 }
 
 /* Buttons */
@@ -433,7 +493,8 @@ const vReveal = {
   border: 1px solid rgba(255,255,255,0.18);
   transition: transform .15s ease, background .15s ease, border-color .15s ease;
 }
-.btn-ghost:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); }
+.btn-ghost:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.24); }
+.btn-ghost:focus-visible { outline: 2px solid rgba(255,255,255,.85); outline-offset: 2px; }
 
 /* Social tiles */
 .social-tile {
@@ -472,4 +533,16 @@ const vReveal = {
 
 /* Neutralize text glow */
 :deep(h1), :deep(h2), :deep(p), :deep(a), :deep(span) { text-shadow: 0 0 0 transparent; }
+/* ===== Headshots ===== */
+.avatar-wrap{ display:flex; justify-content:center; }
+.headshot{
+  width:160px; height:160px; border-radius:9999px; object-fit:cover; display:block;
+  box-shadow:0 12px 28px rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,0.18);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,.08), rgba(255,255,255,.02));
+}
+@media (min-width: 768px){
+  .headshot{ width:192px; height:192px; }
+}
+
 </style>
