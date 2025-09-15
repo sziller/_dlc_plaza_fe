@@ -6,6 +6,7 @@ import './src/index.css';
 import { installSeo } from './src/plugins/seo.js'
 import 'lite-youtube-embed';
 import 'lite-youtube-embed/src/lite-yt-embed.css'
+import './src/api/axiosSetup'
 import {
   captureReferralFromURL,
   purgeLegacyReferralCookies,

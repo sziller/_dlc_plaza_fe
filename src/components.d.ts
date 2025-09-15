@@ -17,6 +17,7 @@ declare module 'vue' {
     OrderModal: typeof import('./components/OrderModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SessionBanner: typeof import('./components/SessionBanner.vue')['default']
     TheFooter: typeof import('./components/TheFooter.vue')['default']
     UsersDLCS: typeof import('./components/UsersDLCS.vue')['default']
   }

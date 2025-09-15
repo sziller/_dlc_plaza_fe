@@ -122,6 +122,9 @@
           v-else
           @click.prevent="logoutUser"
           class="text-sm hover:text-secondary transition cursor-pointer"
+          :disabled="sessionBusy"
+          :aria-disabled="sessionBusy ? 'true' : 'false'"
+          title="Logout disabled while reconnecting"
         >
           Logout
         </button>
@@ -202,6 +205,9 @@
           v-else
           @click.prevent="logoutUser(true)"
           class="block text-left text-lg font-semibold hover:text-secondary cursor-pointer"
+          :disabled="sessionBusy"
+          :aria-disabled="sessionBusy ? 'true' : 'false'"
+          title="Logout disabled while reconnecting"
         >
           Logout
         </button>
@@ -230,19 +236,37 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo.png'
 import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
-const { isLoggedIn, logout } = useAuth()
+const { isLoggedIn, logout, tokenHealth } = useAuth()
 
 const isMobileMenuOpen = ref(false)
 const btcPrice = ref('...')
 
 let priceIntervalId = null
 let abortCtrl = null
+
+// Heartbeat-aware UI: disable actions during "checking/paused"
+const sessionBusy = computed(() => {
+  const s = tokenHealth?.status
+  return s === 'checking' || s === 'paused'
+})
+
+// Redirect the instant the token is invalid
+const stopStatusWatch = watch(
+  () => tokenHealth && tokenHealth.status,
+  (s) => {
+    if (s === 'invalid') {
+      isMobileMenuOpen.value = false
+      logoutUser(false) // clears token and pushes to /login
+    }
+  },
+  { immediate: false }
+)
 
 // Poll BTC price with safer fetch settings and abort on unmount
 const fetchBTCPrice = async () => {
@@ -257,8 +281,8 @@ const fetchBTCPrice = async () => {
         cache: 'no-store',
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
-        signal: abortCtrl.signal,
-        headers: { 'accept': 'application/json' },
+        signal: abortCtrl?.signal,
+        headers: { accept: 'application/json' },
       }
     )
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -269,8 +293,7 @@ const fetchBTCPrice = async () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
-  } catch (err) {
-    // silent degrade to N/A to avoid leaking details
+  } catch {
     btcPrice.value = 'N/A'
   }
 }
@@ -289,7 +312,6 @@ function stopPricePolling() {
 // Pause polling when tab is hidden (saves battery & requests)
 const onVis = () => (document.hidden ? stopPricePolling() : startPricePolling())
 
-// Toggle mobile menu without inline styles; use body class (CSP-friendly)
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
@@ -311,7 +333,7 @@ const logoutUser = async (fromMobile = false) => {
     if (fromMobile) closeMobileMenu()
     await router.push('/login')
   } catch {
-    /* swallow */
+    /* no-op */
   }
 }
 
@@ -326,6 +348,7 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', onVis)
   window.removeEventListener('keydown', onEscClose)
   unregAfterEach && unregAfterEach()
+  stopStatusWatch && stopStatusWatch()
 })
 
 function onEscClose(e) {
