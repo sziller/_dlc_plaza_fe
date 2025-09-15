@@ -3,18 +3,25 @@ export interface UserFace {
   password: string;
 }
 
-export interface UserProfilePayload {
-  auth_code: number;
-  pubkey: string;
-  email: string;
-  timestamp: number;
-  xpub: string;
-  psswd_hsh: string;
-  uuid: string;
-  disabled: boolean;
-  balance_derived: number;
-  balance_onchain: number;
+export interface UserProfilePayload{
+  timestamp: number
+  payload: {
+    email: string
+    uuid: string
+    auth_code: number
+    xpub: string
+    balance_onchain: number
+    balance_derived: number
+    timestamp: number
+    disabled: boolean
+    uuid_parent: string | null
+    referral_code: string | null                 // NEW
+    par_referral_code: string | null             // NEW
+    referral_first_touch_ts: number | null       // NEW
+  }
+  message: string
 }
+
 
 export interface UserProfileResponse {
   timestamp: number;

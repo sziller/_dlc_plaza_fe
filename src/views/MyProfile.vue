@@ -41,6 +41,51 @@
           <div><span class="font-semibold">Liquid Balance:</span> {{ formatBtc(profile.payload.balance_derived) }} BTC</div>
           <div><span class="font-semibold">Wallet Balance:</span> {{ formatBtc(profile.payload.balance_onchain) }} BTC</div>
         </section>
+        <!-- Referrals -->
+<section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
+  <h2 class="text-2xl font-bold">Referrals</h2>
+
+  <div class="space-y-2" v-if="refCode">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+      <span class="font-semibold">Your Code:</span>
+      <code class="px-2 py-1 rounded bg-black/30 border border-white/10 break-all text-xs sm:text-sm">
+        {{ refCode }}
+      </code>
+      <button
+        class="sm:ml-auto px-3 py-1 rounded bg-white/10 border border-white/20 hover:bg-white/15 text-sm"
+        @click="copyText(refCode, 'code')"
+      >
+        {{ copiedWhat === 'code' ? 'Copied' : 'Copy' }}
+      </button>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+      <span class="font-semibold">Share Link:</span>
+      <a
+        v-if="refLink"
+        :href="refLink"
+        class="px-2 py-1 rounded bg-black/30 border border-white/10 break-all text-xs sm:text-sm underline"
+        target="_blank" rel="noopener"
+      >{{ refLink }}</a>
+      <span v-else class="text-white/60 text-sm">Not available</span>
+
+      <button
+        v-if="refLink"
+        class="sm:ml-auto px-3 py-1 rounded bg-white/10 border border-white/20 hover:bg-white/15 text-sm"
+        @click="copyText(refLink, 'link')"
+      >
+        {{ copiedWhat === 'link' ? 'Copied' : 'Copy' }}
+      </button>
+    </div>
+
+    <div v-if="refParent" class="text-white/70 text-sm">
+      Referred by: <code class="px-1 py-0.5 rounded bg-black/30 border border-white/10">{{ refParent }}</code>
+    </div>
+  </div>
+
+  <div v-else class="text-white/70 text-sm">No referral code on file.</div>
+</section>
+
 
         <!-- Add funds -->
         <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-4">
@@ -222,6 +267,35 @@ async function copyAddress() {
 
 function formatBtc(sats) {
   return (Number(sats) / 1e8).toFixed(8)
+}
+// Referral helpers (JS)
+const copiedWhat = ref('') // '' | 'code' | 'link'
+
+const rawRefCode = computed(() => profile.value?.payload?.referral_code || '')
+const refCode = computed(() => {
+  const s = String(rawRefCode.value || '')
+  return s.startsWith('refcode:') ? s.slice('refcode:'.length) : s
+})
+
+// prefer canonical domain if you have it; else current origin
+const siteBase = (import.meta.env && import.meta.env.VITE_SITE_BASE) || window.location.origin
+const refLink = computed(() => (refCode.value ? `${siteBase}/?ref=${encodeURIComponent(refCode.value)}` : ''))
+const refParent = computed(() => profile.value?.payload?.par_referral_code || null)
+
+async function copyText(text, which) {
+  try {
+    await navigator.clipboard.writeText(text)
+    copiedWhat.value = which // 'code' | 'link'
+  } catch {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    document.body.appendChild(ta)
+    ta.select()
+    try { document.execCommand('copy'); copiedWhat.value = which } catch {}
+    document.body.removeChild(ta)
+  } finally {
+    setTimeout(() => { copiedWhat.value = '' }, 1500)
+  }
 }
 
 onMounted(() => {
