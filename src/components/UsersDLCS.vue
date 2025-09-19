@@ -54,23 +54,24 @@
                 <td class="px-4 py-3">{{ row.term }}</td>
                 <td class="px-4 py-3">{{ row.ltv }}</td>
                 <td class="px-4 py-3">{{ row.rate }}</td>
+                <td class="px-4 py-3">{{ row.annualized }}</td>
                 <td class="px-4 py-3">{{ row.status }}</td>
                 <td class="px-4 py-3">{{ row.role }}</td>
               </tr>
               <tr v-if="sortedData.length === 0">
-                <td class="px-4 py-6 text-white/70" colspan="7">No DLCs found.</td>
+                <td class="px-4 py-6 text-white/70" colspan="8">No DLCs found.</td>
               </tr>
             </tbody>
 
             <tbody v-else-if="loading">
               <tr>
-                <td class="px-4 py-6 text-white/70" colspan="7">Loading…</td>
+                <td class="px-4 py-6 text-white/70" colspan="8">Loading…</td>
               </tr>
             </tbody>
 
             <tbody v-else>
               <tr>
-                <td class="px-4 py-6 text-red-400" colspan="7">{{ error }}</td>
+                <td class="px-4 py-6 text-red-400" colspan="8">{{ error }}</td>
               </tr>
             </tbody>
           </table>
@@ -103,7 +104,8 @@ const columns = Object.freeze([
   { label: 'Oracle', key: 'oracle' },
   { label: 'Term', key: 'term' },
   { label: 'Loan To Value', key: 'ltv' },
-  { label: 'Rate', key: 'rate' },
+  { label: 'Rate (Term)', key: 'rate' },
+  { label: 'Annualized Yield', key: 'annualized' },
   { label: 'Status', key: 'status' },
   { label: 'Role', key: 'role' },
 ])
@@ -123,12 +125,28 @@ const parseLtv = (pid) => {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
   return m ? Number(m[1]) : null
 }
+/** Extract raw term days (as provided), without UI normalization. */
 const parseTermDays = (pid, duration) => {
   const fromPid = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
   if (fromPid) return Math.round(Number(fromPid[1]))
   const d = Number(duration)
   return Number.isFinite(d) && d > 0 ? Math.round(d) : null
 }
+/** Treat anything in [360..366] as a 1-year term; display as 365 days. */
+const isYearish = (days) => {
+  const d = Number(days)
+  return Number.isFinite(d) && d >= 360 && d <= 366
+}
+const displayDays = (days) => (isYearish(days) ? 365 : Math.round(Number(days) || 0))
+
+/** Simple 360-day annualization (no compounding), same as Market Overview. */
+const annualize360 = (termPct, days) => {
+  const r = Number(termPct)
+  const d = Number(days)
+  if (!Number.isFinite(r) || !Number.isFinite(d) || d <= 0) return NaN
+  return r * (360 / d)
+}
+
 const isHiddenEmail = (s) => String(s ?? '').trim() === '--- hidden ---'
 const roleLabel = (ini_role, ini_email) => {
   if (ini_role === 'lend' && !isHiddenEmail(ini_email)) return 'Lender'
@@ -139,16 +157,21 @@ const roleLabel = (ini_role, ini_email) => {
 }
 const statusLabel = (s) => s || '—'
 
-// map API item -> table row
+// map API item -> table row (normalize yearish terms to 365 for display, but compute annualized on raw days)
 const toRow = (d) => {
-  const days = parseTermDays(d.product_id, d.duration)
+  const rawDays = parseTermDays(d.product_id, d.duration) // e.g. 30, 90, 180, 360
+  const uiDays  = rawDays ? displayDays(rawDays) : null   // e.g. 30, 90, 180, 365
   const ltv = parseLtv(d.product_id)
+  const rateNum = Number(d.interest)
+  const ear = annualize360(rateNum, rawDays)
+
   return {
     dlcId: d.dlc_id || d.tmp_cntr_id || '—',
     oracle: d.orcl_id || '—',
-    term: days ? `${days} Days` : '—',
+    term: uiDays ? `${uiDays} Days` : '—',
     ltv: ltv != null ? `${ltv}%` : '—',
-    rate: pct2(Number(d.interest)),
+    rate: pct2(rateNum),
+    annualized: pct2(ear),
     status: statusLabel(d.status),
     role: roleLabel(d.ini_role, d.ini_email),
   }
@@ -163,9 +186,10 @@ const normForSort = (row, key) => {
   const v = row[key]
   if (v == null) return ''
   if (key === 'term') {
+    // Parse displayed number (already normalized to 365 if yearish)
     const m = String(v).match(/(\d+)/); return m ? Number(m[1]) : 0
   }
-  if (key === 'ltv' || key === 'rate') {
+  if (key === 'ltv' || key === 'rate' || key === 'annualized') {
     const m = String(v).match(/([\d.]+)/); return m ? Number(m[1]) : -1
   }
   return String(v).toLowerCase()
@@ -199,13 +223,14 @@ const statuses = Object.freeze([
 function sameRows(a, b) {
   // compare on stable keys only
   const pick = r => ({
-    dlcId: r.dlcId, oracle: r.oracle, term: r.term, ltv: r.ltv, rate: r.rate, status: r.status, role: r.role
+    dlcId: r.dlcId, oracle: r.oracle, term: r.term, ltv: r.ltv, rate: r.rate, annualized: r.annualized, status: r.status, role: r.role
   })
   if (a.length !== b.length) return false
   for (let i = 0; i < a.length; i++) {
     const A = pick(a[i]); const B = pick(b[i])
     if (A.dlcId !== B.dlcId || A.oracle !== B.oracle || A.term !== B.term ||
-        A.ltv !== B.ltv || A.rate !== B.rate || A.status !== B.status || A.role !== B.role) return false
+        A.ltv !== B.ltv || A.rate !== B.rate || A.annualized !== B.annualized ||
+        A.status !== B.status || A.role !== B.role) return false
   }
   return true
 }

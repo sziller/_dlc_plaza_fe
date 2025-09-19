@@ -80,7 +80,7 @@
             {{ marketRateStr || '*' }}
           </div>
 
-          <!-- Limit: buttons only -->
+          <!-- Limit: input + buttons -->
           <div v-else class="w-full rounded bg-white/10 border border-white/20 p-3">
             <div class="flex items-center justify-between gap-3">
               <button
@@ -94,7 +94,19 @@
                 class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
               >−</button>
 
-              <div class="text-lg font-bold tabular-nums" :aria-live="'polite'">{{ fmt(rateNum) }}</div>
+              <!-- Editable numeric input (4 decimals) -->
+              <input
+                type="text"
+                inputmode="decimal"
+                pattern="[0-9]*[.]?[0-9]*"
+                v-model="rateInput"
+                @input="onRateInput"
+                @focus="onRateFocus"
+                @blur="onRateBlur"
+                class="w-32 text-center px-3 py-2 rounded bg-white/10 border border-white/20 focus:outline-none font-bold tabular-nums"
+                aria-label="Rate percentage"
+                :aria-describedby="rateHelpId"
+              />
 
               <button
                 type="button"
@@ -107,22 +119,28 @@
                 class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
               >+</button>
             </div>
-            <p class="text-xs text-white/70 mt-2">
+            <p :id="rateHelpId" class="text-xs text-white/70 mt-2 text-center">
               {{ marketIsZeroish
                 ? 'No market quote. Choose your rate.'
                 : (isBorrower ? 'You can move down or back up to market.' : 'You can move up or back down to market.')
               }}
-              Tick: {{ STEP.toFixed(2) }}%.
+              Tick: {{ STEP.toFixed(RATE_DECIMALS) }}%.
             </p>
-          </div>
 
-          <!-- Live rate summary -->
-          <div class="mt-3 grid-cols-2 gap-3">
-            <div class="rounded bg-white/5 border border-white/15 p-3">
-              <div class="text-xs text-center text-white/70">Annualized yield</div>
-              <div class="mt-1 font-semibold text-center tabular-nums">
+            <!-- Annualized, centered under rate for term -->
+            <div class="mt-3 text-center">
+              <div class="text-xs text-white/70">Annualized yield</div>
+              <div class="mt-1 font-semibold tabular-nums">
                 {{ annualizedYield(termRateStr, termDays) }}
               </div>
+            </div>
+          </div>
+
+          <!-- Market-mode annualized, also centered -->
+          <div v-if="orderType === 'market'" class="mt-3 text-center">
+            <div class="text-xs text-white/70">Annualized yield</div>
+            <div class="mt-1 font-semibold tabular-nums">
+              {{ annualizedYield(termRateStr, termDays) }}
             </div>
           </div>
         </div>
@@ -156,7 +174,7 @@
 
         <ul class="space-y-2 text-sm text-white/90">
           <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
-          <li><span class="font-semibold text-white">Amount:</span> 0.1 BTC</li>
+          <li><span class="font-semibold text-white">Amount:</span> {{ formatBtc(amountBtc) }}</li>
           <li><span class="font-semibold text-white">Commission/Fees:</span> 0.50%</li>
           <li><span class="font-semibold text-white">Maturity Date:</span> {{ maturityDate }}</li>
           <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ termRateStr }}</li>
@@ -214,19 +232,31 @@ const props = defineProps({
   termDays: { type: Number, default: 90 },
   loading: { type: Boolean, default: false },
   notice:  { type: Object,  default: () => ({ type: '', text: '' }) },
+  /**
+   * LTV can be given as a ratio (0.5, 0.8) or a percent (50, 80).
+   * We'll normalize to 0..1.
+   */
+  ltv: { type: Number, default: 0.5 },
 })
 const emit = defineEmits(['close', 'submit'])
 
-const { loading, notice, termDays, actionType, rate } = toRefs(props)
+const { loading, notice, termDays, actionType, rate, ltv } = toRefs(props)
 
 const orderType = ref('market')
 const step = ref(1)
 const isBorrower = computed(() => (actionType.value || '').toLowerCase() === 'borrow')
 const isSuccess = computed(() => notice.value?.type === 'success')
 
+// ===== Formatting constants =====
+const RATE_DECIMALS = 4                        // show rate to 4 dp
+const ANNUAL_DECIMALS = 2                      // annualized shown to 2 dp
+const STEP = 0.1                               // % step (0.1%)
+const FEE_PCT = 0.005                          // 0.50% as decimal
+
 // IDs for accessibility
 const titleId = `order-modal-title-${Math.random().toString(36).slice(2)}`
 const descId  = `order-modal-desc-${Math.random().toString(36).slice(2)}`
+const rateHelpId = `order-modal-ratehelp-${Math.random().toString(36).slice(2)}`
 const dialogRef = ref(null)
 
 // Focus trap + scroll lock
@@ -271,15 +301,48 @@ function onTab(e) {
 }
 function closeSelf() { emit('close') }
 
-// Helpers
+// ===== Year-consistency helpers =====
+function isYearish(days) {
+  const d = Number(days)
+  return Number.isFinite(d) && d >= 360 && d <= 366
+}
+function displayDays(days) {
+  // UI should always show 365 for any ~1-year term
+  return isYearish(days) ? 365 : Math.round(Number(days) || 0)
+}
+
+// ===== Helpers =====
 function toNum(rateStr) {
   const m = rateStr?.match(/([\d.]+)/)
   return m ? parseFloat(m[1]) : NaN
 }
-function fmtNum(n) { return Number.isNaN(n) ? NaN : parseFloat(n.toFixed(2)) }
-function fmt(n) { return Number.isNaN(n) ? '*' : `${n.toFixed(2)}%` }
+function roundRate(n) { return Number.isNaN(n) ? NaN : parseFloat(n.toFixed(RATE_DECIMALS)) }
+function fmt(n) { return Number.isNaN(n) ? '*' : `${n.toFixed(RATE_DECIMALS)}%` }
+function formatBtc(n) {
+  const x = Number(n)
+  return Number.isFinite(x) ? `${x.toFixed(4)} BTC` : '*'
+}
+function roundBtc(n) {
+  const x = Number(n)
+  return Number.isFinite(x) ? Number(x.toFixed(8)) : NaN
+}
+function clampRate(val) {
+  let min = 0
+  let max = 100
+  if (!marketIsZeroish.value) {
+    if (isBorrower.value) {
+      // borrower can go down from market, not above it
+      max = marketRateNum.value
+    } else {
+      // lender can go up from market, not below it
+      min = marketRateNum.value
+    }
+  }
+  if (!Number.isFinite(val)) return Number.isNaN(val) ? NaN : val
+  return Math.min(Math.max(val, min), max)
+}
 
-// Baseline market rate
+// ===== Baseline market rate =====
 const marketRateNum = computed(() => {
   const n = toNum(rate.value)
   return Number.isNaN(n) ? 0 : n
@@ -294,47 +357,117 @@ const marketIsZeroish = computed(() => {
 // Enforce limit-only when zeroish
 watch(marketIsZeroish, (zr) => { if (zr) orderType.value = 'limit' }, { immediate: true })
 
-// Limit selection state
-const STEP = 0.01
-const rateNum = ref(marketRateNum.value)
+// ===== Limit selection state =====
+const rateNum = ref(marketRateNum.value)      // numeric backing value (0..100, NaN allowed when input empty)
+const rateInput = ref('')                     // string shown in input
+const rateInputFocused = ref(false)
+
 watch(orderType, () => { rateNum.value = marketRateNum.value })
 watch(marketRateNum, (n) => { rateNum.value = n })
 
-// Button guards
+// keep input in sync with number when not typing
+watch(rateNum, (n) => {
+  if (!rateInputFocused.value) {
+    rateInput.value = Number.isNaN(n) ? '' : n.toFixed(RATE_DECIMALS)
+  }
+}, { immediate: true })
+
+// while typing, update numeric value but don't reformat the input yet
+watch(rateInput, (s) => {
+  if (!rateInputFocused.value) return
+  if (s.trim() === '') {
+    // treat empty as 0 baseline for ticking
+    rateNum.value = NaN
+    return
+  }
+  const parsed = parseFloat(s)
+  if (Number.isFinite(parsed)) {
+    rateNum.value = roundRate(clampRate(parsed))
+  }
+})
+
+// Limit user entry to max 4 decimals (on every keystroke/paste)
+function onRateInput(e) {
+  let v = String(e.target.value || '')
+  // keep digits and dot only
+  v = v.replace(/[^\d.]/g, '')
+  // ensure only one dot
+  const parts = v.split('.')
+  if (parts.length > 1) {
+    const intPart = parts.shift() || '0'
+    let frac = parts.join('') // drop extra dots
+    if (frac.length > RATE_DECIMALS) frac = frac.slice(0, RATE_DECIMALS)
+    v = intPart + '.' + frac
+  } else {
+    v = parts[0]
+  }
+  // avoid starting with a dot -> "0.x"
+  if (v.startsWith('.')) v = '0' + v
+  rateInput.value = v
+}
+
+function onRateFocus() { rateInputFocused.value = true }
+function onRateBlur() {
+  rateInputFocused.value = false
+  const parsed = parseFloat(rateInput.value)
+  if (Number.isFinite(parsed)) {
+    const clamped = roundRate(clampRate(parsed))
+    rateNum.value = clamped
+    rateInput.value = clamped.toFixed(RATE_DECIMALS)
+  } else {
+    // revert to last known good value (use 0 if NaN)
+    const fallback = Number.isNaN(rateNum.value) ? 0 : rateNum.value
+    const clamped = roundRate(clampRate(fallback))
+    rateNum.value = clamped
+    rateInput.value = clamped.toFixed(RATE_DECIMALS)
+  }
+}
+
+// ===== Button guards =====
 const plusDisabled = computed(() => {
   if (orderType.value !== 'limit') return true
-  if (isBorrower.value) return marketIsZeroish.value ? rateNum.value >= 100 : rateNum.value >= marketRateNum.value
-  return rateNum.value >= 100
+  const current = Number.isFinite(rateNum.value) ? rateNum.value : 0
+  if (isBorrower.value) return marketIsZeroish.value ? current >= 100 : current >= marketRateNum.value
+  return current >= 100
 })
 const minusDisabled = computed(() => {
   if (orderType.value !== 'limit') return true
-  if (isBorrower.value) return rateNum.value <= 0
+  const current = Number.isFinite(rateNum.value) ? rateNum.value : 0
+  if (isBorrower.value) return current <= 0
   const floor = marketIsZeroish.value ? 0 : marketRateNum.value
-  return rateNum.value <= floor
+  return current <= floor
 })
 
-// Single-tap nudge
+// ===== Single-tap nudge =====
 function increment() { incrementBy(STEP) }
 function decrement() { decrementBy(STEP) }
 
 // Variable step setters (used by hold)
 function incrementBy(delta) {
   if (orderType.value !== 'limit') return
-  const next = fmtNum(rateNum.value + delta)
+  const base = Number.isFinite(rateNum.value) ? rateNum.value : 0
+  const next = roundRate(base + delta)
   if (isBorrower.value) {
     rateNum.value = marketIsZeroish.value ? Math.min(100, next) : Math.min(marketRateNum.value, next)
   } else {
     rateNum.value = Math.min(100, next)
   }
+  if (rateInputFocused.value || rateInput.value.trim() === '') {
+    rateInput.value = rateNum.value.toFixed(RATE_DECIMALS)
+  }
 }
 function decrementBy(delta) {
   if (orderType.value !== 'limit') return
-  const next = fmtNum(rateNum.value - delta)
+  const base = Number.isFinite(rateNum.value) ? rateNum.value : 0
+  const next = roundRate(base - delta)
   if (isBorrower.value) {
     rateNum.value = Math.max(0, next)
   } else {
     const floor = marketIsZeroish.value ? 0 : marketRateNum.value
     rateNum.value = Math.max(floor, next)
+  }
+  if (rateInputFocused.value || rateInput.value.trim() === '') {
+    rateInput.value = rateNum.value.toFixed(RATE_DECIMALS)
   }
 }
 
@@ -372,51 +505,119 @@ function stopHold() {
 }
 onUnmounted(stopHold)
 
-// Duration and dates
-const loanDuration = computed(() => `${termDays.value} Days`)
+// ===== Duration and dates =====
+const loanDuration = computed(() => `${displayDays(termDays.value)} Days`)
 const maturityDate = computed(() => {
+  // Keep actual date arithmetic based on provided termDays (BE/parent truth)
   const d = new Date()
   d.setDate(d.getDate() + (Number.isFinite(termDays.value) ? termDays.value : 0))
   return d.toLocaleDateString()
 })
 
-// Selected rate for the term (used in both steps)
+// ===== Selected rate for the term (used in both steps) =====
 const termRateStr = computed(() =>
   orderType.value === 'market' ? marketRateStr.value : fmt(rateNum.value)
 )
+const termRateDecimal = computed(() => {
+  const m = termRateStr.value?.match(/([\d.]+)%/)
+  return m ? parseFloat(m[1]) / 100 : NaN
+})
 
 /** ========= Annualized Yield (local calc; ignore API) =========
  * Simple 360-day basis, no compounding:
  * annualized = term_rate_pct * (360 / term_days)
- * Examples:
- *  - 30d @ 1.00%  → 12.00%
- *  - 90d @ 2.83%  → 11.32%
- *  - 180d @ 5.79% → 11.58%
- * For 365-day term, we just show the term rate.
+ * For any ~1-year term (360–366), we display the term rate itself.
  */
 function annualizedYield(rateStr, days) {
   if (!rateStr || rateStr === '*' || !Number.isFinite(days) || days <= 0) return '*'
   const m = rateStr.match(/([\d.]+)%/)
   if (!m) return '*'
   const r = parseFloat(m[1])
-  if (days === 365) return `${r.toFixed(2)}%`
+  if (isYearish(days)) return `${r.toFixed(ANNUAL_DECIMALS)}%`
   const annual = r * (360 / days)
-  return `${annual.toFixed(2)}%`
+  return `${annual.toFixed(ANNUAL_DECIMALS)}%`
 }
 
+// ===== Amount & Collateral contribution calculation =====
+const amountBtc = ref(0.1) // fixed for now; wire this to a real input if needed
+
+// normalize LTV to ratio 0..1
+const ltvRatio = computed(() => {
+  let v = Number(ltv.value)
+  if (!Number.isFinite(v)) return NaN
+  if (v > 1) v = v / 100 // treat as percent if >1
+  if (v < 0) v = 0
+  if (v > 1) v = 1
+  return v
+})
+
+// Lender contribution: loan * LTV / (1 + term_rate_decimal)
+const lenderContributionBtcNum = computed(() => {
+  const L = Number(amountBtc.value)
+  const l = ltvRatio.value
+  const r = termRateDecimal.value
+  if (!Number.isFinite(L) || !Number.isFinite(l) || !Number.isFinite(r)) return NaN
+  const denom = 1 + r
+  if (denom <= 0) return NaN
+  return roundBtc(L * l / denom)
+})
+
+// Borrower contribution: loan - lender_contribution + (0.5% * loan)
+const borrowerContributionBtcNum = computed(() => {
+  const L = Number(amountBtc.value)
+  const lenderC = lenderContributionBtcNum.value
+  if (!Number.isFinite(L) || !Number.isFinite(lenderC)) return NaN
+  const fee = roundBtc(L * FEE_PCT)
+  return roundBtc((L - lenderC) + fee)
+})
+
+const lenderContributionPct = computed(() => {
+  const l = ltvRatio.value
+  const r = termRateDecimal.value
+  if (!Number.isFinite(l) || !Number.isFinite(r)) return NaN
+  return Number(((l / (1 + r)) * 100).toFixed(2))
+})
+const borrowerContributionPct = computed(() => {
+  const lenderP = lenderContributionPct.value
+  if (!Number.isFinite(lenderP)) return NaN
+  return Number((100 - lenderP + (FEE_PCT * 100)).toFixed(2))
+})
+
+const collateralContribution = computed(() => {
+  const val = isBorrower.value ? borrowerContributionBtcNum.value : lenderContributionBtcNum.value
+  return formatBtc(val)
+})
+
+// ===== Submit =====
 function submitOrder () {
   const finalRateStr = termRateStr.value
+  const m = finalRateStr.match(/([\d.]+)/)
+  const rateNumeric = m ? parseFloat(m[1]) : NaN
+
+  const lenderBtc = lenderContributionBtcNum.value
+  const borrowerBtc = borrowerContributionBtcNum.value
+  const lenderPct = lenderContributionPct.value
+  const borrowerPct = borrowerContributionPct.value
+
   emit('submit', {
     action: actionType.value,
     orderType: orderType.value,
-    rate: finalRateStr,
-    duration: loanDuration.value,
-    durationDays: termDays.value,
+    rate: finalRateStr,                          // e.g., "2.5000%"
+    rateNumeric,                                 // numeric percent (no % sign)
+    duration: loanDuration.value,                // displays 365 for any ~1-year term
+    durationDays: displayDays(termDays.value),   // pass 365 to parent for consistency; parent can map to 360 for BE
     maturityDate: maturityDate.value,
     annualizedYield: annualizedYield(finalRateStr, termDays.value),
-    amount: '0.1 BTC',
-    collateralContribution: (actionType.value === 'Lend') ? '0%' : '100%',
-    fees: '0.50%',
+    amount: formatBtc(amountBtc.value),
+    ltvUsed: ltvRatio.value,
+    feePct: '0.50%',
+    collateralContribution: collateralContribution.value,      // formatted string for current role
+    collateralContributionBtcNum: isBorrower.value ? borrowerBtc : lenderBtc,
+    collateralContributionPct: Number.isFinite(isBorrower.value ? borrowerPct : lenderPct)
+      ? `${(isBorrower.value ? borrowerPct : lenderPct).toFixed(2)}%`
+      : null,
+    lenderContributionBtcNum: lenderBtc,
+    borrowerContributionBtcNum: borrowerBtc,
   })
 }
 </script>

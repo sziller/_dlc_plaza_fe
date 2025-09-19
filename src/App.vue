@@ -1,9 +1,10 @@
 <template>
+  
   <div class="text-white min-h-screen">
     <Navbar />
     <router-view class="pt-20 px-4" />
     <!-- Always-on bottom-left chat -->
-    <ChatbotWidget />
+   
   </div>
 </template>
 

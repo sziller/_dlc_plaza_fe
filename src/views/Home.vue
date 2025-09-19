@@ -105,6 +105,15 @@ function scrollRight() {
   const len = articles.length
   currentIndex.value = (currentIndex.value + 1) % len
 }
+const heroCtaTo = computed(() =>
+  isLoggedIn.value
+    ? '/btcusd'
+    : (ctaEmail.value ? `/register?email=${encodeURIComponent(ctaEmail.value)}` : '/register')
+)
+
+const heroCtaLabel = computed(() =>
+  isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'
+)
 </script>
 
 <template>
@@ -114,56 +123,59 @@ function scrollRight() {
     <div class="fixed inset-0 -z-10 bg-page-gradient"></div>
 
     <!-- Hero Section (no animation) -->
-    <section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
-      <!-- Left: Text -->
-      <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
-        <div class="w-full max-w-2xl text-center sm:text-left">
-          <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-            Unlock your Bitcoin's potential.
-          </h2>
-          <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
-            Access loans without selling your Bitcoin or earn yield secured by 
-            Bitcoin.  Better rates, your keys, no sidechains.
-          </p>
-          <!-- Longer email input field with smaller button below -->
-          <div class="mt-8 flex flex-col items-center gap-4 w-full">
-            <input
-              v-model="ctaEmail"
-              type="email"
-              placeholder="Enter your email address"
-              class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
-            />
-            <router-link
-              :to="ctaEmail ? `/register?email=${encodeURIComponent(ctaEmail)}` : '/register'"
-              class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
-            >
-              Get Started Today
-            </router-link>
-          </div>
-        </div>
+<!-- Hero Section (no animation) -->
+<section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
+  <!-- Left: Text -->
+  <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
+    <div class="w-full max-w-2xl text-center sm:text-left">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+        Unlock your Bitcoin's potential.
+      </h2>
+      <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
+        Access loans without selling your Bitcoin or earn yield secured by 
+        Bitcoin.  Better rates, your keys, no sidechains.
+      </p>
+      <!-- Longer email input field with smaller button below -->
+      <div class="mt-8 flex flex-col items-center gap-4 w-full">
+        <input
+          v-if="!isLoggedIn"
+          v-model="ctaEmail"
+          type="email"
+          placeholder="Enter your email address"
+          class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
+        />
+        <router-link
+          :to="heroCtaTo"
+          class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
+        >
+          {{ heroCtaLabel }}
+        </router-link>
       </div>
+    </div>
+  </div>
 
-      <!-- Right: iPhone mockup (kept clean; glow can be done with CSS ::before if you want) -->
-      <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10 phone-col">
-        <div class="[perspective:1100px]">
-          <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
-            <picture>
-              <source type="image/avif" srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
-              <source type="image/webp" srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
-              <img
-                src="/img/iPhoneSC-960.webp"
-                srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
-                sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
-                width="420" height="840"
-                fetchpriority="high" loading="eager" decoding="async"
-                class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
-                alt="App preview on iPhone" draggable="false"
-              />
-            </picture>
-          </div>
-        </div>
+  <!-- Right: iPhone mockup (kept clean; glow can be done with CSS ::before if you want) -->
+  <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10 phone-col">
+    <div class="[perspective:1100px]">
+      <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
+        <picture>
+          <source type="image/avif" srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
+          <source type="image/webp" srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
+          <img
+            src="/img/iPhoneSC-960.webp"
+            srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
+            sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
+            width="420" height="840"
+            fetchpriority="high" loading="eager" decoding="async"
+            class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
+            alt="App preview on iPhone" draggable="false"
+          />
+        </picture>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
+
 
     <!-- Satoshi Quote (animate in from left) -->
     <section

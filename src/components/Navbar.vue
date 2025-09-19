@@ -103,7 +103,7 @@
           <div class="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200" role="menu">
             <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">Cadena Paper</router-link>
             <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">GitHub Resources</router-link>
-            <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">Contact Us</router-link>
+            <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">About Us</router-link>
           </div>
         </div>
       </div>
@@ -189,7 +189,7 @@
           <div class="text-gray-500 uppercase text-xs mt-6 mb-2">Explore Cadena</div>
           <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
           <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">GitHub Resources</router-link>
-          <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">Contact Us</router-link>
+          <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">About Us</router-link>
         </div>
 
         <router-link

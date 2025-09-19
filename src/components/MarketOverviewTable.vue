@@ -347,6 +347,13 @@ const terms = ref([
   { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null, ltv50aId:null, ltv50bId:null, ltv80aId:null, ltv80bId:null },
 ])
 
+// ===== Year-consistency helpers =====
+function isYearish(days) {
+  const d = Number(days)
+  return Number.isFinite(d) && d >= 360 && d <= 366
+}
+function mapDaysForUi(d) { return isYearish(d) ? 365 : d }
+
 // ===== Display helpers =====
 function getEar(row, key) {
   const v = row[`${key}Ear`]
@@ -356,7 +363,6 @@ function getEar(row, key) {
 // ===== Offer → table transform =====
 const TARGET_TERMS = [30, 90, 180, 365]
 
-function mapDaysForUi(d) { return d === 360 ? 365 : d }
 function parseLtv(pid) { const m = String(pid || '').match(/ltv-(\d{1,3})/i); return m ? Number(m[1]) : null }
 
 // raw 'd-xxx' from product_id without mapping to 365
@@ -381,9 +387,10 @@ const fmtPct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
 // === Annualized calculation (replace API ear):
 // We *ignore* API-provided interest_ear and compute our own annualized figure.
 // Convention: simple annualization on a 360-day basis (no compounding).
-// Example: 2.83% for 90d → 2.83 * (360/90) = 11.32%
+// For any ~1-year term (360–366), display the term rate itself.
 function annualize360(termPct, days) {
   if (!Number.isFinite(termPct) || !days) return null
+  if (isYearish(days)) return termPct
   return termPct * (360 / days)
 }
 
@@ -391,7 +398,7 @@ function buildTermsFromOffers(offers) {
   const best = {}
   for (const o of offers || []) {
     const ltv = parseLtv(o.product_id)
-    const rawDays = normalizeRawDays(o.product_id, o.duration) // e.g., 30, 90, 180, 360
+    const rawDays = normalizeRawDays(o.product_id, o.duration) // e.g., 30, 90, 180, 360/365/366
     const uiDays  = normalizeDisplayDays(o.product_id, o.duration) // e.g., 30, 90, 180, 365 (mapped)
     if (!ltv || !rawDays || !uiDays) continue
 
@@ -518,7 +525,8 @@ onUnmounted(() => {
 // ===== Local helpers =====
 const PID_PREFIX = 'LendBorrowBTCUSD:'
 function buildProductId(days, ltv) {
-  const normalizedDays = days === 365 ? 360 : days
+  // Always encode ~1-year terms as 360 for the BE, while *displaying* 365 in the UI
+  const normalizedDays = isYearish(days) ? 360 : days
   return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}`
 }
 function getDaysFromLabel(label) {

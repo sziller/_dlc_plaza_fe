@@ -63,7 +63,7 @@
         <div><span class="font-semibold">Acceptor collateral:</span> {{ satsToBtc(detail.acc_collateral_sats) }} BTC</div>
 
         <!-- Actions -->
-        <div v-if="isOwn" class="pt-4">
+        <div v-if="isOwn && canDelete" class="pt-4">
           <button
             type="button"
             class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
@@ -79,8 +79,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-import { getDlcById } from '../api/dlcById'   // adjust path if needed
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { deleteDlc } from '../api/dlcDelete'  // adjust path if needed
 
 const props = defineProps({
@@ -90,13 +89,19 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'deleted'])
 
-/* ---------- state ---------- */
-const loading = ref(true)
+/* ---------- state (no API fetch; use provided prop) ---------- */
+const loading = ref(false)
 const error = ref(null)
-const detail = ref(null)
+const detail = computed(() => props.dlc || null)
 const deleting = ref(false)
 
 const dlcId = computed(() => props.dlc?.dlc_id || props.dlc?.dlcId || null)
+
+/* Only allow delete for offer_f or offer_p */
+const canDelete = computed(() => {
+  const s = String(detail.value?.status || '').toLowerCase()
+  return s === 'offer_f' || s === 'offer_p'
+})
 
 /* ---------- a11y / focus ---------- */
 const titleId = `dlc-title-${Math.random().toString(36).slice(2)}`
@@ -117,8 +122,6 @@ onMounted(async () => {
     // Move focus to close button (most obvious action)
     closeBtnRef.value?.focus()
   } catch {}
-  // Load initial data
-  if (dlcId.value) load()
 })
 
 // Restore focus to the element that had focus when the modal opened
@@ -157,26 +160,6 @@ function onKeydown(e) {
   }
 }
 
-/* ---------- data loading ---------- */
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await getDlcById(String(dlcId.value))
-    detail.value = res?.payload || null
-  } catch (e) {
-    error.value = e?.message || 'Failed to load DLC.'
-    detail.value = null
-  } finally {
-    loading.value = false
-  }
-}
-
-// If the parent swaps the dlc prop while open, re-load details
-watch(dlcId, (n, o) => {
-  if (n && n !== o) load()
-})
-
 /* ---------- actions ---------- */
 async function confirmDelete() {
   if (!dlcId.value) return
@@ -191,6 +174,16 @@ async function confirmDelete() {
   } finally {
     deleting.value = false
   }
+}
+
+/* ---------- helpers ---------- */
+function isYearish(days) {
+  const d = Number(days)
+  return Number.isFinite(d) && d >= 360 && d <= 366
+}
+function displayDays(days) {
+  // For consistency, show any ~1-year term as 365 days (display only)
+  return isYearish(days) ? 365 : Math.round(Number(days) || 0)
 }
 
 /* ---------- formatters & derived ---------- */
@@ -209,21 +202,25 @@ function fmtDate(tsSec) {
 }
 const startTs = computed(() => detail.value?.offered_at || detail.value?.created_at || null)
 const maturityTs = computed(() => {
+  // Keep actual maturity based on BE-provided duration (no display normalization here)
   const start = startTs.value
   const durDays = Number(detail.value?.duration)
   if (!start || !Number.isFinite(durDays)) return null
   return start + Math.round(durDays * 24 * 60 * 60)
 })
+
+/* LTV from product_id like "...ltv-50" */
 const ltvText = computed(() => {
   const pid = String(detail.value?.product_id || '')
   const m = pid.match(/ltv-(\d{1,3})/i)
   return m ? `${Number(m[1]).toFixed(0)}%` : '—'
 })
+
+/* Term text: ALWAYS show 365 Days for any ~1-year term */
 const termText = computed(() => {
   const raw = Number(detail.value?.duration)
   if (!Number.isFinite(raw)) return '—'
-  const uiDays = raw === 360 ? 365 : Math.round(raw)
-  return `${uiDays} Days`
+  return `${displayDays(raw)} Days`
 })
 
 const roleText = computed(() => {
@@ -233,19 +230,22 @@ const roleText = computed(() => {
   return r || '—'
 })
 
-/** Calculate EAR locally from term rate + duration (map 360→365 for display only). */
-function calcAnnualizedYield(interest, days) {
-  const r = Number(interest)
-  const d = Number(days)
-  if (!Number.isFinite(r) || !Number.isFinite(d) || d <= 0) return '—'
-  if (d === 365) return `${r.toFixed(2)}%`
-  const ear = (Math.pow(1 + r / 100, 360 / d) - 1) * 100
-  return `${ear.toFixed(2)}%`
+/** Annualized yield (local calc; simple 360-day basis, no compounding).
+ * If the term is ~1 year, we show the term rate directly to stay consistent with the 365-day display.
+ * Otherwise: annualized = term_rate_pct * (360 / actual_term_days_from_BE)
+ */
+function calcAnnualizedYieldSimple(interestPct, daysRaw) {
+  const r = Number(interestPct)
+  const dRaw = Number(daysRaw)
+  if (!Number.isFinite(r) || !Number.isFinite(dRaw) || dRaw <= 0) return '—'
+  if (isYearish(dRaw)) return `${r.toFixed(2)}%` // treat any ~1-year term as 365 for display
+  const annual = r * (360 / dRaw)
+  return `${annual.toFixed(2)}%`
 }
 
 const annualizedYieldText = computed(() => {
   const d = Number(detail.value?.duration)
-  return calcAnnualizedYield(detail.value?.interest, Number.isFinite(d) ? d : NaN)
+  return calcAnnualizedYieldSimple(detail.value?.interest, d)
 })
 </script>
 
