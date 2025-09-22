@@ -103,15 +103,14 @@
       </form>
     </div>
 
-    <!-- 📬 Step 2: Email Sent Message -->
+    <!-- 📬 Step 2: Email Sent Message (updated: simpler, mentions delay, no app talk) -->
     <div v-else-if="step === 2" class="max-w-xl mx-auto text-center space-y-6">
       <h1 class="text-3xl font-bold">Check Your Inbox</h1>
       <p class="text-lg">We’ve sent a confirmation link to:</p>
       <p class="text-xl text-secondary font-bold break-all">{{ email }}</p>
       <p class="text-sm text-white/80">
-        Click the link to verify your email. After that, you’ll finish setup by
-        <span class="font-semibold">opening the Cadena <em>Signer</em> app and scanning a QR</span>.
-        Don’t use your phone’s camera—use the Signer app’s QR scanner.
+        It may take a few minutes to arrive. If you don’t see it, check your spam folder
+        or search your inbox for “Cadena”.
       </p>
 
       <div class="pt-4 flex items-center justify-center">

@@ -109,6 +109,11 @@ const routes = [
     description: 'How Cadena Bitcoin handles data and privacy.',
     robots: 'index,follow',
   }},
+  {
+  path: '/loginpage',
+  name: 'LoginPage',
+  component: () => import('../views/LoginPage.vue'),
+},
 ]
 
 const router = createRouter({

@@ -2,7 +2,7 @@ const host = window.location.hostname.replace(/^www\./, '')
 
 let API_URL = ''
 if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
-  API_URL = import.meta.env.VITE_API_URL // prod
+  API_URL = 'https://cadenabitcoin.com' // prod
 } else if (host === 'staging.purabitcoin.com') {
     API_URL = 'https://staging.purabitcoin.com'
   //API_URL = import.meta.env.VITE_STAGING_API_URL
