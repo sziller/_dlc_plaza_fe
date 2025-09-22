@@ -3,6 +3,11 @@
     <!-- 🧾 Step 1: Registration Form -->
     <div v-if="step === 1" class="max-w-xl mx-auto w-full space-y-10">
       <h1 class="text-3xl font-bold text-center">Create Your Account</h1>
+      <p class="text-sm text-white/70 text-center">
+        You’ll receive a confirmation email first. After confirming, finish setup by
+        <span class="font-semibold">opening the Cadena <em>Signer</em> app and scanning a QR</span>.
+        Do <span class="font-semibold">not</span> use your phone’s camera—only the Signer app can complete this step.
+      </p>
 
       <form class="space-y-6" @submit.prevent="submitForm" novalidate>
         <!-- Email -->
@@ -101,9 +106,13 @@
     <!-- 📬 Step 2: Email Sent Message -->
     <div v-else-if="step === 2" class="max-w-xl mx-auto text-center space-y-6">
       <h1 class="text-3xl font-bold">Check Your Inbox</h1>
-      <p class="text-lg">We've sent a confirmation link to:</p>
+      <p class="text-lg">We’ve sent a confirmation link to:</p>
       <p class="text-xl text-secondary font-bold break-all">{{ email }}</p>
-      <p class="text-sm text-white/80">Please click the link in your email to confirm your account.</p>
+      <p class="text-sm text-white/80">
+        Click the link to verify your email. After that, you’ll finish setup by
+        <span class="font-semibold">opening the Cadena <em>Signer</em> app and scanning a QR</span>.
+        Don’t use your phone’s camera—use the Signer app’s QR scanner.
+      </p>
 
       <div class="pt-4 flex items-center justify-center">
         <router-link
@@ -117,12 +126,16 @@
 
     <!-- 🧭 Step 3: Scan QR -->
     <div v-else-if="step === 3" class="max-w-xl mx-auto text-center space-y-6">
-      <h1 class="text-3xl font-bold">Scan the QR Code</h1>
-      <p class="text-lg">Scan the following QR code to complete your registration:</p>
+      <h1 class="text-3xl font-bold">Scan with the <em>Signer</em> App</h1>
+      <p class="text-lg">
+        Open the <span class="font-semibold">Cadena Signer</span> app on your phone and use its built-in
+        <span class="font-semibold">QR Scanner</span> to scan the code below.
+        Do <span class="font-semibold">not</span> use the phone’s default camera—only the Signer app can complete registration.
+      </p>
 
       <div v-if="qrCode" class="mt-6">
         <div class="inline-block p-3 bg-white rounded">
-          <img :src="qrCode" alt="Registration QR code" class="w-64 h-64" />
+          <img :src="qrCode" alt="Registration QR code (scan with Cadena Signer app)" class="w-64 h-64" />
         </div>
 
         <div class="pt-6">
