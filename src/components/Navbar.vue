@@ -167,7 +167,7 @@
           Logout
         </button>
 
-        <a href="/downloads/CadenaBtc.apk" download>Download APK</a>
+        <a href="/downloads/CadenaBtc.apk" download>Download APK</a> 
 
         <router-link
           v-if="!isLoggedIn"
