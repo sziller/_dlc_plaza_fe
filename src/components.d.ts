@@ -21,6 +21,7 @@ declare module 'vue' {
     SessionBanner: typeof import('./components/SessionBanner.vue')['default']
     TheFooter: typeof import('./components/TheFooter.vue')['default']
     UseCasesAccordion: typeof import('./components/UseCasesAccordion.vue')['default']
+    UserInfoBar: typeof import('./components/UserInfoBar.vue')['default']
     UsersDLCS: typeof import('./components/UsersDLCS.vue')['default']
   }
 }
