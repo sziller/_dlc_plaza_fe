@@ -8,7 +8,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    ChatbotWidget: typeof import('./components/ChatbotWidget.vue')['default']
     DLCDetails: typeof import('./components/DLCDetails.vue')['default']
     ISimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']
     ISimpleIconsX: typeof import('~icons/simple-icons/x')['default']
@@ -21,7 +20,6 @@ declare module 'vue' {
     SessionBanner: typeof import('./components/SessionBanner.vue')['default']
     TheFooter: typeof import('./components/TheFooter.vue')['default']
     UseCasesAccordion: typeof import('./components/UseCasesAccordion.vue')['default']
-    UserInfoBar: typeof import('./components/UserInfoBar.vue')['default']
     UsersDLCS: typeof import('./components/UsersDLCS.vue')['default']
   }
 }

@@ -216,10 +216,7 @@
                 <span class="font-medium">Email:</span>
                 <a href="mailto:kevin@cadenabitcoin.com" class="underline hover:opacity-80">kevin@cadenabitcoin.com</a>
               </p>
-              <p>
-                <span class="font-medium">Phone:</span>
-                <a href="tel:+13058311410" class="underline hover:opacity-80">305-831-1410</a>
-              </p>
+              
             </div>
           </div>
 
@@ -430,7 +427,7 @@ const useCases = [
         <li>Borrow 0.5 BTC for 1 year (assuming BTCUSD = $100,000).</li>
         <li>Convert borrowed BTC to USD on your exchange of choice.</li>
         <li>Buy your boat with the proceeds.</li>
-        <li>At term end, buy back 0.5 BTC and repay the loan.</li>
+        <li>At term end, buy back $50,000 worth of Bitcoin and repay the loan.</li>
       </ol>
 
       <p class="mt-4 font-semibold text-white">The Outcome</p>

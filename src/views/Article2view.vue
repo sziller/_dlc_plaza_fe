@@ -1,6 +1,6 @@
 <template>
   <!-- 🔹 Full Page Stack -->
-  <section class="w-full bg-black mt-20 text-white flex flex-col min-h-screen overflow-x-hidden">
+  <section class="w-full bg-black mt-0 text-white flex flex-col min-h-screen overflow-x-hidden">
     
     <!-- 🔹 Header (stays purple) -->
     <div class="w-full bg-secondary py-8 px-4 text-center shadow-md z-10">

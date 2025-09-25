@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen mt-20 text-white relative overflow-hidden bg-black">
+  <div class="min-h-screen mt-0 text-white relative overflow-hidden bg-black">
     <!-- HERO TITLE SECTION (Smaller) -->
     <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">

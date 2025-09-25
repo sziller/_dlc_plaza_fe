@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black mt-20 text-white">
+  <div class="bg-black mt-0 text-white">
     <!-- HERO TITLE SECTION (Smaller) -->
     <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">

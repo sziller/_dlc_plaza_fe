@@ -114,6 +114,11 @@ const routes = [
   name: 'LoginPage',
   component: () => import('../views/LoginPage.vue'),
 },
+{
+  path: '/signerapp',
+  name: 'SignerApp',
+  component: () => import('../views/SignerApp.vue'),
+}
 ]
 
 const router = createRouter({

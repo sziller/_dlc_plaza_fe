@@ -2,108 +2,140 @@
   <div class="relative">
     <!-- NAVBAR -->
     <nav
-  ref="navRef"
-  :class="['w-full fixed top-0 z-50 bg-white text-black shadow transition-shadow', scrolled ? 'shadow-md' : 'shadow']"
-  role="navigation"
-  aria-label="Main"
->
-<!-- Top info strip (only when logged in) -->
-<div
-  v-if="isLoggedIn"
-  class="w-full bg-secondary border-b border-secondary/30 text-white"
-  role="region"
-  aria-label="User info"
->
-  <div class="px-6 h-8 flex items-center justify-center">
-    <div class="h-full flex items-center justify-center gap-3 sm:gap-4 text-center text-[11px] sm:text-xs md:text-[13px] text-white/90">
-      <!-- Loading -->
-      <template v-if="loading">
-        <div class="flex items-center gap-2 sm:gap-3">
-          <div class="h-3 w-24 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-          <div class="h-3 w-20 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-          <div class="hidden sm:block h-3 w-24 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-        </div>
-      </template>
-
-      <!-- Error -->
-      <template v-else-if="error">
-        <div class="flex items-center gap-2 text-red-200">
-          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.5a.75.75 0 011.5 0v5a.75.75 0 01-1.5 0v-5zM10 14.75a.875.875 0 100 1.75.875.875 0 000-1.75z" clip-rule="evenodd" />
-          </svg>
-          <span>Balance unavailable</span>
-          <button
-            v-if="canRetry"
-            class="ml-2 px-2 py-0.5 rounded border border-white/20 hover:bg-white/10 text-white"
-            @click="$emit('retry')"
-          >
-            Retry
-          </button>
-        </div>
-      </template>
-
-      <!-- Data -->
-      <template v-else>
-        <!-- Email -->
-        <div class="min-w-0 flex items-center gap-2">
-          <span class="hidden sm:inline text-white/70">Signed in:</span>
-          <span class="truncate" :title="email">{{ email }}</span>
-        </div>
-
-        <!-- Dot -->
-        <span class="hidden sm:inline select-none text-white/40">•</span>
-
-        <!-- Pairing status -->
-        <div
-          class="flex items-center gap-2"
-          role="status"
-          :aria-label="isPaired ? 'Device paired' : 'Device not paired'"
-        >
-          <span
-            :class="['inline-block w-2 h-2 rounded-full', isPaired ? 'bg-green-400' : 'bg-red-400']"
-            aria-hidden="true"
-          />
-          <span class="text-white/80">
-            {{ isPaired ? 'Paired' : 'Not paired' }}
-          </span>
-        </div>
-
-        <!-- Dot -->
-        <span class="hidden sm:inline select-none text-white/40">•</span>
-
-        <!-- Available (derived) -->
-        <div class="flex items-center gap-1.5">
-          <span class="text-white/70">Available:</span>
-          <span class="tabular-nums" :aria-live="live" role="status">
-            <template v-if="balanceDerivedSats !== null">
-              {{ btc(balanceDerivedSats) }} BTC
-              <span v-if="showFiat && fiatAvailable !== null" class="text-white/70">(≈ {{ fiatAvailable }})</span>
+      ref="navRef"
+      :class="['w-full fixed top-0 z-50 bg-white text-black shadow transition-shadow', scrolled ? 'shadow-md' : 'shadow']"
+      role="navigation"
+      aria-label="Main"
+    >
+      <!-- Top info strip (only when logged in) -->
+      <div
+        v-if="isLoggedIn"
+        class="w-full bg-secondary border-b border-secondary/30 text-white"
+        role="region"
+        aria-label="User info"
+      >
+        <div class="px-6 h-8 flex items-center justify-center">
+          <div class="h-full flex items-center justify-center gap-3 sm:gap-4 text-center text-[11px] sm:text-xs md:text-[13px] text-white/90">
+            <!-- Loading -->
+            <template v-if="loading">
+              <div class="flex items-center gap-2 sm:gap-3">
+                <div class="h-3 w-24 rounded bg-white/20 animate-pulse" aria-hidden="true" />
+                <div class="h-3 w-20 rounded bg-white/20 animate-pulse" aria-hidden="true" />
+                <div class="hidden sm:block h-3 w-24 rounded bg-white/20 animate-pulse" aria-hidden="true" />
+              </div>
             </template>
-            <template v-else>—</template>
-          </span>
-        </div>
 
-        <!-- Dot -->
-        <span class="hidden sm:inline select-none text-white/40">•</span>
-
-        <!-- On-chain -->
-        <div class="hidden sm:flex items-center gap-1.5">
-          <span class="text-white/70">On-chain:</span>
-          <span class="tabular-nums" :aria-live="live" role="status">
-            <template v-if="balanceOnchainSats !== null">
-              {{ btc(balanceOnchainSats) }} BTC
-              <span v-if="showFiat && fiatOnchain !== null" class="text-white/70">(≈ {{ fiatOnchain }})</span>
+            <!-- Error -->
+            <template v-else-if="error">
+              <div class="flex items-center gap-2 text-red-200">
+                <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.5a.75.75 0 011.5 0v5a.75.75 0 01-1.5 0v-5zM10 14.75a.875.875 0 100 1.75.875.875 0 000-1.75z" clip-rule="evenodd" />
+                </svg>
+                <span>Balance unavailable</span>
+                <button
+                  v-if="canRetry"
+                  class="ml-2 px-2 py-0.5 rounded border border-white/20 hover:bg-white/10 text-white"
+                  @click="$emit('retry')"
+                >
+                  Retry
+                </button>
+              </div>
             </template>
-            <template v-else>—</template>
-          </span>
+
+            <!-- Data -->
+            <template v-else>
+              <!-- Email -->
+              <div class="min-w-0 flex items-center gap-2">
+                <span class="hidden sm:inline text-white/70">Signed in:</span>
+                <span class="truncate" :title="email">{{ email }}</span>
+              </div>
+
+              <!-- Dot -->
+              <span class="hidden sm:inline select-none text-white/40">•</span>
+
+              <!-- Pairing status -->
+              <template v-if="showPairing">
+                <div
+                  class="flex items-center gap-2"
+                  role="status"
+                  :aria-label="isPaired ? 'Device paired' : 'Device not paired'"
+                >
+                  <span
+                    :class="['inline-block w-2 h-2 rounded-full', isPaired ? 'bg-green-400' : 'bg-red-400']"
+                    aria-hidden="true"
+                  />
+                  <span class="text-white/80">
+                    {{ isPaired ? 'Paired' : 'Not paired' }}
+                  </span>
+                </div>
+
+                <!-- Not paired hint -->
+                <template v-if="!isPaired">
+                  <span class="hidden sm:inline select-none text-white/40">•</span>
+                  <span class="text-white/80">Scan QR code using signer app</span>
+                </template>
+              </template>
+
+              <!-- Pairing placeholder while loading/unknown -->
+              <template v-else>
+                <div class="flex items-center gap-2" aria-hidden="true">
+                  <span class="inline-block w-2 h-2 rounded-full bg-white/30 animate-pulse" />
+                  <span class="text-white/60">••••••</span>
+                </div>
+              </template>
+
+              <!-- Dot -->
+              <span class="hidden sm:inline select-none text-white/40">•</span>
+
+              <!-- Available (derived) -->
+              <div class="flex items-center gap-1.5">
+                <span class="text-white/70">Liquid Balance:</span>
+                <span class="tabular-nums" :aria-live="live" role="status">
+                  <template v-if="balanceDerivedSats !== null">
+                    {{ btc(balanceDerivedSats) }} BTC
+                    <span v-if="showFiat && fiatAvailable !== null" class="text-white/70">(≈ {{ fiatAvailable }})</span>
+                  </template>
+                  <template v-else>—</template>
+                </span>
+              </div>
+
+              <!-- Dot -->
+              <span class="hidden sm:inline select-none text-white/40">•</span>
+
+              <!-- On-chain -->
+              <div class="hidden sm:flex items-center gap-1.5">
+                <span class="text-white/70">Wallet Balance:</span>
+                <span class="tabular-nums" :aria-live="live" role="status">
+                  <template v-if="balanceOnchainSats !== null">
+                    {{ btc(balanceOnchainSats) }} BTC
+                    <span v-if="showFiat && fiatOnchain !== null" class="text-white/70">(≈ {{ fiatOnchain }})</span>
+                  </template>
+                  <template v-else>—</template>
+                </span>
+              </div>
+
+              <!-- Zero-balance nudge -->
+              <template v-if="isZeroAvailable">
+                <span class="hidden sm:inline select-none text-white/40">•</span>
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center gap-1 text-white/85">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 14a1.25 1.25 0 111.25-1.25A1.251 1.251 0 0112 16zm1-4.75a1 1 0 01-2 0v-5a1 1 0 012 0z"/>
+                    </svg>
+                    Balance is 0
+                  </span>
+                  <router-link
+                    to="/my-profile"
+                    class="px-2 py-0.5 rounded border border-white/20 hover:bg-white/10 text-white/95"
+                  >
+                    Add funds
+                  </router-link>
+                </div>
+              </template>
+            </template>
+          </div>
         </div>
-      </template>
-    </div>
-  </div>
-</div>
-
-
-
+      </div>
 
       <!-- Main navbar row (same size as your reference: px-6 py-4) -->
       <div class="px-6 py-4 flex justify-between items-center">
@@ -147,7 +179,7 @@
           aria-label="Toggle menu"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
-            viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -205,6 +237,8 @@
               <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">Cadena Paper</router-link>
               <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">GitHub Resources</router-link>
               <router-link to="/contact" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">About Us</router-link>
+              <!-- NEW: Signer App -->
+              <router-link to="/signerapp" class="block px-4 py-2 hover:bg-gray-100 transition" role="menuitem">Signer App</router-link>
             </div>
           </div>
         </div>
@@ -293,6 +327,8 @@
           <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
           <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">GitHub Resources</router-link>
           <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">About Us</router-link>
+          <!-- NEW: Signer App -->
+          <router-link @click="closeMobileMenu" to="/signerapp" class="block pl-2 py-2 hover:text-secondary">Signer App</router-link>
         </div>
 
         <router-link
@@ -338,13 +374,12 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo.png'
 import { useAuth } from '../composables/useAuth'
-import { getUserProfile } from '../api/userProfile' // ⬅️ NEW
+import { getUserProfile } from '../api/userProfile'
 
 /** ---- Props for the info strip ---- */
 const props = defineProps({
@@ -392,15 +427,7 @@ const fetchBTCPrice = async () => {
     abortCtrl = new AbortController()
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
-      {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-store',
-        credentials: 'omit',
-        referrerPolicy: 'no-referrer',
-        signal: abortCtrl?.signal,
-        headers: { accept: 'application/json' },
-      }
+      { method: 'GET', mode: 'cors', cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', signal: abortCtrl?.signal, headers: { accept: 'application/json' } }
     )
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
@@ -414,16 +441,8 @@ const fetchBTCPrice = async () => {
     btcPrice.value = 'N/A'
   }
 }
-function startPricePolling() {
-  fetchBTCPrice()
-  clearInterval(priceIntervalId)
-  priceIntervalId = setInterval(fetchBTCPrice, 30000)
-}
-function stopPricePolling() {
-  clearInterval(priceIntervalId)
-  priceIntervalId = null
-  abortCtrl?.abort()
-}
+function startPricePolling() { fetchBTCPrice(); clearInterval(priceIntervalId); priceIntervalId = setInterval(fetchBTCPrice, 30000) }
+function stopPricePolling() { clearInterval(priceIntervalId); priceIntervalId = null; abortCtrl?.abort() }
 
 /** ---- Session / nav interactions ---- */
 const sessionBusy = computed(() => {
@@ -432,22 +451,13 @@ const sessionBusy = computed(() => {
 })
 const unregAfterEach = router.afterEach(() => { closeMobileMenu() })
 
-function toggleMobileMenu() {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
-function closeMobileMenu() {
-  isMobileMenuOpen.value = false
-}
-watch(isMobileMenuOpen, (open) => {
-  document.body.classList.toggle('overflow-hidden', open)
-  nextTick().then(updateNavHeight)
-})
+function toggleMobileMenu() { isMobileMenuOpen.value = !isMobileMenuOpen.value }
+function closeMobileMenu() { isMobileMenuOpen.value = false }
+watch(isMobileMenuOpen, (open) => { document.body.classList.toggle('overflow-hidden', open); nextTick().then(updateNavHeight) })
 
 /** ---- Scroll shadow ---- */
 const scrolled = ref(false)
-function onScroll() {
-  scrolled.value = window.scrollY > 4
-}
+function onScroll() { scrolled.value = window.scrollY > 4 }
 
 /** ---- Auth code fetching ---- */
 const authCodeFromApi = ref(null)
@@ -455,14 +465,8 @@ const authCodeLoading = ref(false)
 const authCodeError = ref(null)
 
 async function loadAuthCode() {
-  // Don’t refetch if we already have a prop value
   if (props.authCode != null) return
-  // Only fetch if user is logged in (by your composable)
-  if (!authLoggedIn.value) {
-    authCodeFromApi.value = null
-    return
-  }
-
+  if (!authLoggedIn.value) { authCodeFromApi.value = null; return }
   authCodeLoading.value = true
   authCodeError.value = null
   try {
@@ -478,17 +482,22 @@ async function loadAuthCode() {
 }
 
 /** Use prop if present; otherwise fall back to fetched value */
-const effectiveAuthCode = computed(() =>
-  props.authCode != null ? Number(props.authCode) : authCodeFromApi.value
-)
+const effectiveAuthCode = computed(() => props.authCode != null ? Number(props.authCode) : authCodeFromApi.value)
 const isPaired = computed(() => Number(effectiveAuthCode.value) === 6)
+/** Only show pairing UI when we definitively know the code and we’re not loading/erroring */
+const showPairing = computed(() => !authCodeLoading.value && authCodeError.value == null && effectiveAuthCode.value != null)
+
+/** Balance zero? (derived available) */
+const isZeroAvailable = computed(() => {
+  const n = Number(props.balanceDerivedSats)
+  return Number.isFinite(n) && n === 0
+})
 
 /** ---- Lifecycle ---- */
 onMounted(async () => {
   await nextTick()
   updateNavHeight()
 
-  // Observe real-time size changes (fonts, dropdowns, strip toggles)
   if ('ResizeObserver' in window) {
     resizeObs = new ResizeObserver(() => requestAnimationFrame(updateNavHeight))
     if (navRef.value) resizeObs.observe(navRef.value)
@@ -496,11 +505,9 @@ onMounted(async () => {
     window.addEventListener('resize', updateNavHeight, { passive: true })
   }
 
-  // Start polling price + scroll
   startPricePolling()
   document.addEventListener('scroll', onScroll, { passive: true })
 
-  // Initial auth code pull
   loadAuthCode()
 })
 
@@ -514,10 +521,7 @@ onUnmounted(() => {
 })
 
 /** Re-measure when header-height-affecting state flips */
-watch(() => authLoggedIn.value, () => {
-  nextTick().then(updateNavHeight)
-  loadAuthCode()
-})
+watch(() => authLoggedIn.value, () => { nextTick().then(updateNavHeight); loadAuthCode() })
 watch(() => props.loading, () => nextTick().then(updateNavHeight))
 watch(() => props.error, () => nextTick().then(updateNavHeight))
 
@@ -525,13 +529,8 @@ watch(() => props.error, () => nextTick().then(updateNavHeight))
 const stopStatusWatch = watch(
   () => tokenHealth && tokenHealth.status,
   (s) => {
-    if (s === 'invalid') {
-      isMobileMenuOpen.value = false
-      logoutUser(false)
-    }
-    if (s === 'valid') {
-      loadAuthCode()
-    }
+    if (s === 'invalid') { isMobileMenuOpen.value = false; logoutUser(false) }
+    if (s === 'valid') { loadAuthCode() }
   },
   { immediate: false }
 )
@@ -542,7 +541,7 @@ const logoutUser = async (fromMobile = false) => {
     logout()
     if (fromMobile) closeMobileMenu()
     await router.push('/login')
-  } catch {/* no-op */}
+  } catch { /* no-op */ }
 }
 
 /** ---- Info strip helpers (BTC/fiat) ---- */
@@ -581,8 +580,6 @@ const fiatOnchain = computed(() => {
   return b == null ? null : formatFiat(b * props.btcUsd)
 })
 </script>
-
-
 
 <style scoped>
 :where(.tabular-nums){

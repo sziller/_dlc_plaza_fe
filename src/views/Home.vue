@@ -3,7 +3,6 @@ import { ref, computed, onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 
-
 const videos = [
   'Psuh8mml91o',
   'D7HDDxh0Wjo',
@@ -105,6 +104,7 @@ function scrollRight() {
   const len = articles.length
   currentIndex.value = (currentIndex.value + 1) % len
 }
+
 const heroCtaTo = computed(() =>
   isLoggedIn.value
     ? '/btcusd'
@@ -114,68 +114,124 @@ const heroCtaTo = computed(() =>
 const heroCtaLabel = computed(() =>
   isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'
 )
+
+/* ---- Smooth FAQ (always animates open/close) ---- */
+const faqs = [
+  { q: 'What is the loan amount?', a: 'Loans are standard 0.1 Bitcoin.' },
+  { q: 'Can I repay my loan early?', a: 'All loans settle at the end of the term (30 days, 90 days, 180 days or 1 year).' },
+  { q: 'Are there monthly payments?', a: 'There are no payments. All loans settle at the end of the term.' },
+  { q: 'What is the Loan To Value?', a: 'We offer 50% and 80% loan to value loans.' },
+  { q: 'How is collateral managed?', a: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin’s core security principle: Your Keys, Your Coins. You control your private keys and funds. Cadena Bitcoin does not hold or access your private keys or seed phrase.' },
+  { q: 'What currency can I get my loan in?', a: 'Loans are funded in Bitcoin and settled in Bitcoin.' },
+  { q: 'How do I get a Bitcoin-backed loan?', a: 'Register online and download the signer app.' },
+  { q: 'How long does it take to get a loan?', a: 'Minutes. Funding transactions are broadcast as soon as both peers sign the contract.' },
+  { q: 'Is there a credit check?', a: 'No. Your bitcoin is your credit.' },
+]
+
+// allow multiple open; use a Set of indexes
+const openSet = ref(new Set([0]))
+
+function isOpen(i) { return openSet.value.has(i) }
+function toggle(i) {
+  const s = new Set(openSet.value)
+  if (s.has(i)) s.delete(i); else s.add(i)
+  openSet.value = s
+}
+
+// Transition hooks for reliable height animation
+function onEnter(el) {
+  el.style.height = '0px'
+  el.style.opacity = '0'
+  el.style.willChange = 'height, opacity'
+  // force reflow
+  void el.offsetHeight
+  el.style.transition = 'height 300ms cubic-bezier(.22,.61,.36,1), opacity 220ms ease-out'
+  el.style.height = el.scrollHeight + 'px'
+  el.style.opacity = '1'
+}
+function onAfterEnter(el) {
+  el.style.transition = ''
+  el.style.height = 'auto'
+  el.style.willChange = ''
+}
+function onBeforeLeave(el) {
+  el.style.height = el.scrollHeight + 'px'
+  el.style.opacity = '1'
+  el.style.willChange = 'height, opacity'
+  // force reflow
+  void el.offsetHeight
+}
+function onLeave(el) {
+  el.style.transition = 'height 300ms cubic-bezier(.22,.61,.36,1), opacity 200ms ease-in'
+  el.style.height = '0px'
+  el.style.opacity = '0'
+}
+function onAfterLeave(el) {
+  el.style.transition = ''
+  el.style.willChange = ''
+}
 </script>
 
 <template>
   <!-- Page wrapper with global gradient background -->
-  <div class="relative min-h-screen mt-20 text-white">
+  <div class="relative min-h-screen mt-0 text-white">
     <!-- Full-page gradient layer (moved to CSS class) -->
     <div class="fixed inset-0 -z-10 bg-page-gradient"></div>
 
     <!-- Hero Section (no animation) -->
-<!-- Hero Section (no animation) -->
-<section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
-  <!-- Left: Text -->
-  <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
-    <div class="w-full max-w-2xl text-center sm:text-left">
-      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-        Unlock your Bitcoin's potential.
-      </h2>
-      <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
-        Access loans without selling your Bitcoin or earn yield secured by 
-        Bitcoin.  Better rates, your keys, no sidechains.
-      </p>
-      <!-- Longer email input field with smaller button below -->
-      <div class="mt-8 flex flex-col items-center gap-4 w-full">
-        <input
-          v-if="!isLoggedIn"
-          v-model="ctaEmail"
-          type="email"
-          placeholder="Enter your email address"
-          class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
-        />
-        <router-link
-          :to="heroCtaTo"
-          class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
-        >
-          {{ heroCtaLabel }}
-        </router-link>
+    <section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
+      <!-- Left: Text -->
+      <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
+        <div class="w-full max-w-2xl text-center sm:text-left">
+          <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
+            Unlock your Bitcoin's potential.
+          </h2>
+          <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
+            Access loans without selling your Bitcoin or earn yield secured by 
+            Bitcoin.  Better rates, your keys, no sidechains.
+          </p>
+          <!-- Longer email input field with smaller button below -->
+          <div class="mt-8 flex flex-col items-center gap-4 w-full">
+            <input
+              v-if="!isLoggedIn"
+              v-model="ctaEmail"
+              type="email"
+              placeholder="Enter your email address"
+              class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
+            />
+            <router-link
+              :to="heroCtaTo"
+              class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
+            >
+              {{ heroCtaLabel }}
+            </router-link>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Right: iPhone mockup (kept clean; glow can be done with CSS ::before if you want) -->
-  <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10 phone-col">
-    <div class="[perspective:1100px]">
-      <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
-        <picture>
-          <source type="image/avif" srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
-          <source type="image/webp" srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
-          <img
-            src="/img/iPhoneSC-960.webp"
-            srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
-            sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
-            width="420" height="840"
-            fetchpriority="high" loading="eager" decoding="async"
-            class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
-            alt="App preview on iPhone" draggable="false"
-          />
-        </picture>
+      <!-- Right: iPhone mockup (hover-grow + link to /signerapp) -->
+      <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10 phone-col">
+        <div class="[perspective:1100px]">
+          <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
+            <router-link to="/signerapp" class="group block cursor-pointer select-none" aria-label="Open Signer App page">
+              <picture>
+                <source type="image/avif" srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
+                <source type="image/webp" srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
+                <img
+                  src="/img/iPhoneSC-960.webp"
+                  srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
+                  sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
+                  width="420" height="840"
+                  fetchpriority="high" loading="eager" decoding="async"
+                  class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto transform transition-transform duration-300 group-hover:scale-105 will-change-transform"
+                  alt="App preview on iPhone" draggable="false"
+                />
+              </picture>
+            </router-link>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
-
+    </section>
 
     <!-- Satoshi Quote (animate in from left) -->
     <section
@@ -204,18 +260,17 @@ const heroCtaLabel = computed(() =>
             </div>
           </div>
           <div>
-  <div class="yt">
-    <iframe
-      src="https://www.youtube-nocookie.com/embed/0v_okPUvHvQ?rel=0&modestbranding=1&playsinline=1"
-      title="What is Cadena Bitcoin?"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen
-      loading="lazy"
-      referrerpolicy="strict-origin-when-cross-origin"
-    ></iframe>
-  </div>
-</div>
-
+            <div class="yt">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/0v_okPUvHvQ?rel=0&modestbranding=1&playsinline=1"
+                title="What is Cadena Bitcoin?"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+              ></iframe>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -312,33 +367,32 @@ const heroCtaLabel = computed(() =>
       </div>
     </section>
 
-    <!-- Latest Videos (animate in from left) -->
-   <!-- Latest Videos -->
-<section class="bg-transparent text-white pt-8 pb-8 px-6 animated-section" :class="sectionInView[2] ? 'animate-in-left' : ''">
-  <div class="max-w-6xl mx-auto space-y-12">
-    <div class="text-center space-y-4">
-      <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
-      <p class="text-white text-lg max-w-2xl mx-auto">
-        Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
-      </p>
-    </div>
+    <!-- Latest Videos -->
+    <section class="bg-transparent text-white pt-8 pb-8 px-6 animated-section" :class="sectionInView[2] ? 'animate-in-left' : ''">
+      <div class="max-w-6xl mx-auto space-y-12">
+        <div class="text-center space-y-4">
+          <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
+          <p class="text-white text-lg max-w-2xl mx-auto">
+            Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
+          </p>
+        </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div v-for="id in videos" :key="id" class="yt">
-        <iframe
-          :src="`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1`"
-          title="YouTube video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-        ></iframe>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div v-for="id in videos" :key="id" class="yt">
+            <iframe
+              :src="`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1`"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-    <!-- FAQ (no animation) -->
+    <!-- FAQ (smooth transitions always) -->
     <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto space-y-4">
         <div class="text-center">
@@ -348,111 +402,46 @@ const heroCtaLabel = computed(() =>
           </p>
         </div>
 
-        <!-- (FAQ items unchanged) -->
-        <details class="group [&_summary::-webkit-details-marker]:hidden" open>
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">What is the loan amount?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">Loans are standard 0.1 Bitcoin.</p>
-        </details>
+        <div class="space-y-3">
+          <div v-for="(item, i) in faqs" :key="i" class="rounded-md border border-white/10 bg-dark overflow-hidden">
+            <button
+              class="w-full flex items-center justify-between gap-3 text-left p-4"
+              @click="toggle(i)"
+              :aria-expanded="isOpen(i)"
+              :aria-controls="`faq-panel-${i}`"
+            >
+              <h3 class="text-lg font-medium">{{ item.q }}</h3>
+              <svg
+                class="size-5 shrink-0 transition-transform duration-300"
+                :class="isOpen(i) ? '-rotate-180' : ''"
+                xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">Can I repay my loan early?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">All loans settle at the end of the term (30 days, 90 days, 180 days or 1 
-year).</p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">Are there monthly payments?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">There are no payments.  All loans settle at the end of the term.</p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">What is the Loan To Value?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">We offer 50% and 80% loan to value loans.</p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">How is collateral managed?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">
-            Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin’s core security principle: Your Keys, Your Coins.
-            You control your private keys and funds. Cadena Bitcoin does not hold or access your private keys or seed phrase.
-          </p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">What currency can I get my loan in?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">Loans are funded in Bitcoin and settled in Bitcoin.</p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">How do I get a Bitcoin-backed loan?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">Register online and download the signer app.</p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">How long does it take to get a loan?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">
-            Minutes. Funding transactions are broadcast as soon as both peers sign the contract.
-          </p>
-        </details>
-
-        <details class="group [&_summary::-webkit-details-marker]:hidden">
-          <summary class="flex items-center justify-between gap-1.5 rounded-md border border-white/10 bg-dark p-4 text-white cursor-pointer">
-            <h2 class="text-lg font-medium">Is there a credit check?</h2>
-            <svg class="size-5 shrink-0 transition-transform duration-300 group-open:-rotate-180"
-                 xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p class="px-4 pt-4 text-white">No. Your bitcoin is your credit.</p>
-        </details>
+            <transition
+  @enter="onEnter"
+  @after-enter="onAfterEnter"
+  @before-leave="onBeforeLeave"
+  @leave="onLeave"
+  @after-leave="onAfterLeave"
+>
+  <div
+    v-show="isOpen(i)"
+    :id="`faq-panel-${i}`"
+    role="region"
+    :aria-labelledby="`faq-header-${i}`"
+    class="faq-panel"
+  >
+    <!-- just spacing and text, no box look -->
+    <div class="px-4 pt-3 pb-5 text-white/90 leading-relaxed">
+      {{ item.a }}
+    </div>
+  </div>
+</transition>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -495,15 +484,14 @@ year).</p>
   background-color: #000; /* solid black base */
   background-image:
     radial-gradient(
-      125% 75% at 50% 100%,      /* big ellipse, anchored at bottom center */
-      rgba(103,56,228,0.58) 0%,  /* #6738e4, strongest near bottom */
+      125% 75% at 50% 100%,
+      rgba(103,56,228,0.58) 0%,
       rgba(103,56,228,0.36) 26%,
       rgba(103,56,228,0.16) 52%,
-      rgba(0,0,0,0) 76%          /* fade to transparent -> pure black */
+      rgba(0,0,0,0) 76%
     );
 }
 
-/* Smoother math when OKLCH is available, but same hue (#6738e4) */
 @supports (background: radial-gradient(in oklch, black, white)) {
   .bg-page-gradient{
     background-color: oklch(0 0 0);
@@ -518,7 +506,7 @@ year).</p>
   }
 }
 
-/* Keep the glow lower on short screens so it doesn't climb mid-page */
+/* Keep the glow lower on short screens */
 @media (max-height: 800px){
   .bg-page-gradient{
     background-image:
@@ -532,7 +520,7 @@ year).</p>
   }
 }
 
-/* Optional: soft glow behind the phone - pure CSS, no inline */
+/* Soft glow behind the phone */
 .phone-col::before{
   content:"";
   position:absolute; inset:0; margin:auto;
@@ -547,7 +535,7 @@ year).</p>
 }
 @media (min-width:1024px){ .phone-col::before{ width:680px; height:680px; } }
 
-/* Animation classes */
+/* Animation classes for scroll-ins */
 .animated-section {
   opacity: 0;
   pointer-events: none;
@@ -571,7 +559,7 @@ year).</p>
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-180px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(180px); } to { opacity: 1; transform: translateX(0); } }
 
-/* Optional: hide scrollbar if needed */
+/* Hide scrollbar if needed */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -582,6 +570,8 @@ year).</p>
 
 /* Fix for top cut-off: add top padding to main container, not body */
 section.bg-primary { padding-top: 5.5rem !important; }
+
+/* YouTube container */
 .yt{
   position: relative;
   width: 100%;
@@ -598,5 +588,22 @@ section.bg-primary { padding-top: 5.5rem !important; }
   height: 100%;
   border: 0;
   display: block;
+}
+
+/* FAQ panel default styles (Vue transition drives height) */
+.faq-panel{
+  overflow: hidden;
+  will-change: height, opacity;
+  /* no background, no border — looks like before */
+  background: transparent;
+  border: 0;
+}
+
+/* Summary hover polish */
+button[aria-expanded]{
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+button[aria-expanded]:hover{
+  background-color: color-mix(in oklch, #0b0b0b 92%, #ffffff 8%);
 }
 </style>

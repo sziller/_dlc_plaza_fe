@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-black mt-20 text-white overflow-x-hidden">
+  <div class="bg-black mt-0 text-white overflow-x-hidden">
     <!-- HERO TITLE SECTION -->
     <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">
@@ -51,7 +51,7 @@
       <div class="space-y-5">
         <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Term</h4>
         <p>
-          Each Cadena Bitcoin contract lasts 30, 90, 180, or 360 days starting when the contract is accepted. Duration may extend slightly to align with the next available Oracle attestation after maturity.
+          Each Cadena Bitcoin contract lasts 30, 90, 180, or 365 days starting when the contract is accepted. Duration may extend slightly to align with the next available Oracle attestation after maturity.
         </p>
 
         <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Interest</h4>

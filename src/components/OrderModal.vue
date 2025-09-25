@@ -538,7 +538,7 @@ function annualizedYield(rateStr, days) {
   return `${annual.toFixed(ANNUAL_DECIMALS)}%`
 }
 
-// ===== Amount & Collateral contribution calculation =====
+// ===== Amount & Collateral contribution =====
 const amountBtc = ref(0.1) // fixed for now; wire this to a real input if needed
 
 // normalize LTV to ratio 0..1

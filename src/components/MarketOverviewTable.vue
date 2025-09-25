@@ -258,7 +258,9 @@ const modalNotice  = ref({ type: '', text: '' }) // type: 'success' | 'error' | 
 
 function handleCellClick(row, key) {
   modalNotice.value = { type: '', text: '' }
-  if (!isLoggedIn.value) { router.push('/login'); return }
+
+  // ⬇️ Removed immediate login redirect so users can complete the flow first
+  // if (!isLoggedIn.value) { router.push('/login'); return }
 
   // NOTE: modal gets the *term* rate (not annualized)
   selectedRate.value = row[key]
@@ -275,6 +277,14 @@ function handleCellClick(row, key) {
 async function handleOrderSubmit(data) {
   const type = (data.orderType || '').toLowerCase()
   modalNotice.value = { type: '', text: '' }
+
+  // ⬇️ Login gate right before hitting the API
+  if (!getToken()) {
+    showModal.value = false
+    router.push('/login')
+    return
+  }
+
   modalLoading.value = true
 
   if (type === 'market') {
