@@ -6,7 +6,7 @@
     <div class="glow-cyan" aria-hidden="true"></div>
 
     <!-- Onboarding Section -->
-    <section class="w-full pt-28 md:pt-32" aria-labelledby="onboarding-title">
+    <section class="w-full pt-0 md:pt-0" aria-labelledby="onboarding-title">
       <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">
 
         <!-- Eyebrow + Title + Lead -->
@@ -110,7 +110,7 @@
 
     <!-- Who we serve -->
     <section class="w-full px-6 py-16 md:py-20">
-      <div class="max-w-6xl mx-auto">
+      <div class="max-w-6xl mx-auto space-y-10">
         <h2 class="section-title text-center" v-reveal>Who we serve.</h2>
 
         <div class="space-y-8">
@@ -687,5 +687,19 @@ const useCases = [
 @media (min-width: 768px){
   .headshot{ width:192px; height:192px; }
 }
-
+.social-tile {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;        /* remove card padding */
+}
+.social-tile::before { content: none !important; }  /* kill gradient border layer */
+.social-tile:hover {
+  transform: none !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
 </style>

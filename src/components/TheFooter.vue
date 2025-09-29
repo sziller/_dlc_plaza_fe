@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-white">
+  <footer class="bg-black text-white">
     <div class="max-w-screen-xl mx-auto px-4 pt-16 pb-6 sm:px-6 lg:px-8 lg:pt-24">
       <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <!-- 🔖 Logo & Title -->
@@ -25,39 +25,56 @@
         </div>
 
         <!-- 📚 Quick Links -->
-        <nav class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:col-span-2 text-sm text-secondary" aria-label="Footer">
+        <nav
+          class="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 lg:col-span-2 text-sm"
+          aria-label="Footer"
+        >
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Company</p>
-            <ul class="space-y-2">
-              <li><router-link to="/faq" class="hover:text-black">FAQ</router-link></li>
-              <li><router-link to="/contact" class="hover:text-black">Contact Us</router-link></li>
+            <ul class="space-y-2 text-white/80">
+              <li><router-link to="/faq" class="hover:text-secondary">FAQ</router-link></li>
+              <li><router-link to="/contact" class="hover:text-secondary">Contact Us</router-link></li>
             </ul>
           </div>
 
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Product</p>
-            <ul class="space-y-2">
-              <li><router-link to="/btcusd" class="hover:text-black">BTC/USD</router-link></li>
-              <li><router-link to="/cadena-paper" class="hover:text-black">Cadena Paper</router-link></li>
+            <ul class="space-y-2 text-white/80">
+              <li><router-link to="/btcusd" class="hover:text-secondary">BTC/USD</router-link></li>
+              <li><router-link to="/cadena-paper" class="hover:text-secondary">Cadena Paper</router-link></li>
             </ul>
           </div>
 
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Social Media</p>
-            <ul class="space-y-2">
+            <ul class="space-y-2 text-white/80">
               <li>
-                <a href="https://x.com/cadenabitcoin" class="hover:text-black" rel="noopener noreferrer" target="_blank">
+                <a
+                  href="https://x.com/cadenabitcoin"
+                  class="hover:text-secondary"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   X <span class="sr-only">(opens in a new tab)</span>
                 </a>
               </li>
               <li>
-                <a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" class="hover:text-black" rel="noopener noreferrer" target="_blank">
+                <a
+                  href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt"
+                  class="hover:text-secondary"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   YouTube <span class="sr-only">(opens in a new tab)</span>
                 </a>
               </li>
               <li>
-                <!-- Replace with your real GitHub org/user URL -->
-                <a href="https://github.com/cadenabitcoin" class="hover:text-black" rel="noopener noreferrer" target="_blank">
+                <a
+                  href="https://github.com/cadenabitcoin"
+                  class="hover:text-secondary"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   GitHub <span class="sr-only">(opens in a new tab)</span>
                 </a>
               </li>
@@ -66,18 +83,18 @@
 
           <div>
             <p class="text-base font-semibold text-secondary mb-4">Legal</p>
-            <ul class="space-y-2">
-              <li><router-link to="/terms" class="hover:text-black">Terms</router-link></li>
-              <li><router-link to="/privacy" class="hover:text-black">Privacy</router-link></li>
+            <ul class="space-y-2 text-white/80">
+              <li><router-link to="/terms" class="hover:text-secondary">Terms</router-link></li>
+              <li><router-link to="/privacy" class="hover:text-secondary">Privacy</router-link></li>
             </ul>
           </div>
         </nav>
       </div>
 
       <!-- 📎 Footer Bottom -->
-      <div class="mt-12 border-t border-gray-200 pt-6 text-sm text-center text-secondary">
+      <div class="mt-12 border-t border-secondary/40 pt-6 text-sm text-center text-white/70">
         <small>&copy; {{ year }} Cadena Bitcoin. All rights reserved.</small>
-        <address class="not-italic mt-2">
+        <address class="not-italic mt-2 text-white/60">
           Cadena Bitcoin is operated by Cadena Bitcoin S.A. de C.V., an El Salvador–licensed Bitcoin service provider.
           Address: Calle Llama del Bosque Poniente, Urbanización Madre Selva III, Edificio Avante, Local 3-13,
           Antiguo Cuscatlán, La Libertad, El Salvador.

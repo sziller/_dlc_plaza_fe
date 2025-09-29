@@ -54,7 +54,14 @@
 
         <div class="h-px bg-white/10 my-2"></div>
 
-        <div><span class="font-semibold">Status:</span> {{ detail.status }}</div>
+        <div class="flex items-center gap-2">
+          <span class="font-semibold">Status:</span>
+          <span class="inline-block px-2 py-1 rounded text-xs font-semibold" :class="statusClass">
+            {{ statusLabel }}
+          </span>
+          <span class="text-white/70" v-if="statusHint">&middot; {{ statusHint }}</span>
+        </div>
+
         <div><span class="font-semibold">Initiator role:</span> {{ roleText }}</div>
 
         <div class="h-px bg-white/10 my-2"></div>
@@ -85,6 +92,8 @@ import { deleteDlc } from '../api/dlcDelete'  // adjust path if needed
 const props = defineProps({
   dlc: { type: Object, required: true },
   isOwn: { type: Boolean, default: false },
+  /** Logged-in user's email for personalized status text */
+  userEmail: { type: String, default: '' },
 })
 
 const emit = defineEmits(['close', 'deleted'])
@@ -103,6 +112,94 @@ const canDelete = computed(() => {
   return s === 'offer_f' || s === 'offer_p'
 })
 
+/* ---------- smart status (label + class + hint) ---------- */
+function getStatusDetails(dlc, userEmail) {
+  let statusLabel = ''
+  let statusStyle = ''
+  let hint = ''
+
+  if (dlc.status === 'offer_p') {
+    statusLabel = 'Offer'
+    statusStyle = 'bg-offer'
+    hint = 'Draft offer created'
+  } else if (dlc.status === 'offer_dlc') {
+    statusLabel = 'Please sign!'
+    statusStyle = 'bg-red-500 text-offer'
+    hint = 'DLC prepared; awaiting signature'
+  } else if (dlc.status === 'signed') {
+    statusLabel = 'Signed'
+    statusStyle = 'bg-signed'
+  } else if (dlc.status === 'broadcast') {
+    statusLabel = 'Broadcast'
+    statusStyle = 'bg-aura-500'
+  } else if (dlc.status === 'active') {
+    statusLabel = 'Active'
+    statusStyle = 'bg-lime-500'
+  } else if (dlc.status === 'confirmed') {
+    statusLabel = 'Confirmed'
+    statusStyle = 'bg-lime-500'
+  } else if (dlc.status === 'executed') {
+    statusLabel = 'Executed'
+    statusStyle = 'bg-aura-500'
+  } else if (dlc.status === 'attested') {
+    statusLabel = 'Attested'
+    statusStyle = 'bg-red-500 text-offer'
+  } else if (dlc.status === 'settled') {
+    statusLabel = 'Settled'
+    statusStyle = 'bg-accepted'
+  } else if (dlc.status === 'revoked') {
+    statusLabel = 'Revoked'
+    statusStyle = 'bg-base-500 text-offer'
+  } else if (dlc.status === 'reset') {
+    statusLabel = 'Reset'
+    statusStyle = 'bg-base-500 text-offer'
+  } else if (dlc.status === 'sign_ini') {
+    if (dlc.ini_email === userEmail) {
+      statusLabel = 'Waiting for peer!'
+      statusStyle = 'bg-blue-500 text-offer'
+      hint = 'You signed; counterparty must sign'
+    }
+    if (dlc.acc_email === userEmail) {
+      statusLabel = 'Please sign!'
+      statusStyle = 'bg-red-500 text-offer'
+      hint = 'Your signature required'
+    }
+  } else if (dlc.status === 'sign_acc') {
+    if (dlc.acc_email === userEmail) {
+      statusLabel = 'Waiting for peer!'
+      statusStyle = 'bg-blue-500 text-offer'
+      hint = 'You signed; counterparty must sign'
+    }
+    if (dlc.ini_email === userEmail) {
+      statusLabel = 'Please sign!'
+      statusStyle = 'bg-red-500 text-offer'
+      hint = 'Your signature required'
+    }
+  } else {
+    statusLabel = 'Unknown'
+    statusStyle = 'bg-gray-500'
+  }
+
+  return { statusLabel, statusStyle, hint }
+}
+
+const statusComputed = computed(() => {
+  const d = detail.value || {}
+  const { statusLabel, statusStyle, hint } = getStatusDetails(
+    { status: d.status, ini_email: d.ini_email, acc_email: d.acc_email },
+    props.userEmail
+  )
+  return {
+    label: statusLabel || (d.status || '—'),
+    class: statusStyle || '',
+    hint: hint || '',
+  }
+})
+
+const statusLabel = computed(() => statusComputed.value.label)
+const statusClass = computed(() => statusComputed.value.class)
+const statusHint  = computed(() => statusComputed.value.hint)
+
 /* ---------- a11y / focus ---------- */
 const titleId = `dlc-title-${Math.random().toString(36).slice(2)}`
 const bodyId = `dlc-body-${Math.random().toString(36).slice(2)}`
@@ -119,7 +216,6 @@ onMounted(async () => {
   await nextTick()
   try {
     backdropRef.value?.focus() // ensure Esc will work immediately
-    // Move focus to close button (most obvious action)
     closeBtnRef.value?.focus()
   } catch {}
 })

@@ -41,7 +41,7 @@
             <tbody v-if="!loading && !error" class="text-white/90 text-sm md:text-base">
               <tr
                 v-for="row in sortedData"
-                :key="row.dlcId"
+                :key="row.dlcIdFull"
                 @click="selectDlc(row)"
                 @keydown.enter.prevent="selectDlc(row)"
                 @keydown.space.prevent="selectDlc(row)"
@@ -55,23 +55,29 @@
                 <td class="px-4 py-3">{{ row.ltv }}</td>
                 <td class="px-4 py-3">{{ row.rate }}</td>
                 <td class="px-4 py-3">{{ row.annualized }}</td>
-                <td class="px-4 py-3">{{ row.status }}</td>
-                <td class="px-4 py-3">{{ row.role }}</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="inline-block px-2 py-1 rounded text-xs font-semibold"
+                    :class="row.statusClass"
+                  >
+                    {{ row.status }}
+                  </span>
+                </td>
               </tr>
               <tr v-if="sortedData.length === 0">
-                <td class="px-4 py-6 text-white/70" colspan="8">No DLCs found.</td>
+                <td class="px-4 py-6 text-white/70" colspan="7">No DLCs found.</td>
               </tr>
             </tbody>
 
             <tbody v-else-if="loading">
               <tr>
-                <td class="px-4 py-6 text-white/70" colspan="8">Loading…</td>
+                <td class="px-4 py-6 text-white/70" colspan="7">Loading…</td>
               </tr>
             </tbody>
 
             <tbody v-else>
               <tr>
-                <td class="px-4 py-6 text-red-400" colspan="8">{{ error }}</td>
+                <td class="px-4 py-6 text-red-400" colspan="7">{{ error }}</td>
               </tr>
             </tbody>
           </table>
@@ -84,6 +90,7 @@
       v-if="selectedDlc"
       :dlc="selectedDlc"
       :is-own="true"
+      :user-email="userEmail"
       @close="selectedDlc = null"
       @deleted="onDeleted"
     />
@@ -94,30 +101,30 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import DlcDetails from './DLCDetails.vue'
 import { getUserDlcs } from '../api/userDlcs'
-
-const props = defineProps({
-  pollMs: { type: Number, default: 30000 } // 30s
-})
+import { getUserProfile } from '../api/userProfile'
 
 const columns = Object.freeze([
   { label: 'DLC ID', key: 'dlcId' },
   { label: 'Oracle', key: 'oracle' },
   { label: 'Term', key: 'term' },
   { label: 'Loan To Value', key: 'ltv' },
-  { label: 'Rate (Term)', key: 'rate' },
+  { label: 'Rate For Term', key: 'rate' },
   { label: 'Annualized Yield', key: 'annualized' },
   { label: 'Status', key: 'status' },
-  { label: 'Role', key: 'role' },
 ])
 
 // state
-const apiDlcs = ref([])     // raw payload from API
-const rows = ref([])        // mapped for table
+const apiDlcs = ref([])
+const rows = ref([])
 const loading = ref(false)
 const error = ref(null)
 const sortKey = ref('dlcId')
 const sortAsc = ref(true)
 const selectedDlc = ref(null)
+const pollMs = 30000
+
+// auth context (real email pulled from profile)
+const userEmail = ref('')
 
 // helpers
 const pct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
@@ -125,55 +132,101 @@ const parseLtv = (pid) => {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
   return m ? Number(m[1]) : null
 }
-/** Extract raw term days (as provided), without UI normalization. */
 const parseTermDays = (pid, duration) => {
   const fromPid = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
   if (fromPid) return Math.round(Number(fromPid[1]))
   const d = Number(duration)
   return Number.isFinite(d) && d > 0 ? Math.round(d) : null
 }
-/** Treat anything in [360..366] as a 1-year term; display as 365 days. */
 const isYearish = (days) => {
   const d = Number(days)
   return Number.isFinite(d) && d >= 360 && d <= 366
 }
 const displayDays = (days) => (isYearish(days) ? 365 : Math.round(Number(days) || 0))
-
-/** Simple 360-day annualization (no compounding), same as Market Overview. */
 const annualize360 = (termPct, days) => {
   const r = Number(termPct)
   const d = Number(days)
   if (!Number.isFinite(r) || !Number.isFinite(d) || d <= 0) return NaN
   return r * (360 / d)
 }
-
 const isHiddenEmail = (s) => String(s ?? '').trim() === '--- hidden ---'
-const roleLabel = (ini_role, ini_email) => {
-  if (ini_role === 'lend' && !isHiddenEmail(ini_email)) return 'Lender'
-  if (ini_role === 'lend' && isHiddenEmail(ini_email))  return 'Borrower'
-  if (ini_role === 'borrow' && !isHiddenEmail(ini_email)) return 'Borrower'
-  if (ini_role === 'borrow' && isHiddenEmail(ini_email))  return 'Lender'
-  return '—'
-}
-const statusLabel = (s) => s || '—'
 
-// map API item -> table row (normalize yearish terms to 365 for display, but compute annualized on raw days)
+/** EXACT mapping from Sziller */
+function getStatusDetails(dlc, user) {
+  let statusLabel = ''
+  let statusStyle = ''
+  if (dlc.status === 'offer_p') {
+    statusLabel = 'Offer'; statusStyle = 'bg-offer'
+  } else if (dlc.status === 'offer_dlc') {
+    statusLabel = 'Please sign!'; statusStyle = 'bg-red-500 text-offer'
+  } else if (dlc.status === 'signed') {
+    statusLabel = 'Signed'; statusStyle = 'bg-signed'
+  } else if (dlc.status === 'broadcast') {
+    statusLabel = 'Broadcast'; statusStyle = 'bg-aura-500'
+  } else if (dlc.status === 'active') {
+    statusLabel = 'Active'; statusStyle = 'bg-lime-500'
+  } else if (dlc.status === 'confirmed') {
+    statusLabel = 'Confirmed'; statusStyle = 'bg-lime-500'
+  } else if (dlc.status === 'executed') {
+    statusLabel = 'Executed'; statusStyle = 'bg-aura-500'
+  } else if (dlc.status === 'attested') {
+    statusLabel = 'Attested'; statusStyle = 'bg-red-500 text-offer'
+  } else if (dlc.status === 'settled') {
+    statusLabel = 'Settled'; statusStyle = 'bg-accepted'
+  } else if (dlc.status === 'revoked') {
+    statusLabel = 'Revoked'; statusStyle = 'bg-base-500 text-offer'
+  } else if (dlc.status === 'reset') {
+    statusLabel = 'Reset'; statusStyle = 'bg-base-500 text-offer'
+  } else if (dlc.status === 'sign_ini') {
+    if (dlc.ini_email === user) { statusLabel = 'Waiting for peer!'; statusStyle = 'bg-blue-500 text-offer' }
+    if (dlc.acc_email === user) { statusLabel = 'Please sign!';      statusStyle = 'bg-red-500 text-offer' }
+  } else if (dlc.status === 'sign_acc') {
+    if (dlc.acc_email === user) { statusLabel = 'Waiting for peer!'; statusStyle = 'bg-blue-500 text-offer' }
+    if (dlc.ini_email === user) { statusLabel = 'Please sign!';      statusStyle = 'bg-red-500 text-offer' }
+  } else {
+    statusLabel = 'Unknown'; statusStyle = 'bg-gray-500'
+  }
+  return { statusLabel, statusStyle }
+}
+
+const statusLabelPlain = (s) => s || '—'
+const short = (s, n) => {
+  const t = String(s || '')
+  if (!t) return '—'
+  return t.slice(0, n)
+}
+
+// map API item -> table row (keep full values for sorting/selection; show short)
 const toRow = (d) => {
-  const rawDays = parseTermDays(d.product_id, d.duration) // e.g. 30, 90, 180, 360
-  const uiDays  = rawDays ? displayDays(rawDays) : null   // e.g. 30, 90, 180, 365
+  const rawDays = parseTermDays(d.product_id, d.duration)
+  const uiDays  = rawDays ? displayDays(rawDays) : null
   const ltv = parseLtv(d.product_id)
   const rateNum = Number(d.interest)
   const ear = annualize360(rateNum, rawDays)
 
+  const fullId = d.dlc_id || d.tmp_cntr_id || ''
+  const fullOracle = d.orcl_id || ''
+
+  const { statusLabel: smartLabel, statusStyle } = getStatusDetails(
+    { status: d.status, ini_email: d.ini_email, acc_email: d.acc_email },
+    userEmail.value
+  )
+
   return {
-    dlcId: d.dlc_id || d.tmp_cntr_id || '—',
-    oracle: d.orcl_id || '—',
+    // full values for logic/sorting
+    dlcIdFull: fullId,
+    oracleFull: fullOracle,
+
+    // displayed trims
+    dlcId: short(fullId, 8),
+    oracle: short(fullOracle, 9),
+
     term: uiDays ? `${uiDays} Days` : '—',
     ltv: ltv != null ? `${ltv}%` : '—',
     rate: pct2(rateNum),
     annualized: pct2(ear),
-    status: statusLabel(d.status),
-    role: roleLabel(d.ini_role, d.ini_email),
+    status: smartLabel || statusLabelPlain(d.status),
+    statusClass: statusStyle || '',
   }
 }
 
@@ -183,10 +236,13 @@ function sortBy(key) {
   else { sortKey.value = key; sortAsc.value = true }
 }
 const normForSort = (row, key) => {
+  // sort on full values where we truncate display
+  if (key === 'dlcId') return row.dlcIdFull || ''
+  if (key === 'oracle') return (row.oracleFull || '').toLowerCase()
+
   const v = row[key]
   if (v == null) return ''
   if (key === 'term') {
-    // Parse displayed number (already normalized to 365 if yearish)
     const m = String(v).match(/(\d+)/); return m ? Number(m[1]) : 0
   }
   if (key === 'ltv' || key === 'rate' || key === 'annualized') {
@@ -204,54 +260,67 @@ const sortedData = computed(() => {
   })
 })
 
-// selection
+// selection uses the full id
 function selectDlc(row) {
-  const raw = apiDlcs.value.find(d => (d.dlc_id || d.tmp_cntr_id) === row.dlcId)
+  const raw = apiDlcs.value.find(d => (d.dlc_id || d.tmp_cntr_id) === row.dlcIdFull)
   selectedDlc.value = raw || null
 }
 
-// polling
+// polling + profile fetch
 let pollId = null
 let isFetching = false
 let hasLoadedOnce = false
 
 const statuses = Object.freeze([
-  "offer_p","offer_dlc","sign_ini","sign_acc","signed",
-  "broadcast","active","attested","executed","settled","revoked","reset"
+  'offer_p','offer_dlc','sign_ini','sign_acc','signed',
+  'broadcast','active','attested','executed','settled','revoked','reset','confirmed'
 ])
 
+async function loadProfileEmail() {
+  try {
+    const prof = await getUserProfile()
+    const email = String(prof?.payload?.email || '')
+    if (email) userEmail.value = email
+  } catch (e) {
+    console.warn('[UsersDLCS] failed to get profile email:', e?.message || e)
+    userEmail.value = ''
+  }
+}
+
 function sameRows(a, b) {
-  // compare on stable keys only
+  // compare on stable keys + statusClass so style updates propagate
   const pick = r => ({
-    dlcId: r.dlcId, oracle: r.oracle, term: r.term, ltv: r.ltv, rate: r.rate, annualized: r.annualized, status: r.status, role: r.role
+    dlcIdFull: r.dlcIdFull, oracleFull: r.oracleFull, term: r.term, ltv: r.ltv,
+    rate: r.rate, annualized: r.annualized, status: r.status, statusClass: r.statusClass
   })
   if (a.length !== b.length) return false
   for (let i = 0; i < a.length; i++) {
     const A = pick(a[i]); const B = pick(b[i])
-    if (A.dlcId !== B.dlcId || A.oracle !== B.oracle || A.term !== B.term ||
-        A.ltv !== B.ltv || A.rate !== B.rate || A.annualized !== B.annualized ||
-        A.status !== B.status || A.role !== B.role) return false
+    if (
+      A.dlcIdFull !== B.dlcIdFull || A.oracleFull !== B.oracleFull || A.term !== B.term ||
+      A.ltv !== B.ltv || A.rate !== B.rate || A.annualized !== B.annualized ||
+      A.status !== B.status || A.statusClass !== B.statusClass
+    ) return false
   }
   return true
 }
 
 async function load(initial = false) {
   if (isFetching) return
-  // Skip background polling when tab is hidden (saves battery/network)
   if (!initial && document.hidden) return
 
   isFetching = true
   if (initial) { loading.value = true; error.value = null }
   try {
+    if (!userEmail.value) await loadProfileEmail()
+
     const res = await getUserDlcs(statuses)
     const payload = Array.isArray(res?.payload) ? res.payload : []
     const nextRows = payload.map(toRow)
 
-    // only update if changed
     if (!sameRows(rows.value, nextRows)) {
       apiDlcs.value = payload
       rows.value = nextRows
-      // keep modal data fresh
       if (selectedDlc.value) {
         const id = selectedDlc.value.dlc_id || selectedDlc.value.tmp_cntr_id
         const updated = payload.find(d => (d.dlc_id || d.tmp_cntr_id) === id)
@@ -272,20 +341,17 @@ async function load(initial = false) {
   }
 }
 
-function onVisChange() {
-  if (!document.hidden) load(false)
-}
-function onFocus() {
-  load(false)
-}
+function onVisChange() { if (!document.hidden) load(false) }
+function onFocus() { load(false) }
 function onAuthChanged() {
-  load(false)
+  userEmail.value = ''
+  load(true)
 }
 
 // lifecycle
 onMounted(async () => {
   await load(true)
-  pollId = setInterval(() => { if (!document.hidden) load(false) }, props.pollMs)
+  pollId = setInterval(() => { if (!document.hidden) load(false) }, pollMs)
   document.addEventListener('visibilitychange', onVisChange)
   window.addEventListener('focus', onFocus)
   window.addEventListener('auth-changed', onAuthChanged)
