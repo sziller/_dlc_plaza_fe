@@ -269,6 +269,12 @@ const formValid = computed(() =>
 const route = useRoute()
 const router = useRouter()
 
+const prefillEmailFromRoute = () => {
+  const qp = Array.isArray(route.query.email) ? route.query.email[0] : route.query.email
+  if (typeof qp === 'string' && qp.trim() && !email.value) {
+    email.value = qp.trim()
+  }
+}
 const submitForm = async () => {
   error.value = null
   if (!formValid.value) return
@@ -341,9 +347,11 @@ watch(step, async (val) => {
 watch(() => route.query.step, () => syncStepFromRoute())
 
 onMounted(async () => {
+   prefillEmailFromRoute() 
   syncStepFromRoute()
   if (step.value === 3) await loadQrCode()
 })
+watch(() => route.query.email, () => prefillEmailFromRoute())
 </script>
 
 <style scoped>

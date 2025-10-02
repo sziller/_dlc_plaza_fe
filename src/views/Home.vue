@@ -5,8 +5,8 @@ import { useAuth } from '../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../api/publicContact'
 const videos = [
   'Psuh8mml91o',
-  'D7HDDxh0Wjo',
-  'l_cy-tWM_lA',
+  'yNbE83BF8Mk',
+  'Gr0H0MpUbhU',
 ]
 
 const articles = [
@@ -109,11 +109,13 @@ function scrollRight() {
   currentIndex.value = (currentIndex.value + 1) % len
 }
 
-const heroCtaTo = computed(() =>
-  isLoggedIn.value
-    ? '/btcusd'
-    : (ctaEmail.value ? `/register?email=${encodeURIComponent(ctaEmail.value)}` : '/register')
-)
+const heroCtaTo = computed(() => {
+  if (isLoggedIn.value) return '/btcusd'
+  const qp = isValidEmail(ctaEmail.value)
+    ? `?email=${encodeURIComponent(ctaEmail.value)}`
+    : ''
+  return `/register${qp}`
+})
 
 const heroCtaLabel = computed(() =>
   isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'

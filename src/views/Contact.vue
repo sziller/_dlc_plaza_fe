@@ -1,10 +1,9 @@
 <template>
   <!-- Gradient Wrapper -->
   <div class="min-h-screen text-white relative overflow-hidden bg-page-gradient">
-    <!-- Soft glows (no inline styles; CSP-safe) -->
-    <div class="glow-purple" aria-hidden="true"></div>
-    <div class="glow-cyan" aria-hidden="true"></div>
-
+  <div class="bg-fixed-gradient" aria-hidden="true"></div>
+  <div class="glow-purple" aria-hidden="true"></div>
+  <div class="glow-cyan" aria-hidden="true"></div>
     <!-- Onboarding Section -->
     <section class="w-full pt-0 md:pt-0" aria-labelledby="onboarding-title">
       <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">
@@ -810,6 +809,84 @@ const useCases = [
 TheFooter{
   margin-top: var(--space-12) !important;
 }
+.text-center .lead,
+.bg-page-gradient .lead {
+  text-align: center;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: 60ch; /* ~perfect line length */
+}
+/* Wrapper is now transparent; content sits above a fixed layer */
+.bg-page-gradient{
+  background: transparent;
+}
 
+/* Fixed, full-viewport gradient (like the home page) */
+.bg-fixed-gradient{
+  position: fixed;
+  inset: 0;
+  z-index: -10;            /* behind everything */
+  pointer-events: none;    /* clicks go through */
+  background-color: #000;  /* solid base */
+  background-image:
+    radial-gradient(
+      125% 75% at 50% 100%,
+      rgba(103,56,228,0.58) 0%,
+      rgba(103,56,228,0.36) 26%,
+      rgba(103,56,228,0.16) 52%,
+      rgba(0,0,0,0) 76%
+    );
+}
+
+@supports (background: radial-gradient(in oklch, black, white)) {
+  .bg-fixed-gradient{
+    background-color: oklch(0 0 0);
+    background-image:
+      radial-gradient(
+        in oklch 125% 75% at 50% 100%,
+        oklch(from #6738e4 l c h / 0.60) 0%,
+        oklch(from #6738e4 l c h / 0.36) 26%,
+        oklch(from #6738e4 l c h / 0.16) 52%,
+        oklch(0 0 0 / 0) 76%
+      );
+  }
+}
+
+/* Slightly lower glow on short screens (same behavior as before) */
+@media (max-height: 800px){
+  .bg-fixed-gradient{
+    background-image:
+      radial-gradient(
+        120% 60% at 50% 100%,
+        rgba(103,56,228,0.52) 0%,
+        rgba(103,56,228,0.30) 24%,
+        rgba(103,56,228,0.12) 48%,
+        rgba(0,0,0,0) 70%
+      );
+  }
+}
+.glow-cyan{
+  right: -22%;         /* was -10% — push it farther off-screen */
+  top: 6%;             /* a touch lower */
+  width: 36rem;        /* slightly smaller */
+  height: 16rem;
+  opacity: .22;        /* softer */
+  background: radial-gradient(
+    40% 60% at 50% 50%,
+    rgba(22,177,255,0.18),   /* gentler center */
+    transparent 70%
+  );
+}
+
+/* On small screens, hide it entirely if it still peeks */
+@media (max-width: 768px){
+  .glow-cyan{ display: none; }
+}
+
+/* If you want an even cleaner edge, feather it with a mask */
+.glow-cyan{
+  -webkit-mask-image: radial-gradient(65% 65% at 50% 50%, #000 60%, transparent 100%);
+          mask-image: radial-gradient(65% 65% at 50% 50%, #000 60%, transparent 100%);
+}
 </style>
 

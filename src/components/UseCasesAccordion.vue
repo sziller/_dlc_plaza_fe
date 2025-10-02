@@ -69,8 +69,8 @@ const props = defineProps({
 })
 
 /** Active index (respects any {open:true}) */
-const initial = Math.max(0, props.items.findIndex(i => i?.open === true))
-const active = ref(initial >= 0 ? initial : null)
+const firstOpen = props.items.findIndex(i => i?.open === true)
+const active = ref(firstOpen >= 0 ? firstOpen : null)
 
 /** Stable ids for a11y */
 const uid = Math.random().toString(36).slice(2)
