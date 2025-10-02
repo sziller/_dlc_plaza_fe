@@ -53,8 +53,8 @@
                 <td class="px-4 py-3">{{ row.oracle }}</td>
                 <td class="px-4 py-3">{{ row.term }}</td>
                 <td class="px-4 py-3">{{ row.ltv }}</td>
-                <td class="px-4 py-3">{{ row.rate }}</td>
                 <td class="px-4 py-3">{{ row.annualized }}</td>
+                <td class="px-4 py-3">{{ row.role }}</td>
                 <td class="px-4 py-3">
                   <span
                     class="inline-block px-2 py-1 rounded text-xs font-semibold"
@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import DlcDetails from './DLCDetails.vue'
 import { getUserDlcs } from '../api/userDlcs'
 import { getUserProfile } from '../api/userProfile'
@@ -108,8 +108,8 @@ const columns = Object.freeze([
   { label: 'Oracle', key: 'oracle' },
   { label: 'Term', key: 'term' },
   { label: 'Loan To Value', key: 'ltv' },
-  { label: 'Rate For Term', key: 'rate' },
   { label: 'Annualized Yield', key: 'annualized' },
+  { label: 'Role', key: 'role' },            // Borrower / Lender (computed)
   { label: 'Status', key: 'status' },
 ])
 
@@ -149,9 +149,46 @@ const annualize360 = (termPct, days) => {
   if (!Number.isFinite(r) || !Number.isFinite(d) || d <= 0) return NaN
   return r * (360 / d)
 }
-const isHiddenEmail = (s) => String(s ?? '').trim() === '--- hidden ---'
 
-/** EXACT mapping from Sziller */
+const isHidden = (s) => String(s ?? '').trim() === '--- hidden ---'
+const normEmail = (s) => String(s ?? '').trim().toLowerCase()
+const normRole  = (r) => {
+  const v = String(r ?? '').trim().toLowerCase()
+  return v === 'borrow' || v === 'lend' ? v : ''
+}
+const roleFromIni = (iniRole) => iniRole === 'borrow' ? 'Borrower' : iniRole === 'lend' ? 'Lender' : '—'
+const oppositeRole = (iniRole) => iniRole === 'borrow' ? 'Lender' : iniRole === 'lend' ? 'Borrower' : '—'
+
+/**
+ * Compute role for the *current user*:
+ * - If user matches initiator email → role = ini_role
+ * - If user matches acceptor email → role = opposite(ini_role)
+ * - If one email is hidden, still allow matching the other one.
+ * - If both hidden or no match → '—'
+ * Supports alternate field names from API.
+ */
+function computeUserRole(d, user) {
+  const u = normEmail(user)
+  if (!u) return '—'
+
+  const iniEmail = normEmail(d.ini_email ?? d.iniEmail)
+  const accEmail = normEmail(d.acc_email ?? d.accEmail)
+  const iniRole  = normRole(d.ini_role ?? d.iniRole)
+
+  // If we can match initiator directly
+  if (!isHidden(iniEmail) && u === iniEmail) return roleFromIni(iniRole)
+
+  // If we can match acceptor directly
+  if (!isHidden(accEmail) && u === accEmail) return oppositeRole(iniRole)
+
+  // If one side is hidden, check the visible side only
+  if (isHidden(iniEmail) && !isHidden(accEmail) && u === accEmail) return oppositeRole(iniRole)
+  if (isHidden(accEmail) && !isHidden(iniEmail) && u === iniEmail) return roleFromIni(iniRole)
+
+  return '—'
+}
+
+/** EXACT mapping from Sziller (kept as-is) */
 function getStatusDetails(dlc, user) {
   let statusLabel = ''
   let statusStyle = ''
@@ -198,8 +235,8 @@ const short = (s, n) => {
 
 // map API item -> table row (keep full values for sorting/selection; show short)
 const toRow = (d) => {
-  const rawDays = parseTermDays(d.product_id, d.duration)
-  const uiDays  = rawDays ? displayDays(rawDays) : null
+  const rawDays = parseTermDays(d.product_id, d.duration)   // e.g. 30, 90, 180, 360
+  const uiDays  = rawDays ? displayDays(rawDays) : null     // e.g. 30, 90, 180, 365
   const ltv = parseLtv(d.product_id)
   const rateNum = Number(d.interest)
   const ear = annualize360(rateNum, rawDays)
@@ -223,8 +260,10 @@ const toRow = (d) => {
 
     term: uiDays ? `${uiDays} Days` : '—',
     ltv: ltv != null ? `${ltv}%` : '—',
-    rate: pct2(rateNum),
     annualized: pct2(ear),
+
+    role: computeUserRole(d, userEmail.value),
+
     status: smartLabel || statusLabelPlain(d.status),
     statusClass: statusStyle || '',
   }
@@ -236,19 +275,14 @@ function sortBy(key) {
   else { sortKey.value = key; sortAsc.value = true }
 }
 const normForSort = (row, key) => {
-  // sort on full values where we truncate display
   if (key === 'dlcId') return row.dlcIdFull || ''
   if (key === 'oracle') return (row.oracleFull || '').toLowerCase()
-
-  const v = row[key]
-  if (v == null) return ''
-  if (key === 'term') {
-    const m = String(v).match(/(\d+)/); return m ? Number(m[1]) : 0
+  if (key === 'term') { const m = String(row.term).match(/(\d+)/); return m ? Number(m[1]) : 0 }
+  if (key === 'ltv' || key === 'annualized') {
+    const m = String(row[key]).match(/([\d.]+)/); return m ? Number(m[1]) : -1
   }
-  if (key === 'ltv' || key === 'rate' || key === 'annualized') {
-    const m = String(v).match(/([\d.]+)/); return m ? Number(m[1]) : -1
-  }
-  return String(v).toLowerCase()
+  if (key === 'role') return String(row.role || '').toLowerCase()
+  return String(row[key] ?? '').toLowerCase()
 }
 const sortedData = computed(() => {
   return [...rows.value].sort((a, b) => {
@@ -279,7 +313,7 @@ const statuses = Object.freeze([
 async function loadProfileEmail() {
   try {
     const prof = await getUserProfile()
-    const email = String(prof?.payload?.email || '')
+    const email = String(prof?.payload?.email || '').trim()
     if (email) userEmail.value = email
   } catch (e) {
     console.warn('[UsersDLCS] failed to get profile email:', e?.message || e)
@@ -291,14 +325,14 @@ function sameRows(a, b) {
   // compare on stable keys + statusClass so style updates propagate
   const pick = r => ({
     dlcIdFull: r.dlcIdFull, oracleFull: r.oracleFull, term: r.term, ltv: r.ltv,
-    rate: r.rate, annualized: r.annualized, status: r.status, statusClass: r.statusClass
+    annualized: r.annualized, status: r.status, statusClass: r.statusClass, role: r.role
   })
   if (a.length !== b.length) return false
   for (let i = 0; i < a.length; i++) {
     const A = pick(a[i]); const B = pick(b[i])
     if (
       A.dlcIdFull !== B.dlcIdFull || A.oracleFull !== B.oracleFull || A.term !== B.term ||
-      A.ltv !== B.ltv || A.rate !== B.rate || A.annualized !== B.annualized ||
+      A.ltv !== B.ltv || A.annualized !== B.annualized || A.role !== B.role ||
       A.status !== B.status || A.statusClass !== B.statusClass
     ) return false
   }
@@ -340,6 +374,14 @@ async function load(initial = false) {
     isFetching = false
   }
 }
+
+// If the userEmail arrives late, recompute rows so Role fills in
+watch(userEmail, (now, prev) => {
+  if (now && apiDlcs.value.length) {
+    const nextRows = apiDlcs.value.map(toRow)
+    if (!sameRows(rows.value, nextRows)) rows.value = nextRows
+  }
+})
 
 function onVisChange() { if (!document.hidden) load(false) }
 function onFocus() { load(false) }
