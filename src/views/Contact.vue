@@ -477,9 +477,9 @@ const useCases = [
 </script>
 
 <style scoped>
-/* ===== Page background (matches Home) ===== */
+/* ===== Page background (kept) ===== */
 .bg-page-gradient{
-  background-color: #000; /* solid black base */
+  background-color: #000;
   background-image:
     radial-gradient(
       125% 75% at 50% 100%,
@@ -515,7 +515,7 @@ const useCases = [
   }
 }
 
-/* Soft glow accents (moved from inline -> classes for CSP) */
+/* Soft glows (unchanged) */
 .glow-purple,
 .glow-cyan{
   position: absolute;
@@ -540,7 +540,7 @@ const useCases = [
   background: radial-gradient(40% 60% at 50% 50%, rgba(22,177,255,0.27), transparent 70%);
 }
 
-/* ===== Typographic polish ===== */
+/* ===== Type ===== */
 .section-title{
   margin-top: 1rem;
   font-weight: 800;
@@ -554,68 +554,73 @@ const useCases = [
   color: rgba(255,255,255,0.8);
 }
 
-/* ===== Unify all boxes to the pro-card look ===== */
+/* ===== Cards: solid #0A1123 with #8387C4 accents ===== */
 .pro-card,
 .glass-card,
-.glass-tile,
-.social-tile {
+.glass-tile {
   position: relative;
-  border-radius: 1.25rem; /* ~rounded-2xl */
+  border-radius: 1.25rem;
   padding: 1.25rem;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: saturate(120%) blur(10px);
-  -webkit-backdrop-filter: saturate(120%) blur(10px);
+  background: #0A1123;             /* ← solid */
+  border: 1px solid #8387C4;       /* ← accent */
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  /* remove glass */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
+/* remove gradient border layer entirely */
 .pro-card::before,
 .glass-card::before,
-.glass-tile::before,
-.social-tile::before {
-  content: "";
-  position: absolute; inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(151, 107, 217, 0.28), rgba(255,255,255,0.08));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  pointer-events: none;
+.glass-tile::before {
+  content: none !important;
 }
 .pro-card:hover,
 .glass-card:hover,
-.glass-tile:hover,
-.social-tile:hover {
+.glass-tile:hover {
   transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255,255,255,0.22);
+  border-color: #A4A8D6;           /* lighter accent on hover */
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
-/* Icon puck */
+/* Social tiles: keep as plain icons (no card look) */
+.social-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  text-align: center;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+}
+.social-tile::before { content: none !important; }
+.social-tile:hover {
+  transform: none !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Icon puck: match card background, accent border */
 .icon-wrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px; height: 44px;
   border-radius: 0.875rem;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.18);
-  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  background: #0A1123;
+  border: 1px solid #8387C4;
+  transition: transform .18s ease, border-color .18s ease;
 }
 .pro-card:hover .icon-wrap,
 .glass-card:hover .icon-wrap,
-.glass-tile:hover .icon-wrap,
-.social-tile:hover .icon-wrap {
+.glass-tile:hover .icon-wrap {
   transform: translateY(-1px);
-  background: rgba(255,255,255,0.16);
-  border-color: rgba(255,255,255,0.24);
+  border-color: #A4A8D6;
 }
 
 /* Buttons */
@@ -632,21 +637,13 @@ const useCases = [
 .btn-ghost {
   display: inline-flex; align-items: center; gap: .5rem;
   padding: .6rem .9rem; border-radius: .75rem;
-  background: rgba(255,255,255,0.10); color: white;
-  border: 1px solid rgba(255,255,255,0.18);
-  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  background: #0A1123;             /* solid */
+  color: white;
+  border: 1px solid #8387C4;       /* accent */
+  transition: transform .15s ease, border-color .15s ease;
 }
-.btn-ghost:hover { transform: translateY(-1px); background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.24); }
+.btn-ghost:hover { transform: translateY(-1px); border-color: #A4A8D6; }
 .btn-ghost:focus-visible { outline: 2px solid rgba(255,255,255,.85); outline-offset: 2px; }
-
-/* Social tiles */
-.social-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .75rem;
-  text-align: center;
-}
 
 /* Tighter padding option */
 .card-tight { padding: 1rem; }
@@ -662,44 +659,157 @@ const useCases = [
     filter .6s ease;
   will-change: opacity, transform, filter;
 }
-.reveal.in {
-  opacity: 1;
-  transform: none;
-  filter: none;
-}
+.reveal.in { opacity: 1; transform: none; filter: none; }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition: none; opacity: 1; transform: none; filter: none; }
-  .pro-card, .btn-primary, .btn-ghost, .social-tile, .icon-wrap { transition: none; }
+  .pro-card, .btn-primary, .btn-ghost, .icon-wrap { transition: none; }
 }
 
 /* Neutralize text glow */
 :deep(h1), :deep(h2), :deep(p), :deep(a), :deep(span) { text-shadow: 0 0 0 transparent; }
+
 /* ===== Headshots ===== */
 .avatar-wrap{ display:flex; justify-content:center; }
 .headshot{
   width:160px; height:160px; border-radius:9999px; object-fit:cover; display:block;
   box-shadow:0 12px 28px rgba(0,0,0,.45);
-  border:1px solid rgba(255,255,255,0.18);
-  background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border: 1px solid #8387C4;       /* accent ring */
+  background: #0A1123;             /* solid chip behind image */
 }
 @media (min-width: 768px){
   .headshot{ width:192px; height:192px; }
 }
-.social-tile {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  padding: 0 !important;        /* remove card padding */
+/* ============ Global spacing tokens (scoped to this page) ============ */
+.bg-page-gradient{
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --section-pad-y-sm: var(--space-12);
+  --section-pad-y-md: var(--space-16);
+  --stack-gap:        var(--space-8);   /* default vertical rhythm */
+  --grid-gap:         var(--space-6);   /* default grid gap */
+  --card-pad:         var(--space-5);   /* card internal padding */
 }
-.social-tile::before { content: none !important; }  /* kill gradient border layer */
-.social-tile:hover {
-  transform: none !important;
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+
+/* ============ Sections: unify vertical padding ============ */
+.bg-page-gradient section{
+  padding-block: var(--section-pad-y-sm) !important;
 }
+@media (min-width: 768px){
+  .bg-page-gradient section{
+    padding-block: var(--section-pad-y-md) !important;
+  }
+}
+
+/* ============ Wrappers: consistent vertical rhythm inside ============ */
+/* Applies to both max-width wrappers you use */
+.bg-page-gradient .max-w-screen-xl > * + *,
+.bg-page-gradient .max-w-6xl > * + *{
+  margin-top: var(--stack-gap) !important;
+}
+
+/* ============ Grids: consistent gaps ============ */
+.bg-page-gradient .grid{
+  row-gap: var(--grid-gap) !important;
+  column-gap: var(--grid-gap) !important;
+}
+
+/* ============ Cards: consistent internal padding ============ */
+.bg-page-gradient .pro-card,
+.bg-page-gradient .glass-card,
+.bg-page-gradient .glass-tile{
+  padding: var(--card-pad) !important;
+}
+
+/* ============ Headings & lead: predictable spacing ============ */
+.bg-page-gradient .section-title{
+  margin-bottom: var(--space-4) !important;
+}
+.bg-page-gradient .lead{
+  margin-top: var(--space-3) !important;
+  margin-bottom: 0 !important;
+}
+
+/* Subtitles in contact cards */
+.bg-page-gradient h4{
+  margin: 0 0 var(--space-2) 0 !important;
+}
+
+/* ============ Stacks inside cards/panels ============ */
+.bg-page-gradient .pro-card > * + *,
+.bg-page-gradient .glass-card > * + *,
+.bg-page-gradient .glass-tile > * + *{
+  margin-top: var(--space-4) !important;
+}
+
+/* ============ Lists & paragraphs ============ */
+.bg-page-gradient p{ margin: 0; }
+.bg-page-gradient p + p,
+.bg-page-gradient p + ul,
+.bg-page-gradient p + ol,
+.bg-page-gradient ul + p,
+.bg-page-gradient ol + p{
+  margin-top: var(--space-3) !important;
+}
+.bg-page-gradient ul,
+.bg-page-gradient ol{
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.bg-page-gradient li + li{
+  margin-top: .35em;
+}
+
+/* ============ Button rows ============ */
+.bg-page-gradient .pro-card .flex.flex-wrap.items-center.gap-3{
+  gap: var(--space-3) !important;
+  margin-top: var(--space-4) !important;
+}
+
+/* ============ “Who we serve” tiles spacing ============ */
+.bg-page-gradient .card-tight{
+  padding: var(--space-4) !important;
+}
+.bg-page-gradient .glass-card.text-center p.text-2xl{
+  margin: 0 !important;
+}
+
+/* ============ Social block ============ */
+.bg-page-gradient .social-tile{
+  margin: 0 !important;
+}
+.bg-page-gradient .glass-card .flex.flex-wrap.items-center.justify-center{
+  gap: var(--space-10) !important;
+}
+
+/* ============ Avatar blocks ============ */
+.bg-page-gradient .avatar-wrap{ margin-bottom: var(--space-3) !important; }
+.bg-page-gradient .headshot{ margin: 0; }
+.bg-page-gradient .reveal.glass-card p.text-xl{ margin-bottom: var(--space-1) !important; }
+.bg-page-gradient .reveal.glass-card p.text-sm.text-white\/70{ margin: 0 0 var(--space-3) 0 !important; }
+
+/* ============ UseCasesAccordion spacing ============ */
+/* The component already normalizes itself; just ensure outer margin matches */
+.bg-page-gradient :is(UseCasesAccordion, .usecases-accordion){
+  display: block;
+  margin-block: var(--stack-gap) !important;
+}
+
+/* ============ Footer top spacing ============ */
+.bg-page-gradient + TheFooter,
+TheFooter{
+  margin-top: var(--space-12) !important;
+}
+
 </style>
+

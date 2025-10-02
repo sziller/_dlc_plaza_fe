@@ -34,7 +34,12 @@
           </button>
         </div>
 
-        <!-- Expanding panel (auto-height, buttery) -->
+        <!-- Active title OUTSIDE the card when expanded -->
+        <div v-if="active !== null" class="hc-active-title" aria-live="polite">
+          <h3 class="hc-title-out">{{ items[active].title }}</h3>
+        </div>
+
+        <!-- Expanding panel (auto-height, smoother) -->
         <transition v-bind="autoHeight">
           <div
             v-if="active !== null"
@@ -44,10 +49,6 @@
             :aria-labelledby="tabId(active)"
             key="hc-panel"
           >
-            <div class="hc-panel-header md:hidden">
-              <span class="hc-title">{{ items[active].title }}</span>
-            </div>
-
             <div class="mt-2 text-white leading-relaxed">
               <div v-if="typeof items[active].content === 'string'" v-html="items[active].content" />
               <component v-else :is="items[active].content" />
@@ -89,10 +90,7 @@ function lockLayoutShiftEnd(before) {
   if (!wrapRef.value) return
   const afterTop = wrapRef.value.getBoundingClientRect().top
   const delta = afterTop - before.top
-  if (delta !== 0) {
-    // hard jump so it feels anchored (no smooth)
-    window.scrollTo(0, window.scrollY + delta)
-  }
+  if (delta !== 0) window.scrollTo(0, window.scrollY + delta)
 }
 
 /** Toggle with layout-shift lock */
@@ -103,7 +101,6 @@ async function onClick(i) {
 
   toggle(i)
 
-  // Let Vue flush & transition set initial styles
   await nextTick()
   await new Promise(r => requestAnimationFrame(r))
   await new Promise(r => requestAnimationFrame(r)) // Safari/iOS settle
@@ -165,50 +162,83 @@ function onKeydown(e) {
   }
 }
 
-/** Auto-height transition (smooth open/close) */
+/** Auto-height transition — smoother (longer + slight translate) */
+// Replace your existing autoHeight with this
 const autoHeight = {
   onBeforeEnter(el) {
     el.style.height = '0px'
     el.style.opacity = '0'
+    el.style.transform = 'translateY(-6px)'
     el.style.overflow = 'hidden'
-    el.style.willChange = 'height, opacity'
+    el.__ro && el.__ro.disconnect()
+    el.__ro = null
   },
   onEnter(el, done) {
-    const target = el.scrollHeight
-    el.style.transition = 'height 320ms cubic-bezier(.2,.65,.2,1), opacity 220ms ease'
-    requestAnimationFrame(() => {
-      el.style.height = target + 'px'
-      el.style.opacity = '1'
-      const end = () => {
-        el.style.height = ''
-        el.style.overflow = ''
-        el.style.willChange = ''
-        el.style.opacity = ''  // clear any fractional value
-        el.removeEventListener('transitionend', end)
-        done()
-      }
-      el.addEventListener('transitionend', end)
+    // Smooth, springy-ish curve + slightly longer height tween
+    const heightEase = 'cubic-bezier(.22,.61,.36,1)'
+    el.style.transition = `height 420ms ${heightEase}, opacity 360ms ease, transform 420ms ${heightEase}`
+
+    // Live-track changes to scrollHeight during the animation
+    const ro = new ResizeObserver(() => {
+      // update target height as content grows (e.g., fonts/images/slots finish)
+      el.style.height = el.scrollHeight + 'px'
     })
+    ro.observe(el)
+    el.__ro = ro
+
+    // Kick it off
+    requestAnimationFrame(() => {
+      el.style.height = el.scrollHeight + 'px'
+      el.style.opacity = '1'
+      el.style.transform = 'translateY(0)'
+    })
+
+    const end = (evt) => {
+      if (evt.propertyName !== 'height') return
+      ro.disconnect()
+      el.__ro = null
+
+      // Prevent the "auto" snap: temporarily remove height transition
+      const prev = el.style.transition
+      el.style.transition = 'opacity 200ms ease, transform 200ms ease'
+      el.style.height = 'auto'
+
+      // Let styles settle, then restore transition for future cycles
+      requestAnimationFrame(() => {
+        el.style.transition = prev
+        el.style.overflow = '' // cleanup
+        done()
+      })
+
+      el.removeEventListener('transitionend', end)
+    }
+    el.addEventListener('transitionend', end)
   },
   onBeforeLeave(el) {
+    // Lock current height as the start point
     el.style.height = el.scrollHeight + 'px'
+    el.style.opacity = '1'
+    el.style.transform = 'translateY(0)'
     el.style.overflow = 'hidden'
-    el.style.willChange = 'height, opacity'
+    if (el.__ro) { el.__ro.disconnect(); el.__ro = null }
   },
   onLeave(el, done) {
-    el.style.transition = 'height 260ms cubic-bezier(.2,.65,.2,1), opacity 200ms ease'
+    const heightEase = 'cubic-bezier(.22,.61,.36,1)'
+    el.style.transition = `height 340ms ${heightEase}, opacity 260ms ease, transform 340ms ${heightEase}`
     requestAnimationFrame(() => {
       el.style.height = '0px'
       el.style.opacity = '0'
-      const end = () => {
-        el.style.willChange = ''
-        el.removeEventListener('transitionend', end)
-        done()
-      }
-      el.addEventListener('transitionend', end)
+      el.style.transform = 'translateY(-6px)'
     })
+    const end = (evt) => {
+      if (evt.propertyName !== 'height') return
+      el.removeEventListener('transitionend', end)
+      done()
+    }
+    el.addEventListener('transitionend', end)
   },
 }
+
 
 /** Reveal directive */
 const vReveal = {
@@ -229,16 +259,13 @@ const vReveal = {
 defineExpose({ vReveal })
 
 onMounted(() => {
-  // Fallback guard: if any resize nudges layout during/after transition, re-anchor.
   if ('ResizeObserver' in window && wrapRef.value) {
     let lastTop = wrapRef.value.getBoundingClientRect().top
     ro = new ResizeObserver(() => {
       if (!wrapRef.value) return
       const nowTop = wrapRef.value.getBoundingClientRect().top
       const delta = nowTop - lastTop
-      if (delta !== 0 && !locking) {
-        window.scrollTo(0, window.scrollY + delta)
-      }
+      if (delta !== 0 && !locking) window.scrollTo(0, window.scrollY + delta)
       lastTop = wrapRef.value.getBoundingClientRect().top
     })
     ro.observe(wrapRef.value)
@@ -283,6 +310,7 @@ onBeforeUnmount(() => {
 }
 
 /* ---- Cards (tabs) ---- */
+.pro-card,
 .hc-card{
   position: relative;
   cursor: pointer;
@@ -292,13 +320,31 @@ onBeforeUnmount(() => {
   padding: 1rem 1.1rem;
   text-align: left;
   border-radius: 1rem;
-  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
   color: #fff;
+  background: #0A1123;
+  border: 1px solid #8387C4;
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, opacity .18s ease;
+}
+.pro-card::before,
+.hc-card::before { content: none !important; }
+
+/* Hide the title INSIDE the active card (keep layout space) */
+.hc-card.is-active .hc-title{
+  opacity: 0;
+}
+
+/* Hover/focus */
+.hc-card:hover{
+  transform: translateY(-2px);
+  border-color: #A4A8D6;
+  box-shadow: 0 16px 36px rgba(0,0,0,.28);
 }
 .hc-card:focus-visible{
-  outline: 2px solid rgba(255,255,255,.9);
+  outline: 2px solid #A4A8D6;
   outline-offset: 2px;
 }
+
 .hc-title{
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -307,67 +353,30 @@ onBeforeUnmount(() => {
   color: #fff;
 }
 
-/* Active highlight */
-.hc-card.is-active{
-  border-color: rgba(103,56,228,.55);
-  background: #0b0b0f; /* solid to avoid tint */
-  box-shadow: 0 14px 36px rgba(103,56,228,.20), 0 10px 24px rgba(0,0,0,.25);
+/* ---- Active title OUTSIDE the cards ---- */
+.hc-active-title{
+  margin-top: .25rem;
+  margin-bottom: .25rem;
+}
+.hc-title-out{
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  font-size: clamp(1.2rem, 1vw + 1.1rem, 1.6rem);
+  color: #A4A8D6; /* accent pop */
 }
 
 /* ---- Panel below the row ---- */
 .hc-panel{
   padding: 1.25rem;
   border-radius: 1.1rem;
-  background: #1a1330; /* solid dark, no milk-glass */
-  border: 1px solid rgba(103,56,228,.38);
+  background: #0A1123;
+  border: 1px solid #8387C4;
   color: #fff;
-}
-
-/* Keep decorative gradient UNDER the content */
-.pro-card,
-.hc-panel { position: relative; color: #fff; }
-.pro-card::before,
-.hc-panel.is-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(151, 107, 217, 0.28), rgba(255,255,255,0.08));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  pointer-events: none;
-  z-index: 0; /* <- under content */
-}
-.pro-card > *,
-.hc-panel > * { position: relative; z-index: 1; }
-
-/* Remove glass blur on cards so text stays crisp */
-.pro-card {
-  background: #0b0b0f;           /* solid */
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid rgba(255,255,255,.16);
   box-shadow: 0 12px 30px rgba(0,0,0,.25);
 }
+.hc-panel::before { content: none !important; }
 
-/* Subtle hover */
-.hc-card:hover{
-  transform: translateY(-2px);
-  background: #111118;
-  border-color: rgba(255,255,255,.22);
-  box-shadow: 0 16px 36px rgba(0,0,0,.28);
-}
-
-/* Panel header and nested content inherit white */
-.hc-panel-header{ display:flex; align-items:center; gap:.5rem; margin-bottom:.25rem; }
-.hc-panel .hc-title{
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-  font-size: clamp(1.1rem, .9vw + 1rem, 1.4rem);
-}
 .hc-panel * { color: inherit; }
 
 /* ---- Reveal animation ---- */
@@ -386,5 +395,12 @@ onBeforeUnmount(() => {
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition: none; opacity: 1; transform: none; filter: none; }
+}
+
+/* Chevron accent when active */
+.chev { color: #fff; }
+.hc-panel {
+  contain: layout paint;   /* isolates layout/paint during the transition */
+  will-change: height, opacity, transform;
 }
 </style>

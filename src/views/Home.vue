@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
-
+import { postContactEmail, isValidEmail } from '../api/publicContact'
 const videos = [
   'Psuh8mml91o',
   'D7HDDxh0Wjo',
@@ -75,7 +75,11 @@ function handleScroll() {
     }
   })
 }
-
+async function onHeroCtaClick() {
+  if (!isLoggedIn.value && isValidEmail(ctaEmail.value)) {
+    postContactEmail(ctaEmail.value) // fire-and-forget
+  }
+}
 onMounted(() => {
   setUserFromApi()
   const updateIsMobile = () => { isMobile.value = window.innerWidth < 640 }
@@ -138,6 +142,7 @@ function toggle(i) {
   openSet.value = s
 }
 
+
 // Transition hooks for reliable height animation
 function onEnter(el) {
   el.style.height = '0px'
@@ -191,21 +196,23 @@ function onAfterLeave(el) {
             Bitcoin.  Better rates, your keys, no sidechains.
           </p>
           <!-- Longer email input field with smaller button below -->
-          <div class="mt-8 flex flex-col items-center gap-4 w-full">
-            <input
-              v-if="!isLoggedIn"
-              v-model="ctaEmail"
-              type="email"
-              placeholder="Enter your email address"
-              class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
-            />
-            <router-link
-              :to="heroCtaTo"
-              class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
-            >
-              {{ heroCtaLabel }}
-            </router-link>
-          </div>
+<div class="mt-8 flex flex-col items-center gap-4 w-full">
+  <input
+    v-if="!isLoggedIn"
+    v-model="ctaEmail"
+    type="email"
+    placeholder="Enter your email address"
+    class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
+  />
+  <router-link
+    :to="heroCtaTo"
+    class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
+    @click="onHeroCtaClick"
+  >
+    {{ heroCtaLabel }}
+  </router-link>
+</div>
+
         </div>
       </div>
 
