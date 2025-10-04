@@ -170,41 +170,48 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getUserProfile } from '../api/userProfile'
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { useAuth } from '../composables/useAuth'
 import { getTopupAddressQR } from '../api/qr'
 import TheFooter from '../components/TheFooter.vue'
 
-// ---- State ----
-const profile = ref(null)
-const loading = ref(false)
-const error = ref(null)
+// ---- Auth: use the one global instance ----
+const {
+  user,               // reactive: payload or null
+  setUserFromApi,     // fetch/refresh + cache
+  loading: authLoading,
+  error: authError,
+} = useAuth()
+
+// Expose the same shape your template expects: profile?.payload.??
+const profile = computed(() => {
+  const u = user.value
+  if (!u) return null
+  return { payload: u?.payload ?? u }
+})
+
+// ---- Local UI state (reuse your names so template stays unchanged) ----
+const loading = computed(() => !!authLoading.value)
+const error   = computed(() => String(authError.value || ''))
 
 const address = ref('')
 const addrLoading = ref(false)
 const addrError = ref(null)
 const copied = ref(false)
 
-// ---- Load profile ----
+// ---- Load profile (now via auth) ----
 async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    profile.value = await getUserProfile()
-  } catch (e) {
-    error.value = e && e.message ? e.message : String(e)
-    profile.value = null
-  } finally {
-    loading.value = false
-  }
+  // Just refresh the canonical auth profile
+  await setUserFromApi()
 }
 
+// Full refresh: profile + (maybe) top-up
 async function reloadAll() {
   await load()
+  await nextTick()
   if (!isPending.value) {
     await fetchTopup()
   } else {
-    // clear any previously fetched address if user fell back to pending
     address.value = ''
     qrRawSvg.value = ''
   }
@@ -243,14 +250,12 @@ function sanitizeSvg(svgText) {
     const doc = parser.parseFromString(svgText, 'image/svg+xml')
     const allowedTags = new Set(['svg', 'g', 'path', 'rect'])
     const allowedAttrs = new Set([
-      'viewBox', 'xmlns', 'version', 'fill', 'stroke', 'd', 'x', 'y', 'width', 'height',
-      'rx', 'ry', 'transform', 'shape-rendering', 'stroke-width'
+      'viewBox','xmlns','version','fill','stroke','d','x','y','width','height',
+      'rx','ry','transform','shape-rendering','stroke-width'
     ])
 
     const walker = document.createTreeWalker(doc, NodeFilter.SHOW_ELEMENT, null)
     const toRemove = []
-
-    // walk & prune
     let node = walker.nextNode()
     while (node) {
       const el = node
@@ -258,7 +263,6 @@ function sanitizeSvg(svgText) {
       if (!allowedTags.has(tag)) {
         toRemove.push(el)
       } else {
-        // remove disallowed attributes (incl. any on*)
         for (const attr of Array.from(el.attributes)) {
           const name = attr.name
           if (name.startsWith('on') || name === 'style' || name === 'href' || name === 'xlink:href') {
@@ -272,17 +276,12 @@ function sanitizeSvg(svgText) {
     }
     for (const n of toRemove) n.parentNode?.removeChild(n)
 
-    // make responsive: strip width/height on root, ensure viewBox + preserveAspectRatio
     const root = doc.documentElement
     root.removeAttribute('width')
     root.removeAttribute('height')
-    if (!root.getAttribute('viewBox')) {
-      // fallback viewBox if missing; QR is square
-      root.setAttribute('viewBox', '0 0 50 50')
-    }
+    if (!root.getAttribute('viewBox')) root.setAttribute('viewBox', '0 0 50 50')
     root.setAttribute('preserveAspectRatio', 'xMidYMid meet')
 
-    // serialize
     return new XMLSerializer().serializeToString(doc)
   } catch {
     return ''
@@ -293,7 +292,6 @@ const qrDataUrl = computed(() => {
   if (!qrRawSvg.value) return ''
   const clean = sanitizeSvg(qrRawSvg.value)
   if (!clean) return ''
-  // Encode to base64 data URL for <img>
   const b64 = btoa(unescape(encodeURIComponent(clean)))
   return `data:image/svg+xml;base64,${b64}`
 })
@@ -319,7 +317,7 @@ function formatBtc(sats) {
   return (Number(sats) / 1e8).toFixed(8)
 }
 
-// Referral helpers (JS)
+// ---- Referrals ----
 const copiedWhat = ref('') // '' | 'code' | 'link'
 
 const rawRefCode = computed(() => profile.value?.payload?.referral_code || '')
@@ -328,7 +326,6 @@ const refCode = computed(() => {
   return s.startsWith('refcode:') ? s.slice('refcode:'.length) : s
 })
 
-// prefer canonical domain if you have it; else current origin
 const siteBase = (import.meta.env && import.meta.env.VITE_SITE_BASE) || window.location.origin
 const refLink = computed(() => (refCode.value ? `${siteBase}/?ref=${encodeURIComponent(refCode.value)}` : ''))
 const refParent = computed(() => profile.value?.payload?.par_referral_code || null)
@@ -336,7 +333,7 @@ const refParent = computed(() => profile.value?.payload?.par_referral_code || nu
 async function copyText(text, which) {
   try {
     await navigator.clipboard.writeText(text)
-    copiedWhat.value = which // 'code' | 'link'
+    copiedWhat.value = which
   } catch {
     const ta = document.createElement('textarea')
     ta.value = text
@@ -349,6 +346,7 @@ async function copyText(text, which) {
   }
 }
 
+// ---- Registration state ----
 const isPending = computed(() => Number(profile.value?.payload?.auth_code) === 0)
 
 const registrationLevel = computed(() => {
@@ -360,13 +358,15 @@ const registrationLevel = computed(() => {
   return `Code ${code}`
 })
 
+// ---- Lifecycle ----
 onMounted(async () => {
-  await load()
+  await load()           // hydrate from cache or fetch once via auth
   if (!isPending.value) {
     await fetchTopup()
   }
 })
 </script>
+
 
 <style scoped>
 /* Gradient background (local, CSP-safe; purple glow from bottom) */

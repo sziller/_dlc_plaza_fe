@@ -1,37 +1,46 @@
-// src/composables/useAuth.ts
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import axios from 'axios'
 import { getToken } from '../api/token'
 import { getUserProfile } from '../api/userProfile'
 import { logout as apiLogout } from '../api/auth'
 import { useTokenHealth } from '../hooks/useTokenHealth'
+import {
+  getCachedProfile,
+  setCachedProfile,
+  getCachedAgeMs
+} from './userProfileCache'
 
 const token = ref<string | null>(getToken() || null)
-const user = ref<any>(null)
+// Store ONLY the payload (uniform across app)
+const user = ref<any>(getCachedProfile() || null)
 const loading = ref(false)
 const error = ref<string | null>(null)
-
-// optional: keep a single listener reference so we can clean up
-let synced = false
-let storageHandler: ((this: Window, ev: StorageEvent) => any) | null = null
-let authChangedHandler: ((this: Window, ev: Event) => any) | null = null
 
 export function useAuth() {
   const isLoggedIn = computed(() => !!(token.value && token.value.trim()))
 
+  // Fetch fresh profile and cache it
   async function setUserFromApi() {
     if (!token.value) {
       user.value = null
+      setCachedProfile(null)
       return
     }
     loading.value = true
     error.value = null
     try {
-      const profile = await getUserProfile()
-      user.value = profile
+      const profile = await getUserProfile()               // <- server call
+      const payload = profile?.payload ?? profile ?? null  // support both shapes
+      user.value = payload
+      if (payload?.payload) {
+        // if API wrapped it twice: {payload: { ...realFields }}
+        setCachedProfile(payload.payload)
+        user.value = payload.payload
+      } else {
+        setCachedProfile(payload)
+      }
     } catch (err) {
-      // Don't log the user out here; the heartbeat handles true expiry.
-      // Still surface a friendly message for the current screen.
+      // keep previous user if any; set friendly error
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 401 || err.response?.status === 403) {
           error.value = 'Your session may have expired.'
@@ -48,101 +57,100 @@ export function useAuth() {
     }
   }
 
-  // login here should ONLY set reactive state; getAuthToken already saved token
+  // Fast-path login: accept optional payload and cache it
   function login(newToken: string, profilePayload?: any) {
     token.value = newToken || null
-    user.value = profilePayload ?? null
+    if (profilePayload?.payload) profilePayload = profilePayload.payload
+    if (profilePayload) {
+      user.value = profilePayload
+      setCachedProfile(profilePayload)
+    } else {
+      // no payload? keep whatever cache we had; a watch below can refresh
+      user.value = getCachedProfile() || null
+    }
     window.dispatchEvent(new Event('auth-changed'))
   }
 
   function logout() {
-    apiLogout() // clears storage + dispatches 'auth-changed'
+    apiLogout()
     token.value = null
     user.value = null
+    setCachedProfile(null)
   }
 
-  // Heartbeat: UI-reactive token health
-  const onInvalid = () => {
-    // unify logout flow when heartbeat detects invalid auth
-    logout()
+  // Convenience: ensure a reasonably fresh user (e.g., TTL 2 min)
+  async function ensureFreshUser(ttlMs = 120_000) {
+    if (!isLoggedIn.value) return null
+    if (!user.value || getCachedAgeMs() > ttlMs) {
+      await setUserFromApi()
+    }
+    return user.value
   }
 
+  // Heartbeat invalidation
+  const onInvalid = () => logout()
   const tokenHealth = useTokenHealth(isLoggedIn, {
-    intervalMs: 60_000,        // adjust as desired
-    failuresBeforeLogout: 1,   // set to 2 if you want extra tolerance
+    intervalMs: 60_000,
+    failuresBeforeLogout: 1,
     onInvalid,
   })
-  if (import.meta.env.DEV) {
-  (window as any).__AUTH = {
-    get status() { return tokenHealth.status },
-    get nextCheckAt() { return tokenHealth.nextCheckAt },
-    pingNow: tokenHealth.pingNow,
-    logout,
-    // NEW: force a bad token and ping immediately
-    expireNow() {
-      sessionStorage.setItem('authToken', 'badtoken')
-      window.dispatchEvent(new Event('auth-changed'))
-      return tokenHealth.pingNow()
-    },
-    // NEW: see which token the ping will send
-    peekToken() { return sessionStorage.getItem('authToken') }
-  }
-}
-  // Keep token in sync across tabs / programmatic changes
+
+  // Keep token & cached profile in sync across tabs
   onMounted(() => {
-  const sync = () => { token.value = getToken() || null }
-  window.addEventListener('storage', sync)
-  window.addEventListener('auth-changed', sync)
+    const sync = () => {
+      token.value = getToken() || null
+      // if token vanished in another tab, drop profile
+      if (!token.value) {
+        user.value = null
+        setCachedProfile(null)
+      } else {
+        // keep in-memory in sync with session cache
+        const cached = getCachedProfile()
+        if (cached) user.value = cached
+      }
+    }
+    window.addEventListener('storage', sync)
+    window.addEventListener('auth-changed', sync)
 
-  // NEW: bounce on 401 anywhere
-  const onAuthInvalid = () => logout()
-  window.addEventListener('auth-invalid', onAuthInvalid)
+    const onAuthInvalid = () => logout()
+    window.addEventListener('auth-invalid', onAuthInvalid)
 
-  // cleanup
-  onBeforeUnmount(() => {
-    window.removeEventListener('storage', sync)
-    window.removeEventListener('auth-changed', sync)
-    window.removeEventListener('auth-invalid', onAuthInvalid)
+    onBeforeUnmount(() => {
+      window.removeEventListener('storage', sync)
+      window.removeEventListener('auth-changed', sync)
+      window.removeEventListener('auth-invalid', onAuthInvalid)
+    })
   })
-})
 
-
-  onBeforeUnmount(() => {
-    if (storageHandler) window.removeEventListener('storage', storageHandler)
-    if (authChangedHandler) window.removeEventListener('auth-changed', authChangedHandler)
-    storageHandler = null
-    authChangedHandler = null
-    synced = false
-  })
-
-  // When token flips to a non-empty value, fetch profile & validate quickly
+  // When token becomes non-empty, quickly validate + backfill user if missing
   watch(
     () => token.value,
-    (t) => {
+    async (t) => {
       if (t) {
-        void setUserFromApi()
-        // quick reality check so UI reflects health ASAP
+        if (!getCachedProfile()) {
+          // no cache? fetch once
+          await setUserFromApi()
+        }
         void tokenHealth.pingNow()
       } else {
         user.value = null
+        setCachedProfile(null)
       }
     }
   )
 
   return {
-    // auth state
     token,
-    user,
+    user,                 // <- THE instance to use everywhere
     isLoggedIn,
     loading,
     error,
 
-    // actions
     login,
     logout,
     setUserFromApi,
+    ensureFreshUser,      // <- optional: guarded refresh on demand
 
-    // heartbeat (reactive UI can bind to these)
-    tokenHealth, // exposes: status, lastOkAt, nextCheckAt, paused, reason, consecutiveAuthFails, pingNow
+    tokenHealth,
   }
 }

@@ -23,66 +23,99 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import { useAuth } from './composables/useAuth'
-import { getUserProfile } from './api/userProfile'
 
 const router = useRouter()
 const route = useRoute()
-const { isLoggedIn, tokenHealth, logout } = useAuth()
 
+// Pull everything from the single auth source of truth
+const {
+  isLoggedIn,
+  tokenHealth,
+  logout,
+  user,               // reactive: the cached/fetched profile payload (or null)
+  setUserFromApi,     // fetch/refresh the profile + cache it
+  loading: authLoading,
+  error: authError,
+} = useAuth()
+
+// Keep your existing guards
 function ensureOnLogin () {
   if (route.path !== '/login') {
     router.replace({ path: '/login', query: { next: route.fullPath } })
   }
 }
-
 function forceLogoutToLogin () {
   if (isLoggedIn.value) logout()
   ensureOnLogin()
 }
 
-// heartbeat path: token marked invalid -> logout + to /login
+// Heartbeat → logout on invalid
 watch(() => tokenHealth.status, (s) => {
   if (s === 'invalid') forceLogoutToLogin()
 })
 
-// interceptor path: any 401 should flip isLoggedIn -> false
+// Any path that flips logged-in false → ensure we’re on /login
 watch(isLoggedIn, (v) => {
   if (!v) ensureOnLogin()
 })
 
-// --- Data for the navbar info strip ---
-const profile = ref(null)
-const loading = ref(false)
-const error = ref('')
-const btcUsd = ref(null) // optional; wire your price feed if you want ≈fiat
+// ----- Navbar data (from auth) -----
+// Keep the same shape the template expects: profile?.payload.??
+const profile = computed(() => {
+  const u = user.value
+  if (!u) return null
+  // Support both shapes: either user is already the payload, or it's { payload: payload }
+  const payload = u?.payload ?? u
+  return { payload }
+})
 
+// Reflect `useAuth` loading/error so the info strip stays accurate
+const loading = computed(() => !!authLoading.value)
+const error   = computed(() => String(authError.value || ''))
+
+// Optional BTCUSD (you can wire your feed later)
+const btcUsd = ref(null)
+
+// Retry handler for the Navbar info strip
 async function load () {
-  loading.value = true
-  error.value = ''
-  try {
-    profile.value = await getUserProfile()
-  } catch (e) {
-    error.value = e && e.message ? e.message : String(e)
-    profile.value = null
-  } finally {
-    loading.value = false
-  }
+  // Ask the composable to refresh the canonical instance
+  await setUserFromApi()
 }
 
+// On mount: if we’re logged in but don’t have a cached profile yet, fetch once
+onMounted(async () => {
+  if (isLoggedIn.value && !user.value) {
+    await setUserFromApi()
+  }
+})
+watch(isLoggedIn, async (v) => {
+  if (v && !user.value) {
+    await setUserFromApi()
+  }
+})
+
+// ----- Layout padding -----
+// Read CSS variables from Navbar (with fallbacks) instead of hard-coding
+const navH = ref(80)
+const infoH = ref(0)
+
+function syncPadFromCssVars () {
+  const cs = getComputedStyle(document.documentElement)
+  const nh = parseFloat(cs.getPropertyValue('--nav-h')) || 80
+  const ih = parseFloat(cs.getPropertyValue('--info-h')) || 0
+  navH.value = nh
+  // Only add info strip when logged in (Navbar hides it otherwise)
+  infoH.value = isLoggedIn.value ? ih : 0
+}
+
+// Recompute on mount, login changes, and on resize
 onMounted(() => {
-  if (isLoggedIn.value) load()
+  syncPadFromCssVars()
+  window.addEventListener('resize', syncPadFromCssVars, { passive: true })
 })
-watch(isLoggedIn, (v) => {
-  if (v) load()
-})
+watch(isLoggedIn, () => syncPadFromCssVars())
 
-// --- Layout math ---
-// Base navbar row height (match your Navbar.vue main row height)
-const NAV_BASE_H = 80 // px
-// Top info strip height (h-10)
-const INFO_H = 40 // px
-
-const contentPad = computed(() =>
-  isLoggedIn.value ? `${NAV_BASE_H + INFO_H}px` : `${NAV_BASE_H}px`
-)
+// Compute the pad-top the page needs beneath the fixed bars
+const contentPad = computed(() => `${navH.value + infoH.value}px`)
 </script>
+

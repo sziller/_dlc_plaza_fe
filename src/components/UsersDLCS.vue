@@ -101,7 +101,8 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import DlcDetails from './DLCDetails.vue'
 import { getUserDlcs } from '../api/userDlcs'
-import { getUserProfile } from '../api/userProfile'
+// import { getUserProfile } from '../api/userProfile' // REMOVED
+import { useAuth } from '../composables/useAuth'        // NEW
 
 const columns = Object.freeze([
   { label: 'DLC ID', key: 'dlcId' },
@@ -109,7 +110,7 @@ const columns = Object.freeze([
   { label: 'Term', key: 'term' },
   { label: 'Loan To Value', key: 'ltv' },
   { label: 'Annualized Yield', key: 'annualized' },
-  { label: 'Role', key: 'role' },            // Borrower / Lender (computed)
+  { label: 'Role', key: 'role' },
   { label: 'Status', key: 'status' },
 ])
 
@@ -123,8 +124,13 @@ const sortAsc = ref(true)
 const selectedDlc = ref(null)
 const pollMs = 30000
 
-// auth context (real email pulled from profile)
-const userEmail = ref('')
+// auth context (email from global auth; supports both shapes: payload.email or email)
+const auth = useAuth() // NEW
+const userEmail = computed(() => {
+  const u = auth.user?.value
+  const email = u?.email ?? u?.payload?.email ?? ''
+  return String(email || '').trim().toLowerCase()
+})
 
 // helpers
 const pct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
@@ -159,32 +165,17 @@ const normRole  = (r) => {
 const roleFromIni = (iniRole) => iniRole === 'borrow' ? 'Borrower' : iniRole === 'lend' ? 'Lender' : '—'
 const oppositeRole = (iniRole) => iniRole === 'borrow' ? 'Lender' : iniRole === 'lend' ? 'Borrower' : '—'
 
-/**
- * Compute role for the *current user*:
- * - If user matches initiator email → role = ini_role
- * - If user matches acceptor email → role = opposite(ini_role)
- * - If one email is hidden, still allow matching the other one.
- * - If both hidden or no match → '—'
- * Supports alternate field names from API.
- */
 function computeUserRole(d, user) {
   const u = normEmail(user)
   if (!u) return '—'
-
   const iniEmail = normEmail(d.ini_email ?? d.iniEmail)
   const accEmail = normEmail(d.acc_email ?? d.accEmail)
   const iniRole  = normRole(d.ini_role ?? d.iniRole)
 
-  // If we can match initiator directly
   if (!isHidden(iniEmail) && u === iniEmail) return roleFromIni(iniRole)
-
-  // If we can match acceptor directly
   if (!isHidden(accEmail) && u === accEmail) return oppositeRole(iniRole)
-
-  // If one side is hidden, check the visible side only
   if (isHidden(iniEmail) && !isHidden(accEmail) && u === accEmail) return oppositeRole(iniRole)
   if (isHidden(accEmail) && !isHidden(iniEmail) && u === iniEmail) return roleFromIni(iniRole)
-
   return '—'
 }
 
@@ -233,10 +224,10 @@ const short = (s, n) => {
   return t.slice(0, n)
 }
 
-// map API item -> table row (keep full values for sorting/selection; show short)
+// map API item -> table row
 const toRow = (d) => {
-  const rawDays = parseTermDays(d.product_id, d.duration)   // e.g. 30, 90, 180, 360
-  const uiDays  = rawDays ? displayDays(rawDays) : null     // e.g. 30, 90, 180, 365
+  const rawDays = parseTermDays(d.product_id, d.duration)
+  const uiDays  = rawDays ? displayDays(rawDays) : null
   const ltv = parseLtv(d.product_id)
   const rateNum = Number(d.interest)
   const ear = annualize360(rateNum, rawDays)
@@ -250,20 +241,14 @@ const toRow = (d) => {
   )
 
   return {
-    // full values for logic/sorting
     dlcIdFull: fullId,
     oracleFull: fullOracle,
-
-    // displayed trims
     dlcId: short(fullId, 8),
     oracle: short(fullOracle, 9),
-
     term: uiDays ? `${uiDays} Days` : '—',
     ltv: ltv != null ? `${ltv}%` : '—',
     annualized: pct2(ear),
-
     role: computeUserRole(d, userEmail.value),
-
     status: smartLabel || statusLabelPlain(d.status),
     statusClass: statusStyle || '',
   }
@@ -300,7 +285,7 @@ function selectDlc(row) {
   selectedDlc.value = raw || null
 }
 
-// polling + profile fetch
+// polling
 let pollId = null
 let isFetching = false
 let hasLoadedOnce = false
@@ -310,19 +295,9 @@ const statuses = Object.freeze([
   'broadcast','active','attested','executed','settled','revoked','reset','confirmed'
 ])
 
-async function loadProfileEmail() {
-  try {
-    const prof = await getUserProfile()
-    const email = String(prof?.payload?.email || '').trim()
-    if (email) userEmail.value = email
-  } catch (e) {
-    console.warn('[UsersDLCS] failed to get profile email:', e?.message || e)
-    userEmail.value = ''
-  }
-}
+// REMOVED loadProfileEmail(); we no longer call the profile API here
 
 function sameRows(a, b) {
-  // compare on stable keys + statusClass so style updates propagate
   const pick = r => ({
     dlcIdFull: r.dlcIdFull, oracleFull: r.oracleFull, term: r.term, ltv: r.ltv,
     annualized: r.annualized, status: r.status, statusClass: r.statusClass, role: r.role
@@ -346,8 +321,6 @@ async function load(initial = false) {
   isFetching = true
   if (initial) { loading.value = true; error.value = null }
   try {
-    if (!userEmail.value) await loadProfileEmail()
-
     const res = await getUserDlcs(statuses)
     const payload = Array.isArray(res?.payload) ? res.payload : []
     const nextRows = payload.map(toRow)
@@ -375,9 +348,9 @@ async function load(initial = false) {
   }
 }
 
-// If the userEmail arrives late, recompute rows so Role fills in
-watch(userEmail, (now, prev) => {
-  if (now && apiDlcs.value.length) {
+// If the userEmail changes (e.g., after login), recompute roles/status labels
+watch(userEmail, () => {
+  if (apiDlcs.value.length) {
     const nextRows = apiDlcs.value.map(toRow)
     if (!sameRows(rows.value, nextRows)) rows.value = nextRows
   }
@@ -386,7 +359,7 @@ watch(userEmail, (now, prev) => {
 function onVisChange() { if (!document.hidden) load(false) }
 function onFocus() { load(false) }
 function onAuthChanged() {
-  userEmail.value = ''
+  // no manual userEmail clearing needed; computed handles it
   load(true)
 }
 
@@ -411,6 +384,7 @@ function onDeleted() {
   load(false)
 }
 </script>
+
 
 <style scoped>
 tbody tr {

@@ -109,21 +109,24 @@ const submitLogin = async () => {
     // 1) Authenticate
     const token = await getAuthToken(email.value, password.value)
 
-    // 2) Try fetching profile. If your API expects the token to be already stored,
-    //    the first call might 401. In that case, store token then retry once.
-    let profilePayload: any | null = null
-    try {
-      const profileData = await getUserProfile()
-      profilePayload = profileData?.payload ?? null
-    } catch {
-      // store token and retry profile once
-      auth.login(token)
-      const profileData = await getUserProfile()
-      profilePayload = profileData?.payload ?? null
-    }
+// try cache first to avoid an immediate request if the user just logged in previously
+let profilePayload: any | null = auth.user.value ?? null
 
-    // 3) Finalize login state (token + profile)
-    auth.login(token, profilePayload || undefined)
+if (!profilePayload) {
+  try {
+    const profileData = await getUserProfile()
+    profilePayload = profileData?.payload ?? profileData ?? null
+  } catch {
+    // store token and retry once (as you already do)
+    auth.login(token)
+    const profileData = await getUserProfile()
+    profilePayload = profileData?.payload ?? profileData ?? null
+  }
+}
+
+// normalize and store
+auth.login(token, profilePayload)
+
 
     // 4) Route based on auth_code if present
     const code = profilePayload?.auth_code

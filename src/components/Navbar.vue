@@ -380,9 +380,8 @@ import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
-import { getUserProfile } from '../api/userProfile'
 
-/** ---- Props for the info strip ---- */
+/** ---- Props / emits ---- */
 const props = defineProps({
   isLoggedIn: { type: Boolean, default: false },
   email: { type: String, default: '' },
@@ -393,14 +392,13 @@ const props = defineProps({
   btcUsd: { type: Number, default: null },
   showFiat: { type: Boolean, default: false },
   canRetry: { type: Boolean, default: true },
-  /** Optional override: if parent already has it, pass it in */
   authCode: { type: Number, default: null },
 })
 defineEmits(['retry'])
 
 /** ---- Auth + router ---- */
 const router = useRouter()
-const { isLoggedIn: authLoggedIn, logout, tokenHealth } = useAuth()
+const { isLoggedIn: authLoggedIn, logout, tokenHealth, user } = useAuth()
 
 /** ---- UI state ---- */
 const isMobileMenuOpen = ref(false)
@@ -425,7 +423,6 @@ function updateInfoHeight() {
   infoHeight.value = props.isLoggedIn ? (infoRef.value?.offsetHeight || 0) : 0
   applyHeights()
 }
-/** Combined spacer to keep content below both fixed bars */
 const spacerHeight = computed(() => navHeight.value + (props.isLoggedIn ? infoHeight.value : 0))
 
 /** ---- BTC price polling ---- */
@@ -433,15 +430,23 @@ let priceIntervalId = null
 let abortCtrl = null
 const fetchBTCPrice = async () => {
   try {
-    abortCtrl?.abort()
+    if (abortCtrl) abortCtrl.abort()
     abortCtrl = new AbortController()
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
-      { method: 'GET', mode: 'cors', cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', signal: abortCtrl?.signal, headers: { accept: 'application/json' } }
+      {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-store',
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer',
+        signal: abortCtrl.signal,
+        headers: { accept: 'application/json' },
+      }
     )
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
-    const usd = data?.bitcoin?.usd
+    const usd = data && data.bitcoin && data.bitcoin.usd
     btcPrice.value = (typeof usd === 'number' ? usd : 0).toLocaleString(undefined, {
       style: 'decimal',
       minimumFractionDigits: 2,
@@ -451,51 +456,46 @@ const fetchBTCPrice = async () => {
     btcPrice.value = 'N/A'
   }
 }
-function startPricePolling() { fetchBTCPrice(); clearInterval(priceIntervalId); priceIntervalId = setInterval(fetchBTCPrice, 30000) }
-function stopPricePolling() { clearInterval(priceIntervalId); priceIntervalId = null; abortCtrl?.abort() }
+function startPricePolling() {
+  fetchBTCPrice()
+  if (priceIntervalId) clearInterval(priceIntervalId)
+  priceIntervalId = setInterval(fetchBTCPrice, 30000)
+}
+function stopPricePolling() {
+  if (priceIntervalId) clearInterval(priceIntervalId)
+  priceIntervalId = null
+  if (abortCtrl) abortCtrl.abort()
+}
 
 /** ---- Session / nav interactions ---- */
 const sessionBusy = computed(() => {
-  const s = tokenHealth?.status
+  const s = tokenHealth && tokenHealth.status
   return s === 'checking' || s === 'paused'
 })
 const unregAfterEach = router.afterEach(() => { closeMobileMenu() })
 
 function toggleMobileMenu() { isMobileMenuOpen.value = !isMobileMenuOpen.value }
 function closeMobileMenu() { isMobileMenuOpen.value = false }
-watch(isMobileMenuOpen, (open) => { document.body.classList.toggle('overflow-hidden', open); nextTick().then(() => { updateNavHeight(); updateInfoHeight() }) })
+watch(isMobileMenuOpen, (open) => {
+  document.body.classList.toggle('overflow-hidden', open)
+  nextTick().then(() => { updateNavHeight(); updateInfoHeight() })
+})
 
-/** ---- Auth code fetching ---- */
-const authCodeFromApi = ref(null)
-const authCodeLoading = ref(false)
-const authCodeError = ref(null)
-
-async function loadAuthCode() {
-  if (props.authCode != null) return
-  if (!authLoggedIn.value) { authCodeFromApi.value = null; return }
-  authCodeLoading.value = true
-  authCodeError.value = null
-  try {
-    const prof = await getUserProfile()
-    const code = Number(prof?.payload?.auth_code)
-    authCodeFromApi.value = Number.isFinite(code) ? code : null
-  } catch (e) {
-    authCodeError.value = e?.message || String(e)
-    authCodeFromApi.value = null
-  } finally {
-    authCodeLoading.value = false
-    // info bar height may change as content swaps
-    nextTick().then(updateInfoHeight)
-  }
-}
-
-/** Use prop if present; otherwise fall back to fetched value */
-const effectiveAuthCode = computed(() => props.authCode != null ? Number(props.authCode) : authCodeFromApi.value)
+/** ---- Auth code (from global auth.user, with prop override) ---- */
+const authUser = computed(() => (user && user.value) || null)
+const authCodeFromAuth = computed(() => {
+  const u = authUser.value
+  const code = (u && u.auth_code) ?? (u && u.payload && u.payload.auth_code)
+  const n = Number(code)
+  return Number.isFinite(n) ? n : null
+})
+const effectiveAuthCode = computed(() =>
+  props.authCode != null ? Number(props.authCode) : authCodeFromAuth.value
+)
 const isPaired = computed(() => Number(effectiveAuthCode.value) === 6)
-/** Only show pairing UI when we definitively know the code and we’re not loading/erroring */
-const showPairing = computed(() => !authCodeLoading.value && authCodeError.value == null && effectiveAuthCode.value != null)
+const showPairing = computed(() => effectiveAuthCode.value != null)
 
-/** Balance zero? (derived available) */
+/** ---- Balance zero? ---- */
 const isZeroAvailable = computed(() => {
   const n = Number(props.balanceDerivedSats)
   return Number.isFinite(n) && n === 0
@@ -508,38 +508,41 @@ onMounted(async () => {
   updateInfoHeight()
 
   if ('ResizeObserver' in window) {
-    resizeObs = new ResizeObserver(() => requestAnimationFrame(() => { updateNavHeight(); updateInfoHeight() }))
+    resizeObs = new ResizeObserver(() =>
+      requestAnimationFrame(() => { updateNavHeight(); updateInfoHeight() })
+    )
     if (navRef.value) resizeObs.observe(navRef.value)
-    // Observe info bar as it can change with data state
-    nextTick(() => { if (infoRef.value) resizeObs.observe(infoRef.value) })
+    nextTick(() => { if (infoRef.value && resizeObs) resizeObs.observe(infoRef.value) })
   } else {
-    window.addEventListener('resize', () => { updateNavHeight(); updateInfoHeight() }, { passive: true })
+    const onResize = () => { updateNavHeight(); updateInfoHeight() }
+    window.addEventListener('resize', onResize, { passive: true })
   }
 
   startPricePolling()
-  loadAuthCode()
 })
 
 onUnmounted(() => {
   stopPricePolling()
   if (resizeObs) resizeObs.disconnect()
-  else window.removeEventListener('resize', () => { updateNavHeight(); updateInfoHeight() })
   unregAfterEach && unregAfterEach()
   stopStatusWatch && stopStatusWatch()
 })
 
 /** Re-measure when header-height-affecting state flips */
-watch(() => authLoggedIn.value, () => { nextTick().then(() => { updateNavHeight(); updateInfoHeight() }); loadAuthCode() })
+watch(() => authLoggedIn.value, () => {
+  nextTick().then(() => { updateNavHeight(); updateInfoHeight() })
+})
+watch(() => authUser.value, () => nextTick().then(updateInfoHeight))
 watch(() => props.loading, () => nextTick().then(updateInfoHeight))
 watch(() => props.error, () => nextTick().then(updateInfoHeight))
 watch(() => props.isLoggedIn, () => nextTick().then(updateInfoHeight))
 
-/** Refresh auth code when token becomes valid again */
+/** Token health reactions */
 const stopStatusWatch = watch(
   () => tokenHealth && tokenHealth.status,
   (s) => {
     if (s === 'invalid') { isMobileMenuOpen.value = false; logoutUser(false) }
-    if (s === 'valid') { loadAuthCode() }
+    if (s === 'valid') { nextTick().then(updateInfoHeight) }
   },
   { immediate: false }
 )
@@ -581,17 +584,19 @@ function formatFiat (n) {
 const fiatAvailable = computed(() => {
   if (!props.showFiat || props.btcUsd == null) return null
   const b = satsToBtc(props.balanceDerivedSats)
-  return b == null ? null : formatFiat(b * props.btcUsd)
+  return b == null ? null : formatFiat(b * Number(props.btcUsd))
 })
 const fiatOnchain = computed(() => {
   if (!props.showFiat || props.btcUsd == null) return null
   const b = satsToBtc(props.balanceOnchainSats)
-  return b == null ? null : formatFiat(b * props.btcUsd)
+  return b == null ? null : formatFiat(b * Number(props.btcUsd))
 })
 
-/** ---- Link color helper (constant white with secondary hover) ---- */
+/** ---- Link color helper ---- */
 const linkClass = computed(() => 'hover:text-secondary text-white')
 </script>
+
+
 
 <style scoped>
 :where(.tabular-nums){
