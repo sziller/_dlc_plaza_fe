@@ -224,7 +224,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
-import { getOffers } from '../api/offers'
+import { getOffers, getUserOffers } from '../api/offers'
 import { postOffer } from '../api/postOffer'
 import { acceptOffer } from '../api/acceptOffer'
 import { getToken } from '../api/token'
@@ -490,7 +490,10 @@ async function loadOffersOnce() {
   if (isFetchingOffers) return
   isFetchingOffers = true
   try {
-    const res = await getOffers('both')
+   const token = getToken()
+       const res = token
+      ? await getUserOffers('both', true)
+      : await getOffers('both')
     if (!res || !Array.isArray(res.payload)) throw new Error('Bad payload')
     const nextTerms = buildTermsFromOffers(res.payload) // <-- annualized computed locally
     diffAndFlash(terms.value, nextTerms)

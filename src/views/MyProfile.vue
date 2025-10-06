@@ -162,10 +162,68 @@
               </div>
             </div>
           </section>
+
+          <!-- ===== Past DLCs (settled > 2 days ago) ===== -->
+          <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
+            <h2 class="text-2xl font-bold">Past DLCs</h2>
+
+            <div v-if="pastError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
+              {{ pastError }}
+            </div>
+
+            <div v-else-if="pastLoading" class="text-white/80 text-sm">Loading past DLCs…</div>
+
+            <div v-else>
+              <div v-if="pastRows.length === 0" class="text-white/70 text-sm">No past DLCs found.</div>
+
+              <div v-else class="overflow-auto -mx-2">
+                <table class="min-w-full table-auto border-collapse text-white mx-2">
+                  <thead>
+                    <tr class="text-left text-sm md:text-base">
+                      <th class="px-3 py-2 whitespace-nowrap">DLC ID</th>
+                      <th class="px-3 py-2 whitespace-nowrap">Term</th>
+                      <th class="px-3 py-2 whitespace-nowrap">LTV</th>
+                      <th class="px-3 py-2 whitespace-nowrap">Annualized</th>
+                      <th class="px-3 py-2 whitespace-nowrap">Settled At</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-white/90 text-sm md:text-base">
+                    <tr
+                      v-for="r in pastRows"
+                      :key="r.fullId"
+                      class="border-b border-white/10 hover:bg-white/5 cursor-pointer transition"
+                      role="button"
+                      tabindex="0"
+                      @click="selectPast(r)"
+                      @keydown.enter.prevent="selectPast(r)"
+                      @keydown.space.prevent="selectPast(r)"
+                    >
+                      <td class="px-3 py-2">{{ r.idShort }}</td>
+                      <td class="px-3 py-2">{{ r.term }}</td>
+                      <td class="px-3 py-2">{{ r.ltv }}</td>
+                      <td class="px-3 py-2">{{ r.annualized }}</td>
+                      <td class="px-3 py-2">{{ r.settledAt }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
         </template>
       </div>
     </div>
   </main>
+
+  <!-- DLC Detail Modal (re-using the same component) -->
+  <DlcDetails
+    v-if="selectedDlc"
+    :dlc="selectedDlc"
+    :is-own="true"
+    :user-email="userEmail"
+    @close="selectedDlc = null"
+    @deleted="onPastDeleted"
+  />
+
   <TheFooter/>
 </template>
 
@@ -173,12 +231,14 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { getTopupAddressQR } from '../api/qr'
+import { getUserDlcs } from '../api/userDlcs'
 import TheFooter from '../components/TheFooter.vue'
+import DlcDetails from '../components/DLCDetails.vue' // NEW
 
 // ---- Auth: use the one global instance ----
 const {
-  user,               // reactive: payload or null
-  setUserFromApi,     // fetch/refresh + cache
+  user,
+  setUserFromApi,
   loading: authLoading,
   error: authError,
 } = useAuth()
@@ -189,6 +249,7 @@ const profile = computed(() => {
   if (!u) return null
   return { payload: u?.payload ?? u }
 })
+const userEmail = computed(() => String(profile.value?.payload?.email || '').trim().toLowerCase()) // NEW
 
 // ---- Local UI state (reuse your names so template stays unchanged) ----
 const loading = computed(() => !!authLoading.value)
@@ -201,11 +262,10 @@ const copied = ref(false)
 
 // ---- Load profile (now via auth) ----
 async function load() {
-  // Just refresh the canonical auth profile
   await setUserFromApi()
 }
 
-// Full refresh: profile + (maybe) top-up
+// Full refresh: profile + (maybe) top-up + past DLCs
 async function reloadAll() {
   await load()
   await nextTick()
@@ -215,6 +275,7 @@ async function reloadAll() {
     address.value = ''
     qrRawSvg.value = ''
   }
+  await fetchPastDlcs()
 }
 
 // ---- QR: fetch & sanitize -> data URL for <img> ----
@@ -358,15 +419,135 @@ const registrationLevel = computed(() => {
   return `Code ${code}`
 })
 
-// ---- Lifecycle ----
+/* ======================= Past DLCs ======================= */
+const pastLoading = ref(false)
+const pastError = ref(null)
+const pastRows = ref([])
+const pastApiDlcs = ref([])            // NEW: keep originals for modal
+const selectedDlc = ref(null)          // NEW: modal state
+
+// API side status filter (kept same list you used elsewhere)
+const STATUSES = Object.freeze([
+  'offer_p','offer_dlc','sign_ini','sign_acc','signed',
+  'broadcast','active','attested','executed','settled','revoked','reset','confirmed'
+])
+
+const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000
+
+const toMs = (v) => {
+  if (v == null) return null
+  const n = Number(v)
+  if (Number.isFinite(n)) return n < 1e12 ? n * 1000 : n // seconds -> ms
+  const p = Date.parse(String(v))
+  return Number.isFinite(p) ? p : null
+}
+
+const isYearish = (days) => {
+  const d = Number(days)
+  return Number.isFinite(d) && d >= 360 && d <= 366
+}
+const displayDays = (days) => (isYearish(days) ? 365 : Math.round(Number(days) || 0))
+
+const parseTermDays = (pid, duration) => {
+  const fromPid = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
+  if (fromPid) return Math.round(Number(fromPid[1]))
+  const d = Number(duration)
+  return Number.isFinite(d) && d > 0 ? Math.round(d) : null
+}
+const parseLtv = (pid) => {
+  const m = String(pid || '').match(/ltv-(\d{1,3})/i)
+  return m ? Number(m[1]) : null
+}
+const annualize360 = (termPct, days) => {
+  const r = Number(termPct)
+  const d = Number(days)
+  if (!Number.isFinite(r) || !Number.isFinite(d) || d <= 0) return NaN
+  return r * (360 / d)
+}
+const pct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '—')
+const shortId = (s) => (s ? String(s).slice(0, 8) : '—')
+const fmtDate = (ms) => (ms ? new Date(ms).toLocaleString() : '—')
+
+// settle time guesser (prefers explicit settled/closed/maturity, then updated_at)
+const settledTimeMs = (d) => {
+  const candidates = [
+    d.settled_at, d.settledAt,
+    d.closed_at, d.closedAt,
+    d.maturity_at, d.maturityAt, d.maturity_date, d.maturityDate,
+    d.updated_at, d.updatedAt,
+  ]
+  for (const c of candidates) {
+    const ms = toMs(c)
+    if (ms) return ms
+  }
+  return null
+}
+
+async function fetchPastDlcs() {
+  pastLoading.value = true
+  pastError.value = null
+  pastRows.value = []
+  pastApiDlcs.value = [] // reset originals
+  try {
+    const res = await getUserDlcs(STATUSES)
+    const items = Array.isArray(res?.payload) ? res.payload : []
+
+    const now = Date.now()
+    const past = items
+      .filter(d => String(d?.status ?? '').toLowerCase() === 'settled')
+      .map(d => ({ d, t: settledTimeMs(d) }))
+      .filter(({ t }) => t && (now - t) > TWO_DAYS_MS)
+
+    pastApiDlcs.value = past.map(p => p.d) // keep originals for modal
+
+    const rows = past
+      .map(({ d, t }) => {
+        const rawDays = parseTermDays(d.product_id, d.duration)
+        const uiDays  = rawDays ? displayDays(rawDays) : null
+        const ltv = parseLtv(d.product_id)
+        const ear = annualize360(Number(d.interest), rawDays)
+        const id = d.dlc_id || d.tmp_cntr_id || ''
+        return {
+          fullId: id,
+          idShort: shortId(id),
+          term: uiDays ? `${uiDays} Days` : '—',
+          ltv: ltv != null ? `${ltv}%` : '—',
+          annualized: pct2(ear),
+          settledAt: fmtDate(t),
+          t,
+        }
+      })
+      // newest first
+      .sort((a, b) => (b.t || 0) - (a.t || 0))
+
+    pastRows.value = rows
+  } catch (e) {
+    pastError.value = e?.message || 'Failed to fetch past DLCs.'
+  } finally {
+    pastLoading.value = false
+  }
+}
+
+// open modal for a past row
+function selectPast(row) {
+  const match = pastApiDlcs.value.find(d => (d.dlc_id || d.tmp_cntr_id) === row.fullId)
+  if (match) selectedDlc.value = match
+}
+
+function onPastDeleted() {
+  selectedDlc.value = null
+  fetchPastDlcs()
+}
+
+/* ===================== Lifecycle ===================== */
 onMounted(async () => {
-  await load()           // hydrate from cache or fetch once via auth
+  await load()
   if (!isPending.value) {
     await fetchTopup()
   }
+  await fetchPastDlcs()
 })
 </script>
-
 
 <style scoped>
 /* Gradient background (local, CSP-safe; purple glow from bottom) */
@@ -409,13 +590,13 @@ onMounted(async () => {
 
 .qr-box{
   display: grid;
-  place-items: center;   /* center the image box */
+  place-items: center;
 }
 
 .qr-box img{
   width: 100%;
   height: 100%;
-  object-fit: contain;   /* keep aspect, no crop */
+  object-fit: contain;
   object-position: center;
   display: block;
 }

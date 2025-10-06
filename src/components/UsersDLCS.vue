@@ -101,8 +101,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import DlcDetails from './DLCDetails.vue'
 import { getUserDlcs } from '../api/userDlcs'
-// import { getUserProfile } from '../api/userProfile' // REMOVED
-import { useAuth } from '../composables/useAuth'        // NEW
+import { useAuth } from '../composables/useAuth'
 
 const columns = Object.freeze([
   { label: 'DLC ID', key: 'dlcId' },
@@ -124,13 +123,47 @@ const sortAsc = ref(true)
 const selectedDlc = ref(null)
 const pollMs = 30000
 
-// auth context (email from global auth; supports both shapes: payload.email or email)
-const auth = useAuth() // NEW
+// auth context (email from global auth)
+const auth = useAuth()
 const userEmail = computed(() => {
   const u = auth.user?.value
   const email = u?.email ?? u?.payload?.email ?? ''
   return String(email || '').trim().toLowerCase()
 })
+
+// ===== Filtering rule: hide DLCs settled > 2 days ago =====
+const HIDE_SETTLED_AFTER_MS = 2 * 24 * 60 * 60 * 1000
+
+const toMs = (v) => {
+  if (v == null) return null
+  const n = Number(v)
+  if (Number.isFinite(n)) return n < 1e12 ? n * 1000 : n // seconds -> ms
+  // string timestamp
+  const p = Date.parse(String(v))
+  return Number.isFinite(p) ? p : null
+}
+
+// Try to find a reasonable "settled at" timestamp; fallback to updated_at
+const settledTimeMs = (d) => {
+  const candidates = [
+    d.settled_at, d.settledAt,
+    d.closed_at, d.closedAt,
+    d.maturity_at, d.maturityAt, d.maturity_date, d.maturityDate,
+    d.updated_at, d.updatedAt,
+  ]
+  for (const c of candidates) {
+    const ms = toMs(c)
+    if (ms) return ms
+  }
+  return null
+}
+
+const shouldHideSettled = (d) => {
+  if (String(d?.status ?? '').toLowerCase() !== 'settled') return false
+  const t = settledTimeMs(d)
+  if (!t) return false
+  return (Date.now() - t) > HIDE_SETTLED_AFTER_MS
+}
 
 // helpers
 const pct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
@@ -295,8 +328,6 @@ const statuses = Object.freeze([
   'broadcast','active','attested','executed','settled','revoked','reset','confirmed'
 ])
 
-// REMOVED loadProfileEmail(); we no longer call the profile API here
-
 function sameRows(a, b) {
   const pick = r => ({
     dlcIdFull: r.dlcIdFull, oracleFull: r.oracleFull, term: r.term, ltv: r.ltv,
@@ -323,15 +354,21 @@ async function load(initial = false) {
   try {
     const res = await getUserDlcs(statuses)
     const payload = Array.isArray(res?.payload) ? res.payload : []
-    const nextRows = payload.map(toRow)
+
+    // 🔎 Filter out DLCs that settled more than 2 days ago
+    const filtered = payload.filter(d => !shouldHideSettled(d))
+
+    const nextRows = filtered.map(toRow)
 
     if (!sameRows(rows.value, nextRows)) {
-      apiDlcs.value = payload
+      apiDlcs.value = filtered
       rows.value = nextRows
+
+      // Update/clear selection if the selected one got filtered out
       if (selectedDlc.value) {
         const id = selectedDlc.value.dlc_id || selectedDlc.value.tmp_cntr_id
-        const updated = payload.find(d => (d.dlc_id || d.tmp_cntr_id) === id)
-        if (updated) selectedDlc.value = updated
+        const updated = filtered.find(d => (d.dlc_id || d.tmp_cntr_id) === id)
+        selectedDlc.value = updated || null
       }
     }
     hasLoadedOnce = true
@@ -358,10 +395,7 @@ watch(userEmail, () => {
 
 function onVisChange() { if (!document.hidden) load(false) }
 function onFocus() { load(false) }
-function onAuthChanged() {
-  // no manual userEmail clearing needed; computed handles it
-  load(true)
-}
+function onAuthChanged() { load(true) }
 
 // lifecycle
 onMounted(async () => {
@@ -384,7 +418,6 @@ function onDeleted() {
   load(false)
 }
 </script>
-
 
 <style scoped>
 tbody tr {
