@@ -320,7 +320,7 @@ function roundRate(n) { return Number.isNaN(n) ? NaN : parseFloat(n.toFixed(RATE
 function fmt(n) { return Number.isNaN(n) ? '*' : `${n.toFixed(RATE_DECIMALS)}%` }
 function formatBtc(n) {
   const x = Number(n)
-  return Number.isFinite(x) ? `${x.toFixed(4)} BTC` : '*'
+  return Number.isFinite(x) ? `${x.toFixed(8)} BTC` : '*'
 }
 function roundBtc(n) {
   const x = Number(n)

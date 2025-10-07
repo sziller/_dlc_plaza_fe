@@ -7,14 +7,40 @@ import { getToken } from '../api/token'
 export type Status = 'idle' | 'checking' | 'healthy' | 'paused' | 'invalid'
 
 export type Options = {
+  /** Base polling interval when healthy (ms). Default: 3000 */
   intervalMs?: number
+  /** How many consecutive 401/403’s before we force logout. Default: 1 */
   failuresBeforeLogout?: number
+  /** Called when we transition to 'invalid' */
   onInvalid: () => void
+  /**
+   * Quiet period immediately after a successful login (ms).
+   * During this window we won't ping to avoid racing the first profile fetch.
+   * Default: 4000
+   */
+  quietAfterLoginMs?: number
+  /**
+   * Provide the timestamp (ms) of the most recent successful login.
+   * If omitted, quiet period is skipped.
+   */
+  getJustLoggedInAt?: () => number | null
+  /**
+   * Optional override for the "ping" call.
+   * If provided, this will be called instead of getUserProfile().
+   */
+  pingOverride?: () => Promise<void>
 }
 
 export function useTokenHealth(
   isLoggedInRef: { value: boolean },
-  { intervalMs = 3_000, failuresBeforeLogout = 1, onInvalid }: Options
+  {
+    intervalMs = 3_000,
+    failuresBeforeLogout = 1,
+    onInvalid,
+    quietAfterLoginMs = 4_000,
+    getJustLoggedInAt,
+    pingOverride,
+  }: Options
 ) {
   // ---- State ----
   const status = ref<Status>('idle')
@@ -43,6 +69,11 @@ export function useTokenHealth(
 
   const pausedNow = () => document.hidden || !navigator.onLine
 
+  const withinQuietLoginWindow = () => {
+    const ts = getJustLoggedInAt?.()
+    return typeof ts === 'number' && ts > 0 && Date.now() - ts < quietAfterLoginMs
+  }
+
   const isAuthError = (err: unknown) =>
     axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)
 
@@ -61,6 +92,17 @@ export function useTokenHealth(
     timeoutId = window.setTimeout(tick, delay)
   }
 
+  // ---- Single-flight profile fetch (local) ----
+  // Note: for best effect, also add single-flight in ../api/userProfile
+  let inFlightProfile: Promise<any> | null = null
+  const getProfileOnce = async () => {
+    if (!inFlightProfile) {
+      inFlightProfile = (pingOverride ? pingOverride() : getUserProfile())
+        .finally(() => { inFlightProfile = null })
+    }
+    return inFlightProfile
+  }
+
   const ping = async (): Promise<void> => {
     if (!isLoggedInRef.value) return
 
@@ -73,12 +115,13 @@ export function useTokenHealth(
     if (!t) {
       reason.value = 'no-token'
       status.value = 'invalid'
-      bc?.postMessage({ type: 'logout', reason: reason.value })
+      bc?.postMessage?.({ type: 'logout', reason: reason.value })
       onInvalid()
       return
     }
 
-    if (pausedNow()) {
+    // Don't spam when tab hidden/offline or right after login
+    if (pausedNow() || withinQuietLoginWindow()) {
       status.value = 'paused'
       return
     }
@@ -88,7 +131,7 @@ export function useTokenHealth(
     status.value = 'checking'
 
     try {
-      await getUserProfile() // lightweight auth check
+      await getProfileOnce() // lightweight auth check (or override)
       consecutiveAuthFails.value = 0
       lastOkAt.value = Date.now()
       status.value = 'healthy'
@@ -98,10 +141,10 @@ export function useTokenHealth(
         reason.value = 'auth-failed'
         if (consecutiveAuthFails.value >= failuresBeforeLogout) {
           status.value = 'invalid'
-          bc?.postMessage({ type: 'logout', reason: reason.value })
+          bc?.postMessage?.({ type: 'logout', reason: reason.value })
           onInvalid()
         } else {
-          // transient: keep checking next cycle
+          // transient auth blip; keep checking next cycle
           status.value = 'checking'
         }
       } else {
@@ -116,27 +159,47 @@ export function useTokenHealth(
   const tick = async () => {
     await ping()
     // Only keep the loop running while logged in
-    if (isLoggedInRef.value) scheduleNext(intervalMs)
+    if (!isLoggedInRef.value) return
+
+    // Slightly adaptive cadence:
+    // - invalid: stop (onInvalid handler should clean up session)
+    // - paused: check again a bit later (same base interval)
+    // - checking/healthy: standard cadence
+    const base =
+      status.value === 'paused'
+        ? Math.max(2_000, intervalMs) // don't hammer while hidden/offline
+        : intervalMs
+
+    scheduleNext(base)
   }
 
   const start = () => {
     if (timeoutId !== null) return
-    // Quick first pass so UI reflects state soon after mount
+    // Quick first pass so UI reflects state soon after mount,
+    // but give the app a moment to settle.
     timeoutId = window.setTimeout(tick, Math.min(5_000, Math.floor(intervalMs / 2)))
   }
 
   // ---- Lifecycle ----
+  const onVisOrOnline = () => {
+    // If we just became visible/online, poke the checker to react quickly.
+    if (timeoutId === null && isLoggedInRef.value) {
+      // run soon, not instantly (avoids thrash on rapid events)
+      timeoutId = window.setTimeout(tick, 200)
+    }
+  }
+
   onMounted(() => {
     if (isLoggedInRef.value) start()
-    window.addEventListener('visibilitychange', tick, { passive: true })
-    window.addEventListener('online', tick, { passive: true })
+    window.addEventListener('visibilitychange', onVisOrOnline, { passive: true })
+    window.addEventListener('online', onVisOrOnline, { passive: true })
   })
 
   onBeforeUnmount(() => {
     stop()
     bc?.close?.()
-    window.removeEventListener('visibilitychange', tick as any)
-    window.removeEventListener('online', tick as any)
+    window.removeEventListener('visibilitychange', onVisOrOnline as any)
+    window.removeEventListener('online', onVisOrOnline as any)
   })
 
   watchEffect(() => {

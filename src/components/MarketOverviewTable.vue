@@ -492,7 +492,7 @@ async function loadOffersOnce() {
   try {
    const token = getToken()
        const res = token
-      ? await getUserOffers('both', true)
+      ? await getUserOffers('both', false)
       : await getOffers('both')
     if (!res || !Array.isArray(res.payload)) throw new Error('Bad payload')
     const nextTerms = buildTermsFromOffers(res.payload) // <-- annualized computed locally

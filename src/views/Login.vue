@@ -102,34 +102,50 @@ const error = ref<string | null>(null)
 
 const formValid = computed(() => !!email.value && !!password.value)
 
+// --- tiny single-flight to avoid parallel profile calls from other listeners right after login ---
+let inFlightProfile: Promise<any> | null = null
+const getUserProfileOnce = async () => {
+  if (!inFlightProfile) {
+    inFlightProfile = getUserProfile()
+      .finally(() => { inFlightProfile = null })
+  }
+  return inFlightProfile
+}
+
 const submitLogin = async () => {
   error.value = null
   loading.value = true
+
   try {
     // 1) Authenticate
     const token = await getAuthToken(email.value, password.value)
 
-// try cache first to avoid an immediate request if the user just logged in previously
-let profilePayload: any | null = auth.user.value ?? null
-
-if (!profilePayload) {
-  try {
-    const profileData = await getUserProfile()
-    profilePayload = profileData?.payload ?? profileData ?? null
-  } catch {
-    // store token and retry once (as you already do)
+    // 2) Store token immediately so subsequent requests are authorized
+    //    (this also signals other parts of the app that we're logged in)
     auth.login(token)
-    const profileData = await getUserProfile()
-    profilePayload = profileData?.payload ?? profileData ?? null
-  }
-}
 
-// normalize and store
-auth.login(token, profilePayload)
+    // 3) Resolve profile (prefer cache, otherwise fetch once)
+    let profilePayload: any | null = auth.user.value ?? null
+    if (!profilePayload) {
+      try {
+        const profileData = await getUserProfileOnce()
+        profilePayload = profileData?.payload ?? profileData ?? null
+      } catch (e: any) {
+        // If the fetch fails with a non-auth error, keep user logged in and continue gracefully
+        // If it was actually an auth error, surface invalid credentials below
+        const msg = String(e?.message || '').toLowerCase()
+        if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('invalid')) {
+          throw e
+        }
+        profilePayload = null
+      }
+    }
 
+    // 4) Normalize + persist combined auth state (token + profile)
+    auth.login(token, profilePayload)
 
-    // 4) Route based on auth_code if present
-    const code = profilePayload?.auth_code
+    // 5) Route based on auth_code if present (fallback to home)
+    const code = Number(profilePayload?.auth_code)
     if (code === 2) {
       await router.push({ path: '/register', query: { step: '3' } })
     } else if (code === 6) {
@@ -138,10 +154,8 @@ auth.login(token, profilePayload)
       await router.push('/')
     }
 
-    // No console logs with PII
-    window.dispatchEvent(new Event('auth-changed'))
+    // No global "auth-changed" event here — avoids fan-out duplicate fetches
   } catch (err: any) {
-    // Show generic message; avoid leaking auth internals
     const msg = String(err?.message || '').toLowerCase()
     if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('invalid')) {
       error.value = 'Invalid email or password.'
@@ -153,6 +167,7 @@ auth.login(token, profilePayload)
   }
 }
 </script>
+
 
 <style scoped>
 /* keeps it local to this component */
