@@ -103,7 +103,7 @@
       </form>
     </div>
 
-    <!-- 📬 Step 2: Email Sent Message (updated: simpler, mentions delay, no app talk) -->
+    <!-- 📬 Step 2: Email Sent Message -->
     <div v-else-if="step === 2" class="max-w-xl mx-auto text-center space-y-6">
       <h1 class="text-3xl font-bold">Check Your Inbox</h1>
       <p class="text-lg">We’ve sent a confirmation link to:</p>
@@ -138,13 +138,16 @@
         </div>
 
         <div class="pt-6">
-          <p class="text-base font-medium mb-3">Once you’ve scanned, log in to your account:</p>
-          <router-link
-            to="/login"
-            class="inline-block bg-secondary hover:bg-secondary/90 text-white px-6 py-3 rounded-full font-semibold transition"
+          <p class="text-base font-medium mb-3">Once you’ve scanned, continue to BTCUSD:</p>
+          <button
+            @click="goToDashboard"
+            class="inline-block bg-secondary hover:bg-secondary/90 text-white px-6 py-3 rounded-full font-semibold transition disabled:opacity-40"
+            :disabled="loading"
+            :aria-busy="loading ? 'true' : 'false'"
           >
-            Go to Login
-          </router-link>
+            <span v-if="loading">Preparing dashboard…</span>
+            <span v-else>Go to Dashboard</span>
+          </button>
         </div>
       </div>
 
@@ -166,7 +169,7 @@
           >
             <svg
               v-if="step > 1"
-              xmlns="https://www.w3.org/2000/svg"
+              xmlns="http://www.w3.org/2000/svg"
               class="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
@@ -192,7 +195,7 @@
           >
             <svg
               v-if="step > 2"
-              xmlns="https://www.w3.org/2000/svg"
+              xmlns="http://www.w3.org/2000/svg"
               class="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
@@ -230,6 +233,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { registerUser } from '../api/user'
 import { getUserQR } from '../api/qr'
 import { getToken } from '../api/token'
+import { useAuth } from '../composables/useAuth'
 import type { QRCodeUserResponse } from '../types/common/qrFace'
 
 // UI state
@@ -244,6 +248,9 @@ const showPw = ref(false)
 
 // QR display
 const qrCode = ref<string | null>(null)
+
+// Auth store (shared with navbar/info strip)
+const { user, setUserFromApi } = useAuth()
 
 // --- Validation (simple) ---
 const emailError = computed(() => {
@@ -265,9 +272,10 @@ const formValid = computed(() =>
   accepted.value
 )
 
-// --- Actions ---
+// --- Router ---
 const route = useRoute()
 const router = useRouter()
+const DASHBOARD_PATH = '/btcusd'
 
 const prefillEmailFromRoute = () => {
   const qp = Array.isArray(route.query.email) ? route.query.email[0] : route.query.email
@@ -275,6 +283,7 @@ const prefillEmailFromRoute = () => {
     email.value = qp.trim()
   }
 }
+
 const submitForm = async () => {
   error.value = null
   if (!formValid.value) return
@@ -316,7 +325,7 @@ const loadQrCode = async () => {
   try {
     const token = getToken()
     if (!token) {
-      await router.push({ path: '/login', query: { redirect: '/register', step: '3' } })
+      // Not blocking navigation later; this only affects QR fetch now
       return
     }
     const data: QRCodeUserResponse = await getUserQR()
@@ -325,6 +334,32 @@ const loadQrCode = async () => {
     qrCode.value = buildSvgDataUri(svg)
   } catch (err: any) {
     error.value = err?.message || 'Failed to load QR code.'
+  }
+}
+
+/** Check profile first, then go to BTCUSD regardless */
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+const goToDashboard = async () => {
+  error.value = null
+  loading.value = true
+  try {
+    const token = getToken()
+    if (token) {
+      // Brief retry to catch pairing writes; keeps the info bar accurate
+      const deadline = Date.now() + 6000
+      while (Date.now() < deadline) {
+        await setUserFromApi?.()
+        const code = Number(user.value?.payload?.auth_code ?? user.value?.auth_code)
+        if (Number.isFinite(code)) break
+        await sleep(400)
+      }
+    }
+  } catch (e: any) {
+    // Non-blocking: we still navigate to the dashboard
+    error.value = e?.message || 'Could not refresh your profile.'
+  } finally {
+    loading.value = false
+    await router.push(DASHBOARD_PATH)
   }
 }
 
@@ -347,7 +382,7 @@ watch(step, async (val) => {
 watch(() => route.query.step, () => syncStepFromRoute())
 
 onMounted(async () => {
-   prefillEmailFromRoute() 
+  prefillEmailFromRoute()
   syncStepFromRoute()
   if (step.value === 3) await loadQrCode()
 })

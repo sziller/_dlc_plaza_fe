@@ -209,12 +209,26 @@
               </div>
             </div>
           </section>
+
+          <!-- ===== Danger Zone ===== -->
+          <section class="p-4 border border-red-500/40 bg-red-500/10 rounded-lg space-y-3">
+            <h2 class="text-2xl font-bold text-red-200">Delete Account</h2>
+            <p class="text-red-200/80 text-sm">
+              This will permanently delete your Cadena account and associated data. This action cannot be undone.
+            </p>
+            <button
+              class="px-4 py-2 rounded bg-red-600/90 hover:bg-red-600 text-white font-semibold"
+              @click="delOpen = true"
+            >
+              Delete account
+            </button>
+          </section>
         </template>
       </div>
     </div>
   </main>
 
-  <!-- DLC Detail Modal (re-using the same component) -->
+  <!-- DLC Detail Modal -->
   <DlcDetails
     v-if="selectedDlc"
     :dlc="selectedDlc"
@@ -224,23 +238,82 @@
     @deleted="onPastDeleted"
   />
 
+  <!-- Delete Account Confirm Modal -->
+  <transition name="fade">
+    <div
+      v-if="delOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="del-title"
+    >
+      <!-- backdrop -->
+      <div class="absolute inset-0 bg-black/70" @click="delOpen = false"></div>
+
+      <!-- dialog -->
+      <div class="relative w-[min(560px,92vw)] rounded-lg border border-white/20 bg-black p-6 text-white shadow-xl">
+        <h3 id="del-title" class="text-xl font-bold mb-2">Delete account</h3>
+        <p class="text-white/80 mb-4">
+          This will permanently delete your account. Type
+          <code class="px-1 py-0.5 rounded bg-black/40 border border-white/10">DELETE</code>
+          to confirm.
+        </p>
+
+        <input
+          v-model.trim="delConfirm"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          class="w-full px-3 py-2 rounded bg-white text-black mb-3"
+          placeholder="Type DELETE to confirm"
+          :disabled="delBusy"
+        />
+
+        <div v-if="delError" class="mb-3 p-2 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
+          {{ delError }}
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button
+            class="px-3 py-2 rounded border border-white/20 hover:bg-white/10"
+            @click="delOpen = false; delConfirm = ''; delError = null"
+            :disabled="delBusy"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-3 py-2 rounded bg-red-600/90 hover:bg-red-600 disabled:opacity-50"
+            :disabled="delBusy || delConfirm !== 'DELETE'"
+            @click="onConfirmDelete"
+          >
+            {{ delBusy ? 'Deleting…' : 'Delete account' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </transition>
+
   <TheFooter/>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { getTopupAddressQR } from '../api/qr'
 import { getUserDlcs } from '../api/userDlcs'
+import { deleteSelf } from '../api/deleteSelf'
 import TheFooter from '../components/TheFooter.vue'
-import DlcDetails from '../components/DLCDetails.vue' // NEW
+import DlcDetails from '../components/DLCDetails.vue'
 
-// ---- Auth: use the one global instance ----
+// ---- Router & Auth ----
+const router = useRouter()
 const {
   user,
   setUserFromApi,
   loading: authLoading,
   error: authError,
+  logout,
 } = useAuth()
 
 // Expose the same shape your template expects: profile?.payload.??
@@ -249,9 +322,9 @@ const profile = computed(() => {
   if (!u) return null
   return { payload: u?.payload ?? u }
 })
-const userEmail = computed(() => String(profile.value?.payload?.email || '').trim().toLowerCase()) // NEW
+const userEmail = computed(() => String(profile.value?.payload?.email || '').trim().toLowerCase())
 
-// ---- Local UI state (reuse your names so template stays unchanged) ----
+// ---- Local UI state ----
 const loading = computed(() => !!authLoading.value)
 const error   = computed(() => String(authError.value || ''))
 
@@ -260,12 +333,12 @@ const addrLoading = ref(false)
 const addrError = ref(null)
 const copied = ref(false)
 
-// ---- Load profile (now via auth) ----
+// ---- Load profile ----
 async function load() {
   await setUserFromApi()
 }
 
-// Full refresh: profile + (maybe) top-up + past DLCs
+// Full refresh
 async function reloadAll() {
   await load()
   await nextTick()
@@ -278,7 +351,7 @@ async function reloadAll() {
   await fetchPastDlcs()
 }
 
-// ---- QR: fetch & sanitize -> data URL for <img> ----
+// ---- QR fetch & sanitize ----
 const qrRawSvg = ref('')
 
 async function fetchTopup() {
@@ -304,7 +377,6 @@ async function fetchTopup() {
   }
 }
 
-// Very small allowlist sanitizer for QR SVGs
 function sanitizeSvg(svgText) {
   try {
     const parser = new DOMParser()
@@ -314,7 +386,6 @@ function sanitizeSvg(svgText) {
       'viewBox','xmlns','version','fill','stroke','d','x','y','width','height',
       'rx','ry','transform','shape-rendering','stroke-width'
     ])
-
     const walker = document.createTreeWalker(doc, NodeFilter.SHOW_ELEMENT, null)
     const toRemove = []
     let node = walker.nextNode()
@@ -380,13 +451,11 @@ function formatBtc(sats) {
 
 // ---- Referrals ----
 const copiedWhat = ref('') // '' | 'code' | 'link'
-
 const rawRefCode = computed(() => profile.value?.payload?.referral_code || '')
 const refCode = computed(() => {
   const s = String(rawRefCode.value || '')
   return s.startsWith('refcode:') ? s.slice('refcode:'.length) : s
 })
-
 const siteBase = (import.meta.env && import.meta.env.VITE_SITE_BASE) || window.location.origin
 const refLink = computed(() => (refCode.value ? `${siteBase}/?ref=${encodeURIComponent(refCode.value)}` : ''))
 const refParent = computed(() => profile.value?.payload?.par_referral_code || null)
@@ -409,7 +478,6 @@ async function copyText(text, which) {
 
 // ---- Registration state ----
 const isPending = computed(() => Number(profile.value?.payload?.auth_code) === 0)
-
 const registrationLevel = computed(() => {
   const code = Number(profile.value?.payload?.auth_code)
   if (code === 6) return 'Signer'
@@ -423,31 +491,27 @@ const registrationLevel = computed(() => {
 const pastLoading = ref(false)
 const pastError = ref(null)
 const pastRows = ref([])
-const pastApiDlcs = ref([])            // NEW: keep originals for modal
-const selectedDlc = ref(null)          // NEW: modal state
+const pastApiDlcs = ref([])
+const selectedDlc = ref(null)
 
-// API side status filter (kept same list you used elsewhere)
 const STATUSES = Object.freeze([
   'offer_p','offer_dlc','sign_ini','sign_acc','signed',
   'broadcast','active','attested','executed','settled','revoked','reset','confirmed'
 ])
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000
-
 const toMs = (v) => {
   if (v == null) return null
   const n = Number(v)
-  if (Number.isFinite(n)) return n < 1e12 ? n * 1000 : n // seconds -> ms
+  if (Number.isFinite(n)) return n < 1e12 ? n * 1000 : n
   const p = Date.parse(String(v))
   return Number.isFinite(p) ? p : null
 }
-
 const isYearish = (days) => {
   const d = Number(days)
   return Number.isFinite(d) && d >= 360 && d <= 366
 }
 const displayDays = (days) => (isYearish(days) ? 365 : Math.round(Number(days) || 0))
-
 const parseTermDays = (pid, duration) => {
   const fromPid = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
   if (fromPid) return Math.round(Number(fromPid[1]))
@@ -467,8 +531,6 @@ const annualize360 = (termPct, days) => {
 const pct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '—')
 const shortId = (s) => (s ? String(s).slice(0, 8) : '—')
 const fmtDate = (ms) => (ms ? new Date(ms).toLocaleString() : '—')
-
-// settle time guesser (prefers explicit settled/closed/maturity, then updated_at)
 const settledTimeMs = (d) => {
   const candidates = [
     d.settled_at, d.settledAt,
@@ -487,7 +549,7 @@ async function fetchPastDlcs() {
   pastLoading.value = true
   pastError.value = null
   pastRows.value = []
-  pastApiDlcs.value = [] // reset originals
+  pastApiDlcs.value = []
   try {
     const res = await getUserDlcs(STATUSES)
     const items = Array.isArray(res?.payload) ? res.payload : []
@@ -498,7 +560,7 @@ async function fetchPastDlcs() {
       .map(d => ({ d, t: settledTimeMs(d) }))
       .filter(({ t }) => t && (now - t) > TWO_DAYS_MS)
 
-    pastApiDlcs.value = past.map(p => p.d) // keep originals for modal
+    pastApiDlcs.value = past.map(p => p.d)
 
     const rows = past
       .map(({ d, t }) => {
@@ -517,7 +579,6 @@ async function fetchPastDlcs() {
           t,
         }
       })
-      // newest first
       .sort((a, b) => (b.t || 0) - (a.t || 0))
 
     pastRows.value = rows
@@ -528,15 +589,34 @@ async function fetchPastDlcs() {
   }
 }
 
-// open modal for a past row
 function selectPast(row) {
   const match = pastApiDlcs.value.find(d => (d.dlc_id || d.tmp_cntr_id) === row.fullId)
   if (match) selectedDlc.value = match
 }
-
 function onPastDeleted() {
   selectedDlc.value = null
   fetchPastDlcs()
+}
+
+/* ======================= Delete account ======================= */
+const delOpen = ref(false)
+const delBusy = ref(false)
+const delError = ref(null)
+const delConfirm = ref('')
+
+async function onConfirmDelete() {
+  if (delBusy.value) return
+  delBusy.value = true
+  delError.value = null
+  try {
+    await deleteSelf()
+    logout()
+    await router.replace('/login?deleted=1')
+  } catch (e) {
+    delError.value = e?.message || 'Failed to delete account.'
+  } finally {
+    delBusy.value = false
+  }
 }
 
 /* ===================== Lifecycle ===================== */
@@ -600,4 +680,7 @@ onMounted(async () => {
   object-position: center;
   display: block;
 }
+
+.fade-enter-active, .fade-leave-active { transition: opacity .15s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

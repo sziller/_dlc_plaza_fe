@@ -219,13 +219,19 @@
           </div>
           <template v-if="!isPaired">
             <span class="hidden sm:inline select-none text-white/40">•</span>
-            <span class="text-white/90">Scan QR code using signer app</span>
+<router-link
+  to="/register?step=3"
+  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+  aria-label="Go to registration to scan QR with the Signer app"
+>
+  Scan QR code using signer app
+</router-link>
           </template>
         </template>
         <template v-else>
           <div class="flex items-center gap-2" aria-hidden="true">
             <span class="inline-block w-2.5 h-2.5 rounded-full bg-white/30 animate-pulse" />
-            <span class="text-white/70">••••••</span>
+            <span class="text-white/70">•••∂•••</span>
           </div>
         </template>
 
@@ -237,7 +243,6 @@
           <span class="tabular-nums font-semibold" :aria-live="live" role="status">
             <template v-if="balanceDerivedSats !== null">
               {{ btc(balanceDerivedSats) }} BTC
-              <span v-if="showFiat && fiatAvailable !== null" class="text-white/80 font-normal">(≈ {{ fiatAvailable }})</span>
             </template>
             <template v-else>—</template>
           </span>
@@ -251,7 +256,6 @@
           <span class="tabular-nums font-semibold" :aria-live="live" role="status">
             <template v-if="balanceOnchainSats !== null">
               {{ btc(balanceOnchainSats) }} BTC
-              <span v-if="showFiat && fiatOnchain !== null" class="text-white/80 font-normal">(≈ {{ fiatOnchain }})</span>
             </template>
             <template v-else>—</template>
           </span>
@@ -381,53 +385,48 @@ import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
 
-/** ---- Props / emits ---- */
+/** ---- Emits (kept for the Retry button in the template) ---- */
+const emit = defineEmits(['retry'])
+
+/** ---- Optional display config props only ----
+ * Keep surface-level display toggles here (not data).
+ * If you already store btcUsd globally, you can drop this too.
+ */
 const props = defineProps({
-  isLoggedIn: { type: Boolean, default: false },
-  email: { type: String, default: '' },
-  balanceDerivedSats: { type: [Number, String], default: null },
-  balanceOnchainSats: { type: [Number, String], default: null },
-  loading: { type: Boolean, default: false },
-  error: { type: String, default: '' },
-  btcUsd: { type: Number, default: null },
   showFiat: { type: Boolean, default: false },
-  canRetry: { type: Boolean, default: true },
-  authCode: { type: Number, default: null },
+  btcUsd: { type: Number, default: null },
 })
-defineEmits(['retry'])
 
 /** ---- Auth + router ---- */
 const router = useRouter()
-const { isLoggedIn: authLoggedIn, logout, tokenHealth, user } = useAuth()
+const {
+  isLoggedIn: authLoggedIn,
+  logout,
+  tokenHealth,
+  user,
+  // If your composable exposes these, use them:
+  loading: authLoading = ref(false),
+  error: authError = ref(null),
+  setUserFromApi,            // canonical refresher (SWR-friendly in the composable)
+} = useAuth()
 
 /** ---- UI state ---- */
 const isMobileMenuOpen = ref(false)
+
+/** ---- BTC price polling (singleton-ish) ---- */
 const btcPrice = ref('...')
-
-/** ---- Fixed nav + info measurement ---- */
-const navRef = ref(null)
-const navHeight = ref(0)
-const infoRef = ref(null)
-const infoHeight = ref(0)
-let resizeObs = null
-
-function applyHeights() {
-  document.documentElement.style.setProperty('--nav-h', navHeight.value + 'px')
-  document.documentElement.style.setProperty('--info-h', infoHeight.value + 'px')
-}
-function updateNavHeight() {
-  navHeight.value = navRef.value?.offsetHeight || 0
-  applyHeights()
-}
-function updateInfoHeight() {
-  infoHeight.value = props.isLoggedIn ? (infoRef.value?.offsetHeight || 0) : 0
-  applyHeights()
-}
-const spacerHeight = computed(() => navHeight.value + (props.isLoggedIn ? infoHeight.value : 0))
-
-/** ---- BTC price polling ---- */
 let priceIntervalId = null
 let abortCtrl = null
+let priceStarted = false
+function pickNumber(obj, keys) {
+  const src = obj ?? {}
+  for (const k of keys) {
+    const v = src[k]
+    const n = Number(v)
+    if (Number.isFinite(n)) return n
+  }
+  return null
+}
 const fetchBTCPrice = async () => {
   try {
     if (abortCtrl) abortCtrl.abort()
@@ -446,8 +445,8 @@ const fetchBTCPrice = async () => {
     )
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
-    const usd = data && data.bitcoin && data.bitcoin.usd
-    btcPrice.value = (typeof usd === 'number' ? usd : 0).toLocaleString(undefined, {
+    const usd = data?.bitcoin?.usd ?? 0
+    btcPrice.value = Number(usd).toLocaleString(undefined, {
       style: 'decimal',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -457,15 +456,85 @@ const fetchBTCPrice = async () => {
   }
 }
 function startPricePolling() {
+  if (priceStarted) return
+  priceStarted = true
   fetchBTCPrice()
-  if (priceIntervalId) clearInterval(priceIntervalId)
-  priceIntervalId = setInterval(fetchBTCPrice, 30000)
+  priceIntervalId = setInterval(fetchBTCPrice, 30_000)
 }
 function stopPricePolling() {
   if (priceIntervalId) clearInterval(priceIntervalId)
   priceIntervalId = null
   if (abortCtrl) abortCtrl.abort()
+  priceStarted = false
 }
+
+/** ---- Fixed nav + info measurement ---- */
+const navRef = ref(null)
+const navHeight = ref(0)
+const infoRef = ref(null)
+const infoHeight = ref(0)
+let resizeObs = null
+let rafId = 0
+
+function applyHeights() {
+  document.documentElement.style.setProperty('--nav-h', navHeight.value + 'px')
+  document.documentElement.style.setProperty('--info-h', infoHeight.value + 'px')
+}
+function updateNavHeight() {
+  navHeight.value = navRef.value?.offsetHeight || 0
+  applyHeights()
+}
+function updateInfoHeight() {
+  infoHeight.value = isLoggedIn.value ? (infoRef.value?.offsetHeight || 0) : 0
+  applyHeights()
+}
+function scheduleRecalc() {
+  if (rafId) cancelAnimationFrame(rafId)
+  rafId = requestAnimationFrame(() => {
+    updateNavHeight()
+    updateInfoHeight()
+  })
+}
+const spacerHeight = computed(() => navHeight.value + (isLoggedIn.value ? infoHeight.value : 0))
+
+/** ---- Derived auth state (no page props) ---- */
+const isLoggedIn = computed(() => !!authLoggedIn?.value)
+const authUser = computed(() => user?.value ?? null)
+
+const email = computed(() => authUser.value?.payload?.email ?? authUser.value?.email ?? '')
+const balanceDerivedSats = computed(() => {
+  const src = authUser.value?.payload ?? authUser.value
+  return pickNumber(src, [
+    'balance_derived',     // your old field
+    'liquid_sats',         // common alt
+    'available_sats',      // common alt
+    'liquid',              // sometimes just 'liquid'
+    'balance_available',   // seen in some APIs
+    'available',
+  ])
+})
+const balanceOnchainSats = computed(() => {
+  const src = authUser.value?.payload ?? authUser.value
+  return pickNumber(src, [
+    'balance_onchain',
+    'onchain_sats',
+    'wallet_sats',
+    'onchain',
+  ])
+})
+const authCode = computed(() => {
+  const raw = authUser.value?.auth_code ?? authUser.value?.payload?.auth_code
+  const n = Number(raw)
+  return Number.isFinite(n) ? n : null
+})
+const isPaired = computed(() => authCode.value === 6)
+const showPairing = computed(() => authCode.value != null)
+
+/** ---- Zero available? ---- */
+const isZeroAvailable = computed(() => {
+  const n = Number(balanceDerivedSats.value)
+  return Number.isFinite(n) && n === 0
+})
 
 /** ---- Session / nav interactions ---- */
 const sessionBusy = computed(() => {
@@ -476,49 +545,34 @@ const unregAfterEach = router.afterEach(() => { closeMobileMenu() })
 
 function toggleMobileMenu() { isMobileMenuOpen.value = !isMobileMenuOpen.value }
 function closeMobileMenu() { isMobileMenuOpen.value = false }
+
 watch(isMobileMenuOpen, (open) => {
   document.body.classList.toggle('overflow-hidden', open)
-  nextTick().then(() => { updateNavHeight(); updateInfoHeight() })
-})
-
-/** ---- Auth code (from global auth.user, with prop override) ---- */
-const authUser = computed(() => (user && user.value) || null)
-const authCodeFromAuth = computed(() => {
-  const u = authUser.value
-  const code = (u && u.auth_code) ?? (u && u.payload && u.payload.auth_code)
-  const n = Number(code)
-  return Number.isFinite(n) ? n : null
-})
-const effectiveAuthCode = computed(() =>
-  props.authCode != null ? Number(props.authCode) : authCodeFromAuth.value
-)
-const isPaired = computed(() => Number(effectiveAuthCode.value) === 6)
-const showPairing = computed(() => effectiveAuthCode.value != null)
-
-/** ---- Balance zero? ---- */
-const isZeroAvailable = computed(() => {
-  const n = Number(props.balanceDerivedSats)
-  return Number.isFinite(n) && n === 0
+  nextTick().then(scheduleRecalc)
 })
 
 /** ---- Lifecycle ---- */
 onMounted(async () => {
   await nextTick()
-  updateNavHeight()
-  updateInfoHeight()
+  scheduleRecalc()
 
   if ('ResizeObserver' in window) {
-    resizeObs = new ResizeObserver(() =>
-      requestAnimationFrame(() => { updateNavHeight(); updateInfoHeight() })
-    )
+    resizeObs = new ResizeObserver(() => scheduleRecalc())
     if (navRef.value) resizeObs.observe(navRef.value)
     nextTick(() => { if (infoRef.value && resizeObs) resizeObs.observe(infoRef.value) })
   } else {
-    const onResize = () => { updateNavHeight(); updateInfoHeight() }
+    const onResize = () => scheduleRecalc()
     window.addEventListener('resize', onResize, { passive: true })
   }
 
+  // Start BTC price polling once
   startPricePolling()
+
+  // If logged in but no cached profile yet, refresh without blanking UI
+  if (isLoggedIn.value && !authUser.value) {
+    // IMPORTANT: your composable should implement SWR so this doesn’t toggle loading if data exists
+    await setUserFromApi?.().catch(() => {})
+  }
 })
 
 onUnmounted(() => {
@@ -528,21 +582,16 @@ onUnmounted(() => {
   stopStatusWatch && stopStatusWatch()
 })
 
-/** Re-measure when header-height-affecting state flips */
-watch(() => authLoggedIn.value, () => {
-  nextTick().then(() => { updateNavHeight(); updateInfoHeight() })
-})
-watch(() => authUser.value, () => nextTick().then(updateInfoHeight))
-watch(() => props.loading, () => nextTick().then(updateInfoHeight))
-watch(() => props.error, () => nextTick().then(updateInfoHeight))
-watch(() => props.isLoggedIn, () => nextTick().then(updateInfoHeight))
+/** Re-measure only on actual auth/user changes (not page props) */
+watch(() => isLoggedIn.value, () => nextTick().then(scheduleRecalc))
+watch(() => authUser.value, () => nextTick().then(scheduleRecalc))
 
 /** Token health reactions */
 const stopStatusWatch = watch(
   () => tokenHealth && tokenHealth.status,
   (s) => {
     if (s === 'invalid') { isMobileMenuOpen.value = false; logoutUser(false) }
-    if (s === 'valid') { nextTick().then(updateInfoHeight) }
+    if (s === 'valid') { nextTick().then(scheduleRecalc) }
   },
   { immediate: false }
 )
@@ -556,7 +605,7 @@ const logoutUser = async (fromMobile = false) => {
   } catch { /* no-op */ }
 }
 
-/** ---- Info strip helpers (BTC/fiat) ---- */
+/** ---- Info strip helpers (BTC/fiat display) ---- */
 const live = computed(() => 'polite')
 
 function satsToBtc (s) {
@@ -581,20 +630,40 @@ function formatFiat (n) {
     return `$${Math.round(n).toLocaleString()}`
   }
 }
-const fiatAvailable = computed(() => {
-  if (!props.showFiat || props.btcUsd == null) return null
-  const b = satsToBtc(props.balanceDerivedSats)
-  return b == null ? null : formatFiat(b * Number(props.btcUsd))
-})
-const fiatOnchain = computed(() => {
-  if (!props.showFiat || props.btcUsd == null) return null
-  const b = satsToBtc(props.balanceOnchainSats)
-  return b == null ? null : formatFiat(b * Number(props.btcUsd))
+
+/** Prefer prop btcUsd if given; otherwise try parsing the live ticker number */
+const btcUsdEffective = computed(() => {
+  if (props.btcUsd != null) return Number(props.btcUsd)
+  const raw = (btcPrice.value || '').replace(/,/g, '')
+  const n = Number(raw)
+  return Number.isFinite(n) ? n : null
 })
 
-/** ---- Link color helper ---- */
-const linkClass = computed(() => 'hover:text-secondary text-white')
+const fiatAvailable = computed(() => {
+  if (!props.showFiat || btcUsdEffective.value == null) return null
+  const b = satsToBtc(balanceDerivedSats.value)
+  return b == null ? null : formatFiat(b * btcUsdEffective.value)
+})
+const fiatOnchain = computed(() => {
+  if (!props.showFiat || btcUsdEffective.value == null) return null
+  const b = satsToBtc(balanceOnchainSats.value)
+  return b == null ? null : formatFiat(b * btcUsdEffective.value)
+})
+
+/** ---- Expose refs used in template ---- */
+defineExpose({
+  navRef, infoRef, spacerHeight,
+  // Data used in template:
+  email, balanceDerivedSats, balanceOnchainSats,
+  isLoggedIn, isPaired, showPairing, isZeroAvailable,
+  sessionBusy, btcPrice, authLoading, authError,
+  logoutUser,
+  // For Retry button: bubble up so parent can call setUserFromApi (or handle centrally)
+  onRetry: () => emit('retry'),
+  linkClass: computed(() => 'hover:text-secondary text-white'),
+})
 </script>
+
 
 
 

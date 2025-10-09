@@ -4,7 +4,7 @@ import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../api/publicContact'
 const videos = [
-  'Psuh8mml91o',
+  'WfBMCMVsD1Q',
   'yNbE83BF8Mk',
   'Gr0H0MpUbhU',
 ]
@@ -264,7 +264,7 @@ function onAfterLeave(el) {
               </h2>
               <p class="mt-6 text-white text-lg md:text-xl leading-relaxed">
                 Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Whether you want to grow your Bitcoin holdings or generate fiat returns secured by Bitcoin, Cadena's innovative technology allows
-                <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/80">users to always maintain custody of their Bitcoin</span>
+                <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/80">users to always maintain custody of their Bitcoin.</span>
               </p>
             </div>
           </div>
