@@ -220,6 +220,44 @@ function onAfterLeave(el) {
 
       <!-- Right: iPhone mockup (hover-grow + link to /signerapp) -->
       <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10 phone-col">
+        <div
+  class="hidden sm:flex absolute top-6 left-1/2 -translate-x-1/2 z-20 items-center gap-3"
+  aria-label="Download badges"
+>
+  <!-- App Store badge (exact size) -->
+  <a
+    href="https://apps.apple.com/app/idYOUR_APP_ID"
+    target="_blank"
+    rel="noopener"
+    aria-label="Download on the App Store"
+    class="inline-block"
+    style="line-height:0"
+  >
+    <img
+      src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
+      alt="Download on the App Store"
+      width="246"
+      height="82"
+      style="width:246px;height:82px;vertical-align:middle;object-fit:contain"
+    />
+  </a>
+
+  <!-- Google Play badge (exact height) -->
+  <a
+    href="https://play.google.com/store/apps/details?id=com.app.cadenabitcoin&pcampaignid=web_share"
+    target="_blank"
+    rel="noopener"
+    aria-label="Get it on Google Play"
+    class="inline-block"
+    style="line-height:0"
+  >
+    <img
+      src="/img/GetItOnGooglePlay_Badge_Web_color_English.svg"
+      alt="Get it on Google Play"
+      style="height:120px;width:auto;object-fit:contain;vertical-align:middle"
+    />
+  </a>
+</div>
         <div class="[perspective:1100px]">
           <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
             <router-link to="/signerapp" class="group block cursor-pointer select-none" aria-label="Open Signer App page">

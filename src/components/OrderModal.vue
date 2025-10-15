@@ -48,28 +48,41 @@
         </div>
 
         <div v-if="marketIsZeroish">
-          <label class="block mb-1 font-semibold">Order Type</label>
-          <div class="w-full px-4 py-2 rounded bg-white/10 border border-white/20 flex items-center justify-between">
-            <span>Limit Order</span>
-            <span class="text-xs px-2 py-1 rounded bg-secondary/20 border border-secondary/40">required</span>
-          </div>
-          <p class="text-xs text-white/70 mt-1">No market quote. Set your own rate.</p>
-        </div>
+  <label class="block mb-1 font-semibold">Order Type</label>
+  <div class="w-full px-4 py-2 rounded bg-white/10 border border-white/20 flex items-center justify-between">
+    <span>Limit Order</span>
+    <span class="text-xs px-2 py-1 rounded bg-secondary/20 border border-secondary/40">required</span>
+  </div>
+  <p class="text-xs text-white/70 mt-1">No market quote. Set your own rate.</p>
+</div>
 
-        <div v-else>
-          <label class="block mb-1 font-semibold" for="order-type">Order Type</label>
-          <select
-            id="order-type"
-            v-model="orderType"
-            class="w-full px-4 py-2 rounded bg-white/10 border border-white/20 focus:outline-none"
-          >
-            <option value="market">Market Order</option>
-            <option value="limit">Limit Order</option>
-          </select>
-          <p class="text-xs text-white/70 mt-1">
-            Market executes at current rate. Limit lets you adjust relative to market.
-          </p>
-        </div>
+<div v-else>
+  <label class="block mb-1 font-semibold">Order Type</label>
+  <!-- Custom toggle instead of <select> -->
+  <div class="flex space-x-2">
+    <!-- Market button: active when orderType === 'market' -->
+    <button
+      type="button"
+      @click="orderType = 'market'"
+      :class="orderType === 'market' ? 'bg-secondary text-white' : 'bg-white/10 text-white/70'"
+      class="flex-1 px-4 py-2 rounded font-medium transition-colors"
+    >
+      Market Order
+    </button>
+    <!-- Limit button: active when orderType === 'limit' -->
+    <button
+      type="button"
+      @click="orderType = 'limit'"
+      :class="orderType === 'limit' ? 'bg-secondary text-white' : 'bg-white/10 text-white/70'"
+      class="flex-1 px-4 py-2 rounded font-medium transition-colors"
+    >
+      Limit Order
+    </button>
+  </div>
+  <p class="text-xs text-white/70 mt-1">
+    Market executes at current rate. Limit lets you adjust relative to market.
+  </p>
+</div>
 
         <!-- Rate Control -->
         <div class="mt-4">

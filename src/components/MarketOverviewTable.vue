@@ -1,24 +1,24 @@
 <template>
-  <section class="w-full h-full">
+  <section class="w-full h-full" :class="{ compact }">
     <div class="w-full h-full mx-auto">
       <div class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col">
         <!-- Title -->
-        <div class="text-3xl font-extrabold text-center mb-6 shrink-0">
+        <div class="text-3xl font-extrabold text-center mb-6 shrink-0 title-text">
           {{ title }}
         </div>
 
         <!-- Content Wrapper -->
         <div class="overflow-auto flex-1 min-h-0">
-          <!-- ✅ Desktop/Tablet (unchanged look) -->
+          <!-- ✅ Desktop/Tablet (unchanged structure; tighter sizing via CSS) -->
           <div class="hidden sm:block">
-            <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-6">
+            <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-2">
               <thead>
                 <tr>
                   <th></th>
                   <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
                     {{ leftGroupLabel }}
                   </th>
-                  <th class="spacer px-4"></th>
+                  <th class="spacer px-1"></th>
                   <th colspan="2" class="bg-secondary rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg">
                     {{ rightGroupLabel }}
                   </th>
@@ -35,7 +35,7 @@
                       Borrow
                     </div>
                   </th>
-                  <th class="spacer px-4 py-4"></th>
+                  <th class="spacer px-1 py-4"></th>
                   <th class="px-4 py-4">
                     <div class="bg-secondary text-white rounded-md font-semibold px-4 py-4 w-full text-center min-w-[6rem]">
                       Lend
@@ -62,12 +62,12 @@
                     v-for="(key) in leftKeys"
                     :key="key"
                     @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer min-w-[6rem]"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw"
                   >
                     <div>
                       <span
                         :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                        class="text-3xl font-bold leading-tight"
+                        class="text-3xl font-bold leading-tight rate"
                       >
                         {{ getEar(term, key) }}
                       </span>
@@ -83,19 +83,19 @@
                     </div>
                   </td>
 
-                  <td class="px-4 spacer"></td>
+                  <td class="px-1 spacer"></td>
 
                   <!-- Right group cells -->
                   <td
                     v-for="(key) in rightKeys"
                     :key="key"
                     @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer min-w-[6rem]"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw"
                   >
                     <div>
                       <span
                         :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                        class="text-3xl font-bold leading-tight"
+                        class="text-3xl font-bold leading-tight rate"
                       >
                         {{ getEar(term, key) }}
                       </span>
@@ -136,7 +136,7 @@
                     :key="`m-${term.label}-${key}`"
                     type="button"
                     @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-w-[6rem]"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw"
                   >
                     <div class="space-y-1">
                       <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
@@ -145,7 +145,7 @@
 
                       <span
                         :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                        class="text-2xl font-bold leading-tight"
+                        class="text-2xl font-bold leading-tight rate"
                       >
                         {{ getEar(term, key) }}
                       </span>
@@ -174,7 +174,7 @@
                     :key="`m-${term.label}-${key}`"
                     type="button"
                     @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer min-w-[6rem]"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw"
                   >
                     <div class="space-y-1">
                       <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
@@ -183,7 +183,7 @@
 
                       <span
                         :class="flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''"
-                        class="text-2xl font-bold leading-tight"
+                        class="text-2xl font-bold leading-tight rate"
                       >
                         {{ getEar(term, key) }}
                       </span>
@@ -258,9 +258,6 @@ const modalNotice  = ref({ type: '', text: '' }) // type: 'success' | 'error' | 
 
 function handleCellClick(row, key) {
   modalNotice.value = { type: '', text: '' }
-
-  // ⬇️ Removed immediate login redirect so users can complete the flow first
-  // if (!isLoggedIn.value) { router.push('/login'); return }
 
   // NOTE: modal gets the *term* rate (not annualized)
   selectedRate.value = row[key]
@@ -347,6 +344,7 @@ const props = defineProps({
   rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
   offersPollMs: { type: Number, default: 5000 },
   changeFlashMs: { type: Number, default: 600 },
+  compact: { type: Boolean, default: true }, // 👈 new
 })
 
 // ===== Table rows (built from API) =====
@@ -372,7 +370,6 @@ function getEar(row, key) {
 
 // ===== Offer → table transform =====
 const TARGET_TERMS = [30, 90, 180, 365]
-
 function parseLtv(pid) { const m = String(pid || '').match(/ltv-(\d{1,3})/i); return m ? Number(m[1]) : null }
 
 // raw 'd-xxx' from product_id without mapping to 365
@@ -408,8 +405,8 @@ function buildTermsFromOffers(offers) {
   const best = {}
   for (const o of offers || []) {
     const ltv = parseLtv(o.product_id)
-    const rawDays = normalizeRawDays(o.product_id, o.duration) // e.g., 30, 90, 180, 360/365/366
-    const uiDays  = normalizeDisplayDays(o.product_id, o.duration) // e.g., 30, 90, 180, 365 (mapped)
+    const rawDays = normalizeRawDays(o.product_id, o.duration)
+    const uiDays  = normalizeDisplayDays(o.product_id, o.duration)
     if (!ltv || !rawDays || !uiDays) continue
 
     best[uiDays] ??= {}
@@ -490,8 +487,8 @@ async function loadOffersOnce() {
   if (isFetchingOffers) return
   isFetchingOffers = true
   try {
-   const token = getToken()
-       const res = token
+    const token = getToken()
+    const res = token
       ? await getUserOffers('both', false)
       : await getOffers('both')
     if (!res || !Array.isArray(res.payload)) throw new Error('Bad payload')
@@ -561,6 +558,7 @@ defineExpose({ loadOffersOnce, getEar })
 </script>
 
 <style scoped>
+/* ===== Animations ===== */
 .flash-text {
   animation: flashPop 0.18s ease-in-out;
 }
@@ -570,7 +568,7 @@ defineExpose({ loadOffersOnce, getEar })
   100% { transform: scale(1); }
 }
 
-/* Keep desktop table spacing tweaks for small screens if ever rendered */
+/* ===== Small-screen fallback for desktop table (if ever rendered) ===== */
 @media (max-width: 640px) {
   table {
     border-spacing: 0.25rem 0.75rem !important;
@@ -593,5 +591,50 @@ defineExpose({ loadOffersOnce, getEar })
   .-mt-1 {
     margin-top: -0.25rem;
   }
+}
+
+/* ===== Spacer (narrow but visible) ===== */
+.spacer {
+  width: 0.5rem;         /* narrow separator */
+  min-width: 0.5rem;
+  max-width: 0.5rem;
+  padding-left: 0.25rem; /* tailwind px-1 */
+  padding-right: 0.25rem;
+}
+
+/* ===== Compact Mode (in-between sizing) ===== */
+.compact .rounded-xl { padding: 1rem; } /* was 0.75rem */
+.compact .title-text { font-size: 1.75rem; margin-bottom: 1rem; } /* was 1.5/0.75 */
+
+/* Desktop table tightening */
+.compact table { border-spacing: 0.25rem 0.625rem !important; } /* horizontal smaller, vertical same */
+.compact thead th { padding: 0.45rem 0.6rem !important; font-size: 0.95rem; } /* was 0.35/0.5/0.9 */
+.compact tbody td { padding: 0.6rem !important; } /* was 0.5rem */
+
+/* Group chips ("Lend"/"Borrow") + group headers */
+.compact thead .bg-secondary { padding: 0.5rem 0.75rem !important; font-size: 1rem; }
+.compact thead .font-semibold { font-size: 0.9rem; }
+
+/* Rates */
+.compact .rate { font-size: 1.6rem; line-height: 1.15; }
+@media (min-width: 640px) {
+  .compact .rate { font-size: 1.75rem; }
+}
+
+/* Hint lines under rates (avoid invalid identifiers like .text-[10px]) */
+.compact [class*="text-[10px]"] { font-size: 10px !important; }
+.compact .text-xs,
+.compact [class*="text-[11px]"] { font-size: 11px !important; }
+
+/* Min width for cells/buttons */
+.minw { min-width: 6rem; }
+.compact .minw { min-width: 5rem; }
+
+/* Mobile card tightening — roomier than ultra-compact */
+@media (max-width: 640px) {
+  .compact .p-3 { padding: 0.625rem !important; }
+  .compact .mb-3 { margin-bottom: 0.625rem !important; }
+  .compact .grid { gap: 0.5rem !important; }
+  .compact .px-3.py-3 { padding: 0.625rem !important; }
 }
 </style>

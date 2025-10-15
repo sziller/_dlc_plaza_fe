@@ -1,5 +1,5 @@
 <template>
-  <main class="flex flex-col min-h-screen text-white pt-0 md:pt-24 relative">
+  <main class="flex flex-col min-h-screen text-white pt-0 md:pt-4 relative">
     <!-- Gradient Background (matches Home) -->
     <div class="absolute inset-0 -z-10 bg-page-gradient"></div>
 

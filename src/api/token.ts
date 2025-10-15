@@ -1,25 +1,17 @@
+// src/api/token.ts
 let authToken: string | null = null;
 
-// This function saves the token to memory and local storage
-// It takes a token as input and returns nothing
-export const saveToken = (token: string) => {
+// Save the token in memory only.  Nothing is persisted in web storage.
+export const saveToken = (token: string): void => {
   authToken = token;
-  sessionStorage.setItem('authToken', token);
 };
 
-// This function gets the token from memory or local storage
-// It returns the token if available, otherwise null
+// Return the current token from memory.  Returns null after a page reload.
 export const getToken = (): string | null => {
-  if (!authToken) {
-    authToken = sessionStorage.getItem('authToken');
-  }
   return authToken;
 };
 
-// This function removes the token from memory and local storage
-// It returns nothing
-export const removeToken = () => {
+// Clear the in‑memory token.
+export const removeToken = (): void => {
   authToken = null;
-  sessionStorage.removeItem('authToken');
-  localStorage.removeItem('authToken');
 };

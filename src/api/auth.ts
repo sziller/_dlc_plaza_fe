@@ -14,7 +14,7 @@ export const getAuthToken = async (
   timeout: number = 300000
 ): Promise<string> => {
   try {
-    console.log('API_URL:', API_URL); // Konzolra írja az API_URL értékét
+     // Konzolra írja az API_URL értékét
     const data = new URLSearchParams({
       grant_type: 'password',
       username: email,

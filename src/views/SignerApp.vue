@@ -97,13 +97,50 @@
       <!-- Final image strip -->
       
       <!-- CTA (optional) -->
-      <section class="text-center space-y-3">
-        <p class="text-white/70">Ready to keep your keys on your device and use Cadena securely?</p>
-        <div class="flex items-center justify-center gap-3">
-          <button type="button" class="px-5 py-2 rounded-lg bg-white/10 border border-white/20 hover:bg-white/15">Download (soon)</button>
-          <button type="button" class="px-5 py-2 rounded-lg bg-white text-black hover:bg-gray-100">Open Web App</button>
-        </div>
-      </section>
+      <!-- CTA -->
+<section class="text-center space-y-3">
+  <p class="text-white/70">
+    Ready to keep your keys on your device and use Cadena securely?
+  </p>
+  <div
+    class="flex items-center justify-center gap-3 flex-wrap"
+    style="line-height: 0"
+  >
+    <!-- Apple App Store badge -->
+    <a
+      href="https://apps.apple.com/us/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
+      style="display: inline-block"
+      aria-label="Download on the App Store"
+      target="_blank"
+      rel="noopener"
+    >
+      <img
+        src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
+        alt="Download on the App Store"
+        style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain"
+      />
+    </a>
+
+    <!-- Google Play badge (stored in public/img) -->
+    <a
+      href="https://play.google.com/store/apps/details?id=com.app.cadenabitcoin&pcampaignid=web_share"
+      style="display: inline-block"
+      aria-label="Get it on Google Play"
+      target="_blank"
+      rel="noopener"
+    >
+      <!-- Use your local SG asset from public/img -->
+      <img
+        src="/img/GetItOnGooglePlay_Badge_Web_color_English.svg"
+        alt="Get it on Google Play"
+        style="height: 120px; object-fit: contain"
+      />
+    </a>
+
+    
+  </div>
+</section>
+
     </div>
   </main>
 </template>
