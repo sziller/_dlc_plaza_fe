@@ -213,6 +213,45 @@ function onAfterLeave(el) {
   >
     {{ heroCtaLabel }}
   </router-link>
+  <!-- Mobile-only download badges -->
+<div
+  class="mt-4 flex sm:hidden items-center justify-center gap-3"
+  aria-label="Download badges"
+  style="line-height:0"
+>
+  <!-- App Store badge (smaller on mobile) -->
+  <a
+    href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
+    target="_blank"
+    rel="noopener"
+    aria-label="Download on the App Store"
+    class="inline-block"
+  >
+    <img
+      src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
+      alt="Download on the App Store"
+      width="200"
+      height="66"
+      style="width:200px;height:66px;vertical-align:middle;object-fit:contain"
+    />
+  </a>
+
+  <!-- Google Play badge -->
+  <a
+    href="https://play.google.com/store/apps/details?id=com.app.cadenabitcoin&pcampaignid=web_share"
+    target="_blank"
+    rel="noopener"
+    aria-label="Get it on Google Play"
+    class="inline-block"
+  >
+    <img
+      src="/img/GetItOnGooglePlay_Badge_Web_color_English.svg"
+      alt="Get it on Google Play"
+      style="height:95px;width:auto;object-fit:contain;vertical-align:middle"
+    />
+  </a>
+</div>
+
 </div>
 
         </div>
@@ -226,7 +265,7 @@ function onAfterLeave(el) {
 >
   <!-- App Store badge (exact size) -->
   <a
-    href="https://apps.apple.com/app/idYOUR_APP_ID"
+    href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
     target="_blank"
     rel="noopener"
     aria-label="Download on the App Store"

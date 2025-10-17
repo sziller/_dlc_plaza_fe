@@ -12,35 +12,42 @@
     >
       <!-- Main navbar row -->
       <div class="px-6 py-4 flex justify-between items-center">
-        <!-- Logo & BTC Price -->
-        <div class="flex items-center space-x-4">
-          <img
-            :src="logo"
-            alt="Cadena Bitcoin Logo"
-            class="w-10 h-10 object-contain"
-            decoding="async"
-            loading="eager"
-            draggable="false"
-            referrerpolicy="no-referrer"
-          />
-          <div class="flex flex-col items-start space-y-1">
-            <div class="text-xl font-bold tracking-wide leading-tight text-secondary">Cadena Bitcoin</div>
-            <div class="text-sm font-medium flex items-center gap-1">
-              <img
-                src="https://flagcdn.com/us.svg"
-                alt="US Flag"
-                class="w-4 h-4 inline-block"
-                width="16" height="12"
-                decoding="async"
-                loading="lazy"
-                draggable="false"
-                referrerpolicy="no-referrer"
-              />
-              <span class="text-white">BTCUSD:</span>
-              <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
-            </div>
-          </div>
-        </div>
+       <!-- Logo & BTC Price (clickable to Home) -->
+<router-link
+  to="/"
+  class="flex items-center space-x-4 group focus:outline-none focus:ring-2 focus:ring-secondary/60 rounded-md"
+  aria-label="Go to Home"
+>
+  <img
+    :src="logo"
+    alt="Cadena Bitcoin Logo"
+    class="w-10 h-10 object-contain"
+    decoding="async"
+    loading="eager"
+    draggable="false"
+    referrerpolicy="no-referrer"
+  />
+  <div class="flex flex-col items-start space-y-1">
+    <div class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
+      Cadena Bitcoin
+    </div>
+    <div class="text-sm font-medium flex items-center gap-1">
+      <img
+        src="https://flagcdn.com/us.svg"
+        alt="US Flag"
+        class="w-4 h-4 inline-block"
+        width="16" height="12"
+        decoding="async"
+        loading="lazy"
+        draggable="false"
+        referrerpolicy="no-referrer"
+      />
+      <span class="text-white">BTCUSD:</span>
+      <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
+    </div>
+  </div>
+</router-link>
+
 
         <!-- Burger -->
         <button
@@ -123,7 +130,7 @@
 
         <!-- CTA Buttons Desktop -->
         <div class="hidden md:flex items-center space-x-4 text-white">
-          <a href="/downloads/Cadena(notify).apk" download type="application/vnd.android.package-archive" class="hover:text-secondary transition">Download APK</a>
+          
 
           <router-link
             v-if="!isLoggedIn"
@@ -356,7 +363,7 @@
           Logout
         </button>
 
-        <a href="/downloads/Cadena(notify).apk" download type="application/vnd.android.package-archive" class="block hover:text-secondary transition">Download APK</a>
+       
 
         <router-link
           v-if="!isLoggedIn"

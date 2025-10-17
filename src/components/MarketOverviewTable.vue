@@ -62,7 +62,7 @@
                     v-for="(key) in leftKeys"
                     :key="key"
                     @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw hover-glow"
                   >
                     <div>
                       <span
@@ -90,7 +90,7 @@
                     v-for="(key) in rightKeys"
                     :key="key"
                     @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw"
+                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw hover-glow"
                   >
                     <div>
                       <span
@@ -136,7 +136,7 @@
                     :key="`m-${term.label}-${key}`"
                     type="button"
                     @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw hover-glow"
                   >
                     <div class="space-y-1">
                       <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
@@ -174,7 +174,7 @@
                     :key="`m-${term.label}-${key}`"
                     type="button"
                     @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw"
+                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw hover-glow"
                   >
                     <div class="space-y-1">
                       <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
@@ -637,4 +637,79 @@ defineExpose({ loadOffersOnce, getEar })
   .compact .grid { gap: 0.5rem !important; }
   .compact .px-3.py-3 { padding: 0.625rem !important; }
 }
+
+/* ==== Natural edge glow (no circle, no rectangle bleed) ==== */
+.hover-glow {
+  position: relative;
+  isolation: isolate;
+  outline: none;
+  /* base surface stays quiet */
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+/* ring that follows the shape exactly, blurred for glow */
+.hover-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;                      /* match element bounds */
+  border-radius: inherit;        /* respect rounded corners */
+  pointer-events: none;
+
+  /* theme knobs */
+  --secondary: #6738e4;          /* swap to your CSS var if you have one */
+  --ring: 5px;                  /* ring thickness */
+  --blur: 16px;                  /* softness */
+  --alpha: 0;                    /* start hidden */
+
+  /* solid color, then we cut out the middle with mask below */
+  background: color-mix(in oklch, var(--secondary), white 10%);
+
+  /* Mask trick: keep only a thin band near the edges (no circles) */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask-composite: exclude;
+
+  /* The content box is the inner edge of the ring */
+  padding: var(--ring);
+
+  /* soften + subtle scale to sit “behind” */
+  filter: blur(var(--blur));
+  opacity: var(--alpha);
+  transform: scale(0.995);
+
+  transition:
+    opacity 180ms ease,
+    filter 180ms ease,
+    transform 180ms ease;
+}
+
+/* Hover / focus: reveal the ring */
+.hover-glow:hover::before,
+.hover-glow:focus-visible::before {
+  --alpha: 0.85;
+  --blur: 18px;
+  transform: scale(1);
+}
+
+/* A touch of depth: faint inner rim + outer drop (kept subtle) */
+.hover-glow:hover,
+.hover-glow:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--secondary), white 25%),
+    inset 0 0 24px color-mix(in oklch, var(--secondary), black 70% / 18%),
+    0 10px 26px -14px color-mix(in oklch, var(--secondary), black 20%);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .hover-glow::before {
+    transition: opacity 120ms linear;
+  }
+}
+
 </style>
