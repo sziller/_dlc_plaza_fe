@@ -163,18 +163,7 @@
             </a>
 
             <!-- Use your real GitHub org/user if available -->
-            <a
-              href="https://github.com/"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              referrerpolicy="no-referrer"
-              aria-label="Visit our GitHub"
-              class="social-tile"
-            >
-              <i-simple-icons-github class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true" />
-              <span class="text-base font-medium">GitHub</span>
-            </a>
-
+           
             <a
               href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt"
               target="_blank"

@@ -123,19 +123,15 @@
 
     <!-- Google Play badge (stored in public/img) -->
     <a
-      href="https://play.google.com/store/apps/details?id=com.app.cadenabitcoin&pcampaignid=web_share"
-      style="display: inline-block"
-      aria-label="Get it on Google Play"
-      target="_blank"
-      rel="noopener"
-    >
-      <!-- Use your local SG asset from public/img -->
-      <img
-        src="/img/GetItOnGooglePlay_Badge_Web_color_English.svg"
-        alt="Get it on Google Play"
-        style="height: 120px; object-fit: contain"
-      />
-    </a>
+  href="/downloads/CadenaBitcoinLive%28v101%29.apk"
+  download="CadenaBitcoinLive(v101).apk"
+  rel="nofollow"
+  aria-label="Download Android APK"
+  class="inline-flex items-center gap-2 rounded-full border border-secondary px-8 py-2 text-base font-semibold text-white hover:bg-white/10"
+  
+>
+  <span>Download APK</span>
+</a>
 
     
   </div>
@@ -143,6 +139,7 @@
 
     </div>
   </main>
+  <TheFooter/>
 </template>
 
 <script setup lang="ts">

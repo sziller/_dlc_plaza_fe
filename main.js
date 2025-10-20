@@ -17,4 +17,8 @@ captureReferralFromURL({ keys: ['ref', 'r', 'referral'], cleanURL: true });
 const app = createApp(App)
 app.use(router)
 installSeo(router)
+router.afterEach((to) => {
+  // Call plausible('pageview') to track navigation within the SPA
+  window.plausible?.('pageview', { u: location.origin + to.fullPath });
+});
 app.mount('#app');

@@ -237,19 +237,17 @@ function onAfterLeave(el) {
   </a>
 
   <!-- Google Play badge -->
-  <a
-    href="https://play.google.com/store/apps/details?id=com.app.cadenabitcoin&pcampaignid=web_share"
-    target="_blank"
-    rel="noopener"
-    aria-label="Get it on Google Play"
-    class="inline-block"
-  >
-    <img
-      src="/img/GetItOnGooglePlay_Badge_Web_color_English.svg"
-      alt="Get it on Google Play"
-      style="height:95px;width:auto;object-fit:contain;vertical-align:middle"
-    />
-  </a>
+<a
+  href="/downloads/CadenaBitcoinLive%28v101%29.apk"
+  download="CadenaBitcoinLive(v101).apk"
+  rel="nofollow"
+  aria-label="Download Android APK"
+  class="inline-flex items-center gap-2 rounded-full border border-secondary px-4 py-3 text-sm font-semibold text-white hover:bg-white/10"
+ 
+>
+  <!-- optional: small android glyph you already use; otherwise text is fine -->
+  <span>Download APK</span>
+</a>
 </div>
 
 </div>
@@ -283,19 +281,15 @@ function onAfterLeave(el) {
 
   <!-- Google Play badge (exact height) -->
   <a
-    href="https://play.google.com/store/apps/details?id=com.app.cadenabitcoin&pcampaignid=web_share"
-    target="_blank"
-    rel="noopener"
-    aria-label="Get it on Google Play"
-    class="inline-block"
-    style="line-height:0"
-  >
-    <img
-      src="/img/GetItOnGooglePlay_Badge_Web_color_English.svg"
-      alt="Get it on Google Play"
-      style="height:120px;width:auto;object-fit:contain;vertical-align:middle"
-    />
-  </a>
+  href="/downloads/CadenaBitcoinLive%28v101%29.apk"
+  download="CadenaBitcoinLive(v101).apk"
+  rel="nofollow"
+  aria-label="Download Android APK"
+  class="inline-flex items-center gap-2 rounded-full border border-secondary px-8 py-2 text-base font-semibold text-white hover:bg-white/10"
+  
+>
+  <span>Download APK</span>
+</a>
 </div>
         <div class="[perspective:1100px]">
           <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
@@ -559,7 +553,7 @@ function onAfterLeave(el) {
     </section>
   </div>
 
-  <TheFooter />
+  <TheFooter/>
 </template>
 
 <style scoped>

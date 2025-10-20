@@ -9,7 +9,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     DLCDetails: typeof import('./components/DLCDetails.vue')['default']
-    ISimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']
     ISimpleIconsX: typeof import('~icons/simple-icons/x')['default']
     ISimpleIconsYoutube: typeof import('~icons/simple-icons/youtube')['default']
     MarketOverviewTable: typeof import('./components/MarketOverviewTable.vue')['default']
