@@ -6,9 +6,11 @@
     <div class="max-w-7xl mx-auto space-y-14">
       <!-- Hero -->
       <header class="text-center space-y-5">
-        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">Cadena <em>Signer</em> App</h1>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">
+          Cadena <em>Signer</em> App
+        </h1>
         <p class="text-white/80 max-w-3xl mx-auto text-base sm:text-lg">
-          Your on-device key holder and transaction signer. Non‑custodial by design, so your secrets stay on your phone while
+          Your on-device key holder and transaction signer. Non-custodial by design, so your secrets stay on your phone while
           the web app and backend only see what they need: public keys and signatures.
         </p>
       </header>
@@ -17,15 +19,23 @@
       <section aria-label="Image preview" class="max-w-5xl mx-auto flex justify-center">
         <div class="relative title-glow">
           <picture>
-            <source type="image/avif" srcset="/img/titlePage-640.avif 640w, /img/titlePage-960.avif 960w, /img/titlePage-1280.avif 1280w" />
-            <source type="image/webp" srcset="/img/titlePage-640.webp 640w, /img/titlePage-960.webp 960w, /img/titlePage-1280.webp 1280w" />
+            <source
+              type="image/avif"
+              srcset="/img/titlePage-640.avif 640w, /img/titlePage-960.avif 960w, /img/titlePage-1280.avif 1280w"
+            />
+            <source
+              type="image/webp"
+              srcset="/img/titlePage-640.webp 640w, /img/titlePage-960.webp 960w, /img/titlePage-1280.webp 1280w"
+            />
             <img
               src="/img/titlePage-960.webp"
               srcset="/img/titlePage-640.webp 640w, /img/titlePage-960.webp 960w, /img/titlePage-1280.webp 1280w"
               sizes="(max-width: 768px) 640px, (max-width: 1024px) 960px, 1280px"
               alt="Signer app title screen"
               class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
-              decoding="async" loading="eager" fetchpriority="high"
+              decoding="async"
+              loading="eager"
+              fetchpriority="high"
             />
           </picture>
         </div>
@@ -36,7 +46,7 @@
         <div class="space-y-4">
           <h2 class="text-2xl sm:text-3xl font-bold">What is the Signer?</h2>
           <p class="text-white/80">
-            The Signer is a mobile companion app that generates and protects your cryptographic keys on‑device. It authorizes
+            The Signer is a mobile companion app that generates and protects your cryptographic keys on-device. It authorizes
             Cadena actions by producing signatures when you approve them. Keys are never uploaded or shared with Cadena.
           </p>
           <ul class="list-disc pl-5 space-y-2 text-white/80 text-base md:text-lg">
@@ -48,9 +58,9 @@
         <div class="space-y-4">
           <h3 class="text-2xl sm:text-3xl font-bold">Why it’s needed</h3>
           <p class="text-white/80">
-            Cadena is non‑custodial. That means <span class="font-semibold">you</span> hold the keys and control authorization. The Signer separates
+            Cadena is non-custodial. That means <span class="font-semibold">you</span> hold the keys and control authorization. The Signer separates
             identity and UI in the browser from the sensitive key material on your device, reducing attack surface and preserving
-            self‑custody.
+            self-custody.
           </p>
           <ul class="list-disc pl-5 space-y-2 text-white/80">
             <li><span class="font-medium">Security:</span> private keys never touch the server or the browser.</li>
@@ -59,19 +69,26 @@
           </ul>
         </div>
       </section>
-<!-- Security model -->
+
+      <!-- Security model -->
       <section class="grid md:grid-cols-2 gap-8 items-center">
         <div class="space-y-6 self-center">
           <h2 class="text-4xl md:text-5xl font-extrabold">Security model</h2>
           <div class="grid gap-4 md:gap-5">
             <div class="p-5 md:p-6 rounded-xl bg-white/5 border border-white/10">
-              <p class="text-white/90 text-lg md:text-xl leading-relaxed">Keys are generated <strong>on‑device</strong> and stored in secure storage. They never leave your phone.</p>
+              <p class="text-white/90 text-lg md:text-xl leading-relaxed">
+                Keys are generated <strong>on-device</strong> and stored in secure storage. They never leave your phone.
+              </p>
             </div>
             <div class="p-5 md:p-6 rounded-xl bg-white/5 border border-white/10">
-              <p class="text-white/90 text-lg md:text-xl leading-relaxed">Cadena only receives your <strong>XPUB</strong> and <strong>signatures</strong>—<em>never</em> your seed or private keys.</p>
+              <p class="text-white/90 text-lg md:text-xl leading-relaxed">
+                Cadena only receives your <strong>XPUB</strong> and <strong>signatures</strong>—<em>never</em> your seed or private keys.
+              </p>
             </div>
             <div class="p-5 md:p-6 rounded-xl bg-white/5 border border-white/10">
-              <p class="text-white/90 text-lg md:text-xl leading-relaxed">Every signature is <strong>scoped</strong> to the exact action you approve, preventing reuse elsewhere.</p>
+              <p class="text-white/90 text-lg md:text-xl leading-relaxed">
+                Every signature is <strong>scoped</strong> to the exact action you approve, preventing reuse elsewhere.
+              </p>
             </div>
           </div>
         </div>
@@ -85,122 +102,196 @@
               sizes="(max-width: 768px) 640px, 960px"
               alt="Seed phrase and recovery flow"
               class="block mx-auto w-[300px] md:w-[360px] lg:w-[420px] h-auto select-none"
-              decoding="async" loading="lazy"
+              decoding="async"
+              loading="lazy"
             />
           </picture>
-       
         </div>
       </section>
 
-      <!-- FAQ / Notes -->
-      
-      <!-- Final image strip -->
-      
-      <!-- CTA (optional) -->
       <!-- CTA -->
-<section class="text-center space-y-3">
-  <p class="text-white/70">
-    Ready to keep your keys on your device and use Cadena securely?
-  </p>
-  <div
-    class="flex items-center justify-center gap-3 flex-wrap"
-    style="line-height: 0"
-  >
-    <!-- Apple App Store badge -->
-    <a
-      href="https://apps.apple.com/us/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
-      style="display: inline-block"
-      aria-label="Download on the App Store"
-      target="_blank"
-      rel="noopener"
-    >
-      <img
-        src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
-        alt="Download on the App Store"
-        style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain"
-      />
-    </a>
+      <section class="text-center space-y-3">
+        <p class="text-white/70">
+          Ready to keep your keys on your device and use Cadena securely?
+        </p>
+        <div
+          class="flex items-center justify-center gap-3 flex-wrap"
+          style="line-height: 0"
+        >
+          <!-- Apple App Store badge -->
+          <a
+            href="https://apps.apple.com/us/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
+            style="display: inline-block"
+            aria-label="Download on the App Store"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
+              alt="Download on the App Store"
+              style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain"
+            />
+          </a>
 
-    <!-- Google Play badge (stored in public/img) -->
-    <a
-  href="/downloads/CadenaBitcoinLive%28v101%29.apk"
-  download="CadenaBitcoinLive(v101).apk"
-  rel="nofollow"
-  aria-label="Download Android APK"
-  class="inline-flex items-center gap-2 rounded-full border border-secondary px-8 py-2 text-base font-semibold text-white hover:bg-white/10"
-  
->
-  <span>Download APK</span>
-</a>
+          <!-- Android APK badge (same shape as homepage version, now via API) -->
+          <button
+            type="button"
+            class="apk-badge"
+            :disabled="downloading"
+            @click="handleApkDownload"
+            aria-label="Download Android APK v101"
+          >
+            <span class="apk-version">
+              {{ downloading ? '...' : 'v101' }}
+            </span>
+            <span>
+              {{ downloading ? 'Downloading…' : 'Download APK' }}
+            </span>
+          </button>
+        </div>
 
-    
-  </div>
-</section>
-
+        <p v-if="downloadError" class="text-sm text-red-300 pt-2">
+          {{ downloadError }}
+        </p>
+      </section>
     </div>
   </main>
-  <TheFooter/>
+  <TheFooter />
 </template>
 
-<script setup lang="ts">
-// Optional: add route meta if your router uses it
-// defineOptions({ name: 'SignerAppPage' })
+<script setup lang="js">
+import { ref } from 'vue'
+import TheFooter from '../components/TheFooter.vue'
+import { downloadApp } from '../api/downloadApp'
+
+const downloading = ref(false)
+const downloadError = ref('')
+
+const handleApkDownload = async () => {
+  if (downloading.value) return
+
+  downloading.value = true
+  downloadError.value = ''
+
+  try {
+    // match the type your TS expects: an object with optional filename
+    await downloadApp({ filename: 'CadenaBitcoinLive(v101).apk' })
+  } catch (err) {
+    // fallback to static file if API fails
+    try {
+      const fallbackUrl = '/downloads/CadenaBitcoinLive%28v101%29.apk'
+      const a = document.createElement('a')
+      a.href = fallbackUrl
+      a.download = 'CadenaBitcoinLive(v101).apk'
+      a.rel = 'nofollow'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    } catch (err2) {
+      downloadError.value = 'Could not start download. Try again in a bit.'
+    }
+  } finally {
+    downloading.value = false
+  }
+}
 </script>
 
 <style scoped>
-/* Page gradient moved from style= to a class */
-.bg-page-gradient{
-  background-color: #000; /* solid black base */
-  background-image:
-    radial-gradient(
-      125% 75% at 50% 100%,      /* big ellipse, anchored at bottom center */
-      rgba(103,56,228,0.58) 0%,  /* #6738e4, strongest near bottom */
-      rgba(103,56,228,0.36) 26%,
-      rgba(103,56,228,0.16) 52%,
-      rgba(0,0,0,0) 76%          /* fade to transparent -> pure black */
-    );
+.bg-page-gradient {
+  background-color: #000;
+  background-image: radial-gradient(
+    125% 75% at 50% 100%,
+    rgba(103, 56, 228, 0.58) 0%,
+    rgba(103, 56, 228, 0.36) 26%,
+    rgba(103, 56, 228, 0.16) 52%,
+    rgba(0, 0, 0, 0) 76%
+  );
 }
 
-/* Smoother math when OKLCH is available, but same hue (#6738e4) */
 @supports (background: radial-gradient(in oklch, black, white)) {
-  .bg-page-gradient{
+  .bg-page-gradient {
     background-color: oklch(0 0 0);
-    background-image:
-      radial-gradient(
-        in oklch 125% 75% at 50% 100%,
-        oklch(from #6738e4 l c h / 0.60) 0%,
-        oklch(from #6738e4 l c h / 0.36) 26%,
-        oklch(from #6738e4 l c h / 0.16) 52%,
-        oklch(0 0 0 / 0) 76%
-      );
+    background-image: radial-gradient(
+      in oklch 125% 75% at 50% 100%,
+      oklch(from #6738e4 l c h / 0.6) 0%,
+      oklch(from #6738e4 l c h / 0.36) 26%,
+      oklch(from #6738e4 l c h / 0.16) 52%,
+      oklch(0 0 0 / 0) 76%
+    );
   }
 }
 
-/* Keep the glow lower on short screens so it doesn't climb mid-page */
-@media (max-height: 800px){
-  .bg-page-gradient{
-    background-image:
-      radial-gradient(
-        120% 60% at 50% 100%,
-        rgba(103,56,228,0.52) 0%,
-        rgba(103,56,228,0.30) 24%,
-        rgba(103,56,228,0.12) 48%,
-        rgba(0,0,0,0) 70%
-      );
+@media (max-height: 800px) {
+  .bg-page-gradient {
+    background-image: radial-gradient(
+      120% 60% at 50% 100%,
+      rgba(103, 56, 228, 0.52) 0%,
+      rgba(103, 56, 228, 0.3) 24%,
+      rgba(103, 56, 228, 0.12) 48%,
+      rgba(0, 0, 0, 0) 70%
+    );
   }
 }
-  
-/* Image card hover (subtle) */
-.img-card{ transition: transform .25s ease, box-shadow .25s ease; }
-.img-card:hover{ transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
 
-/* Hero banner glow similar to phone mock */
-.title-glow::before{
-  content:"";
-  position:absolute; inset:-10% -10% -20% -10%;
-  border-radius:2rem; pointer-events:none;
-  filter: blur(80px); opacity:.6;
-  background: radial-gradient(55% 55% at 50% 80%, rgba(103,56,228,.55) 0%, rgba(103,56,228,.28) 40%, rgba(0,0,0,0) 75%);
+.img-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.img-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
+.title-glow::before {
+  content: "";
+  position: absolute;
+  inset: -10% -10% -20% -10%;
+  border-radius: 2rem;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.6;
+  background: radial-gradient(
+    55% 55% at 50% 80%,
+    rgba(103, 56, 228, 0.55) 0%,
+    rgba(103, 56, 228, 0.28) 40%,
+    rgba(0, 0, 0, 0) 75%
+  );
+}
+
+/* APK badge, same shape */
+.apk-badge {
+  --badge-h: clamp(34px, 5.5vw, 52px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--badge-h) * 0.14);
+  padding-inline: calc(var(--badge-h) * 0.18);
+  height: var(--badge-h);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: clamp(0.62rem, calc(var(--badge-h) * 0.22), 0.85rem);
+  line-height: 1;
+  border-radius: calc(var(--badge-h) * 0.26);
+  transition: background 0.15s ease-out, border 0.15s ease-out, opacity 0.15s ease-out;
+  cursor: pointer;
+}
+.apk-badge:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.apk-badge:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.apk-version {
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65em;
+  line-height: 1;
+  white-space: nowrap;
+}
 </style>

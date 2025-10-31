@@ -1,127 +1,75 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../api/publicContact'
-const videos = [
-  'WfBMCMVsD1Q',
-  'yNbE83BF8Mk',
-  'Gr0H0MpUbhU',
-]
+import Rates50Mini from '../components/Rates50Mini.vue'
+import { downloadApp } from '../api/downloadApp'
 
+// Store badge width sync
+const appleBadgeRef = ref(null)
+const apkBadgeRef = ref(null)
+
+/* ---------- Media ---------- */
+const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
+
+/* ---------- Articles ---------- */
 const articles = [
-  {
-    id: 1,
-    title: 'Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance',
-    description: 'Understand what sets Cadena Bitcoin apart from other platforms.',
-    imageBase: 'article1',
-    link: '/article/cadena-vs-others',
-    internal: true,
-  },
-  {
-    id: 2,
-    title: 'Cadena Bitcoin - Empowering Individual Financial Freedom',
-    description: ' Learn how Cadena Bitcoin lets you use Bitcoin flexibly.',
-    imageBase: 'article2',
-    link: '/article/cadena-empowering-financial-freedom',
-    internal: true,
-  },
-  {
-    id: 3,
-    title: 'Cadena Bitcoin: Security',
-    description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles',
-    imageBase: 'article3',
-    link: '/article/cadena-loan-lifecycle',
-    internal: true,
-  },
-  {
-    id: 4,
-    title: 'How Does it Work?',
-    description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.',
-    imageBase: 'article4',
-    link: '/article/cadena-bitcoin-security',
-    internal: true,
-  },
-  {
-    id: 5,
-    title: 'We need to talk about KYC',
-    description: 'Identification is quietly becoming the default requirement for access to the internet.',
-    imageBase: 'article6',
-    link: '/article/we-need-to-talk-about-kyc',
-    internal: true,
-  },
-  {
-    id: 6,
-    title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending',
-    description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
-    imageBase: 'article5',
-    link: '/article/cadena-improving-btc',
-    internal: true,
-  },
+  { id: 1, title: 'Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance', description: 'Understand what sets Cadena Bitcoin apart from other platforms.', imageBase: 'article1', link: '/article/cadena-vs-others', internal: true },
+  { id: 2, title: 'Cadena Bitcoin - Empowering Individual Financial Freedom', description: ' Learn how Cadena Bitcoin lets you use Bitcoin flexibly.', imageBase: 'article2', link: '/article/cadena-empowering-financial-freedom', internal: true },
+  { id: 3, title: 'Cadena Bitcoin: Security', description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles', imageBase: 'article3', link: '/article/cadena-loan-lifecycle', internal: true },
+  { id: 4, title: 'How Does it Work?', description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.', imageBase: 'article4', link: '/article/cadena-bitcoin-security', internal: true },
+  { id: 5, title: 'We need to talk about KYC', description: 'Identification is quietly becoming the default requirement for access to the internet.', imageBase: 'article6', link: '/article/we-need-to-talk-about-kyc', internal: true },
+  { id: 6, title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending', description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.', imageBase: 'article5', link: '/article/cadena-improving-btc', internal: true },
 ]
 
+/* ---------- Auth / CTA ---------- */
 const { isLoggedIn, setUserFromApi } = useAuth()
+const ctaEmail = ref('')
+const heroCtaTo = computed(() => {
+  if (isLoggedIn.value) return '/btcusd'
+  const qp = isValidEmail(ctaEmail.value) ? `?email=${encodeURIComponent(ctaEmail.value)}` : ''
+  return `/register${qp}`
+})
+const heroCtaLabel = computed(() => (isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'))
+function onHeroCtaClick() {
+  if (!isLoggedIn.value && isValidEmail(ctaEmail.value)) postContactEmail(ctaEmail.value)
+}
+
+/* ---------- Carousel ---------- */
 const currentIndex = ref(0)
 const isMobile = ref(false)
-const ctaEmail = ref('')
-const sectionInView = ref([false, false, false])
+const visibleArticles = computed(() => {
+  if (isMobile.value) return articles
+  const res = []
+  const len = articles.length
+  for (let i = 0; i < 3; i++) res.push(articles[(currentIndex.value + i) % len])
+  return res
+})
+function scrollLeft() {
+  if (!isMobile.value) {
+    const len = articles.length
+    currentIndex.value = (currentIndex.value - 1 + len) % len
+  }
+}
+function scrollRight() {
+  if (!isMobile.value) {
+    const len = articles.length
+    currentIndex.value = (currentIndex.value + 1) % len
+  }
+}
 
+/* ---------- Scroll-in animations ---------- */
+const sectionInView = ref([false, false, false])
 function handleScroll() {
   const sections = document.querySelectorAll('.animated-section')
   sections.forEach((section, idx) => {
     const rect = section.getBoundingClientRect()
-    if (!sectionInView.value[idx] && rect.top < window.innerHeight - 100) {
-      sectionInView.value[idx] = true
-    }
+    if (!sectionInView.value[idx] && rect.top < window.innerHeight - 100) sectionInView.value[idx] = true
   })
 }
-async function onHeroCtaClick() {
-  if (!isLoggedIn.value && isValidEmail(ctaEmail.value)) {
-    postContactEmail(ctaEmail.value) // fire-and-forget
-  }
-}
-onMounted(() => {
-  setUserFromApi()
-  const updateIsMobile = () => { isMobile.value = window.innerWidth < 640 }
-  updateIsMobile()
-  window.addEventListener('resize', updateIsMobile)
-  window.addEventListener('scroll', handleScroll)
-  handleScroll()
-})
 
-const visibleArticles = computed(() => {
-  if (isMobile.value) return articles
-  const result = []
-  const len = articles.length
-  for (let i = 0; i < 3; i++) result.push(articles[(currentIndex.value + i) % len])
-  return result
-})
-
-function scrollLeft() {
-  if (isMobile.value) return
-  const len = articles.length
-  currentIndex.value = (currentIndex.value - 1 + len) % len
-}
-
-function scrollRight() {
-  if (isMobile.value) return
-  const len = articles.length
-  currentIndex.value = (currentIndex.value + 1) % len
-}
-
-const heroCtaTo = computed(() => {
-  if (isLoggedIn.value) return '/btcusd'
-  const qp = isValidEmail(ctaEmail.value)
-    ? `?email=${encodeURIComponent(ctaEmail.value)}`
-    : ''
-  return `/register${qp}`
-})
-
-const heroCtaLabel = computed(() =>
-  isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'
-)
-
-/* ---- Smooth FAQ (always animates open/close) ---- */
+/* ---------- FAQ ---------- */
 const faqs = [
   { q: 'What is the loan amount?', a: 'Loans are standard 0.1 Bitcoin.' },
   { q: 'Can I repay my loan early?', a: 'All loans settle at the end of the term (30 days, 90 days, 180 days or 1 year).' },
@@ -133,24 +81,17 @@ const faqs = [
   { q: 'How long does it take to get a loan?', a: 'Minutes. Funding transactions are broadcast as soon as both peers sign the contract.' },
   { q: 'Is there a credit check?', a: 'No. Your bitcoin is your credit.' },
 ]
-
-// allow multiple open; use a Set of indexes
 const openSet = ref(new Set([0]))
-
-function isOpen(i) { return openSet.value.has(i) }
+const isOpen = (i) => openSet.value.has(i)
 function toggle(i) {
   const s = new Set(openSet.value)
-  if (s.has(i)) s.delete(i); else s.add(i)
+  s.has(i) ? s.delete(i) : s.add(i)
   openSet.value = s
 }
-
-
-// Transition hooks for reliable height animation
 function onEnter(el) {
   el.style.height = '0px'
   el.style.opacity = '0'
-  el.style.willChange = 'height, opacity'
-  // force reflow
+  el.style.willChange = 'height,opacity'
   void el.offsetHeight
   el.style.transition = 'height 300ms cubic-bezier(.22,.61,.36,1), opacity 220ms ease-out'
   el.style.height = el.scrollHeight + 'px'
@@ -164,8 +105,7 @@ function onAfterEnter(el) {
 function onBeforeLeave(el) {
   el.style.height = el.scrollHeight + 'px'
   el.style.opacity = '1'
-  el.style.willChange = 'height, opacity'
-  // force reflow
+  el.style.willChange = 'height,opacity'
   void el.offsetHeight
 }
 function onLeave(el) {
@@ -177,154 +117,301 @@ function onAfterLeave(el) {
   el.style.transition = ''
   el.style.willChange = ''
 }
+
+/* ---------- Left stack instant-fit logic ---------- */
+const leftStackRef = ref(null)
+const stackScale = ref(1)
+const density = ref('normal')
+const NAV_OFFSET = 96
+const GAP_BETWEEN = 24
+
+if (typeof window !== 'undefined') {
+  const availPre = window.innerHeight - NAV_OFFSET - GAP_BETWEEN
+  density.value = availPre < 620 ? 'tiny' : availPre < 780 ? 'compact' : 'normal'
+}
+
+function rafDebounce(fn) {
+  let raf = 0
+  return () => {
+    if (raf) cancelAnimationFrame(raf)
+    raf = requestAnimationFrame(fn)
+  }
+}
+
+let lastMeasuredH = 0
+function fitLeftStack() {
+  if (!leftStackRef.value) return
+  const base = baseScale || 1
+
+  const avail = Math.max((window.innerHeight || 0) - NAV_OFFSET - GAP_BETWEEN, 160)
+
+  const h = leftStackRef.value.offsetHeight
+  lastMeasuredH = h
+
+  const needShrink = (h * base) > avail
+  const s = needShrink
+    ? Math.max(0.78, Math.min(1, avail / (h * base)))
+    : 1
+
+  stackScale.value = s
+}
+const fitDebounced = rafDebounce(() => {
+  if (!leftStackRef.value) return
+  const h = leftStackRef.value.offsetHeight
+  if (Math.abs(h - lastMeasuredH) > 1) fitLeftStack()
+})
+
+/* ---------- Phone preview height = EXACT rendered LEFT STACK HEIGHT ---------- */
+const clampedPhoneH = ref(0)
+function computeClampedPhoneH() {
+  const viewportCap = Math.max((window.innerHeight || 0) - NAV_OFFSET, 360)
+  const generousCap = Math.min(viewportCap * 1, viewportCap)
+  const rawH = leftStackRef.value?.offsetHeight || generousCap
+  const renderedH = rawH * (stackScale.value || 1) * (baseScale || 1)
+  const target = Math.min(Math.max(renderedH, 320), generousCap)
+  clampedPhoneH.value = Math.round(target)
+}
+const clampDebounced = rafDebounce(computeClampedPhoneH)
+const baseScale = 1.2
+
+/* ---------- Mount / Unmount ---------- */
+let ro
+let updateIsMobile
+function handleLayoutChange() {
+  fitDebounced()
+  clampDebounced()
+  syncStoreBadgeWidth()
+}
+
+function syncStoreBadgeWidth() {
+  try {
+    const el = appleBadgeRef?.value
+    const apk = apkBadgeRef?.value
+    if (!el || !apk) return
+    const w = el.getBoundingClientRect().width
+    if (w > 0) apk.style.width = w + 'px'
+  } catch (_) {}
+}
+async function onDownloadApkClick() {
+  try {
+    await downloadApp()
+  } catch (err) {
+    console.error('APK download failed', err)
+  }
+}
+onMounted(async () => {
+  setUserFromApi()
+  updateIsMobile = () => { isMobile.value = window.innerWidth < 640 }
+  updateIsMobile()
+  window.addEventListener('resize', updateIsMobile)
+
+  window.addEventListener('scroll', handleScroll)
+  handleScroll()
+
+  await nextTick()
+  fitLeftStack()
+  computeClampedPhoneH()
+
+  ro = new ResizeObserver(() => handleLayoutChange())
+  if (leftStackRef.value) ro.observe(leftStackRef.value)
+
+  try {
+    if (appleBadgeRef?.value) {
+      const ob = new ResizeObserver(syncStoreBadgeWidth)
+      ob.observe(appleBadgeRef.value)
+      window.__badgeRO = ob
+    }
+  } catch (_) {}
+  syncStoreBadgeWidth()
+
+  window.addEventListener('resize', handleLayoutChange)
+  window.addEventListener('orientationchange', handleLayoutChange)
+  window.addEventListener('focus', handleLayoutChange)
+
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => { handleLayoutChange(); syncStoreBadgeWidth(); }).catch(() => {})
+  }
+})
+
+onBeforeUnmount(() => {
+  if (updateIsMobile) window.removeEventListener('resize', updateIsMobile)
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleLayoutChange)
+  window.removeEventListener('orientationchange', handleLayoutChange)
+  window.removeEventListener('focus', handleLayoutChange)
+  if (ro) { try { ro.disconnect() } catch {} }
+  try { window.__badgeRO?.disconnect?.(); delete window.__badgeRO } catch (_) {}
+})
 </script>
 
 <template>
   <!-- Page wrapper with global gradient background -->
-  <div class="relative min-h-screen mt-0 text-white">
-    <!-- Full-page gradient layer (moved to CSS class) -->
+  <div class="relative min-h-screen mt-2 text-white">
     <div class="fixed inset-0 -z-10 bg-page-gradient"></div>
 
-    <!-- Hero Section (no animation) -->
-    <section class="overflow-hidden bg-transparent text-white sm:grid sm:grid-cols-2 pt-1">
-      <!-- Left: Text -->
-      <div class="flex items-center justify-center p-10 md:p-12 lg:px-20 lg:py-24">
-        <div class="w-full max-w-2xl text-center sm:text-left">
-          <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight">
-            Unlock your Bitcoin's potential.
-          </h2>
-          <p class="mt-6 text-white text-xl md:text-xl leading-relaxed">
-            Access loans without selling your Bitcoin or earn yield secured by 
-            Bitcoin.  Better rates, your keys, no sidechains.
-          </p>
-          <!-- Longer email input field with smaller button below -->
-<div class="mt-8 flex flex-col items-center gap-4 w-full">
-  <input
-    v-if="!isLoggedIn"
-    v-model="ctaEmail"
-    type="email"
-    placeholder="Enter your email address"
-    class="w-full px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
-  />
-  <router-link
-    :to="heroCtaTo"
-    class="inline-block rounded-full bg-secondary px-8 py-4 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none mt-2 w-auto min-w-[180px] max-w-[300px]"
-    @click="onHeroCtaClick"
-  >
-    {{ heroCtaLabel }}
-  </router-link>
-  <!-- Mobile-only download badges -->
-<div
-  class="mt-4 flex sm:hidden items-center justify-center gap-3"
-  aria-label="Download badges"
-  style="line-height:0"
->
-  <!-- App Store badge (smaller on mobile) -->
-  <a
-    href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
-    target="_blank"
-    rel="noopener"
-    aria-label="Download on the App Store"
-    class="inline-block"
-  >
-    <img
-      src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
-      alt="Download on the App Store"
-      width="200"
-      height="66"
-      style="width:200px;height:66px;vertical-align:middle;object-fit:contain"
-    />
-  </a>
-
-  <!-- Google Play badge -->
-<a
-  href="/downloads/CadenaBitcoinLive%28v101%29.apk"
-  download="CadenaBitcoinLive(v101).apk"
-  rel="nofollow"
-  aria-label="Download Android APK"
-  class="inline-flex items-center gap-2 rounded-full border border-secondary px-4 py-3 text-sm font-semibold text-white hover:bg-white/10"
- 
->
-  <!-- optional: small android glyph you already use; otherwise text is fine -->
-  <span>Download APK</span>
-</a>
-</div>
-
-</div>
-
-        </div>
-      </div>
-
-      <!-- Right: iPhone mockup (hover-grow + link to /signerapp) -->
-      <div class="relative hidden sm:flex flex-col justify-center items-center bg-transparent px-6 py-14 z-10 phone-col">
+    <!-- Hero Section -->
+    <section class="hero-shell bg-transparent text-white">
+      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div
-  class="hidden sm:flex absolute top-6 left-1/2 -translate-x-1/2 z-20 items-center gap-3"
-  aria-label="Download badges"
->
-  <!-- App Store badge (exact size) -->
-  <a
-    href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
-    target="_blank"
-    rel="noopener"
-    aria-label="Download on the App Store"
-    class="inline-block"
-    style="line-height:0"
-  >
-    <img
-      src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
-      alt="Download on the App Store"
-      width="246"
-      height="82"
-      style="width:246px;height:82px;vertical-align:middle;object-fit:contain"
-    />
-  </a>
+          ref="heroRef"
+          class="hero-grid sm:grid sm:grid-cols-12 gap-[var(--g)] pt-[0px]"
+        >
+          <!-- Left: Rates + CTA (tablet: full width, centered) -->
+          <div
+            class="
+              sm:col-span-5 lg:col-span-6
+              min-[640px]:max-[900px]:col-span-12
+              flex p-0 sm:items-start
+              min-[640px]:max-[900px]:justify-center
+            "
+          >
+            <div
+              class="
+                w-full max-w-none flex flex-col gap-5 sm:gap-6 scale-wrapper chart-base-scale
+                text-center sm:text-left
+                min-[640px]:max-[900px]:items-center  min-[640px]:max-[900px]:text-center
+              "
+              ref="leftStackRef"
+              :style="{ transform: `scale(${(stackScale * baseScale).toFixed(3)})`, transformOrigin: 'top left' }"
+            >
+              <!-- Chart -->
+              <Rates50Mini :density="density" />
 
-  <!-- Google Play badge (exact height) -->
-  <a
-  href="/downloads/CadenaBitcoinLive%28v101%29.apk"
-  download="CadenaBitcoinLive(v101).apk"
-  rel="nofollow"
-  aria-label="Download Android APK"
-  class="inline-flex items-center gap-2 rounded-full border border-secondary px-8 py-2 text-base font-semibold text-white hover:bg-white/10"
-  
->
-  <span>Download APK</span>
-</a>
-</div>
-        <div class="[perspective:1100px]">
-          <div class="transform-gpu translate-y-6 md:translate-y-8 lg:translate-y-10">
-            <router-link to="/signerapp" class="group block cursor-pointer select-none" aria-label="Open Signer App page">
-              <picture>
-                <source type="image/avif" srcset="/img/iPhoneSC-640.avif 640w, /img/iPhoneSC-960.avif 960w" />
-                <source type="image/webp" srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w" />
-                <img
-                  src="/img/iPhoneSC-960.webp"
-                  srcset="/img/iPhoneSC-640.webp 640w, /img/iPhoneSC-960.webp 960w"
-                  sizes="(max-width: 768px) 300px, (max-width: 1024px) 360px, 420px"
-                  width="420" height="840"
-                  fetchpriority="high" loading="eager" decoding="async"
-                  class="block w-[300px] md:w-[360px] lg:w-[420px] h-auto transform transition-transform duration-300 group-hover:scale-105 will-change-transform"
-                  alt="App preview on iPhone" draggable="false"
+              <!-- CTA -->
+              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
+                <input
+                  v-if="!isLoggedIn"
+                  v-model="ctaEmail"
+                  type="email"
+                  placeholder="Enter your email address"
+                  class="w-full sm:flex-1 max-w-2xl px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
                 />
-              </picture>
-            </router-link>
+                <router-link
+                  :to="heroCtaTo"
+                  class="inline-flex items-center justify-center rounded-full bg-secondary px-7 py-3 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none min-w-[200px]"
+                  @click="onHeroCtaClick"
+                >
+                  {{ heroCtaLabel }}
+                </router-link>
+              </div>
+
+              <!-- Store buttons: show on phone + tablet (<901px), hide on desktop -->
+              <div class="mt-6 flex items-center justify-center gap-3 sm:gap-4 min-[901px]:hidden store-row">
+                <a
+                  href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
+                  target="_blank" rel="noopener" aria-label="Download on the App Store"
+                  class="inline-block" style="line-height:0"
+                >
+                  <img
+                    src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
+                    alt="Download on the App Store"
+                    width="240" height="80"
+                    class="app-store-badge store-badge"
+                    decoding="async" loading="lazy"
+                  />
+                </a>
+
+                <button
+                  type="button"
+                  class="apk-badge store-badge"
+                  aria-label="Download Android APK v101"
+                  @click="onDownloadApkClick"
+                >
+                  <span class="apk-version">v101</span>
+                  Download APK
+                </button>
+              </div>
+              <!-- /Store buttons -->
+            </div>
+          </div>
+
+          <!-- Right: Phone column -->
+          <div
+            class="
+              sm:col-span-7 lg:col-span-6
+              hidden sm:flex
+              min-[640px]:max-[900px]:hidden
+              p-0 hero-right
+            "
+          >
+            <div class="flex items-start justify-end w-full">
+              <div class="flex flex-col items-center ml-auto">
+                <router-link to="/signerapp" class="group block cursor-pointer select-none" aria-label="Open Signer App page">
+                  <picture class="block">
+                    <source type="image/avif" :srcset="`
+                      /img/IMG_4240-portrait-640.avif 640w,
+                      /img/IMG_4240-portrait-960.avif 960w,
+                      /img/IMG_4240-portrait-1280.avif 1280w
+                    `" />
+                    <source type="image/webp" :srcset="`
+                      /img/IMG_4240-portrait-640.webp 640w,
+                      /img/IMG_4240-portrait-960.webp 960w,
+                      /img/IMG_4240-portrait-1280.webp 1280w
+                    `" />
+                    <img
+                      src="/img/IMG_4240-portrait-960.webp"
+                      :srcset="`
+                        /img/IMG_4240-portrait-640.webp 640w,
+                        /img/IMG_4240-portrait-960.webp 960w,
+                        /img/IMG_4240-portrait-1280.webp 1280w
+                      `"
+                      :style="{
+                        maxHeight: (clampedPhoneH - 100) + 'px',
+                        height: (clampedPhoneH - 60) + 'px',
+                        width: Math.round((clampedPhoneH - 60) * 0.46) + 'px'
+                      }"
+                      width="420" height="840"
+                      fetchpriority="high" loading="eager" decoding="async"
+                      class="block object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                      alt="Cadena Signer App preview"
+                      draggable="false"
+                    />
+                  </picture>
+                </router-link>
+
+                <!-- Desktop-only store buttons (≥901px) under phone -->
+                <div class="mt-8 hidden min-[901px]:flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center w-full store-row">
+                  <a
+                    href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
+                    target="_blank" rel="noopener" aria-label="Download on the App Store"
+                    class="inline-block" style="line-height:0"
+                  >
+                    <img
+                      src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
+                      alt="Download on the App Store"
+                      width="240" height="80"
+                      class="app-store-badge store-badge" ref="appleBadgeRef" decoding="async" loading="lazy"
+                    />
+                  </a>
+
+                  <button
+                    type="button"
+                    class="apk-badge store-badge"
+                    ref="apkBadgeRef"
+                    aria-label="Download Android APK v101"
+                    @click="onDownloadApkClick"
+                  >
+                    <span class="apk-version">v101</span>
+                    Download APK
+                  </button>
+                </div>
+                <!-- /Desktop-only store buttons -->
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Satoshi Quote (animate in from left) -->
-    <section
-      class="w-full bg-transparent text-white py-12 px-6 sm:px-8 lg:px-12 text-center animated-section"
-      :class="sectionInView[0] ? 'animate-in-left' : ''"
-    >
+    <!-- Satoshi Quote -->
+    <section class="w-full bg-transparent text-white py-12 px-6 sm:px-[var(--g)] lg:px-[var(--g)] text-center animated-section" :class="sectionInView[0] ? 'animate-in-left' : ''">
       <blockquote class="text-2xl md:text-3xl font-semibold leading-tight max-w-5xl mx-auto">
         “The main benefits are lost if a trusted third party is still required.”
       </blockquote>
       <cite class="block mt-4 text-white text-lg">— Satoshi Nakamoto</cite>
     </section>
 
-    <!-- What is Cadena Bitcoin (no animation) -->
+    <!-- What is Cadena Bitcoin -->
     <section>
       <div class="rounded-xl bg-secondary mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
@@ -355,11 +442,8 @@ function onAfterLeave(el) {
       </div>
     </section>
 
-    <!-- Featured Articles (animate in from right) -->
-    <section
-      class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-6 lg:px-8 animated-section"
-      :class="sectionInView[1] ? 'animate-in-right' : ''"
-    >
+    <!-- Featured Articles -->
+    <section class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-[var(--g)] lg:px-[var(--g)] animated-section" :class="sectionInView[1] ? 'animate-in-right' : ''">
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
@@ -367,23 +451,14 @@ function onAfterLeave(el) {
         </div>
 
         <div class="relative flex items-center justify-center">
-          <!-- Left Arrow (hidden on mobile) -->
-          <button
-            @click="scrollLeft"
-            class="hidden sm:flex absolute left-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
-          >
-            ◀
-          </button>
-
-          <!-- Carousel Scroll Wrapper (NO max-w limit here!) -->
+          <button @click="scrollLeft" class="hidden sm:flex absolute left-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md">◀</button>
           <div class="w-full overflow-x-auto sm:overflow-visible px-2">
             <div class="flex space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-x snap-mandatory sm:snap-none">
               <template v-for="article in visibleArticles" :key="article.id">
-                <!-- internal -->
                 <router-link
                   v-if="article.internal"
                   :to="article.link"
-                  class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
+                  class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 cursor-pointer snap-center"
                 >
                   <picture>
                     <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
@@ -405,13 +480,12 @@ function onAfterLeave(el) {
                   </div>
                 </router-link>
 
-                <!-- external -->
                 <a
                   v-else
                   :href="article.link"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 hover:shadow-lg cursor-pointer snap-center"
+                  class="flex-shrink-0 w-[280px] sm:w-[300px] bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-md transition-all duration-300 transform hover:shadow-xl hover:ring-2 hover:ring-secondary hover:bg-white/10 hover:border-white/20 cursor-pointer snap-center"
                 >
                   <picture>
                     <source type="image/avif" :srcset="`/img/${article.imageBase}-320.avif 320w, /img/${article.imageBase}-480.avif 480w, /img/${article.imageBase}-640.avif 640w`" />
@@ -435,20 +509,13 @@ function onAfterLeave(el) {
               </template>
             </div>
           </div>
-
-          <!-- Right Arrow (hidden on mobile) -->
-          <button
-            @click="scrollRight"
-            class="hidden sm:flex absolute right-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md"
-          >
-            ▶
-          </button>
+          <button @click="scrollRight" class="hidden sm:flex absolute right-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md">▶</button>
         </div>
       </div>
     </section>
 
     <!-- Latest Videos -->
-    <section class="bg-transparent text-white pt-8 pb-8 px-6 animated-section" :class="sectionInView[2] ? 'animate-in-left' : ''">
+    <section class="bg-transparent text-white pt-8 pb-8 px-6 sm:px-[var(--g)] lg:px-[var(--g)] animated-section" :class="sectionInView[2] ? 'animate-in-left' : ''">
       <div class="max-w-6xl mx-auto space-y-12">
         <div class="text-center space-y-4">
           <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
@@ -472,14 +539,12 @@ function onAfterLeave(el) {
       </div>
     </section>
 
-    <!-- FAQ (smooth transitions always) -->
-    <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-6 lg:px-8">
+    <!-- FAQ -->
+    <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-[var(--g)] lg:px-[var(--g)]">
       <div class="max-w-4xl mx-auto space-y-4">
         <div class="text-center">
           <h2 class="text-3xl md:text-4xl font-extrabold">Frequently Asked Questions</h2>
-          <p class="mt-4 text-white text-lg">
-            Everything you need to know about Cadena Bitcoin’s loan product.
-          </p>
+          <p class="mt-4 text-white text-lg">Everything you need to know about Cadena Bitcoin’s loan product.</p>
         </div>
 
         <div class="space-y-3">
@@ -491,41 +556,24 @@ function onAfterLeave(el) {
               :aria-controls="`faq-panel-${i}`"
             >
               <h3 class="text-lg font-medium">{{ item.q }}</h3>
-              <svg
-                class="size-5 shrink-0 transition-transform duration-300"
-                :class="isOpen(i) ? '-rotate-180' : ''"
-                xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              >
+              <svg class="size-5 shrink-0 transition-transform duration-300" :class="isOpen(i) ? '-rotate-180' : ''" xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
-            <transition
-  @enter="onEnter"
-  @after-enter="onAfterEnter"
-  @before-leave="onBeforeLeave"
-  @leave="onLeave"
-  @after-leave="onAfterLeave"
->
-  <div
-    v-show="isOpen(i)"
-    :id="`faq-panel-${i}`"
-    role="region"
-    :aria-labelledby="`faq-header-${i}`"
-    class="faq-panel"
-  >
-    <!-- just spacing and text, no box look -->
-    <div class="px-4 pt-3 pb-5 text-white/90 leading-relaxed">
-      {{ item.a }}
-    </div>
-  </div>
-</transition>
+            <transition @enter="onEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave" @leave="onLeave" @after-leave="onAfterLeave">
+              <div v-show="isOpen(i)" :id="`faq-panel-${i}`" role="region" :aria-labelledby="`faq-header-${i}`" class="faq-panel">
+                <div class="px-4 pt-3 pb-5 text-white/90 leading-relaxed">
+                  {{ item.a }}
+                </div>
+              </div>
+            </transition>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Final CTA Section (no animation for footer) -->
+    <!-- Final CTA -->
     <section class="bg-secondary text-white py-12 px-6">
       <div class="max-w-4xl mx-auto text-center space-y-6">
         <h2 class="text-3xl md:text-4xl font-extrabold">
@@ -535,155 +583,110 @@ function onAfterLeave(el) {
           Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-          <router-link
-            :to="isLoggedIn ? '/btcusd' : '/register'"
-            class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
-          >
-            Borrow Bitcoin
-          </router-link>
-
-          <router-link
-            :to="isLoggedIn ? '/btcusd' : '/register'"
-            class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary"
-          >
-            Lend Bitcoin
-          </router-link>
+          <router-link :to="isLoggedIn ? '/btcusd' : '/register'" class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90">Borrow Bitcoin</router-link>
+          <router-link :to="isLoggedIn ? '/btcusd' : '/register'" class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary">Lend Bitcoin</router-link>
         </div>
       </div>
     </section>
   </div>
 
-  <TheFooter/>
+  <TheFooter />
 </template>
 
 <style scoped>
-/* ===== No inline styles; CSP-friendly ===== */
+/* ===== Unified horizontal rhythm for the hero ===== */
+.hero-grid { --g: 24px; overflow: visible; }
+@media (min-width: 1024px) { .hero-grid { --g: 32px; } }
 
-/* Page gradient moved from style= to a class */
-.bg-page-gradient{
-  background-color: #000; /* solid black base */
+/* ===== Background gradient ===== */
+.bg-page-gradient {
+  background-color: #000;
   background-image:
-    radial-gradient(
-      125% 75% at 50% 100%,
-      rgba(103,56,228,0.58) 0%,
-      rgba(103,56,228,0.36) 26%,
-      rgba(103,56,228,0.16) 52%,
-      rgba(0,0,0,0) 76%
-    );
+    radial-gradient(125% 75% at 50% 100%, rgba(103,56,228,0.58) 0%, rgba(103,56,228,0.36) 26%, rgba(103,56,228,0.16) 52%, rgba(0,0,0,0) 76%);
 }
-
 @supports (background: radial-gradient(in oklch, black, white)) {
-  .bg-page-gradient{
+  .bg-page-gradient {
     background-color: oklch(0 0 0);
     background-image:
-      radial-gradient(
-        in oklch 125% 75% at 50% 100%,
-        oklch(from #6738e4 l c h / 0.60) 0%,
-        oklch(from #6738e4 l c h / 0.36) 26%,
-        oklch(from #6738e4 l c h / 0.16) 52%,
-        oklch(0 0 0 / 0) 76%
-      );
+      radial-gradient(in oklch 125% 75% at 50% 100%, oklch(from #6738e4 l c h / 0.60) 0%, oklch(from #6738e4 l c h / 0.36) 26%, oklch(from #6738e4 l c h / 0.16) 52%, oklch(0 0 0 / 0) 76%);
   }
 }
-
-/* Keep the glow lower on short screens */
-@media (max-height: 800px){
-  .bg-page-gradient{
+@media (max-height: 800px) {
+  .bg-page-gradient {
     background-image:
-      radial-gradient(
-        120% 60% at 50% 100%,
-        rgba(103,56,228,0.52) 0%,
-        rgba(103,56,228,0.30) 24%,
-        rgba(103,56,228,0.12) 48%,
-        rgba(0,0,0,0) 70%
-      );
+      radial-gradient(120% 60% at 50% 100%, rgba(103,56,228,0.52) 0%, rgba(103,56,228,0.30) 24%, rgba(103,56,228,0.12) 48%, rgba(103,56,228,0) 70%);
   }
 }
 
-/* Soft glow behind the phone */
-.phone-col::before{
-  content:"";
-  position:absolute; inset:0; margin:auto;
-  width:560px; height:560px; border-radius:9999px;
-  filter:blur(80px); opacity:.85;
-  background: radial-gradient(55% 55% at 50% 50%,
-    rgba(103,56,228,.70) 0%,
-    rgba(103,56,228,.40) 35%,
-    rgba(53,21,122,.30) 60%,
-    rgba(0,0,0,0) 75%);
-  pointer-events:none;
-}
-@media (min-width:1024px){ .phone-col::before{ width:680px; height:680px; } }
-
-/* Animation classes for scroll-ins */
-.animated-section {
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 1.2s cubic-bezier(.77,0,.18,1),
-    transform 1.2s cubic-bezier(.77,0,.18,1);
-  will-change: opacity, transform;
-}
-.animate-in-left {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0);
-  animation: slideInLeft 1.2s cubic-bezier(.77,0,.18,1);
-}
-.animate-in-right {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0);
-  animation: slideInRight 1.2s cubic-bezier(.77,0,.18,1);
-}
+/* Scroll-in */
+.animated-section { opacity: 0; pointer-events: none; transition: opacity 1.2s cubic-bezier(.77,0,.18,1), transform 1.2s cubic-bezier(.77,0,.18,1); will-change: opacity, transform; }
+.animate-in-left { opacity: 1; pointer-events: auto; transform: translateX(0); animation: slideInLeft 1.2s cubic-bezier(.77,0,.18,1); }
+.animate-in-right { opacity: 1; pointer-events: auto; transform: translateX(0); animation: slideInRight 1.2s cubic-bezier(.77,0,.18,1); }
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-180px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideInRight { from { opacity: 0; transform: translateX(180px); } to { opacity: 1; transform: translateX(0); } }
 
-/* Hide scrollbar if needed */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
+/* Keep the left stack scaling crisp and anchored to top */
 .scale-wrapper { width: 100%; transform-origin: top center; }
-@media (max-width: 640px) {
-  .scale-wrapper { transform: scale(calc(100vw / 640)); }
-}
 
-/* Fix for top cut-off: add top padding to main container, not body */
-section.bg-primary { padding-top: 5.5rem !important; }
+/* Enforce tabular numerals inside Rates50Mini so placeholders don't shift */
+:deep(.rate) { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
 
-/* YouTube container */
-.yt{
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: #000;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
+/* YouTube */
+.yt { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 0.75rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+.yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+
+/* FAQ */
+.faq-panel { overflow: hidden; background: transparent; border: 0; }
+
+/* Buttons — smaller */
+.store-row {
+  --badge-h: clamp(30px, 3.8vw, 56px);
 }
-.yt iframe{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
+.store-badge {
+  height: var(--badge-h);
+}
+.app-store-badge {
+  height: var(--badge-h);
+  width: auto;
   display: block;
 }
-
-/* FAQ panel default styles (Vue transition drives height) */
-.faq-panel{
-  overflow: hidden;
-  will-change: height, opacity;
-  /* no background, no border — looks like before */
-  background: transparent;
-  border: 0;
+.apk-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--badge-h) * 0.14);
+  padding-inline: calc(var(--badge-h) * 0.18);
+  height: var(--badge-h);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: clamp(0.62rem, calc(var(--badge-h) * 0.22), 0.85rem);
+  line-height: 1;
+  border-radius: calc(var(--badge-h) * 0.26);
+}
+.apk-version {
+  background: rgba(0,0,0,0.22);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 9999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65em;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-/* Summary hover polish */
-button[aria-expanded]{
-  transition: background-color 200ms ease, border-color 200ms ease;
+@media (max-width: 640px) {
+  .store-row {
+    --badge-h: clamp(34px, 5.5vw, 52px);
+  }
 }
-button[aria-expanded]:hover{
-  background-color: color-mix(in oklch, #0b0b0b 92%, #ffffff 8%);
+
+.chart-base-scale { transform-origin: top left; }
+
+@media (min-width: 640px) and (max-width: 900px) {
+  .hero-shell {
+    padding-bottom: 4.5rem;
+  }
 }
 </style>

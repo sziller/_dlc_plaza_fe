@@ -12,42 +12,41 @@
     >
       <!-- Main navbar row -->
       <div class="px-6 py-4 flex justify-between items-center">
-       <!-- Logo & BTC Price (clickable to Home) -->
-<router-link
-  to="/"
-  class="flex items-center space-x-4 group focus:outline-none focus:ring-2 focus:ring-secondary/60 rounded-md"
-  aria-label="Go to Home"
->
-  <img
-    :src="logo"
-    alt="Cadena Bitcoin Logo"
-    class="w-10 h-10 object-contain"
-    decoding="async"
-    loading="eager"
-    draggable="false"
-    referrerpolicy="no-referrer"
-  />
-  <div class="flex flex-col items-start space-y-1">
-    <div class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
-      Cadena Bitcoin
-    </div>
-    <div class="text-sm font-medium flex items-center gap-1">
-      <img
-        src="https://flagcdn.com/us.svg"
-        alt="US Flag"
-        class="w-4 h-4 inline-block"
-        width="16" height="12"
-        decoding="async"
-        loading="lazy"
-        draggable="false"
-        referrerpolicy="no-referrer"
-      />
-      <span class="text-white">BTCUSD:</span>
-      <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
-    </div>
-  </div>
-</router-link>
-
+        <!-- Logo & BTC Price (clickable to Home) -->
+        <router-link
+          to="/"
+          class="flex items-center space-x-4 group focus:outline-none focus:ring-2 focus:ring-secondary/60 rounded-md"
+          aria-label="Go to Home"
+        >
+          <img
+            :src="logo"
+            alt="Cadena Bitcoin Logo"
+            class="w-10 h-10 object-contain"
+            decoding="async"
+            loading="eager"
+            draggable="false"
+            referrerpolicy="no-referrer"
+          />
+          <div class="flex flex-col items-start space-y-1">
+            <div class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
+              Cadena Bitcoin
+            </div>
+            <div class="text-sm font-medium flex items-center gap-1">
+              <img
+                src="https://flagcdn.com/us.svg"
+                alt="US Flag"
+                class="w-4 h-4 inline-block"
+                width="16" height="12"
+                decoding="async"
+                loading="lazy"
+                draggable="false"
+                referrerpolicy="no-referrer"
+              />
+              <span class="text-white">BTCUSD:</span>
+              <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
+            </div>
+          </div>
+        </router-link>
 
         <!-- Burger -->
         <button
@@ -68,45 +67,8 @@
         <div class="hidden md:flex space-x-6 items-center">
           <router-link :class="linkClass" to="/">Home</router-link>
 
-          <!-- Products and Services -->
-          <div class="relative group">
-            <button :class="['flex items-center space-x-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
-              <span>Products and Services</span>
-              <svg class="w-4 h-4 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
-              </svg>
-            </button>
-            <div
-              class="absolute top-full left-0 mt-2 w-64 bg-black text-white border border-secondary/40 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
-              role="menu"
-            >
-              <router-link to="/btcusd" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition flex items-center gap-2" role="menuitem">
-                <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-                BTCUSD
-              </router-link>
-              <div class="block px-4 py-2 text-secondary/60 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-                <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-                BTCEUR (Coming Soon)
-              </div>
-              <div class="block px-4 py-2 text-secondary/60 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-                <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-                BTCJPY (Coming Soon)
-              </div>
-              <div class="block px-4 py-2 text-secondary/60 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">🟡 BTC/XAU (Coming Soon)</div>
-              <div class="block px-4 py-2 text-secondary/60 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-                <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-                BTCGBP (Coming Soon)
-              </div>
-              <div class="block px-4 py-2 text-secondary/60 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-                <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-                BTCCAD (Coming Soon)
-              </div>
-              <div class="block px-4 py-2 text-secondary/60 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-                <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-                BTCAUD (Coming Soon)
-              </div>
-            </div>
-          </div>
+          <!-- BTCUSD (no dropdown) -->
+          <router-link :class="linkClass" to="/btcusd">BTCUSD</router-link>
 
           <!-- Explore Cadena -->
           <div class="relative group">
@@ -121,7 +83,6 @@
               role="menu"
             >
               <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
-             
               <router-link to="/contact" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">About Us</router-link>
               <router-link to="/signerapp" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Signer App</router-link>
             </div>
@@ -130,8 +91,6 @@
 
         <!-- CTA Buttons Desktop -->
         <div class="hidden md:flex items-center space-x-4 text-white">
-          
-
           <router-link
             v-if="!isLoggedIn"
             to="/login"
@@ -167,178 +126,159 @@
       </div>
     </nav>
 
-<!-- INFO STRIP (fixed under nav, medium size, BIGGER TEXT) -->
-<div
-  v-if="isLoggedIn"
-  ref="infoRef"
-  class="w-full fixed left-0 right-0 z-40 border-b border-secondary bg-secondary text-white supports-[backdrop-filter]:bg-secondary backdrop-blur"
-  :style="{ top: `var(--nav-h)` }"
-  role="region"
-  aria-label="User info"
->
-  <!-- keep bar height the same -->
-  <div class="px-6 h-12 sm:h-14 md:h-16 flex items-center justify-center">
-    <!-- ↑ text sizes only (no height change) -->
-    <div class="h-full flex items-center justify-center gap-3 md:gap-4 text-center text-sm sm:text-base md:text-lg text-white/90">
-      <!-- Loading -->
-      <template v-if="loading">
-        <div class="flex items-center gap-3">
-          <div class="h-4 w-28 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-          <div class="h-4 w-24 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-          <div class="hidden sm:block h-4 w-28 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-        </div>
-      </template>
-
-      <!-- Error -->
-      <template v-else-if="error">
-        <div class="flex items-center gap-2 text-red-200 text-base md:text-lg">
-          <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.5a.75.75 0 011.5 0v5a.75.75 0 01-1.5 0v-5zM10 14.75a.875.875 0 100 1.75.875.875 0 000-1.75z" clip-rule="evenodd" />
-          </svg>
-          <span>Balance unavailable</span>
-          <button
-            v-if="canRetry"
-            class="ml-2 px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white"
-            @click="$emit('retry')"
-          >
-            Retry
-          </button>
-        </div>
-      </template>
-
-      <!-- Data -->
-      <template v-else>
-        <!-- Email -->
-        <div class="min-w-0 flex items-center gap-2">
-          <span class="hidden sm:inline text-white/70">Signed in:</span>
-          <span class="truncate max-w-[38ch] font-medium" :title="email">{{ email }}</span>
-        </div>
-
-        <span class="hidden sm:inline select-none text-white/40">•</span>
-
-        <!-- Pairing -->
-        <template v-if="showPairing">
-          <div class="flex items-center gap-2" role="status" :aria-label="isPaired ? 'Device paired' : 'Device not paired'">
-            <span :class="['inline-block w-2.5 h-2.5 rounded-full', isPaired ? 'bg-green-400' : 'bg-red-400']" aria-hidden="true" />
-            <span class="text-white/90 font-medium">
-              {{ isPaired ? 'Paired' : 'Not paired' }}
-            </span>
-          </div>
-          <template v-if="!isPaired">
-            <span class="hidden sm:inline select-none text-white/40">•</span>
-<router-link
-  to="/register?step=3"
-  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
-  aria-label="Go to registration to scan QR with the Signer app"
->
-  Scan QR code using signer app
-</router-link>
+    <!-- INFO STRIP (fixed under nav, medium size, BIGGER TEXT) -->
+    <div
+      v-if="isLoggedIn"
+      ref="infoRef"
+      class="w-full fixed left-0 right-0 z-40 border-b border-secondary bg-secondary text-white supports-[backdrop-filter]:bg-secondary backdrop-blur"
+      :style="{ top: `var(--nav-h)` }"
+      role="region"
+      aria-label="User info"
+    >
+      <!-- keep bar height the same -->
+      <div class="px-6 h-12 sm:h-14 md:h-16 flex items-center justify-center">
+        <!-- ↑ text sizes only (no height change) -->
+        <div class="h-full flex items-center justify-center gap-3 md:gap-4 text-center text-sm sm:text-base md:text-lg text-white/90">
+          <!-- Loading -->
+          <template v-if="loading">
+            <div class="flex items-center gap-3">
+              <div class="h-4 w-28 rounded bg-white/20 animate-pulse" aria-hidden="true" />
+              <div class="h-4 w-24 rounded bg-white/20 animate-pulse" aria-hidden="true" />
+              <div class="hidden sm:block h-4 w-28 rounded bg-white/20 animate-pulse" aria-hidden="true" />
+            </div>
           </template>
-        </template>
-        <template v-else>
-          <div class="flex items-center gap-2" aria-hidden="true">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-white/30 animate-pulse" />
-            <span class="text-white/70">•••∂•••</span>
-          </div>
-        </template>
 
-        <span class="hidden sm:inline select-none text-white/40">•</span>
-
-        <!-- Liquid -->
-        <div class="flex items-center gap-2">
-          <span class="text-white/80">Liquid Balance:</span>
-          <span class="tabular-nums font-semibold" :aria-live="live" role="status">
-            <template v-if="balanceDerivedSats !== null">
-              {{ btc(balanceDerivedSats) }} BTC
-            </template>
-            <template v-else>—</template>
-          </span>
-        </div>
-
-        <span class="hidden sm:inline select-none text-white/40">•</span>
-
-        <!-- On-chain -->
-        <div class="hidden sm:flex items-center gap-2">
-          <span class="text-white/80">Wallet Balance:</span>
-          <span class="tabular-nums font-semibold" :aria-live="live" role="status">
-            <template v-if="balanceOnchainSats !== null">
-              {{ btc(balanceOnchainSats) }} BTC
-            </template>
-            <template v-else>—</template>
-          </span>
-        </div>
-
-        <!-- Zero-balance nudge -->
-        <template v-if="isZeroAvailable">
-          <span class="hidden sm:inline select-none text-white/40">•</span>
-          <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1 text-white/95">
-              <svg class="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 14a1.25 1.25 0 111.25-1.25A1.251 1.251 0 0112 16zm1-4.75a1 1 0 01-2 0v-5a1 1 0 012 0z"/>
+          <!-- Error -->
+          <template v-else-if="error">
+            <div class="flex items-center gap-2 text-red-200 text-base md:text-lg">
+              <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.5a.75.75 0 011.5 0v5a.75.75 0 01-1.5 0v-5zM10 14.75a.875.875 0 100 1.75.875.875 0 000-1.75z" clip-rule="evenodd" />
               </svg>
-              Balance is 0
-            </span>
-            <router-link
-              to="/my-profile"
-              class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white"
-            >
-              Add funds
-            </router-link>
-          </div>
-        </template>
-      </template>
+              <span>Balance unavailable</span>
+              <button
+                v-if="canRetry"
+                class="ml-2 px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white"
+                @click="$emit('retry')"
+              >
+                Retry
+              </button>
+            </div>
+          </template>
+
+          <!-- Data -->
+          <template v-else>
+            <!-- Email -->
+            <div class="min-w-0 flex items-center gap-2">
+              <span class="hidden sm:inline text-white/70">Signed in:</span>
+              <span class="truncate max-w-[38ch] font-medium" :title="email">{{ email }}</span>
+            </div>
+
+            <span class="hidden sm:inline select-none text-white/40">•</span>
+
+            <!-- Pairing -->
+            <template v-if="showPairing">
+              <div class="flex items-center gap-2" role="status" :aria-label="isPaired ? 'Device paired' : 'Device not paired'">
+                <span :class="['inline-block w-2.5 h-2.5 rounded-full', isPaired ? 'bg-green-400' : 'bg-red-400']" aria-hidden="true" />
+                <span class="text-white/90 font-medium">
+                  {{ isPaired ? 'Paired' : 'Not paired' }}
+                </span>
+              </div>
+              <template v-if="!isPaired">
+                <span class="hidden sm:inline select-none text-white/40">•</span>
+                <router-link
+                  to="/register?step=3"
+                  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+                  aria-label="Go to registration to scan QR with the Signer app"
+                >
+                  Scan QR code using signer app
+                </router-link>
+              </template>
+            </template>
+            <template v-else>
+              <div class="flex items-center gap-2" aria-hidden="true">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-white/30 animate-pulse" />
+                <span class="text-white/70">•••∂•••</span>
+              </div>
+            </template>
+
+            <span class="hidden sm:inline select-none text-white/40">•</span>
+
+            <!-- Liquid -->
+            <div class="flex items-center gap-2">
+              <span class="text-white/80">Liquid Balance:</span>
+              <span class="tabular-nums font-semibold" :aria-live="live" role="status">
+                <template v-if="balanceDerivedSats !== null">
+                  {{ btc(balanceDerivedSats) }} BTC
+                </template>
+                <template v-else>—</template>
+              </span>
+            </div>
+
+            <span class="hidden sm:inline select-none text-white/40">•</span>
+
+            <!-- On-chain -->
+            <div class="hidden sm:flex items-center gap-2">
+              <span class="text-white/80">Wallet Balance:</span>
+              <span class="tabular-nums font-semibold" :aria-live="live" role="status">
+                <template v-if="balanceOnchainSats !== null">
+                  {{ btc(balanceOnchainSats) }} BTC
+                </template>
+                <template v-else>—</template>
+              </span>
+            </div>
+
+            <!-- Zero-balance nudge -->
+            <template v-if="isZeroAvailable">
+              <span class="hidden sm:inline select-none text-white/40">•</span>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1 text-white/95">
+                  <svg class="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 14a1.25 1.25 0 111.25-1.25A1.251 1.251 0 0112 16zm1-4.75a1 1 0 01-2 0v-5a1 1 0 012 0z"/>
+                  </svg>
+                  Balance is 0
+                </span>
+                <router-link
+                  to="/my-profile"
+                  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white"
+                >
+                  Add funds
+                </router-link>
+              </div>
+            </template>
+          </template>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-
 
     <!-- Spacer: reserve combined height (nav + info if shown) -->
     <div :style="{ height: spacerHeight + 'px' }" aria-hidden="true"></div>
 
-    <!-- MOBILE MENU (unchanged colors) -->
+    <!-- MOBILE MENU (black theme, BTCUSD only) -->
     <transition name="fade-slide">
       <div
         v-if="isMobileMenuOpen"
         id="mobile-menu"
-        class="fixed inset-0 bg-white text-black px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-lg pt-[var(--nav-h)]"
+        class="fixed inset-0 bg-black text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-lg pt-[var(--nav-h)]"
         @keyup.esc="closeMobileMenu"
       >
         <router-link @click="closeMobileMenu" to="/" class="block text-lg font-semibold hover:text-secondary">Home</router-link>
 
+        <!-- BTCUSD section (no extras) -->
         <div>
-          <div class="text-gray-500 uppercase text-xs mb-2">Products and Services</div>
-          <router-link @click="closeMobileMenu" to="/btcusd" class="block pl-2 py-2 hover:text-secondary flex items-center gap-2">
+          <div class="text-white/50 uppercase text-xs mb-2">Markets</div>
+          <router-link
+            @click="closeMobileMenu"
+            to="/btcusd"
+            class="block pl-2 py-2 hover:text-secondary flex items-center gap-2"
+          >
             <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
             BTCUSD
           </router-link>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-            <img src="https://flagcdn.com/eu.svg" alt="EUR" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-            BTCEUR (Coming Soon)
-          </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-            <img src="https://flagcdn.com/jp.svg" alt="JPY" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-            BTCJPY (Coming Soon)
-          </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">🟡 BTC/XAU (Coming Soon)</div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-            <img src="https://flagcdn.com/gb.svg" alt="GBP" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-            BTCGBP (Coming Soon)
-          </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-            <img src="https://flagcdn.com/ca.svg" alt="CAD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-            BTCCAD (Coming Soon)
-          </div>
-          <div class="pl-2 py-2 text-gray-400 flex items-center gap-2 cursor-not-allowed" aria-disabled="true">
-            <img src="https://flagcdn.com/au.svg" alt="AUD" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-            BTCAUD (Coming Soon)
-          </div>
         </div>
 
         <div>
-          <div class="text-gray-500 uppercase text-xs mt-6 mb-2">Explore Cadena</div>
+          <div class="text-white/50 uppercase text-xs mt-6 mb-2">Explore Cadena</div>
           <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
-          
           <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">About Us</router-link>
           <router-link @click="closeMobileMenu" to="/signerapp" class="block pl-2 py-2 hover:text-secondary">Signer App</router-link>
         </div>
@@ -362,8 +302,6 @@
         >
           Logout
         </button>
-
-       
 
         <router-link
           v-if="!isLoggedIn"
@@ -670,9 +608,6 @@ defineExpose({
   linkClass: computed(() => 'hover:text-secondary text-white'),
 })
 </script>
-
-
-
 
 <style scoped>
 :where(.tabular-nums){

@@ -1,6 +1,6 @@
 <template>
   <main class="min-h-screen text-white pt-[150px] px-6 pb-16 relative overflow-hidden">
-    <!-- Gradient background (local class, no inline styles) -->
+    <!-- Gradient background (local, no inline styles) -->
     <div class="fixed inset-0 -z-10 page-gradient"></div>
 
     <div class="max-w-7xl mx-auto space-y-8">
@@ -136,8 +136,8 @@
 
             <div v-else-if="addrLoading" class="text-white/80 text-sm">Fetching top-up address…</div>
 
-            <div v-else-if="address" class="space-y-3">
-              <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <div v-else class="space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2" v-if="address">
                 <span class="font-semibold">Address:</span>
                 <code class="px-2 py-1 rounded bg-black/30 border border-white/10 break-all text-xs sm:text-sm">{{ address }}</code>
                 <button
@@ -149,23 +149,31 @@
                 </button>
               </div>
 
-              <!-- QR (sanitized SVG rendered as a data URL in an <img>) -->
+              <!-- QR (same logic as registration page), now bigger/wider -->
               <div class="flex justify-center">
-                <div class="qr-box rounded-lg bg-white text-black w-1/2 aspect-square overflow-hidden">
-                  <img
-                    v-if="qrDataUrl"
-                    :src="qrDataUrl"
-                    alt="QR code for your top-up address"
-                    class="w-full h-full block"
-                  />
+                <div
+                  class="qr-box rounded-lg bg-white text-black w-full max-w-[420px] aspect-square overflow-hidden flex items-center justify-center"
+                >
+                  <template v-if="qrCode">
+                    <img
+                      :src="qrCode"
+                      alt="QR code for your top-up / signer link"
+                      class="w-full h-full block object-contain"
+                    />
+                  </template>
+                  <p v-else class="text-black text-sm px-2 text-center">Loading QR Code…</p>
                 </div>
+              </div>
+
+              <div v-if="qrError" class="text-red-200 text-sm">
+                {{ qrError }}
               </div>
             </div>
           </section>
 
           <!-- ===== Past DLCs (settled > 2 days ago) ===== -->
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
-            <h2 class="text-2xl font-bold">Past DLCs</h2>
+            <h2 class="text-2xl font-bold">DLC History</h2>
 
             <div v-if="pastError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
               {{ pastError }}
@@ -248,42 +256,68 @@
       aria-labelledby="del-title"
     >
       <!-- backdrop -->
-      <div class="absolute inset-0 bg-black/70" @click="delOpen = false"></div>
+      <div class="absolute inset-0 bg-black/70" @click="delOpen = false; delConfirm = ''; delEmail = ''; delError = null"></div>
 
       <!-- dialog -->
-      <div class="relative w-[min(560px,92vw)] rounded-lg border border-white/20 bg-black p-6 text-white shadow-xl">
-        <h3 id="del-title" class="text-xl font-bold mb-2">Delete account</h3>
-        <p class="text-white/80 mb-4">
-          This will permanently delete your account. Type
-          <code class="px-1 py-0.5 rounded bg-black/40 border border-white/10">DELETE</code>
-          to confirm.
+      <div class="relative w-[min(560px,92vw)] rounded-lg border border-white/20 bg-black p-6 text-white shadow-xl space-y-4">
+        <h3 id="del-title" class="text-xl font-bold">Delete account</h3>
+
+        <div class="space-y-2 text-white/80 text-sm leading-relaxed">
+          <p>
+            Deleting your account will permanently remove your <span class="font-semibold">Cadena</span> profile from our database.
+            DLCs already <span class="font-semibold">in progress (active)</span> will remain unaffected.
+          </p>
+          <p>
+            Your <span class="font-semibold">Seed Phrase</span> and <span class="font-semibold">XPUB</span> data on-chain stay valid — meaning:
+          </p>
+          <ul class="list-disc list-inside space-y-1 ml-3">
+            <li>Funds on your existing Cadena-used addresses are unchanged.</li>
+            <li>You can still use your Seed Phrase in other wallet software.</li>
+            <li>We delete your email-linked records, forget your XPUB, UTXO-set, and any placed Offers.</li>
+          </ul>
+        </div>
+
+        <p class="text-white/70 text-sm">
+          To confirm deletion, please type <code class="px-1 py-0.5 rounded bg-black/40 border border-white/10">DELETE</code> and your
+          <span class="font-semibold">current email address</span> below.
         </p>
 
-        <input
-          v-model.trim="delConfirm"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          class="w-full px-3 py-2 rounded bg-white text-black mb-3"
-          placeholder="Type DELETE to confirm"
-          :disabled="delBusy"
-        />
+        <div class="space-y-2">
+          <input
+            v-model.trim="delConfirm"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            class="w-full px-3 py-2 rounded bg-white text-black"
+            placeholder='Type "DELETE"'
+            :disabled="delBusy"
+          />
+          <input
+            v-model.trim="delEmail"
+            type="email"
+            autocomplete="off"
+            spellcheck="false"
+            class="w-full px-3 py-2 rounded bg-white text-black"
+            placeholder="Enter your email address"
+            :disabled="delBusy"
+          />
+        </div>
 
-        <div v-if="delError" class="mb-3 p-2 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
+        <div v-if="delError" class="p-2 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
           {{ delError }}
         </div>
 
         <div class="flex justify-end gap-2">
           <button
             class="px-3 py-2 rounded border border-white/20 hover:bg-white/10"
-            @click="delOpen = false; delConfirm = ''; delError = null"
+            @click="delOpen = false; delConfirm = ''; delEmail = ''; delError = null"
             :disabled="delBusy"
           >
             Cancel
           </button>
           <button
             class="px-3 py-2 rounded bg-red-600/90 hover:bg-red-600 disabled:opacity-50"
-            :disabled="delBusy || delConfirm !== 'DELETE'"
+            :disabled="delBusy || delConfirm !== 'DELETE' || delEmail.toLowerCase() !== userEmail"
             @click="onConfirmDelete"
           >
             {{ delBusy ? 'Deleting…' : 'Delete account' }}
@@ -301,6 +335,8 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { getTopupAddressQR } from '../api/qr'
+import { getUserQR } from '../api/qr'
+import { getToken } from '../api/token'
 import { getUserDlcs } from '../api/userDlcs'
 import { deleteSelf } from '../api/deleteSelf'
 import TheFooter from '../components/TheFooter.vue'
@@ -333,6 +369,10 @@ const addrLoading = ref(false)
 const addrError = ref(null)
 const copied = ref(false)
 
+// QR (like registration page)
+const qrCode = ref(null)
+const qrError = ref(null)
+
 // ---- Load profile ----
 async function load() {
   await setUserFromApi()
@@ -344,32 +384,24 @@ async function reloadAll() {
   await nextTick()
   if (!isPending.value) {
     await fetchTopup()
+    await loadQrCode() // refresh QR too
   } else {
     address.value = ''
-    qrRawSvg.value = ''
+    qrCode.value = null
   }
   await fetchPastDlcs()
 }
 
-// ---- QR fetch & sanitize ----
-const qrRawSvg = ref('')
-
+// ---- Address fetch (keep) ----
 async function fetchTopup() {
   addrError.value = null
   addrLoading.value = true
   address.value = ''
-  qrRawSvg.value = ''
   copied.value = false
 
   try {
     const res = await getTopupAddressQR(-1)
     address.value = String(res?.payload?.string || '')
-    const svg = String(res?.payload?.qr_code || '')
-    if (!address.value || !svg) {
-      addrError.value = 'Invalid response: missing address or QR code.'
-    } else {
-      qrRawSvg.value = svg
-    }
   } catch (e) {
     addrError.value = e && e.message ? e.message : String(e)
   } finally {
@@ -377,56 +409,38 @@ async function fetchTopup() {
   }
 }
 
-function sanitizeSvg(svgText) {
-  try {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(svgText, 'image/svg+xml')
-    const allowedTags = new Set(['svg', 'g', 'path', 'rect'])
-    const allowedAttrs = new Set([
-      'viewBox','xmlns','version','fill','stroke','d','x','y','width','height',
-      'rx','ry','transform','shape-rendering','stroke-width'
-    ])
-    const walker = document.createTreeWalker(doc, NodeFilter.SHOW_ELEMENT, null)
-    const toRemove = []
-    let node = walker.nextNode()
-    while (node) {
-      const el = node
-      const tag = el.tagName?.toLowerCase?.()
-      if (!allowedTags.has(tag)) {
-        toRemove.push(el)
-      } else {
-        for (const attr of Array.from(el.attributes)) {
-          const name = attr.name
-          if (name.startsWith('on') || name === 'style' || name === 'href' || name === 'xlink:href') {
-            el.removeAttribute(name)
-            continue
-          }
-          if (!allowedAttrs.has(name)) el.removeAttribute(name)
-        }
-      }
-      node = walker.nextNode()
-    }
-    for (const n of toRemove) n.parentNode?.removeChild(n)
-
-    const root = doc.documentElement
-    root.removeAttribute('width')
-    root.removeAttribute('height')
-    if (!root.getAttribute('viewBox')) root.setAttribute('viewBox', '0 0 50 50')
-    root.setAttribute('preserveAspectRatio', 'xMidYMid meet')
-
-    return new XMLSerializer().serializeToString(doc)
-  } catch {
-    return ''
+// ---- QR load (copied from registration page style) ----
+const buildSvgDataUri = (svgLike) => {
+  const val = String(svgLike || '').trim()
+  if (!val) throw new Error('Empty QR')
+  if (/^data:image\/svg\+xml[,;]/i.test(val)) return val
+  if (/^https?:\/\//i.test(val)) return val
+  if (val.startsWith('<svg') || val.startsWith('<?xml')) {
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(val)
   }
+  if (val.startsWith('%3Csvg') || val.startsWith('%3C?xml')) {
+    return 'data:image/svg+xml,' + val
+  }
+  throw new Error('Unexpected QR format.')
 }
 
-const qrDataUrl = computed(() => {
-  if (!qrRawSvg.value) return ''
-  const clean = sanitizeSvg(qrRawSvg.value)
-  if (!clean) return ''
-  const b64 = btoa(unescape(encodeURIComponent(clean)))
-  return `data:image/svg+xml;base64,${b64}`
-})
+async function loadQrCode() {
+  qrError.value = null
+  qrCode.value = null
+  try {
+    const token = getToken()
+    if (!token) {
+      qrError.value = 'You are not authenticated.'
+      return
+    }
+    const data = await getUserQR()
+    const svg = data?.payload?.qr_code
+    if (typeof svg !== 'string') throw new Error('QR code not found in response payload.')
+    qrCode.value = buildSvgDataUri(svg)
+  } catch (err) {
+    qrError.value = err?.message || 'Failed to load QR code.'
+  }
+}
 
 // ---- Copy address ----
 async function copyAddress() {
@@ -603,9 +617,16 @@ const delOpen = ref(false)
 const delBusy = ref(false)
 const delError = ref(null)
 const delConfirm = ref('')
+const delEmail = ref('')
 
 async function onConfirmDelete() {
   if (delBusy.value) return
+
+  if (delConfirm.value !== 'DELETE' || delEmail.value.toLowerCase() !== userEmail.value) {
+    delError.value = 'Confirmation text or email does not match.'
+    return
+  }
+
   delBusy.value = true
   delError.value = null
   try {
@@ -624,6 +645,7 @@ onMounted(async () => {
   await load()
   if (!isPending.value) {
     await fetchTopup()
+    await loadQrCode()
   }
   await fetchPastDlcs()
 })
@@ -675,7 +697,7 @@ onMounted(async () => {
 
 .qr-box img{
   width: 100%;
-  height: 100%;
+  height: 420px;
   object-fit: contain;
   object-position: center;
   display: block;

@@ -44,7 +44,7 @@
             />
             <button
               type="button"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-sm px-2 py-1 rounded bg-white/20 hover:bg-white/30"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-sm px-2 py-1 rounded bg-secondary hover:bg-secondary/90"
               @click="showPw = !showPw"
               :aria-pressed="showPw ? 'true' : 'false'"
             >
@@ -54,20 +54,30 @@
         </label>
 
         <!-- Confirm Password -->
-        <label>
-          <span class="block mb-1 font-semibold">Confirm Password</span>
-          <input
-            :type="showPw ? 'text' : 'password'"
-            v-model="confirmPassword"
-            autocomplete="new-password"
-            placeholder="Re-enter your password"
-            class="w-full px-4 py-2 rounded bg-white text-black"
-            :aria-invalid="!!confirmError"
-            aria-describedby="confirm-hint"
-            required
-          />
-          <p id="confirm-hint" class="mt-1 text-sm text-red-300" v-if="confirmError">{{ confirmError }}</p>
-        </label>
+       <label>
+  <span class="block mb-1 font-semibold">Confirm Password</span>
+  <div class="relative">
+    <input
+      :type="showPw ? 'text' : 'password'"
+      v-model="confirmPassword"
+      autocomplete="new-password"
+      placeholder="Re-enter your password"
+      class="w-full px-4 py-2 pr-12 rounded bg-white text-black"
+      :aria-invalid="!!confirmError"
+      aria-describedby="confirm-hint"
+      required
+    />
+    <button
+      type="button"
+      class="absolute right-2 top-1/2 -translate-y-1/2 text-sm px-2 py-1 rounded bg-secondary hover:bg-secondary/90"
+      @click="showPw = !showPw"
+      :aria-pressed="showPw ? 'true' : 'false'"
+    >
+      {{ showPw ? 'Hide' : 'Show' }}
+    </button>
+  </div>
+  <p id="confirm-hint" class="mt-1 text-sm text-red-300" v-if="confirmError">{{ confirmError }}</p>
+</label>
 
         <!-- Terms -->
         <div class="flex items-start gap-2 text-sm">
@@ -228,7 +238,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { registerUser } from '../api/user'
 import { getUserQR } from '../api/qr'
@@ -249,10 +259,10 @@ const showPw = ref(false)
 // QR display
 const qrCode = ref<string | null>(null)
 
-// Auth store (shared with navbar/info strip)
+// Auth store
 const { user, setUserFromApi } = useAuth()
 
-// --- Validation (simple) ---
+// --- Validation ---
 const emailError = computed(() => {
   if (!email.value) return ''
   const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
@@ -277,6 +287,9 @@ const route = useRoute()
 const router = useRouter()
 const DASHBOARD_PATH = '/btcusd'
 
+// poll timer for step 3
+const step3PollId = ref<number | null>(null)
+
 const prefillEmailFromRoute = () => {
   const qp = Array.isArray(route.query.email) ? route.query.email[0] : route.query.email
   if (typeof qp === 'string' && qp.trim() && !email.value) {
@@ -299,7 +312,6 @@ const submitForm = async () => {
   } catch (err: any) {
     error.value = err?.message || 'Registration failed.'
   } finally {
-    // Clear password fields ASAP
     password.value = ''
     confirmPassword.value = ''
     loading.value = false
@@ -324,16 +336,48 @@ const loadQrCode = async () => {
   qrCode.value = null
   try {
     const token = getToken()
-    if (!token) {
-      // Not blocking navigation later; this only affects QR fetch now
-      return
-    }
+    if (!token) return
     const data: QRCodeUserResponse = await getUserQR()
     const svg = (data as any)?.payload?.qr_code
     if (typeof svg !== 'string') throw new Error('QR code not found in response payload.')
     qrCode.value = buildSvgDataUri(svg)
   } catch (err: any) {
     error.value = err?.message || 'Failed to load QR code.'
+  }
+}
+
+// small helper
+const readAuthCode = () => {
+  const raw = user.value
+  const fromPayload = Number((raw as any)?.payload?.auth_code)
+  if (Number.isFinite(fromPayload)) return fromPayload
+  const top = Number((raw as any)?.auth_code)
+  if (Number.isFinite(top)) return top
+  return null
+}
+
+const startStep3Polling = () => {
+  // avoid double timers
+  if (step3PollId.value !== null) return
+  step3PollId.value = window.setInterval(async () => {
+    try {
+      await setUserFromApi?.()
+      const code = readAuthCode()
+      if (code === 6) {
+        // stop first so we don't keep firing after navigation
+        stopStep3Polling()
+        await router.push(DASHBOARD_PATH)
+      }
+    } catch (e) {
+      // non-blocking, just keep polling
+    }
+  }, 3000) // every 3s
+}
+
+const stopStep3Polling = () => {
+  if (step3PollId.value !== null) {
+    clearInterval(step3PollId.value)
+    step3PollId.value = null
   }
 }
 
@@ -345,17 +389,15 @@ const goToDashboard = async () => {
   try {
     const token = getToken()
     if (token) {
-      // Brief retry to catch pairing writes; keeps the info bar accurate
       const deadline = Date.now() + 6000
       while (Date.now() < deadline) {
         await setUserFromApi?.()
-        const code = Number(user.value?.payload?.auth_code ?? user.value?.auth_code)
+        const code = readAuthCode()
         if (Number.isFinite(code)) break
         await sleep(400)
       }
     }
   } catch (e: any) {
-    // Non-blocking: we still navigate to the dashboard
     error.value = e?.message || 'Could not refresh your profile.'
   } finally {
     loading.value = false
@@ -376,7 +418,12 @@ watch(step, async (val) => {
   if (route.query.step !== next) {
     await router.replace({ query: { ...route.query, step: next } })
   }
-  if (val === 3) await loadQrCode()
+  if (val === 3) {
+    await loadQrCode()
+    startStep3Polling()
+  } else {
+    stopStep3Polling()
+  }
 })
 
 watch(() => route.query.step, () => syncStepFromRoute())
@@ -384,10 +431,18 @@ watch(() => route.query.step, () => syncStepFromRoute())
 onMounted(async () => {
   prefillEmailFromRoute()
   syncStepFromRoute()
-  if (step.value === 3) await loadQrCode()
+  if (step.value === 3) {
+    await loadQrCode()
+    startStep3Polling()
+  }
 })
 watch(() => route.query.email, () => prefillEmailFromRoute())
+
+onBeforeUnmount(() => {
+  stopStep3Polling()
+})
 </script>
+
 
 <style scoped>
 /* Bottom-centered purple glow on black (local-only) */
