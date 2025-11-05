@@ -6,17 +6,20 @@ import { getToken } from './token'
 /**
  * Permanently delete the authenticated user.
  * Endpoint: DELETE /app/auth/self
+ * Now requires the user's email as a parameter.
  */
-export const deleteSelf = async (): Promise<void> => {
+export const deleteSelf = async (email: string): Promise<void> => {
   const token = getToken()
 
   try {
     await axios.delete(`${API_URL}/app/auth/self`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
+      // axios allows a request body on DELETE via the `data` option
+      data: { email },
     })
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('[deleteSelf] User account deleted')
+      console.log('[deleteSelf] User account deleted for', email)
     }
   } catch (error: any) {
     if (axios.isAxiosError(error)) {

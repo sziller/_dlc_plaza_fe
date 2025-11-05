@@ -630,7 +630,8 @@ async function onConfirmDelete() {
   delBusy.value = true
   delError.value = null
   try {
-    await deleteSelf()
+    // pass email to API (lowercased)
+    await deleteSelf(delEmail.value.toLowerCase())
     logout()
     await router.replace('/login?deleted=1')
   } catch (e) {

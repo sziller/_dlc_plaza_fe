@@ -148,35 +148,45 @@
 
         <!-- Socials -->
         <div class="reveal glass-card" v-reveal="{ delay: 60 }">
-          <p class="text-2xl font-semibold mb-8 text-center">Find Us On Social Media</p>
-          <div class="flex flex-wrap items-center justify-center gap-10 md:gap-12">
-            <a
-              href="https://x.com/cadenabitcoin"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              referrerpolicy="no-referrer"
-              aria-label="Visit us on X (Twitter)"
-              class="social-tile"
-            >
-              <i-simple-icons-x class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true" />
-              <span class="text-base font-medium">X</span>
-            </a>
+  <p class="text-2xl font-semibold mb-8 text-center">Find Us On Social Media</p>
+  <div class="flex flex-wrap items-center justify-center gap-10 md:gap-12">
+    <a
+      href="https://x.com/cadenabitcoin"
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      referrerpolicy="no-referrer"
+      aria-label="Visit us on X (Twitter)"
+      class="social-tile"
+    >
+      <i-simple-icons-x class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-x>
+      <span class="text-base font-medium">X</span>
+    </a>
 
-            <!-- Use your real GitHub org/user if available -->
-           
-            <a
-              href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              referrerpolicy="no-referrer"
-              aria-label="Visit our YouTube"
-              class="social-tile"
-            >
-              <i-simple-icons-youtube class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true" />
-              <span class="text-base font-medium">YouTube</span>
-            </a>
-          </div>
-        </div>
+    <a
+      href="https://github.com/CadenaWizard/oracle"
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      referrerpolicy="no-referrer"
+      aria-label="Visit our GitHub repository"
+      class="social-tile"
+    >
+      <i-simple-icons-github class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-github>
+      <span class="text-base font-medium">GitHub</span>
+    </a>
+
+    <a
+      href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt"
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      referrerpolicy="no-referrer"
+      aria-label="Visit our YouTube"
+      class="social-tile"
+    >
+      <i-simple-icons-youtube class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-youtube>
+      <span class="text-base font-medium">YouTube</span>
+    </a>
+  </div>
+</div>
 
         <!-- Contacts -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">

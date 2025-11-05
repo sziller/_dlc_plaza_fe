@@ -168,26 +168,39 @@ const props = defineProps({
 
 const router = useRouter()
 
+// ---- Staging detection (prod = any cadenabitcoin.com except staging.cadenabitcoin.com) ----
+const IS_STAGING = (() => {
+  const host = (typeof location !== 'undefined' ? location.hostname : '').toLowerCase()
+  const IS_PROD = /^(?:www\.)?cadenabitcoin\.com$/.test(host) && host !== 'staging.cadenabitcoin.com'
+  return !IS_PROD
+})()
+
 // contract sizes -> accent
 const CONTRACT_ACCENTS = {
-  '0.01': '#000000',
-  '0.10': '#6738e4',
-  '1.00': '#8387c4',
+  '0.01':  '#000000',
+  '0.10':  '#6738e4',
+  '1.00':  '#8387c4',
+  '0.001': '#6738e4', // staging-only option uses secondary
 }
 
-const contractOptions = [
-  { value: '1.00', label: '1.00 BTC' },
-  { value: '0.10', label: '0.10 BTC' },
-  { value: '0.01', label: '0.01 BTC' },
-]
+// Staging-gated contract options
+const contractOptions = computed(() => {
+  const base = [
+    { value: '1.00',  label: '1.00 BTC' },
+    { value: '0.10',  label: '0.10 BTC' },
+    { value: '0.01',  label: '0.01 BTC' },
+  ]
+  if (IS_STAGING) base.push({ value: '0.001', label: '0.001 BTC' })
+  return base
+})
 
 // dropdown state
 const selectedContract = ref('0.10')
 const dropdownOpen = ref(false)
 
-const displayContractLabel = computed(() => {
-  return contractOptions.find(o => o.value === selectedContract.value)?.label || '0.10 BTC'
-})
+const displayContractLabel = computed(() =>
+  (contractOptions.value.find(o => o.value === selectedContract.value)?.label) || '0.10 BTC'
+)
 
 // computed accent
 const currentAccent = computed(() => {
@@ -248,7 +261,8 @@ function parseContractFromPid(pid) {
   if (m) {
     const num = Number(m[1])
     if (Number.isFinite(num)) {
-      return num.toFixed(2)
+      const decimals = num < 0.01 ? 3 : 2
+      return num.toFixed(decimals)
     }
   }
   return '0.10'
@@ -269,7 +283,8 @@ function annualize360(termPct, days) {
 function buildProductId(days, contractStr) {
   const normalizedDays = isYearish(days) ? 360 : days
   const cleanContract = Number(contractStr)
-  const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(2) : '0.10'
+  const decimals = (Number.isFinite(cleanContract) && cleanContract < 0.01) ? 3 : 2
+  const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(decimals) : '0.10'
   return `${PID_PREFIX}ltv-50_d-${normalizedDays}_c-${cPart}`
 }
 

@@ -339,21 +339,21 @@ onBeforeUnmount(() => {
                 <router-link to="/signerapp" class="group block cursor-pointer select-none" aria-label="Open Signer App page">
                   <picture class="block">
                     <source type="image/avif" :srcset="`
-                      /img/IMG_4240-portrait-640.avif 640w,
-                      /img/IMG_4240-portrait-960.avif 960w,
-                      /img/IMG_4240-portrait-1280.avif 1280w
+                      /img/File-portrait-640.avif 640w,
+                      /img/File-portrait-960.avif 960w,
+                      /img/File-portrait-1280.avif 1280w
                     `" />
                     <source type="image/webp" :srcset="`
-                      /img/IMG_4240-portrait-640.webp 640w,
-                      /img/IMG_4240-portrait-960.webp 960w,
-                      /img/IMG_4240-portrait-1280.webp 1280w
+                      /img/File-portrait-640.webp 640w,
+                      /img/File-portrait-960.webp 960w,
+                      /img/File-portrait-1280.webp 1280w
                     `" />
                     <img
-                      src="/img/IMG_4240-portrait-960.webp"
+                      src="/img/File-portrait-960.webp"
                       :srcset="`
-                        /img/IMG_4240-portrait-640.webp 640w,
-                        /img/IMG_4240-portrait-960.webp 960w,
-                        /img/IMG_4240-portrait-1280.webp 1280w
+                        /img/File-portrait-640.webp 640w,
+                        /img/File-portrait-960.webp 960w,
+                        /img/File-portrait-1280.webp 1280w
                       `"
                       :style="{
                         maxHeight: (clampedPhoneH - 100) + 'px',

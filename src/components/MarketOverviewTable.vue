@@ -281,17 +281,35 @@ import { getToken } from '../api/token'
 
 const router = useRouter()
 
+// Detect staging via envs or hostname
+const IS_STAGING = (() => {
+  const host = (typeof location !== 'undefined' ? location.hostname : '').toLowerCase()
+
+  // prod if cadenabitcoin.com (or www.) but NOT staging.cadenabitcoin.com
+  const IS_PROD =
+    /^(?:www\.)?cadenabitcoin\.com$/.test(host) &&
+    host !== 'staging.cadenabitcoin.com'
+
+  return !IS_PROD
+})()
+
 const CONTRACT_ACCENTS = {
-  '0.01': '#000000',
-  '0.10': '#6738e4',
-  '1.00': '#8387c4',
+  '0.01':  '#000000',
+  '0.10':  '#6738e4',
+  '1.00':  '#8387c4',
+  '0.001': '#6738e4', // staging-only: use secondary
 }
 
-const contractOptions = [
-  { value: '1.00', label: '1.00 BTC' },
-  { value: '0.10', label: '0.10 BTC' },
-  { value: '0.01', label: '0.01 BTC' },
-]
+// Staging-gated contract options
+const contractOptions = computed(() => {
+  const base = [
+    { value: '1.00',  label: '1.00 BTC' },
+    { value: '0.10',  label: '0.10 BTC' },
+    { value: '0.01',  label: '0.01 BTC' },
+  ]
+  if (IS_STAGING) base.push({ value: '0.001', label: '0.001 BTC' })
+  return base
+})
 
 const props = defineProps({
   title: { type: String, default: 'BTCUSD Market Overview' },
@@ -307,7 +325,7 @@ const props = defineProps({
 const selectedContract = ref('0.10')
 const dropdownOpen = ref(false)
 const displayContractLabel = computed(() =>
-  contractOptions.find(o => o.value === selectedContract.value)?.label || '0.10 BTC'
+  (contractOptions.value.find(o => o.value === selectedContract.value)?.label) || '0.10 BTC'
 )
 const currentAccent = computed(() =>
   CONTRACT_ACCENTS[selectedContract.value] || '#6738e4'
@@ -448,7 +466,9 @@ function parseContractFromPid(pid) {
   const m = String(pid || '').match(/c-([\d.]+)/i)
   if (m) {
     const v = Number(m[1])
-    return Number.isFinite(v) ? v.toFixed(2) : '0.10'
+    if (!Number.isFinite(v)) return '0.10'
+    const decimals = v < 0.01 ? 3 : 2
+    return v.toFixed(decimals)
   }
   return '0.10'
 }
@@ -607,7 +627,8 @@ onUnmounted(() => {
 function buildProductId(days, ltv, contractStr) {
   const normalizedDays = isYearish(days) ? 360 : days
   const cleanContract = Number(contractStr)
-  const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(2) : '0.10'
+  const decimals = (Number.isFinite(cleanContract) && cleanContract < 0.01) ? 3 : 2
+  const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(decimals) : '0.10'
   return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}_c-${cPart}`
 }
 function getDaysFromLabel(label) {

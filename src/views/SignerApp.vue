@@ -58,7 +58,7 @@
         <div class="space-y-4">
           <h3 class="text-2xl sm:text-3xl font-bold">Why it’s needed</h3>
           <p class="text-white/80">
-            Cadena is non-custodial. That means <span class="font-semibold">you</span> hold the keys and control authorization. The Signer separates
+            Cadena is non-c custodial. That means <span class="font-semibold">you</span> hold the keys and control authorization. The Signer separates
             identity and UI in the browser from the sensitive key material on your device, reducing attack surface and preserving
             self-custody.
           </p>
@@ -153,6 +153,25 @@
         <p v-if="downloadError" class="text-sm text-red-300 pt-2">
           {{ downloadError }}
         </p>
+      </section>
+
+      <!-- GitHub link (near bottom) -->
+      <section class="text-center pt-1">
+        <a
+          class="github-badge"
+          href="https://github.com/CadenaWizard/signer_app"
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          aria-label="View the Signer app on GitHub"
+        >
+          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true">
+            <path
+              d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38l-.01-1.32c-2.23.49-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.81.06 1.24.84 1.24.84.72 1.23 1.88.88 2.34.67.07-.52.28-.88.5-1.08-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.64 7.64 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.88 3.75-3.67 3.95.29.25.54.74.54 1.49l-.01 2.21c0 .21.14.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+              fill="currentColor"
+            />
+          </svg>
+          <span>View on GitHub</span>
+        </a>
       </section>
     </div>
   </main>
@@ -293,5 +312,30 @@ const handleApkDownload = async () => {
   font-size: 0.65em;
   line-height: 1;
   white-space: nowrap;
+}
+
+/* GitHub badge (simple, matches style) */
+.github-badge {
+  --gh-h: clamp(50px, 5.5vw, 60px);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--gh-h);
+  padding: 0 14px;
+  border-radius: calc(var(--gh-h) * 0.26);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-weight: 700;
+  font-size: clamp(0.7rem, 0.55rem + 0.4vw, 0.9rem);
+  line-height: 1;
+  transition: background .15s ease-out, border .15s ease-out, transform .12s ease-out;
+}
+.github-badge:hover {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.35);
+}
+.github-badge svg {
+  display: block;
 }
 </style>
