@@ -1,3 +1,4 @@
+<!-- MarketOverview.vue -->
 <template>
   <section
     class="w-full"
@@ -8,38 +9,112 @@
       class="rounded-xl border border-secondary/60 shadow-lg bg-dark/80 p-5 sm:p-6"
       :style="{ '--secondary': currentAccent }"
     >
+      <!-- ===== Title row: BTCUSD · [LTV dropdown] · [Amount dropdown] ===== -->
       <header class="flex items-center justify-center mb-3 sm:mb-4 gap-2 sm:gap-3">
         <h3 class="font-bold text-center chart-title">
-          50% LTV · BTCUSD ·
+          BTCUSD ·
         </h3>
 
-        <!-- custom dropdown -->
+        <!-- LTV dropdown -->
         <div class="relative">
           <button
             type="button"
-            class="custom-dd-trigger"
+            class="custom-dd-trigger custom-dd-trigger--lg"
+            @click="toggleLtv"
+          >
+            <span>{{ displayLtvLabel }}</span>
+            <svg class="w-6 h-6 shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <!-- LTV menu + explainer (desktop) -->
+          <div v-if="ltvOpen" class="custom-dd-wrap sm:flex hidden">
+            <div class="custom-dd-menu custom-dd-menu--th">
+              <button
+                v-for="opt in ltvOptions"
+                :key="`ltv-${opt.value}`"
+                type="button"
+                class="custom-dd-item"
+                :class="opt.value === selectedLtv ? 'active' : ''"
+                @click="selectLtv(opt.value)"
+              >
+                {{ opt.label }}
+              </button>
+            </div>
+
+            <aside class="custom-dd-infobox" role="note" aria-live="polite">
+              <div class="infobox-title">What you’re changing</div>
+              <p class="infobox-text">
+                <strong>LTV</strong> (Loan-to-Value) filters quotes to that collateral level and is encoded in the product you’ll trade.
+              </p>
+              <ul class="infobox-list">
+                <li>Lower LTV → safer for lender; borrower often sees lower % at higher collateral.</li>
+                <li>We refresh the table to this LTV.</li>
+              </ul>
+            </aside>
+          </div>
+
+          <!-- LTV explainer (mobile) -->
+          <aside v-if="ltvOpen" class="custom-dd-infobox-mobile mt-2 sm:hidden" role="note" aria-live="polite">
+            <div class="infobox-title">What you’re changing</div>
+            <p class="infobox-text">
+              <strong>LTV</strong> filters quotes and is baked into the product ID.
+            </p>
+          </aside>
+        </div>
+
+        <h3 class="font-bold text-center chart-title">·</h3>
+
+        <!-- Amount (contract size) dropdown -->
+        <div class="relative">
+          <button
+            type="button"
+            class="custom-dd-trigger custom-dd-trigger--lg"
             @click="toggleDropdown"
           >
             <span>{{ displayContractLabel }}</span>
-            <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none">
-              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            <svg class="w-6 h-6 shrink-0" viewBox="0 0 20 20" fill="none">
+              <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
-          <div
-            v-if="dropdownOpen"
-            class="custom-dd-menu"
-          >
-            <button
-              v-for="opt in contractOptions"
-              :key="opt.value"
-              type="button"
-              class="custom-dd-item"
-              :class="opt.value === selectedContract ? 'active' : ''"
-              @click="selectContract(opt.value)"
-            >
-              {{ opt.label }}
-            </button>
+
+          <!-- Dropdown + explanatory box wrapper (desktop only) -->
+          <div v-if="dropdownOpen" class="custom-dd-wrap sm:flex hidden">
+            <div class="custom-dd-menu custom-dd-menu--th">
+              <button
+                v-for="opt in contractOptions"
+                :key="opt.value"
+                type="button"
+                class="custom-dd-item"
+                :class="opt.value === selectedContract ? 'active' : ''"
+                @click="selectContract(opt.value)"
+              >
+                {{ opt.label }}
+              </button>
+            </div>
+
+            <!-- Info box -->
+            <aside class="custom-dd-infobox" role="note" aria-live="polite">
+              <div class="infobox-title">What you’re changing</div>
+              <p class="infobox-text">
+                <strong>Contract size</strong> is the notional BTC for each deal. It
+                filters quotes to this size and is baked into the product ID you’ll trade.
+              </p>
+              <ul class="infobox-list">
+                <li>We’ll show the best Lend/Borrow quotes that match this size.</li>
+                <li>You can switch sizes anytime; the table will refresh.</li>
+              </ul>
+            </aside>
           </div>
+
+          <!-- Mobile info box under the button -->
+          <aside v-if="dropdownOpen" class="custom-dd-infobox-mobile mt-2 sm:hidden" role="note" aria-live="polite">
+            <div class="infobox-title">What you’re changing</div>
+            <p class="infobox-text">
+              <strong>Contract size</strong> sets the BTC notional for each deal and filters the quotes shown below.
+            </p>
+          </aside>
         </div>
       </header>
 
@@ -155,6 +230,7 @@ import { getOffers, getUserOffers } from '../api/offers'
 import { getToken } from '../api/token'
 import { acceptOffer } from '../api/acceptOffer'
 import { postOffer } from '../api/postOffer'
+import { postProductQueryV0 } from '../api/productQuery' // ApiEnvelope<ProductLendBorrowDtoLtd[]>
 
 const props = defineProps({
   pollMs: { type: Number, default: 5000 },
@@ -175,52 +251,116 @@ const IS_STAGING = (() => {
   return !IS_PROD
 })()
 
-// contract sizes -> accent
+// accent by contract — MATCHED to your other component
 const CONTRACT_ACCENTS = {
-  '0.01':  '#000000',
-  '0.10':  '#6738e4',
-  '1.00':  '#8387c4',
-  '0.001': '#6738e4', // staging-only option uses secondary
+  '0.001': '#6738e4',
+  '0.01' : '#6738e4',
+  '0.10' : '#8387c4',
+  '1.00' : '#000000',
 }
 
-// Staging-gated contract options
-const contractOptions = computed(() => {
-  const base = [
-    { value: '1.00',  label: '1.00 BTC' },
-    { value: '0.10',  label: '0.10 BTC' },
-    { value: '0.01',  label: '0.01 BTC' },
-  ]
-  if (IS_STAGING) base.push({ value: '0.001', label: '0.001 BTC' })
-  return base
+/* ---------- Persistence for amount (contract size) ---------- */
+const STORAGE_KEY = 'mo:selectedContract'
+function loadPreferredContract() {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY)
+    return v && typeof v === 'string' ? v : null
+  } catch { return null }
+}
+function savePreferredContract(v) {
+  try { localStorage.setItem(STORAGE_KEY, String(v)) } catch {}
+}
+function onContractStorage(e) {
+  if (e.key === STORAGE_KEY) {
+    const v = e.newValue
+    if (v && v !== selectedContract.value) {
+      selectedContract.value = v // watch will refresh data + resave
+    }
+  }
+}
+
+/* ---------- Dynamic product catalog (ltv + contract) ---------- */
+const products = ref([])
+
+const ltvValues = computed(() => {
+  const set = new Set()
+  for (const p of products.value || []) {
+    const n = Number(p.ltv)
+    if (Number.isFinite(n)) set.add(Math.round(n))
+  }
+  return Array.from(set).sort((a,b)=>a-b)
+})
+const ltvOptions = computed(() => {
+  const arr = ltvValues.value
+  const fb = [50, 80]
+  const use = arr.length ? arr : fb
+  return use.map(v => ({ value: v, label: `${v}% LTV` }))
 })
 
-// dropdown state
-const selectedContract = ref('0.10')
+function satsToBtcLabel(sats) {
+  const n = Number(sats)
+  if (!Number.isFinite(n)) return null
+  const btc = n / 1e8
+  const decimals = btc < 0.01 ? 3 : 2
+  return btc.toFixed(decimals)
+}
+const availableContracts = computed(() => {
+  const set = new Set()
+  for (const p of products.value || []) {
+    const label = satsToBtcLabel(p.contract_value)
+    if (label) set.add(label)
+  }
+  if (!set.size) {
+    const fb = IS_STAGING ? ['0.001', '0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
+    return fb
+  }
+  return Array.from(set).sort((a,b)=>Number(a)-Number(b))
+})
+const contractOptions = computed(() => availableContracts.value.map(v => ({ value: v, label: `${v} BTC` })))
+
+/* ---------- Dropdown state ---------- */
+const selectedLtv = ref(50)
+const selectedContract = ref(loadPreferredContract() || '0.10')
+const ltvOpen = ref(false)
 const dropdownOpen = ref(false)
 
+const displayLtvLabel = computed(() =>
+  (ltvOptions.value.find(o => o.value === selectedLtv.value)?.label) || (ltvOptions.value[0]?.label ?? '50% LTV')
+)
 const displayContractLabel = computed(() =>
   (contractOptions.value.find(o => o.value === selectedContract.value)?.label) || '0.10 BTC'
 )
 
-// computed accent
+/* ---------- Accent ---------- */
 const currentAccent = computed(() => {
   return CONTRACT_ACCENTS[selectedContract.value] || '#6738e4'
 })
 
+function toggleLtv() {
+  ltvOpen.value = !ltvOpen.value
+  if (ltvOpen.value) dropdownOpen.value = false
+}
 function toggleDropdown() {
   dropdownOpen.value = !dropdownOpen.value
+  if (dropdownOpen.value) ltvOpen.value = false
+}
+function selectLtv(val) {
+  selectedLtv.value = val
+  ltvOpen.value = false
+  loadOnce()
 }
 function selectContract(val) {
   selectedContract.value = val
+  savePreferredContract(val)
   dropdownOpen.value = false
+  loadOnce()
 }
 
-// modal state
+/* ---------- Modal state ---------- */
 const showModal = ref(false)
 const selectedRate = ref('*')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
-const selectedLtv = ref(50)
 const selectedOfferId = ref(null)
 const modalLoading = ref(false)
 const modalNotice = ref({ type: '', text: '' })
@@ -230,7 +370,7 @@ function getDaysFromLabel(label) {
   return m ? Number(m[1]) : 30
 }
 
-// table data (now also stores ids)
+/* ---------- Table data (unchanged sizes) ---------- */
 const rows = ref([
   { label: '30 Days',  lendTerm: '*', lendEar: '*', borrowTerm: '*', borrowEar: '*', lendId: null, borrowId: null, pid: null },
   { label: '90 Days',  lendTerm: '*', lendEar: '*', borrowTerm: '*', borrowEar: '*', lendId: null, borrowId: null, pid: null },
@@ -247,7 +387,7 @@ const fmtPct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
 const isYearish = (d) => Number.isFinite(d) && d >= 360 && d <= 366
 const PID_PREFIX = 'LendBorrowBTCUSD:'
 
-// parsing helpers
+/* ---------- parsing helpers ---------- */
 function parseLtv(pid) {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
   return m ? Number(m[1]) : null
@@ -280,20 +420,21 @@ function annualize360(termPct, days) {
   return termPct * (360 / days)
 }
 
-function buildProductId(days, contractStr) {
-  const normalizedDays = isYearish(days) ? 360 : days
+/* ---------- product id ---------- */
+function buildProductId(days, ltv, contractStr) {
+  const normalizedDays = isYearish(days) ? 365 : days
   const cleanContract = Number(contractStr)
   const decimals = (Number.isFinite(cleanContract) && cleanContract < 0.01) ? 3 : 2
   const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(decimals) : '0.10'
-  return `${PID_PREFIX}ltv-50_d-${normalizedDays}_c-${cPart}`
+  return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}_c-${cPart}`
 }
 
-function buildRows(offers, contractStr) {
+/* ---------- rows from offers (filter by chosen LTV + contract) ---------- */
+function buildRows(offers, ltv, contractStr) {
   const best = {}
   for (const o of offers || []) {
-    const ltv = parseLtv(o.product_id)
-    // ONLY 50% LTV here
-    if (ltv !== 50) continue
+    const l = parseLtv(o.product_id)
+    if (l !== ltv) continue
 
     const contract = parseContractFromPid(o.product_id)
     if (contract !== contractStr) continue
@@ -330,7 +471,7 @@ function buildRows(offers, contractStr) {
   }
 
   return TARGET_TERMS.map(d => {
-    const b = best[d] || { lend:{}, borrow:{}, pid: buildProductId(d, contractStr) }
+    const b = best[d] || { lend:{}, borrow:{}, pid: buildProductId(d, ltv, contractStr) }
     return {
       label: `${d} Days`,
       lendTerm: fmtPct2(b.lend.term),
@@ -339,7 +480,7 @@ function buildRows(offers, contractStr) {
       borrowEar:  fmtPct2(b.borrow.ear),
       lendId: b.lend.id || null,
       borrowId: b.borrow.id || null,
-      pid: b.pid || buildProductId(d, contractStr),
+      pid: b.pid || buildProductId(d, ltv, contractStr),
     }
   })
 }
@@ -361,6 +502,33 @@ function mark(id) {
   }, props.changeFlashMs)
 }
 
+/* ---------- data + actions ---------- */
+async function prefetchProducts() {
+  try {
+    const res = await postProductQueryV0([]) // [] => all products
+    const payload = Array.isArray(res?.payload) ? res.payload : []
+    products.value = payload
+
+    // ensure selections are valid (and honor persisted contract if valid)
+    const optsLtv = ltvOptions.value
+    const optsCn  = contractOptions.value
+
+    if (!optsLtv.find(o => o.value === selectedLtv.value) && optsLtv.length) {
+      selectedLtv.value = optsLtv[0].value
+    }
+
+    const stored = loadPreferredContract()
+    const storedValid = stored && optsCn.find(o => o.value === stored)
+    if (storedValid && stored !== selectedContract.value) {
+      selectedContract.value = stored
+    } else if (!optsCn.find(o => o.value === selectedContract.value) && optsCn.length) {
+      selectedContract.value = optsCn[0].value
+    }
+  } catch (e) {
+    console.debug('Product catalog prefetch failed:', e)
+  }
+}
+
 async function loadOnce() {
   if (fetching) return
   fetching = true
@@ -368,11 +536,11 @@ async function loadOnce() {
     const token = getToken()
     const res = token ? await getUserOffers('both', false) : await getOffers('both')
     const list = Array.isArray(res?.payload) ? res.payload : []
-    const nextRows = buildRows(list, selectedContract.value)
+    const nextRows = buildRows(list, selectedLtv.value, selectedContract.value)
     flashDiff(rows.value, nextRows)
     rows.value = nextRows
   } catch (e) {
-    console.error('Rates50Mini: load failed', e)
+    console.error('Rates table load failed', e)
   } finally {
     fetching = false
   }
@@ -383,7 +551,6 @@ function handleCellClick(row, side) {
   selectedRate.value = side === 'lend' ? row.lendTerm : row.borrowTerm
   selectedAction.value = side === 'lend' ? 'Lend' : 'Borrow'
   selectedTermDays.value = getDaysFromLabel(row.label)
-  selectedLtv.value = 50
   selectedOfferId.value = side === 'lend' ? row.lendId : row.borrowId
   modalNotice.value = { type: '', text: '' }
   showModal.value = true
@@ -431,8 +598,9 @@ async function handleOrderSubmit(data) {
     }
 
     const days = Number(data.durationDays) || selectedTermDays.value
+    const ltv = selectedLtv.value
     const cntr = selectedContract.value
-    const product_id = buildProductId(days, cntr)
+    const product_id = buildProductId(days, ltv, cntr)
     const tmp_cntr_id = genTmpCntrId()
 
     const params = {
@@ -465,25 +633,27 @@ function genTmpCntrId() {
 }
 
 onMounted(async () => {
+  await prefetchProducts()
   await loadOnce()
   intervalId = setInterval(loadOnce, props.pollMs)
   window.addEventListener('focus', loadOnce)
   document.addEventListener('visibilitychange', onVisChange)
+  window.addEventListener('storage', onContractStorage)
 })
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId)
   window.removeEventListener('focus', loadOnce)
   document.removeEventListener('visibilitychange', onVisChange)
+  window.removeEventListener('storage', onContractStorage)
 })
 
 function onVisChange() {
   if (!document.hidden) loadOnce()
 }
 
-// reload data when switching contract
-watch(selectedContract, () => {
-  loadOnce()
-})
+// reload & persist data when switching selections
+watch(selectedContract, (v) => { savePreferredContract(v); loadOnce() })
+watch(selectedLtv, () => { loadOnce() })
 </script>
 
 <style scoped>
@@ -530,7 +700,7 @@ watch(selectedContract, () => {
 /* Title */
 .chart-title { font-size: var(--title-fs); }
 
-/* Table */
+/* Table (UNCHANGED sizes/shape) */
 .rates-table {
   border-collapse: separate;
   border-spacing: var(--table-gap-x) var(--table-gap-y);
@@ -551,7 +721,7 @@ watch(selectedContract, () => {
   border-radius: 0.5rem;
 }
 
-/* Cells */
+/* Cells (UNCHANGED) */
 .td.term {
   padding: var(--cell-py) var(--cell-px);
   text-align: center;
@@ -570,7 +740,7 @@ watch(selectedContract, () => {
 .kicker { margin-top: 0.35rem; color: rgba(255,255,255,0.7); font-size: var(--kicker-fs); }
 .sub { margin-top: 0.2rem; color: rgba(255,255,255,0.9); font-size: var(--sub-fs); }
 
-/* Mobile */
+/* Mobile (UNCHANGED) */
 .mobile-card { padding: 0.65rem 0.75rem; }
 .mobile-term { font-weight: 600; font-size: clamp(1rem, 0.95rem + 0.6vw, 1.25rem); margin-bottom: 0.4rem; }
 .btn {
@@ -586,7 +756,7 @@ watch(selectedContract, () => {
 .btn-kicker { font-size: 0.65rem; color: rgba(255,255,255,0.7); margin-top: 0.1rem; }
 .btn-sub { font-size: 0.7rem; color: rgba(255,255,255,0.9); margin-top: 0.15rem; }
 
-/* Flash & hover */
+/* Flash & hover (UNCHANGED) */
 .flash { animation: pop 0.18s ease-in-out; }
 @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
 
@@ -622,6 +792,7 @@ watch(selectedContract, () => {
   transform:scale(1);
 }
 
+/* table layout widths (UNCHANGED) */
 .rates-table { table-layout: fixed; }
 .rates-table .col-term { width: clamp(88px, 12%, 128px); }
 .rates-table .col-side { width: auto; }
@@ -645,7 +816,7 @@ watch(selectedContract, () => {
   color: var(--secondary, #6738e4) !important;
 }
 
-/* custom dropdown */
+/* ===== Bigger, colored dropdowns (NEW) — Title bar only ===== */
 .custom-dd-trigger {
   display: inline-flex;
   align-items: center;
@@ -663,6 +834,20 @@ watch(selectedContract, () => {
   border-color: rgba(255,255,255,.32);
   background: rgba(10,10,15,.55);
 }
+
+/* Larger colored variant used in the title bar */
+.custom-dd-trigger--lg {
+  background: #6738e4; /* colored to match */
+  border: 1px solid rgba(255,255,255,.18);
+  padding: 0.55rem 0.9rem;
+  font-size: 1rem;
+  border-radius: 0.6rem;
+}
+.custom-dd-trigger--lg:hover {
+  border-color: rgba(255,255,255,.32);
+  background: rgba(103,56,228,.9);
+}
+
 .custom-dd-menu {
   position: absolute;
   top: 100%;
@@ -677,21 +862,59 @@ watch(selectedContract, () => {
   z-index: 30;
   overflow: hidden;
 }
+.custom-dd-menu--th { left: 0; right: auto; }
+
 .custom-dd-item {
   width: 100%;
   text-align: left;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.82rem;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.92rem;
   color: rgba(255,255,255,.9);
   background: transparent;
   transition: background 120ms ease;
 }
-.custom-dd-item:hover {
-  background: rgba(103,56,228,.14);
-}
+.custom-dd-item + .custom-dd-item { border-top: 1px solid rgba(0,0,0,.35) }
+.custom-dd-item:hover { background: rgba(103,56,228,.14); }
 .custom-dd-item.active {
   background: rgba(103,56,228,.28);
   color: #fff;
   font-weight: 600;
+}
+
+/* Menu + info panel wrapper (desktop) */
+.custom-dd-wrap {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+  z-index: 45;
+}
+
+/* Info panels */
+.custom-dd-infobox {
+  width: 22rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.7rem;
+  background: rgba(13,14,20,0.9);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 20px 45px rgba(0,0,0,.35);
+  color: rgba(255,255,255,.92);
+  backdrop-filter: blur(6px);
+}
+.infobox-title { font-weight: 800; margin-bottom: 0.35rem; font-size: 0.95rem; letter-spacing: -0.01em; }
+.infobox-text { font-size: 0.86rem; line-height: 1.3; margin-bottom: 0.4rem; }
+.infobox-list { font-size: 0.82rem; line-height: 1.35; padding-left: 1rem; list-style: disc; color: rgba(255,255,255,.85); }
+
+/* Mobile info panel */
+.custom-dd-infobox-mobile {
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(13,14,20,0.9);
+  color: rgba(255,255,255,.92);
+  border-radius: 0.7rem;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 12px 28px rgba(0,0,0,.35);
 }
 </style>

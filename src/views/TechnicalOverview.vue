@@ -34,7 +34,7 @@ const page = ref(1)
 const zoom = ref('page-fit')
 
 /** Build the fragment-only viewer URL */
-const pdfHref = computed(() => `${pdfUrl}#page=${page.value}&zoom=${encodeURIComponent(zoom.value)}`)
+const pdfHref = computed(() => `${pdfUrl}`)
 
 onMounted(() => {
   try {

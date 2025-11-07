@@ -283,7 +283,7 @@ onBeforeUnmount(() => {
                   v-if="!isLoggedIn"
                   v-model="ctaEmail"
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder="Join mailing list for offers and updates"
                   class="w-full sm:flex-1 max-w-2xl px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
                 />
                 <router-link
@@ -429,7 +429,7 @@ onBeforeUnmount(() => {
           <div>
             <div class="yt">
               <iframe
-                src="https://www.youtube-nocookie.com/embed/0v_okPUvHvQ?rel=0&modestbranding=1&playsinline=1"
+                src="https://www.youtube-nocookie.com/embed/GSwoA__CH5I?rel=0&modestbranding=1&playsinline=1"
                 title="What is Cadena Bitcoin?"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen
@@ -515,29 +515,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- Latest Videos -->
-    <section class="bg-transparent text-white pt-8 pb-8 px-6 sm:px-[var(--g)] lg:px-[var(--g)] animated-section" :class="sectionInView[2] ? 'animate-in-left' : ''">
-      <div class="max-w-6xl mx-auto space-y-12">
-        <div class="text-center space-y-4">
-          <h2 class="text-3xl md:text-4xl font-extrabold">Latest Videos</h2>
-          <p class="text-white text-lg max-w-2xl mx-auto">
-            Explore our latest updates, tutorials, and overviews about Cadena Bitcoin and our protocol innovations.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div v-for="id in videos" :key="id" class="yt">
-            <iframe
-              :src="`https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1`"
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-              loading="lazy"
-              referrerpolicy="strict-origin-when-cross-origin"
-            ></iframe>
-          </div>
-        </div>
-      </div>
-    </section>
+    
 
     <!-- FAQ -->
     <section class="bg-transparent text-white px-4 pt-8 pb-20 sm:px-[var(--g)] lg:px-[var(--g)]">

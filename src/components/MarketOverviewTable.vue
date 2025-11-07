@@ -6,86 +6,98 @@
         class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col"
         :style="{ '--secondary': currentAccent }"
       >
-        <!-- Title + dropdown -->
-        <div class="flex items-center justify-between gap-3 mb-6 shrink-0">
-          <div class="text-3xl font-extrabold text-center sm:text-left title-text flex-1">
+        <!-- Header: title only -->
+        <div class="mb-6 shrink-0">
+          <div class="text-3xl font-extrabold text-center title-text">
             {{ title }}
-          </div>
-
-          <!-- custom dropdown (contract size) -->
-          <div class="relative">
-            <button
-              type="button"
-              class="custom-dd-trigger"
-              @click="toggleDropdown"
-            >
-              <span>{{ displayContractLabel }}</span>
-              <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none">
-                <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </button>
-            <div
-              v-if="dropdownOpen"
-              class="custom-dd-menu"
-            >
-              <button
-                v-for="opt in contractOptions"
-                :key="opt.value"
-                type="button"
-                class="custom-dd-item"
-                :class="opt.value === selectedContract ? 'active' : ''"
-                @click="selectContract(opt.value)"
-              >
-                {{ opt.label }}
-              </button>
-            </div>
           </div>
         </div>
 
         <!-- Content Wrapper -->
-        <div class="overflow-auto flex-1 min-h-0">
+        <div class="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
           <!-- ✅ Desktop/Tablet -->
-          <div class="hidden sm:block">
+          <div class="hidden sm:block overflow-x-hidden">
             <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-2">
               <thead>
                 <tr>
-                  <th></th>
-                  <th
-                    colspan="2"
-                    class="group-header rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg"
-                  >
-                    {{ leftGroupLabel }}
+                  <!-- LEFT CONTROL CELL (over Term) -->
+                  <th class="px-2 py-4 text-left align-middle">
+                    <div class="relative inline-block">
+                      <button
+                        type="button"
+                        class="custom-dd-trigger custom-dd-trigger--lg"
+                        @click="toggleDropdown"
+                      >
+                        <span>{{ displayContractLabel }}</span>
+                        <svg class="w-6 h-6 shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                          <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+
+                      <!-- Dropdown + explanatory box wrapper (desktop only) -->
+                      <div v-if="dropdownOpen" class="custom-dd-wrap sm:flex hidden">
+                        <div class="custom-dd-menu custom-dd-menu--th">
+                          <button
+                            v-for="opt in contractOptions"
+                            :key="opt.value"
+                            type="button"
+                            class="custom-dd-item"
+                            :class="opt.value === selectedContract ? 'active' : ''"
+                            @click="selectContract(opt.value)"
+                          >
+                            {{ opt.label }}
+                          </button>
+                        </div>
+
+                        <!-- Info box -->
+                        <aside class="custom-dd-infobox" role="note" aria-live="polite">
+                          <div class="infobox-title">What you’re changing</div>
+                          <p class="infobox-text">
+                            <strong>Contract size</strong> is the notional BTC for each deal. It
+                            filters quotes to this size and is baked into the product ID you’ll trade.
+                          </p>
+                          <ul class="infobox-list">
+                            <li>We’ll show the best Lend/Borrow quotes that match this size.</li>
+                            <li>You can switch sizes anytime; the table will refresh.</li>
+                          </ul>
+                        </aside>
+                      </div>
+                    </div>
                   </th>
-                  <th class="spacer px-1"></th>
+
+                  <!-- Left group header -->
                   <th
                     colspan="2"
-                    class="group-header rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg"
+                    class="group-header rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg whitespace-nowrap"
                   >
-                    {{ rightGroupLabel }}
+                    <span class="gh-label">{{ leftGroupLabel }}</span>
+                  </th>
+
+                  <th class="spacer px-1"></th>
+
+                  <!-- Right group header -->
+                  <th
+                    colspan="2"
+                    class="group-header rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg whitespace-nowrap"
+                  >
+                    <span class="gh-label">{{ rightGroupLabel }}</span>
                   </th>
                 </tr>
+
                 <tr class="text-white text-md">
                   <th class="px-4 py-4 text-left">Term</th>
                   <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">
-                      Lend
-                    </div>
+                    <div class="chip w-full text-center min-w-[6rem]">Lend</div>
                   </th>
                   <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">
-                      Borrow
-                    </div>
+                    <div class="chip w-full text-center min-w-[6rem]">Borrow</div>
                   </th>
                   <th class="spacer px-1 py-4"></th>
                   <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">
-                      Lend
-                    </div>
+                    <div class="chip w-full text-center min-w-[6rem]">Lend</div>
                   </th>
                   <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">
-                      Borrow
-                    </div>
+                    <div class="chip w-full text-center min-w-[6rem]">Borrow</div>
                   </th>
                 </tr>
               </thead>
@@ -164,6 +176,48 @@
 
           <!-- 📱 Mobile -->
           <div class="sm:hidden space-y-4">
+            <!-- mobile control row (global) -->
+            <div class="flex items-center justify-between">
+              <div class="text-white/70 text-xs uppercase tracking-wide">Contract size</div>
+              <div class="relative inline-block">
+                <button
+                  type="button"
+                  class="custom-dd-trigger"
+                  @click="toggleDropdown"
+                >
+                  <span>{{ displayContractLabel }}</span>
+                  <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+
+                <div v-if="dropdownOpen" class="custom-dd-menu custom-dd-menu--th">
+                  <button
+                    v-for="opt in contractOptions"
+                    :key="`m-${opt.value}`"
+                    type="button"
+                    class="custom-dd-item"
+                    :class="opt.value === selectedContract ? 'active' : ''"
+                    @click="selectContract(opt.value)"
+                  >
+                    {{ opt.label }}
+                  </button>
+                </div>
+
+                <!-- Mobile info box under the button -->
+                <aside v-if="dropdownOpen" class="custom-dd-infobox-mobile mt-2" role="note" aria-live="polite">
+                  <div class="infobox-title">What you’re changing</div>
+                  <p class="infobox-text">
+                    <strong>Contract size</strong> sets the BTC notional for each deal and filters the quotes shown below.
+                  </p>
+                  <ul class="infobox-list">
+                    <li>Size changes BTC amounts, not the % rate.</li>
+                    <li>Table refreshes to this size.</li>
+                  </ul>
+                </aside>
+              </div>
+            </div>
+
             <div
               v-for="(term, index) in terms"
               :key="`m-${term.label}`"
@@ -174,8 +228,8 @@
               </div>
 
               <!-- 50% LTV -->
-              <div class="rounded-md bg-white/5 p-3 mb-3">
-                <div class="text-[11px] tracking-wide uppercase text-white/70 mb-2 font-semibold">
+              <div class="rounded-md bg-white/5 p-0 mb-3">
+                <div class="text-[10px] tracking-wide uppercase text-white/70 mb-2 font-semibold">
                   {{ leftGroupLabel }}
                 </div>
                 <div class="grid grid-cols-2 gap-2">
@@ -278,39 +332,26 @@ import { getOffers, getUserOffers } from '../api/offers'
 import { postOffer } from '../api/postOffer'
 import { acceptOffer } from '../api/acceptOffer'
 import { getToken } from '../api/token'
+import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 
 const router = useRouter()
 
-// Detect staging via envs or hostname
+// -------- Env: staging vs prod ----------
 const IS_STAGING = (() => {
   const host = (typeof location !== 'undefined' ? location.hostname : '').toLowerCase()
-
-  // prod if cadenabitcoin.com (or www.) but NOT staging.cadenabitcoin.com
-  const IS_PROD =
-    /^(?:www\.)?cadenabitcoin\.com$/.test(host) &&
-    host !== 'staging.cadenabitcoin.com'
-
+  const IS_PROD = /^(?:www\.)?cadenabitcoin\.com$/.test(host) && host !== 'staging.cadenabitcoin.com'
   return !IS_PROD
 })()
 
+// -------- Accent colors per known sizes ----------
 const CONTRACT_ACCENTS = {
-  '0.01':  '#000000',
-  '0.10':  '#6738e4',
-  '1.00':  '#8387c4',
-  '0.001': '#6738e4', // staging-only: use secondary
+  '0.001': '#6738e4',
+  '0.01':  '#6738e4',
+  '0.10':  '#8387c4',
+  '1.00':  '#000000',
 }
 
-// Staging-gated contract options
-const contractOptions = computed(() => {
-  const base = [
-    { value: '1.00',  label: '1.00 BTC' },
-    { value: '0.10',  label: '0.10 BTC' },
-    { value: '0.01',  label: '0.01 BTC' },
-  ]
-  if (IS_STAGING) base.push({ value: '0.001', label: '0.001 BTC' })
-  return base
-})
-
+// -------- Props ----------
 const props = defineProps({
   title: { type: String, default: 'BTCUSD Market Overview' },
   leftGroupLabel: { type: String, default: '50% LTV' },
@@ -322,29 +363,13 @@ const props = defineProps({
   compact: { type: Boolean, default: true },
 })
 
-const selectedContract = ref('0.10')
-const dropdownOpen = ref(false)
-const displayContractLabel = computed(() =>
-  (contractOptions.value.find(o => o.value === selectedContract.value)?.label) || '0.10 BTC'
-)
-const currentAccent = computed(() =>
-  CONTRACT_ACCENTS[selectedContract.value] || '#6738e4'
-)
-
-function toggleDropdown() { dropdownOpen.value = !dropdownOpen.value }
-function selectContract(v) {
-  selectedContract.value = v
-  dropdownOpen.value = false
-  loadOffersOnce()
-}
-
-// ===== Auth state =====
+// -------- Auth state ----------
 const isLoggedIn = ref(false)
 function updateAuthState() {
   isLoggedIn.value = !!getToken()
 }
 
-// ===== Modal state =====
+// -------- Modal state ----------
 const showModal = ref(false)
 const selectedRate = ref('')
 const selectedAction = ref('Lend')
@@ -356,15 +381,12 @@ const modalNotice  = ref({ type: '', text: '' })
 
 function handleCellClick(row, key) {
   modalNotice.value = { type: '', text: '' }
-
   selectedRate.value = row[key]
   selectedAction.value = key.includes('a') ? 'Lend' : 'Borrow'
   selectedTermDays.value = getDaysFromLabel(row.label)
   selectedLtv.value = key.startsWith('ltv50') ? 50 : 80
-
   const idKey = `${key}Id`
   selectedOfferId.value = row[idKey] || null
-
   showModal.value = true
 }
 
@@ -432,7 +454,7 @@ async function handleOrderSubmit(data) {
   }
 }
 
-// ===== Table rows =====
+// -------- Table rows / offers polling ----------
 const terms = ref([
   { label: '30 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null, ltv50aId:null, ltv50bId:null, ltv80aId:null, ltv80bId:null },
   { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null, ltv50aId:null, ltv50bId:null, ltv80aId:null, ltv80bId:null },
@@ -574,6 +596,89 @@ function diffAndFlash(oldRows, newRows) {
   }
 }
 
+// -------- Persist selected contract size ----------
+const STORAGE_KEY = 'mo:selectedContract'
+function loadPreferredContract() {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY)
+    return v && typeof v === 'string' ? v : null
+  } catch { return null }
+}
+function savePreferredContract(v) {
+  try { localStorage.setItem(STORAGE_KEY, String(v)) } catch {}
+}
+
+// -------- Product catalog → dynamic contract sizes ----------
+const products = ref([])
+const selectedContract = ref(loadPreferredContract() || '0.10')
+const dropdownOpen = ref(false)
+
+function satsToBtcLabel(sats) {
+  const n = Number(sats)
+  if (!Number.isFinite(n)) return null
+  const btc = n / 1e8
+  const decimals = btc < 0.01 ? 3 : 2
+  return btc.toFixed(decimals)
+}
+
+const availableContracts = computed(() => {
+  const set = new Set()
+  for (const p of products.value || []) {
+    const label = satsToBtcLabel(p.contract_value)
+    if (!label) continue
+    set.add(label)
+  }
+  return Array.from(set).sort((a, b) => Number(a) - Number(b))
+})
+
+const contractOptions = computed(() => {
+  const arr = availableContracts.value
+  if (arr.length) {
+    return arr.map(v => ({ value: v, label: `${v} BTC` }))
+  }
+  const fallback = IS_STAGING ? ['0.001', '0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
+  return fallback.map(v => ({ value: v, label: `${v} BTC` }))
+})
+
+const displayContractLabel = computed(() =>
+  (contractOptions.value.find(o => o.value === selectedContract.value)?.label) ||
+  (contractOptions.value[0]?.label ?? '0.10 BTC')
+)
+
+const currentAccent = computed(() =>
+  CONTRACT_ACCENTS[selectedContract.value] || '#6738e4'
+)
+
+function toggleDropdown() { dropdownOpen.value = !dropdownOpen.value }
+function selectContract(v) {
+  selectedContract.value = v
+  savePreferredContract(v)
+  dropdownOpen.value = false
+  loadOffersOnce()
+}
+
+// -------- Fetch products once, then offers --------
+async function prefetchProducts() {
+  try {
+    const res = await postProductQueryV0([]) // [] => all products
+    const payload = Array.isArray(res?.payload) ? res.payload : []
+    products.value = payload
+
+    // validate persisted choice against current options
+    const opts = contractOptions.value
+    const stored = loadPreferredContract()
+    const valid = stored && opts.find(o => o.value === stored)
+
+    if (valid && stored !== selectedContract.value) {
+      selectedContract.value = stored // triggers watch → save + refresh
+    } else if (!opts.find(o => o.value === selectedContract.value) && opts.length) {
+      selectedContract.value = opts[0].value // triggers watch
+    }
+  } catch (e) {
+    console.debug('Product catalog prefetch failed:', e)
+  }
+}
+
 async function loadOffersOnce() {
   if (isFetchingOffers) return
   isFetchingOffers = true
@@ -597,7 +702,17 @@ function onVisChange() {
   if (!document.hidden) loadOffersOnce()
 }
 
-// ===== Lifecycle =====
+// keep tabs/windows in sync for this preference only
+function onContractStorage(e) {
+  if (e.key === STORAGE_KEY) {
+    const v = e.newValue
+    if (v && v !== selectedContract.value) {
+      selectedContract.value = v // watch handles save + refresh
+    }
+  }
+}
+
+// -------- Lifecycle ----------
 onMounted(async () => {
   updateAuthState()
   window.addEventListener('auth-changed', updateAuthState)
@@ -606,7 +721,9 @@ onMounted(async () => {
 
   document.addEventListener('visibilitychange', onVisChange)
   window.addEventListener('focus', loadOffersOnce)
+  window.addEventListener('storage', onContractStorage)
 
+  await prefetchProducts()
   await loadOffersOnce()
   offersIntervalId = setInterval(loadOffersOnce, props.offersPollMs)
 })
@@ -618,14 +735,15 @@ onUnmounted(() => {
 
   document.removeEventListener('visibilitychange', onVisChange)
   window.removeEventListener('focus', loadOffersOnce)
+  window.removeEventListener('storage', onContractStorage)
 
   if (offersIntervalId) clearInterval(offersIntervalId)
   flashActive.value = new Set()
 })
 
-// ===== Local helpers =====
+// -------- Local helpers ----------
 function buildProductId(days, ltv, contractStr) {
-  const normalizedDays = isYearish(days) ? 360 : days
+  const normalizedDays = isYearish(days) ? 365 : days
   const cleanContract = Number(contractStr)
   const decimals = (Number.isFinite(cleanContract) && cleanContract < 0.01) ? 3 : 2
   const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(decimals) : '0.10'
@@ -645,7 +763,9 @@ function genTmpCntrId() {
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
 }
 
-watch(selectedContract, () => {
+// Save + refresh whenever selection changes programmatically
+watch(selectedContract, (v) => {
+  savePreferredContract(v)
   loadOffersOnce()
 })
 
@@ -687,14 +807,14 @@ defineExpose({ loadOffersOnce, getEar })
 }
 
 .compact .rounded-xl { padding: 1rem; }
-.compact .title-text { font-size: 1.75rem; margin-bottom: 1rem; }
+.compact .title-text { font-size: 1.75rem; margin-bottom: 0; }
 
+/* keep spacing tight */
 .compact table { border-spacing: 0.25rem 0.625rem !important; }
-.compact thead th { padding: 0.45rem 0.6rem !important; font-size: 0.95rem; }
+.compact thead th { padding: 0.45rem 0.6rem !important; }
+/* don't clamp font-size too small for headers; let the gh-label scale instead */
+.compact thead .group-header { padding: 0.5rem 0.75rem !important; }
 .compact tbody td { padding: 0.6rem !important; }
-
-.compact thead .group-header { padding: 0.5rem 0.75rem !important; font-size: 1rem; }
-.compact thead .font-semibold { font-size: 0.9rem; }
 
 .compact .rate { font-size: 1.6rem; line-height: 1.15; }
 @media (min-width: 640px) {
@@ -718,6 +838,20 @@ defineExpose({ loadOffersOnce, getEar })
 .group-header {
   background: color-mix(in oklch, var(--secondary, #6738e4), black 12%);
   border: 1px solid color-mix(in oklch, var(--secondary, #6738e4), white 10%);
+  line-height: 1.05; /* keep box height tight while text grows */
+}
+
+/* make the label text "fill" more of the header without growing the box */
+.gh-label {
+  display: inline-block;
+  font-weight: 800;
+  /* grows with viewport but stays within same header height */
+  font-size: clamp(1rem, 1.4vw + 0.2rem, 1.35rem);
+  letter-spacing: -0.015em; /* tighten just a touch so text looks fuller */
+  white-space: nowrap;      /* no wrap to avoid taller header */
+  line-height: 1.05;
+  vertical-align: middle;
+  text-wrap: balance;
 }
 
 /* chips use accent */
@@ -736,6 +870,7 @@ defineExpose({ loadOffersOnce, getEar })
   isolation: isolate;
   outline: none;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  overflow: clip; /* keep blur ring inside */
 }
 .hover-glow::before {
   content: "";
@@ -783,53 +918,137 @@ defineExpose({ loadOffersOnce, getEar })
   color: var(--secondary, #6738e4) !important;
 }
 
-/* dropdown */
+/* Dropdown sizing + feel (bigger) */
 .custom-dd-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  background: rgba(10,10,15,.35);
+  gap: 0.5rem;
+  background: #6738e4;
   border: 1px solid rgba(255,255,255,.12);
-  border-radius: 0.45rem;
-  padding: 0.35rem 0.6rem 0.35rem 0.7rem;
-  font-size: 0.875rem;
+  border-radius: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 1rem;
   color: #fff;
-  line-height: 1.1;
-  transition: border 120ms ease, background 120ms ease;
+  line-height: 1.2;
+  transition: border 120ms ease, background 120ms ease, transform 80ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 .custom-dd-trigger:hover {
   border-color: rgba(255,255,255,.32);
-  background: rgba(10,10,15,.55);
+  background: rgba(103,56,228,.32);
 }
+.custom-dd-trigger:active { transform: translateY(0.5px); }
+
+/* Larger variant used near the table header */
+.custom-dd-trigger--lg {
+  padding: 0.75rem 1.15rem;
+  font-size: 1.125rem; /* ~18px */
+  border-radius: 0.7rem;
+  min-width: 11rem;
+}
+
 .custom-dd-menu {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 0.35rem;
-  min-width: 7.5rem;
+  margin-top: 0.5rem;
+  min-width: 12rem;
   background: rgba(11,12,18,0.96);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 0.55rem;
-  box-shadow: 0 16px 35px rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 0.7rem;
+  box-shadow: 0 20px 45px rgba(0,0,0,.40);
   backdrop-filter: blur(6px);
-  z-index: 30;
+  z-index: 40;
   overflow: hidden;
 }
+
+/* When used under header control, anchor under the button's left edge */
+.custom-dd-menu--th {
+  left: 0;
+  right: auto;
+}
+
 .custom-dd-item {
   width: 100%;
   text-align: left;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.82rem;
-  color: rgba(255,255,255,.9);
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: rgba(255,255,255,.92);
   background: transparent;
-  transition: background 120ms ease;
+  transition: background 120ms ease, color 120ms ease;
+}
+.custom-dd-item + .custom-dd-item {
+  border-top: 1px solid rgba(0,0,0,.40)
 }
 .custom-dd-item:hover {
-  background: rgba(103,56,228,.14);
+  background: rgba(103,56,228,.16);
 }
 .custom-dd-item.active {
-  background: rgba(103,56,228,.28);
+  background: rgba(103,56,228,.32);
   color: #fff;
   font-weight: 600;
+}
+
+/* Wrapper to sit the menu and info box side-by-side (desktop) */
+.custom-dd-wrap {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+  z-index: 45; /* above table header */
+}
+
+/* Desktop info panel */
+.custom-dd-infobox {
+  width: 22rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.7rem;
+  background: rgba(13,14,20,0.9);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 20px 45px rgba(0,0,0,.35);
+  color: rgba(255,255,255,.92);
+  backdrop-filter: blur(6px);
+}
+.infobox-title {
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+.infobox-text {
+  font-size: 0.86rem;
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+}
+.infobox-list {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  padding-left: 1rem;
+  list-style: disc;
+  color: rgba(255,255,255,.85);
+}
+
+/* Mobile info panel */
+.custom-dd-infobox-mobile {
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(13,14,20,0.9);
+  color: rgba(255,255,255,.92);
+  border-radius: 0.7rem;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 12px 28px rgba(0,0,0,.35);
+}
+
+/* Better touch targets on small screens */
+@media (max-width: 640px) {
+  .custom-dd-trigger--lg {
+    padding: 0.85rem 1.2rem;
+    font-size: 1.15rem;
+    min-width: 12rem;
+  }
+  .custom-dd-menu { min-width: 14rem; }
 }
 </style>
