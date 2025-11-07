@@ -12,9 +12,9 @@
     >
       <!-- Main navbar row -->
       <div class="px-6 py-4 flex justify-between items-center">
-        <!-- Logo & BTC Price (clickable to Home) -->
+        <!-- Logo & BTC Price (clickable; when logged in -> BTCUSD) -->
         <router-link
-          to="/"
+          :to="isLoggedIn ? '/btcusd' : '/'"
           class="flex items-center space-x-4 group focus:outline-none focus:ring-2 focus:ring-secondary/60 rounded-md"
           aria-label="Go to Home"
         >
@@ -65,7 +65,8 @@
 
         <!-- Desktop Nav -->
         <div class="hidden md:flex space-x-6 items-center">
-          <router-link :class="linkClass" to="/">Home</router-link>
+          <!-- Hide Home when logged in -->
+          <router-link v-if="!isLoggedIn" :class="linkClass" to="/">Home</router-link>
 
           <!-- BTCUSD (no dropdown) -->
           <router-link :class="linkClass" to="/btcusd">BTCUSD</router-link>
@@ -261,7 +262,13 @@
         class="fixed inset-0 bg-black text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-lg pt-[var(--nav-h)]"
         @keyup.esc="closeMobileMenu"
       >
-        <router-link @click="closeMobileMenu" to="/" class="block text-lg font-semibold hover:text-secondary">Home</router-link>
+        <!-- Hide Home when logged in -->
+        <router-link
+          v-if="!isLoggedIn"
+          @click="closeMobileMenu"
+          to="/"
+          class="block text-lg font-semibold hover:text-secondary"
+        >Home</router-link>
 
         <!-- BTCUSD section (no extras) -->
         <div>
@@ -596,6 +603,7 @@ const fiatOnchain = computed(() => {
 })
 
 /** ---- Expose refs used in template ---- */
+const linkClass = computed(() => 'hover:text-secondary text-white')
 defineExpose({
   navRef, infoRef, spacerHeight,
   // Data used in template:
@@ -603,9 +611,9 @@ defineExpose({
   isLoggedIn, isPaired, showPairing, isZeroAvailable,
   sessionBusy, btcPrice, authLoading, authError,
   logoutUser,
+  linkClass,
   // For Retry button: bubble up so parent can call setUserFromApi (or handle centrally)
   onRetry: () => emit('retry'),
-  linkClass: computed(() => 'hover:text-secondary text-white'),
 })
 </script>
 
