@@ -11,7 +11,9 @@
     "postbuild": "npx critical dist/index.html --inline --base dist/ --width 375 --height 667",
     "preview": "vite preview --port 3000 --strictPort",
     "img:hero": "node scripts/gen-hero-images.mjs",
-    "img:logo": "node scripts/gen-logo.mjs"
+    "img:logo": "node scripts/gen-logo.mjs",
+    "img:social": "node scripts/gen-social-images.mjs",
+    "test:seo": "node scripts/test-seo-previews.mjs"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.18",
@@ -37,9 +39,10 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "autoprefixer": "^10.4.0",
     "critical": "^7.2.1",
+    "jsdom": "^27.1.0",
     "pdfjs-dist": "^5.4.149",
     "postcss": "^8.4.0",
-    "sharp": "^0.34.3",
+    "sharp": "^0.34.5",
     "sharp-cli": "^5.2.0",
     "svgo": "^4.0.0",
     "tailwindcss": "^3.3.0",
