@@ -4,6 +4,7 @@ import { getToken } from '../api/token' // <-- add this import
 
 // Lazy-loaded views
 const Home               = () => import('../views/Home.vue')
+const SimpleHeroLP       = () => import('../views/lp/SimpleHero.vue')
 const About              = () => import('../views/About.vue')
 const Article1View       = () => import('../views/Article1view.vue')
 const BTCUSD             = () => import('../views/BTCUSD.vue')
@@ -25,6 +26,11 @@ const routes = [
   { path: '/', name: 'Home', component: Home, meta: {
     title: 'Cadena Bitcoin — Decentralized BTC Lending & Borrowing',
     description: 'Borrow against Bitcoin or earn yield with BTC-secured lending. Your keys, your coins. No banks, no sidechains.',
+    robots: 'index,follow',
+  }},
+  { path: '/lp/simple-hero', name: 'LandingPageSimpleHero', component: SimpleHeroLP, meta: {
+    title: 'Access Dollars Instantly — Cadena Bitcoin',
+    description: 'Securely borrow dollars using your bitcoin as collateral. Keep your keys, access BTC-backed loans instantly.',
     robots: 'index,follow',
   }},
   { path: '/about', component: About, meta: {
