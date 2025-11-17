@@ -1,17 +1,49 @@
 // src/api/token.ts
-let authToken: string | null = null;
+const TOKEN_KEY = 'token';
 
-// Save the token in memory only.  Nothing is persisted in web storage.
-export const saveToken = (token: string): void => {
-  authToken = token;
+const canUseBrowserStorage = () =>
+  typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+
+const readPersistedToken = (): string | null => {
+  if (!canUseBrowserStorage()) return null;
+  try {
+    return window.localStorage.getItem(TOKEN_KEY);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Unable to access localStorage for token read', error);
+    }
+    return null;
+  }
 };
 
-// Return the current token from memory.  Returns null after a page reload.
+let authToken: string | null = readPersistedToken();
+
+export const saveToken = (token: string): void => {
+  authToken = token;
+  if (!canUseBrowserStorage()) return;
+  try {
+    window.localStorage.setItem(TOKEN_KEY, token);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Unable to persist auth token', error);
+    }
+  }
+};
+
 export const getToken = (): string | null => {
+  if (authToken) return authToken;
+  authToken = readPersistedToken();
   return authToken;
 };
 
-// Clear the in‑memory token.
 export const removeToken = (): void => {
   authToken = null;
+  if (!canUseBrowserStorage()) return;
+  try {
+    window.localStorage.removeItem(TOKEN_KEY);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Unable to clear persisted auth token', error);
+    }
+  }
 };

@@ -20,6 +20,7 @@ const Login              = () => import('../views/Login.vue')
 const MyProfile          = () => import('../views/MyProfile.vue')
 const Terms              = () => import('../views/Terms.vue')
 const Privacy            = () => import('../views/Privacy.vue')
+const Cookies            = () => import('../views/Cookies.vue')
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: {
@@ -32,8 +33,8 @@ const routes = [
     description: 'Learn our mission and how Cadena Bitcoin works behind the scenes.',
     robots: 'index,follow',
   }},
-  { path: '/article/cadena-vs-others', name: 'Article1', component: Article1View, meta: {
-    title: 'Cadena vs Others — Article',
+  { path: '/article/cadena-decentralized-finance', name: 'Article1', component: Article1View, meta: {
+    title: 'Cadena Decentralized — Article',
     description: 'What makes Cadena Bitcoin different from centralized lenders and sidechains.',
     robots: 'index,follow',
   }},
@@ -72,14 +73,14 @@ const routes = [
     description: 'How Cadena lets you use Bitcoin flexibly while keeping self-custody.',
     robots: 'index,follow',
   }},
-  { path: '/article/cadena-loan-lifecycle', name: 'Article4', component: Article4view, meta: {
-    title: 'Loan Lifecycle — Article',
-    description: 'Step-by-step breakdown of Cadena Bitcoin loan lifecycle.',
-    robots: 'index,follow',
-  }},
-  { path: '/article/cadena-bitcoin-security', name: 'Article5', component: Article5view, meta: {
+  { path: '/article/cadena-bitcoin-security', name: 'Article4', component: Article4view, meta: {
     title: 'Security — Article',
     description: 'Security model: self-sovereignty, decentralization, and core Bitcoin principles.',
+    robots: 'index,follow',
+  }},
+  { path: '/article/cadena-loan-lifecycle', name: 'Article5', component: Article5view, meta: {
+    title: 'Loan Lifecycle — Article',
+    description: 'Step-by-step breakdown of Cadena Bitcoin loan lifecycle.',
     robots: 'index,follow',
   }},
   { path: '/article/we-need-to-talk-about-kyc', name: 'Article6', component: Article6view, meta: {
@@ -107,6 +108,11 @@ const routes = [
   { path: '/privacy', name: 'Privacy', component: Privacy, meta: {
     title: 'Privacy Policy — Cadena Bitcoin',
     description: 'How Cadena Bitcoin handles data and privacy.',
+    robots: 'index,follow',
+  }},
+  { path: '/cookies', name: 'Cookies', component: Cookies, meta: {
+    title: 'Cookie Policy — Cadena Bitcoin',
+    description: 'Learn how Cadena Bitcoin uses cookies and how to control them.',
     robots: 'index,follow',
   }},
   {

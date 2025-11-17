@@ -15,10 +15,10 @@ const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
 
 /* ---------- Articles ---------- */
 const articles = [
-  { id: 1, title: 'Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance', description: 'Understand what sets Cadena Bitcoin apart from other platforms.', imageBase: 'article1', link: '/article/cadena-vs-others', internal: true },
+  { id: 1, title: 'Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance', description: 'Understand what sets Cadena Bitcoin apart from other platforms.', imageBase: 'article1', link: '/article/cadena-decentralized-finance', internal: true },
   { id: 2, title: 'Cadena Bitcoin - Empowering Individual Financial Freedom', description: ' Learn how Cadena Bitcoin lets you use Bitcoin flexibly.', imageBase: 'article2', link: '/article/cadena-empowering-financial-freedom', internal: true },
-  { id: 3, title: 'Cadena Bitcoin: Security', description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles', imageBase: 'article3', link: '/article/cadena-loan-lifecycle', internal: true },
-  { id: 4, title: 'How Does it Work?', description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.', imageBase: 'article4', link: '/article/cadena-bitcoin-security', internal: true },
+  { id: 3, title: 'Cadena Bitcoin: Security', description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles', imageBase: 'article3', link: '/article/cadena-bitcoin-security', internal: true },
+  { id: 4, title: 'How Does it Work?', description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.', imageBase: 'article4', link: '/article/cadena-loan-lifecycle', internal: true },
   { id: 5, title: 'We need to talk about KYC', description: 'Identification is quietly becoming the default requirement for access to the internet.', imageBase: 'article6', link: '/article/we-need-to-talk-about-kyc', internal: true },
   { id: 6, title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending', description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.', imageBase: 'article5', link: '/article/cadena-improving-btc', internal: true },
 ]

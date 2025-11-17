@@ -336,6 +336,7 @@ import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
+import { getPrice } from '../api/price' // ⬅️ oracle price helper
 
 /** ---- Emits (kept for the Retry button in the template) ---- */
 const emit = defineEmits(['retry'])
@@ -365,12 +366,12 @@ const {
 /** ---- UI state ---- */
 const isMobileMenuOpen = ref(false)
 
-/** ---- BTC price polling (singleton-ish) ---- */
+/** ---- BTC price polling (via oracle) ---- */
 const btcPrice = ref('...')
 let priceIntervalId = null
-let abortCtrl = null
 let priceStarted = false
-function pickNumber(obj, keys) {
+
+function pickNumber (obj, keys) {
   const src = obj ?? {}
   for (const k of keys) {
     const v = src[k]
@@ -379,44 +380,53 @@ function pickNumber(obj, keys) {
   }
   return null
 }
+
 const fetchBTCPrice = async () => {
   try {
-    if (abortCtrl) abortCtrl.abort()
-    abortCtrl = new AbortController()
-    const res = await fetch(
-      'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
-      {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-store',
-        credentials: 'omit',
-        referrerPolicy: 'no-referrer',
-        signal: abortCtrl.signal,
-        headers: { accept: 'application/json' },
+    // getPrice is typed Promise<number>, but be defensive in case
+    // the implementation returns a JSON object instead.
+    const raw = await getPrice()
+
+    let usd = null
+
+    if (typeof raw === 'number') {
+      usd = raw
+    } else if (raw && typeof raw === 'object') {
+      // Try common field names on the top level
+      usd = pickNumber(raw, ['price', 'value', 'last_price', 'price_usd'])
+      // Or inside payload if present
+      if (usd == null && raw.payload && typeof raw.payload === 'object') {
+        usd = pickNumber(raw.payload, ['price', 'value', 'last_price', 'price_usd'])
       }
-    )
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const data = await res.json()
-    const usd = data?.bitcoin?.usd ?? 0
+    }
+
+    if (usd == null || !Number.isFinite(Number(usd))) {
+      throw new Error('Invalid oracle response for BTCUSD')
+    }
+
     btcPrice.value = Number(usd).toLocaleString(undefined, {
       style: 'decimal',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
-  } catch {
+  } catch (err) {
+    console.error('Failed to fetch BTC price from oracle:', err)
     btcPrice.value = 'N/A'
   }
 }
-function startPricePolling() {
+
+function startPricePolling () {
   if (priceStarted) return
   priceStarted = true
   fetchBTCPrice()
   priceIntervalId = setInterval(fetchBTCPrice, 30_000)
 }
-function stopPricePolling() {
-  if (priceIntervalId) clearInterval(priceIntervalId)
-  priceIntervalId = null
-  if (abortCtrl) abortCtrl.abort()
+
+function stopPricePolling () {
+  if (priceIntervalId) {
+    clearInterval(priceIntervalId)
+    priceIntervalId = null
+  }
   priceStarted = false
 }
 
@@ -428,19 +438,19 @@ const infoHeight = ref(0)
 let resizeObs = null
 let rafId = 0
 
-function applyHeights() {
+function applyHeights () {
   document.documentElement.style.setProperty('--nav-h', navHeight.value + 'px')
   document.documentElement.style.setProperty('--info-h', infoHeight.value + 'px')
 }
-function updateNavHeight() {
+function updateNavHeight () {
   navHeight.value = navRef.value?.offsetHeight || 0
   applyHeights()
 }
-function updateInfoHeight() {
+function updateInfoHeight () {
   infoHeight.value = isLoggedIn.value ? (infoRef.value?.offsetHeight || 0) : 0
   applyHeights()
 }
-function scheduleRecalc() {
+function scheduleRecalc () {
   if (rafId) cancelAnimationFrame(rafId)
   rafId = requestAnimationFrame(() => {
     updateNavHeight()
@@ -495,8 +505,8 @@ const sessionBusy = computed(() => {
 })
 const unregAfterEach = router.afterEach(() => { closeMobileMenu() })
 
-function toggleMobileMenu() { isMobileMenuOpen.value = !isMobileMenuOpen.value }
-function closeMobileMenu() { isMobileMenuOpen.value = false }
+function toggleMobileMenu () { isMobileMenuOpen.value = !isMobileMenuOpen.value }
+function closeMobileMenu () { isMobileMenuOpen.value = false }
 
 watch(isMobileMenuOpen, (open) => {
   document.body.classList.toggle('overflow-hidden', open)
@@ -517,7 +527,7 @@ onMounted(async () => {
     window.addEventListener('resize', onResize, { passive: true })
   }
 
-  // Start BTC price polling once
+  // Start BTC price polling once (from oracle)
   startPricePolling()
 
   // If logged in but no cached profile yet, refresh without blanking UI
@@ -534,11 +544,11 @@ onUnmounted(() => {
   stopStatusWatch && stopStatusWatch()
 })
 
-/** Re-measure only on actual auth/user changes (not page props) */
+/** Re-measure only on actual auth/user changes (not page props) ---- */
 watch(() => isLoggedIn.value, () => nextTick().then(scheduleRecalc))
 watch(() => authUser.value, () => nextTick().then(scheduleRecalc))
 
-/** Token health reactions */
+/** ---- Token health reactions ---- */
 const stopStatusWatch = watch(
   () => tokenHealth && tokenHealth.status,
   (s) => {
@@ -616,6 +626,7 @@ defineExpose({
   onRetry: () => emit('retry'),
 })
 </script>
+
 
 <style scoped>
 :where(.tabular-nums){

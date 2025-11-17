@@ -89,7 +89,7 @@
       <!-- Next: follows prev on mobile; absolute on md+ -->
       <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
         <router-link
-          to="/article/cadena-loan-lifecycle"
+          to="/article/cadena-bitcoin-security"
           class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
         >
           <span class="leading-tight">

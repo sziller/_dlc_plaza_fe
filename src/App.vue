@@ -15,6 +15,7 @@
 
     <!-- Page content: pad for navbar base + (optional) info strip -->
     <router-view class="px-4" :style="{ paddingTop: contentPad }" />
+    <CookieBanner />
   </div>
 </template>
 
@@ -22,6 +23,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
+import CookieBanner from './components/CookieBanner.vue'
 import { useAuth } from './composables/useAuth'
 
 const router = useRouter()
@@ -118,4 +120,3 @@ watch(isLoggedIn, () => syncPadFromCssVars())
 // Compute the pad-top the page needs beneath the fixed bars
 const contentPad = computed(() => `${navH.value + infoH.value}px`)
 </script>
-

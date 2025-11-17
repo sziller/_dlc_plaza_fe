@@ -86,6 +86,7 @@
             <ul class="space-y-2 text-white/80">
               <li><router-link to="/terms" class="hover:text-secondary">Terms</router-link></li>
               <li><router-link to="/privacy" class="hover:text-secondary">Privacy</router-link></li>
+              <li><router-link to="/cookies" class="hover:text-secondary">Cookies</router-link></li>
             </ul>
           </div>
         </nav>

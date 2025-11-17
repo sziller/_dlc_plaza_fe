@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ORACLE_API_URL } from '../config';
+const  ORACLE_API_URL = 'https://oracle.purabitcoin.com';
 
 // const ORACLE_API_URL = process.env.REACT_APP_ORACLE_API_URL;
 
