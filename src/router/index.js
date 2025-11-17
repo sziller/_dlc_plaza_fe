@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '../api/token' // <-- add this import
 
 // Lazy-loaded views
-const Home               = () => import('../views/Home.vue')
+const Home               = () => import('../views/lp/SimpleHero.vue')
 const SimpleHeroLP       = () => import('../views/lp/SimpleHero.vue')
 const About              = () => import('../views/About.vue')
 const Article1View       = () => import('../views/Article1view.vue')
