@@ -40,7 +40,7 @@
           </label>
 
           <p v-if="localError" class="text-sm text-red-300" aria-live="polite">{{ localError }}</p>
-          <p v-else-if="error" class="text-sm text-red-300" aria-live="polite">{{ error }}</p>
+          <p v-else-if="apiError" class="text-sm text-red-300" aria-live="polite">{{ apiError }}</p>
           <p v-else-if="successMessage" class="text-sm text-green-300" aria-live="polite">{{ successMessage }}</p>
 
           <button
@@ -60,22 +60,22 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
-import { isValidEmail } from '../api/publicContact'
+import { postContactEmail, isValidEmail } from '../api/publicContact'
 
 const props = defineProps<{
   open: boolean
-  loading?: boolean
-  error?: string | null
-  successMessage?: string | null
 }>()
 
 const emit = defineEmits<{
   (e: 'close'): void
-  (e: 'submit', email: string): void
+  (e: 'submitted', email: string): void
 }>()
 
 const email = ref('')
 const localError = ref('')
+const apiError = ref('')
+const successMessage = ref('')
+const loading = ref(false)
 const emailField = ref<HTMLInputElement | null>(null)
 
 watch(
@@ -83,6 +83,8 @@ watch(
   async (isOpen) => {
     if (isOpen) {
       localError.value = ''
+      apiError.value = ''
+      successMessage.value = ''
       email.value = ''
       await nextTick()
       emailField.value?.focus()
@@ -94,13 +96,29 @@ function handleClose() {
   emit('close')
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   localError.value = ''
+  apiError.value = ''
+  successMessage.value = ''
   if (!isValidEmail(email.value)) {
     localError.value = 'Please enter a valid email address.'
     return
   }
-  emit('submit', email.value)
+  loading.value = true
+  try {
+    await postContactEmail(email.value)
+    successMessage.value = 'Thanks! Check your inbox for Cadena updates.'
+    emit('submitted', email.value)
+    setTimeout(() => {
+      handleClose()
+      successMessage.value = ''
+    }, 2000)
+  } catch (err) {
+    const msg = err && typeof err === 'object' && 'message' in err ? err.message : null
+    apiError.value = (msg as string) || 'Could not add your email. Please try again.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 

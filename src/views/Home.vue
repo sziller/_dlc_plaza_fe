@@ -5,7 +5,6 @@ import { useAuth } from '../composables/useAuth'
 import Rates50Mini from '../components/Rates50Mini.vue'
 import { downloadApp } from '../api/downloadApp'
 import MailingListModal from '../components/MailingListModal.vue'
-import { postContactEmail, isValidEmail } from '../api/publicContact'
 
 // Store badge width sync
 const appleBadgeRef = ref(null)
@@ -33,33 +32,6 @@ function onHeroCtaClick() {
 }
 
 const showMailingList = ref(false)
-const mailingLoading = ref(false)
-const mailingError = ref(null)
-const mailingSuccess = ref(null)
-
-async function handleMailingSubmit(email) {
-  mailingLoading.value = true
-  mailingError.value = null
-  mailingSuccess.value = null
-  try {
-    await postContactEmail(email)
-    mailingSuccess.value = 'Thanks! We just added you to the list.'
-    setTimeout(() => {
-      showMailingList.value = false
-      mailingSuccess.value = null
-    }, 2000)
-  } catch (err: any) {
-    mailingError.value = err?.message || 'Could not add your email. Please try again.'
-  } finally {
-    mailingLoading.value = false
-  }
-}
-
-function closeMailingModal() {
-  showMailingList.value = false
-  mailingError.value = null
-  mailingSuccess.value = null
-}
 
 /* ---------- Carousel ---------- */
 const currentIndex = ref(0)
@@ -602,11 +574,7 @@ onBeforeUnmount(() => {
 
   <MailingListModal
     :open="showMailingList"
-    :loading="mailingLoading"
-    :error="mailingError"
-    :success-message="mailingSuccess"
-    @close="closeMailingModal"
-    @submit="handleMailingSubmit"
+    @close="showMailingList = false"
   />
 </template>
 

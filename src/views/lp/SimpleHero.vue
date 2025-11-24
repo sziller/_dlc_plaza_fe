@@ -4,7 +4,6 @@ import TheFooter from '../../components/TheFooter.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
 import { useAuth } from '../../composables/useAuth'
 import { downloadApp } from '../../api/downloadApp'
-import { postContactEmail } from '../../api/publicContact'
 
 // Store badge width sync
 const appleBadgeRef = ref(null)
@@ -31,34 +30,6 @@ function onHeroCtaClick() {
 }
 
 const showMailingList = ref(false)
-const mailingLoading = ref(false)
-const mailingError = ref(null)
-const mailingSuccess = ref(null)
-
-async function handleMailingSubmit(email) {
-  mailingLoading.value = true
-  mailingError.value = null
-  mailingSuccess.value = null
-  try {
-    await postContactEmail(email)
-    mailingSuccess.value = 'Thanks! You are now on the list.'
-    setTimeout(() => {
-      showMailingList.value = false
-      mailingSuccess.value = null
-    }, 2000)
-  } catch (err) {
-    const message = err && typeof err === 'object' && 'message' in err ? err.message : null
-    mailingError.value = message || 'Could not add your email. Please try again.'
-  } finally {
-    mailingLoading.value = false
-  }
-}
-
-function closeMailingModal() {
-  showMailingList.value = false
-  mailingError.value = null
-  mailingSuccess.value = null
-}
 
 /* ---------- Carousel ---------- */
 const currentIndex = ref(0)
@@ -611,11 +582,7 @@ onBeforeUnmount(() => {
 
   <MailingListModal
     :open="showMailingList"
-    :loading="mailingLoading"
-    :error="mailingError"
-    :success-message="mailingSuccess"
-    @close="closeMailingModal"
-    @submit="handleMailingSubmit"
+    @close="showMailingList = false"
   />
 </template>
 

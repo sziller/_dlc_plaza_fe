@@ -24,7 +24,7 @@ export const postContactEmail = async (
   if (!isValidEmail(email)) return
 
   try {
-    const payload = { email: String(email).toLowerCase() }
+    const payload = { email_address: String(email).toLowerCase() }
 
     const res = await axios.post(
       `${API_URL}/app/auth/contact-email`,

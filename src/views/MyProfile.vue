@@ -347,11 +347,7 @@
 
   <MailingListModal
     :open="showMailingList"
-    :loading="mailingLoading"
-    :error="mailingError"
-    :success-message="mailingSuccess"
-    @close="closeMailingModal"
-    @submit="handleMailingSubmit"
+    @close="showMailingList = false"
   />
 </template>
 
@@ -367,7 +363,6 @@ import { deleteSelf } from '../api/deleteSelf'
 import TheFooter from '../components/TheFooter.vue'
 import DlcDetails from '../components/DLCDetails.vue'
 import MailingListModal from '../components/MailingListModal.vue'
-import { postContactEmail } from '../api/publicContact'
 import { isSignerAuthCode } from '../lib/authCode'
 
 // ---- Router & Auth ----
@@ -530,34 +525,6 @@ const registrationLevel = computed(() => {
 })
 
 const showMailingList = ref(false)
-const mailingLoading = ref(false)
-const mailingError = ref(null)
-const mailingSuccess = ref(null)
-
-async function handleMailingSubmit(email) {
-  mailingLoading.value = true
-  mailingError.value = null
-  mailingSuccess.value = null
-  try {
-    await postContactEmail(email)
-    mailingSuccess.value = 'Thanks! We just added you to the list.'
-    setTimeout(() => {
-      showMailingList.value = false
-      mailingSuccess.value = null
-    }, 2000)
-  } catch (err) {
-    const msg = err && typeof err === 'object' && 'message' in err ? err.message : null
-    mailingError.value = msg || 'Could not add your email. Please try again.'
-  } finally {
-    mailingLoading.value = false
-  }
-}
-
-function closeMailingModal() {
-  showMailingList.value = false
-  mailingError.value = null
-  mailingSuccess.value = null
-}
 
 /* ======================= Past DLCs ======================= */
 const pastLoading = ref(false)
