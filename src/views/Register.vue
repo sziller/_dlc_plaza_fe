@@ -1,7 +1,7 @@
 <template>
-  <section class="min-h-screen text-white pt-24 pb-16 px-6 flex flex-col justify-between bg-page-gradient">
+  <section class="min-h-screen text-white pt-8 pb-8 px-6 flex flex-col gap-8 bg-page-gradient">
     <!-- 🧾 Step 1: Registration Form -->
-    <div v-if="step === 1" class="max-w-xl mx-auto w-full space-y-10">
+    <div v-if="step === 1" class="max-w-xl mx-auto w-full space-y-0">
       <h1 class="text-3xl font-bold text-center">Create Your Account</h1>
       <p class="text-sm text-white/70 text-center">
         You’ll receive a confirmation email first. After confirming, finish setup by
@@ -114,7 +114,7 @@
     </div>
 
     <!-- 📬 Step 2: Email Sent Message -->
-    <div v-else-if="step === 2" class="max-w-xl mx-auto text-center space-y-6">
+    <div v-else-if="step === 2" class="max-w-xl mx-auto text-center space-y-0">
       <h1 class="text-3xl font-bold">Check Your Inbox</h1>
       <p class="text-lg">We’ve sent a confirmation link to:</p>
       <p class="text-xl text-secondary font-bold break-all">{{ email }}</p>
@@ -166,7 +166,7 @@
     </div>
 
     <!-- 🧭 Step Tracker (unchanged) -->
-    <div class="mt-20 flex justify-center">
+    <div class="mt-0 flex justify-center pb-4">
       <ol class="flex items-center gap-10 text-base font-semibold">
         <li class="flex items-center gap-3">
           <div
@@ -235,6 +235,7 @@
       </ol>
     </div>
   </section>
+  <TheFooter/>
 </template>
 
 <script setup lang="ts">
@@ -245,6 +246,8 @@ import { getUserQR } from '../api/qr'
 import { getToken } from '../api/token'
 import { useAuth } from '../composables/useAuth'
 import type { QRCodeUserResponse } from '../types/common/qrFace'
+import TheFooter from '../components/TheFooter.vue'
+import { isSignerAuthCode } from '../lib/authCode'
 
 // UI state
 const step = ref<number>(1)
@@ -363,7 +366,7 @@ const startStep3Polling = () => {
     try {
       await setUserFromApi?.()
       const code = readAuthCode()
-      if (code === 6) {
+      if (isSignerAuthCode(code)) {
         // stop first so we don't keep firing after navigation
         stopStep3Polling()
         await router.push(DASHBOARD_PATH)

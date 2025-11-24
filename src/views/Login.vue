@@ -82,12 +82,15 @@
       </div>
     </section>
   </main>
+  <TheFooter/>
 </template>
 
 <script setup lang="ts">
+import TheFooter from '../components/TheFooter.vue'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAuthToken } from '../api/auth'
+import { isSignerAuthCode } from '../lib/authCode'
 import { getUserProfile } from '../api/userProfile'
 import { useAuth } from '../composables/useAuth'
 
@@ -148,7 +151,7 @@ const submitLogin = async () => {
     const code = Number(profilePayload?.auth_code)
     if (code === 2) {
       await router.push({ path: '/register', query: { step: '3' } })
-    } else if (code === 6) {
+    } else if (isSignerAuthCode(code)) {
       await router.push('/btcusd')
     } else {
       await router.push('/')

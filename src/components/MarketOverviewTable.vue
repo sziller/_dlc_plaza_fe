@@ -14,7 +14,16 @@
         </div>
 
         <!-- Content Wrapper -->
-        <div class="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
+        <div
+          v-if="isServerDown"
+          class="flex flex-col items-center justify-center text-center gap-4 rounded-lg border border-white/15 bg-white/5 p-6 sm:p-8 flex-1"
+        >
+          <div class="text-2xl font-semibold">Cadena is undergoing maintenance</div>
+          <p class="text-white/80 text-base max-w-2xl">
+            {{ serverStatusMessage || 'There are no live rates right now and logins are temporarily disabled. Please try again shortly.' }}
+          </p>
+        </div>
+        <div v-else class="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
           <!-- ✅ Desktop/Tablet -->
           <div class="hidden sm:block overflow-x-hidden">
             <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-2">
@@ -333,6 +342,7 @@ import { postOffer } from '../api/postOffer'
 import { acceptOffer } from '../api/acceptOffer'
 import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
+import { getServerStatus } from '../api/serverStatus'
 
 const router = useRouter()
 
@@ -367,6 +377,43 @@ const props = defineProps({
 const isLoggedIn = ref(false)
 function updateAuthState() {
   isLoggedIn.value = !!getToken()
+}
+
+// -------- Server availability ----------
+const FORCE_SERVER_DOWN = false
+const serverStatus = ref(FORCE_SERVER_DOWN ? 'down' : 'checking')
+const serverStatusMessage = ref('')
+const DEFAULT_DOWNTIME_MSG =
+  'There are no live rates right now and you will not be able to log in while the Cadena servers are under maintenance. Please try again shortly.'
+
+const isServerDown = computed(() => serverStatus.value === 'down')
+
+async function checkServerStatus() {
+  if (FORCE_SERVER_DOWN) {
+    serverStatus.value = 'down'
+    serverStatusMessage.value = DEFAULT_DOWNTIME_MSG
+    return
+  }
+  try {
+    const res = await getServerStatus()
+    const payload = res?.payload
+    if (payload?.ok && payload?.status === 'up') {
+      serverStatus.value = 'up'
+      serverStatusMessage.value = ''
+      return
+    }
+    serverStatus.value = 'down'
+    serverStatusMessage.value = DEFAULT_DOWNTIME_MSG
+  } catch (error) {
+    const statusCode = error?.response?.status
+    if (statusCode === 429) {
+      serverStatusMessage.value =
+        'Too many health-check requests from this IP. Please wait a moment and refresh. Rates are temporarily unavailable and logins are disabled until we reconnect.'
+    } else {
+      serverStatusMessage.value = DEFAULT_DOWNTIME_MSG
+    }
+    serverStatus.value = 'down'
+  }
 }
 
 // -------- Modal state ----------
@@ -680,6 +727,7 @@ async function prefetchProducts() {
 }
 
 async function loadOffersOnce() {
+  if (isServerDown.value || serverStatus.value === 'checking') return
   if (isFetchingOffers) return
   isFetchingOffers = true
   try {
@@ -722,6 +770,11 @@ onMounted(async () => {
   document.addEventListener('visibilitychange', onVisChange)
   window.addEventListener('focus', loadOffersOnce)
   window.addEventListener('storage', onContractStorage)
+
+  await checkServerStatus()
+  if (serverStatus.value !== 'up') {
+    return
+  }
 
   await prefetchProducts()
   await loadOffersOnce()

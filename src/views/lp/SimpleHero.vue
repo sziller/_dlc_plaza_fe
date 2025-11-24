@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import TheFooter from '../../components/TheFooter.vue'
+import MailingListModal from '../../components/MailingListModal.vue'
 import { useAuth } from '../../composables/useAuth'
 import { downloadApp } from '../../api/downloadApp'
+import { postContactEmail } from '../../api/publicContact'
 
 // Store badge width sync
 const appleBadgeRef = ref(null)
@@ -22,9 +24,41 @@ const articles = [
 ]
 /* ---------- Auth / CTA ---------- */
 const { isLoggedIn, setUserFromApi } = useAuth()
-const heroCtaTo = computed(() => {
-  return isLoggedIn.value ? '/btcusd' : '/register'
-})
+const heroCtaTo = computed(() => (isLoggedIn.value ? '/btcusd' : '/register'))
+const heroCtaLabel = computed(() => (isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'))
+function onHeroCtaClick() {
+  // placeholder for analytics/tracking when CTA is clicked
+}
+
+const showMailingList = ref(false)
+const mailingLoading = ref(false)
+const mailingError = ref(null)
+const mailingSuccess = ref(null)
+
+async function handleMailingSubmit(email) {
+  mailingLoading.value = true
+  mailingError.value = null
+  mailingSuccess.value = null
+  try {
+    await postContactEmail(email)
+    mailingSuccess.value = 'Thanks! You are now on the list.'
+    setTimeout(() => {
+      showMailingList.value = false
+      mailingSuccess.value = null
+    }, 2000)
+  } catch (err) {
+    const message = err && typeof err === 'object' && 'message' in err ? err.message : null
+    mailingError.value = message || 'Could not add your email. Please try again.'
+  } finally {
+    mailingLoading.value = false
+  }
+}
+
+function closeMailingModal() {
+  showMailingList.value = false
+  mailingError.value = null
+  mailingSuccess.value = null
+}
 
 /* ---------- Carousel ---------- */
 const currentIndex = ref(0)
@@ -275,12 +309,13 @@ onBeforeUnmount(() => {
               </div>
 
               <!-- Primary CTA -->
-              <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+              <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start w-full">
                 <router-link
                   :to="heroCtaTo"
                   class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
+                  @click="onHeroCtaClick"
                 >
-                  Get Started
+                  {{ heroCtaLabel }}
                 </router-link>
               </div>
 
@@ -290,6 +325,16 @@ onBeforeUnmount(() => {
                 <router-link to="/register" class="text-secondary hover:underline font-medium">
                   Click here
                 </router-link>
+              </p>
+              <p class="text-white/70 text-sm">
+                Want email updates?
+                <button
+                  type="button"
+                  class="text-secondary underline font-medium hover:text-secondary/80"
+                  @click="showMailingList = true"
+                >
+                  Join our mailing list
+                </button>
               </p>
 
               <!-- Store buttons: show on phone + tablet (<901px), hide on desktop -->
@@ -563,6 +608,15 @@ onBeforeUnmount(() => {
   </div>
 
   <TheFooter />
+
+  <MailingListModal
+    :open="showMailingList"
+    :loading="mailingLoading"
+    :error="mailingError"
+    :success-message="mailingSuccess"
+    @close="closeMailingModal"
+    @submit="handleMailingSubmit"
+  />
 </template>
 
 <style scoped>

@@ -126,6 +126,22 @@
             <div v-else class="text-white/70 text-sm">No referral code on file.</div>
           </section>
 
+          <!-- Mailing list -->
+          <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
+            <h2 class="text-2xl font-bold">Stay in the loop</h2>
+            <p class="text-white/70 text-sm">
+              Educational explainers, product updates, and occasional announcements to help you get more comfortable
+              with Cadena’s technology.
+            </p>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 self-start rounded-full border border-white/40 px-6 py-2 text-sm font-semibold text-white transition hover:border-secondary hover:text-secondary"
+              @click="showMailingList = true"
+            >
+              Join our mailing list
+            </button>
+          </section>
+
           <!-- Add funds -->
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-4">
             <h2 class="text-2xl font-bold">Add funds</h2>
@@ -328,6 +344,15 @@
   </transition>
 
   <TheFooter/>
+
+  <MailingListModal
+    :open="showMailingList"
+    :loading="mailingLoading"
+    :error="mailingError"
+    :success-message="mailingSuccess"
+    @close="closeMailingModal"
+    @submit="handleMailingSubmit"
+  />
 </template>
 
 <script setup>
@@ -341,6 +366,9 @@ import { getUserDlcs } from '../api/userDlcs'
 import { deleteSelf } from '../api/deleteSelf'
 import TheFooter from '../components/TheFooter.vue'
 import DlcDetails from '../components/DLCDetails.vue'
+import MailingListModal from '../components/MailingListModal.vue'
+import { postContactEmail } from '../api/publicContact'
+import { isSignerAuthCode } from '../lib/authCode'
 
 // ---- Router & Auth ----
 const router = useRouter()
@@ -494,12 +522,42 @@ async function copyText(text, which) {
 const isPending = computed(() => Number(profile.value?.payload?.auth_code) === 0)
 const registrationLevel = computed(() => {
   const code = Number(profile.value?.payload?.auth_code)
-  if (code === 6) return 'Signer'
+  if (isSignerAuthCode(code)) return 'Signer'
   if (code === 2) return 'Registered'
   if (code === 0) return 'Pending email confirmation'
   if (!Number.isFinite(code)) return '—'
   return `Code ${code}`
 })
+
+const showMailingList = ref(false)
+const mailingLoading = ref(false)
+const mailingError = ref(null)
+const mailingSuccess = ref(null)
+
+async function handleMailingSubmit(email) {
+  mailingLoading.value = true
+  mailingError.value = null
+  mailingSuccess.value = null
+  try {
+    await postContactEmail(email)
+    mailingSuccess.value = 'Thanks! We just added you to the list.'
+    setTimeout(() => {
+      showMailingList.value = false
+      mailingSuccess.value = null
+    }, 2000)
+  } catch (err) {
+    const msg = err && typeof err === 'object' && 'message' in err ? err.message : null
+    mailingError.value = msg || 'Could not add your email. Please try again.'
+  } finally {
+    mailingLoading.value = false
+  }
+}
+
+function closeMailingModal() {
+  showMailingList.value = false
+  mailingError.value = null
+  mailingSuccess.value = null
+}
 
 /* ======================= Past DLCs ======================= */
 const pastLoading = ref(false)

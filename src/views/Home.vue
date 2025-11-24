@@ -2,9 +2,10 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
-import { postContactEmail, isValidEmail } from '../api/publicContact'
 import Rates50Mini from '../components/Rates50Mini.vue'
 import { downloadApp } from '../api/downloadApp'
+import MailingListModal from '../components/MailingListModal.vue'
+import { postContactEmail, isValidEmail } from '../api/publicContact'
 
 // Store badge width sync
 const appleBadgeRef = ref(null)
@@ -25,15 +26,39 @@ const articles = [
 
 /* ---------- Auth / CTA ---------- */
 const { isLoggedIn, setUserFromApi } = useAuth()
-const ctaEmail = ref('')
-const heroCtaTo = computed(() => {
-  if (isLoggedIn.value) return '/btcusd'
-  const qp = isValidEmail(ctaEmail.value) ? `?email=${encodeURIComponent(ctaEmail.value)}` : ''
-  return `/register${qp}`
-})
+const heroCtaTo = computed(() => (isLoggedIn.value ? '/btcusd' : '/register'))
 const heroCtaLabel = computed(() => (isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'))
 function onHeroCtaClick() {
-  if (!isLoggedIn.value && isValidEmail(ctaEmail.value)) postContactEmail(ctaEmail.value)
+  // placeholder for analytics/tracking when CTA is clicked
+}
+
+const showMailingList = ref(false)
+const mailingLoading = ref(false)
+const mailingError = ref(null)
+const mailingSuccess = ref(null)
+
+async function handleMailingSubmit(email) {
+  mailingLoading.value = true
+  mailingError.value = null
+  mailingSuccess.value = null
+  try {
+    await postContactEmail(email)
+    mailingSuccess.value = 'Thanks! We just added you to the list.'
+    setTimeout(() => {
+      showMailingList.value = false
+      mailingSuccess.value = null
+    }, 2000)
+  } catch (err: any) {
+    mailingError.value = err?.message || 'Could not add your email. Please try again.'
+  } finally {
+    mailingLoading.value = false
+  }
+}
+
+function closeMailingModal() {
+  showMailingList.value = false
+  mailingError.value = null
+  mailingSuccess.value = null
 }
 
 /* ---------- Carousel ---------- */
@@ -279,13 +304,6 @@ onBeforeUnmount(() => {
 
               <!-- CTA -->
               <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
-                <input
-                  v-if="!isLoggedIn"
-                  v-model="ctaEmail"
-                  type="email"
-                  placeholder="Join mailing list for offers and updates"
-                  class="w-full sm:flex-1 max-w-2xl px-6 py-4 rounded-full text-black bg-white focus:outline-none focus:ring-2 focus:ring-secondary text-lg"
-                />
                 <router-link
                   :to="heroCtaTo"
                   class="inline-flex items-center justify-center rounded-full bg-secondary px-7 py-3 text-base md:text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none min-w-[200px]"
@@ -294,6 +312,18 @@ onBeforeUnmount(() => {
                   {{ heroCtaLabel }}
                 </router-link>
               </div>
+
+              <p class="text-white/70 text-sm">
+                Want educational updates?
+                <button
+                  type="button"
+                  class="text-secondary underline font-medium hover:text-secondary/80"
+                  @click="showMailingList = true"
+                >
+                  Click here
+                </button>
+                to join our mailing list.
+              </p>
 
               <!-- Store buttons: show on phone + tablet (<901px), hide on desktop -->
               <div class="mt-6 flex items-center justify-center gap-3 sm:gap-4 min-[901px]:hidden store-row">
@@ -569,6 +599,15 @@ onBeforeUnmount(() => {
   </div>
 
   <TheFooter />
+
+  <MailingListModal
+    :open="showMailingList"
+    :loading="mailingLoading"
+    :error="mailingError"
+    :success-message="mailingSuccess"
+    @close="closeMailingModal"
+    @submit="handleMailingSubmit"
+  />
 </template>
 
 <style scoped>
