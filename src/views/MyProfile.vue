@@ -347,6 +347,7 @@
 
   <MailingListModal
     :open="showMailingList"
+    :default-email="profile?.payload?.email || ''"
     @close="showMailingList = false"
   />
 </template>

@@ -34,6 +34,15 @@ const showMailingList = ref(false)
 /* ---------- Carousel ---------- */
 const currentIndex = ref(0)
 const isMobile = ref(false)
+const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1280)
+const heroPhoneScale = computed(() => {
+  const width = viewportWidth.value
+  if (width >= 1800) return 1.45
+  if (width >= 1500) return 1.3
+  if (width >= 1200) return 1.18
+  if (width >= 1000) return 1.05
+  return 1
+})
 const visibleArticles = computed(() => {
   if (isMobile.value) return articles
   const res = []
@@ -169,6 +178,14 @@ function computeClampedPhoneH() {
 const clampDebounced = rafDebounce(computeClampedPhoneH)
 const baseScale = 1.2
 
+const heroStackScaleAmount = computed(() => {
+  const width = viewportWidth.value || 0
+  if (width < 768) return 1
+  const scaled = (stackScale.value || 1) * baseScale
+  return Number.isFinite(scaled) ? scaled : 1
+})
+const heroStackOrigin = computed(() => (viewportWidth.value < 768 ? 'top center' : 'top left'))
+
 /* ---------- Mount / Unmount ---------- */
 let ro
 let updateIsMobile
@@ -196,7 +213,11 @@ async function onDownloadApkClick() {
 }
 onMounted(async () => {
   setUserFromApi()
-  updateIsMobile = () => { isMobile.value = window.innerWidth < 640 }
+  updateIsMobile = () => {
+    const width = window.innerWidth
+    isMobile.value = width < 640
+    viewportWidth.value = width
+  }
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
 
@@ -241,7 +262,7 @@ onBeforeUnmount(() => {
 
 <template>
   <!-- Page wrapper with global gradient background -->
-  <div class="relative min-h-screen mt-2 text-white">
+  <div class="relative min-h-screen text-white">
     <div class="fixed inset-0 -z-10 bg-page-gradient"></div>
 
     <!-- Simplified Hero Section -->
@@ -249,7 +270,7 @@ onBeforeUnmount(() => {
       <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div
           ref="heroRef"
-          class="hero-grid sm:grid sm:grid-cols-12 gap-[var(--g)] pt-[0px]"
+          class="hero-grid sm:grid sm:grid-cols-12 items-center gap-[var(--g)] pt-[0px]"
         >
           <!-- Left: Simplified copy + CTA (tablet: full width, centered) -->
           <div
@@ -258,6 +279,7 @@ onBeforeUnmount(() => {
               min-[640px]:max-[900px]:col-span-12
               flex p-0 sm:items-start
               min-[640px]:max-[900px]:justify-center
+              lg:-mt-20 xl:-mt-28
             "
           >
             <div
@@ -267,7 +289,10 @@ onBeforeUnmount(() => {
                 min-[640px]:max-[900px]:items-center  min-[640px]:max-[900px]:text-center
               "
               ref="leftStackRef"
-              :style="{ transform: `scale(${(stackScale * baseScale).toFixed(3)})`, transformOrigin: 'top left' }"
+              :style="{
+                transform: heroStackScaleAmount === 1 ? 'none' : `scale(${heroStackScaleAmount.toFixed(3)})`,
+                transformOrigin: heroStackOrigin
+              }"
             >
               <!-- Simplified Hero Content -->
               <div class="space-y-4 sm:space-y-6">
@@ -345,6 +370,7 @@ onBeforeUnmount(() => {
               hidden sm:flex
               min-[640px]:max-[900px]:hidden
               p-0 hero-right
+              lg:-mt-6 xl:-mt-10
             "
           >
             <div class="flex items-start justify-end w-full">
@@ -369,9 +395,9 @@ onBeforeUnmount(() => {
                         /img/File-portrait-1280.webp 1280w
                       `"
                       :style="{
-                        maxHeight: (clampedPhoneH - 100) + 'px',
-                        height: (clampedPhoneH - 60) + 'px',
-                        width: Math.round((clampedPhoneH - 60) * 0.46) + 'px'
+                        maxHeight: ((clampedPhoneH - 100) * heroPhoneScale) + 'px',
+                        height: ((clampedPhoneH - 60) * heroPhoneScale) + 'px',
+                        width: Math.round(((clampedPhoneH - 60) * 0.46) * heroPhoneScale) + 'px'
                       }"
                       width="420" height="840"
                       fetchpriority="high" loading="eager" decoding="async"
@@ -416,12 +442,153 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <!-- Satoshi Quote -->
-    <section class="w-full bg-transparent text-white py-12 px-6 sm:px-[var(--g)] lg:px-[var(--g)] text-center animated-section" :class="sectionInView[0] ? 'animate-in-left' : ''">
-      <blockquote class="text-2xl md:text-3xl font-semibold leading-tight max-w-5xl mx-auto">
-        "The main benefits are lost if a trusted third party is still required."
-      </blockquote>
-      <cite class="block mt-4 text-white text-lg">— Satoshi Nakamoto</cite>
+    <!-- 21Rates Graphic -->
+    <section class="partners-section w-full bg-transparent text-white pt-6 pb-4 px-4 sm:px-[var(--g)] lg:px-[var(--g)]">
+      <div class="max-w-screen-xl mx-auto text-center mb-6 px-2 sm:px-6">
+        <h2 class="text-3xl md:text-4xl font-extrabold">Partners</h2>
+      </div>
+      <div class="partner-grid max-w-screen-xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-10 sm:gap-y-12 items-center px-2 sm:px-6">
+        <a
+          href="https://21rates.com/companies/1067/cadena-bitcoin"
+          target="_blank"
+          rel="noopener"
+          class="block press-logo"
+          aria-label="View Cadena Bitcoin on 21Rates"
+        >
+          <picture class="press-figure press-figure--medium">
+            <source
+              type="image/avif"
+              srcset="
+                /img/21rates-640.avif 640w,
+                /img/21rates-960.avif 960w
+              "
+              sizes="(max-width: 640px) 70vw, 320px"
+            />
+            <source
+              type="image/webp"
+              srcset="
+                /img/21rates-640.webp 640w,
+                /img/21rates-960.webp 960w
+              "
+              sizes="(max-width: 640px) 70vw, 480px"
+            />
+            <img
+              src="/img/21rates-640.webp"
+              alt="21Rates"
+              class="w-auto h-full object-contain"
+              loading="lazy"
+              decoding="async"
+              width="402"
+              height="82"
+            />
+          </picture>
+        </a>
+        <a
+          href="https://sv25.adoptingbitcoin.org/"
+          target="_blank"
+          rel="noopener"
+          class="block press-logo"
+          aria-label="View Cadena Bitcoin on Adopting Bitcoin"
+        >
+          <picture class="press-figure press-figure--tall">
+            <source
+              type="image/avif"
+              srcset="
+                /img/adopting-640.avif 640w,
+                /img/adopting-960.avif 960w
+              "
+              sizes="(max-width: 640px) 70vw, 320px"
+            />
+            <source
+              type="image/webp"
+              srcset="
+                /img/adopting-640.webp 640w,
+                /img/adopting-960.webp 960w
+              "
+              sizes="(max-width: 640px) 70vw, 320px"
+            />
+            <img
+              src="/img/adopting-640.webp"
+              alt="Adopting Bitcoin"
+              class="w-auto h-full object-contain"
+              loading="lazy"
+              decoding="async"
+              width="1048"
+              height="330"
+            />
+          </picture>
+        </a>
+        <a
+          href="https://surfdojo.org/"
+          target="_blank"
+          rel="noopener"
+          class="block press-logo"
+          aria-label="Visit Surfdojo"
+        >
+          <picture class="press-figure press-figure--medium">
+            <source
+              type="image/avif"
+              srcset="
+                /img/surfdojo-640.avif 640w,
+                /img/surfdojo-960.avif 960w
+              "
+              sizes="(max-width: 640px) 70vw, 320px"
+            />
+            <source
+              type="image/webp"
+              srcset="
+                /img/surfdojo-640.webp 640w,
+                /img/surfdojo-960.webp 960w
+              "
+              sizes="(max-width: 640px) 70vw, 320px"
+            />
+            <img
+              src="/img/surfdojo-640.webp"
+              alt="Surfdojo"
+              class="w-auto h-full object-contain"
+              loading="lazy"
+              decoding="async"
+              width="558"
+              height="149"
+            />
+          </picture>
+        </a>
+        <a
+          href="https://bitcointreasuries.net/directory#C"
+          target="_blank"
+          rel="noopener"
+          class="block press-logo"
+          aria-label="View Cadena Bitcoin on Bitcoin Treasuries"
+        >
+          <picture class="press-figure press-figure--short">
+            <source
+              type="image/avif"
+              srcset="
+                /img/treasuries-640.avif 640w,
+                /img/treasuries-960.avif 960w
+              "
+              sizes="(max-width: 640px) 70vw, 320px"
+            />
+            <source
+              type="image/webp"
+              srcset="
+                /img/treasuries-640.webp 640w,
+                /img/treasuries-960.webp 960w
+              "
+              sizes="(max-width: 640px) 70vw, 320px"
+            />
+            <img
+              src="/img/treasuries-640.webp"
+              alt="Bitcoin Treasuries"
+              class="w-auto h-full object-contain"
+              loading="lazy"
+              decoding="async"
+              width="509"
+              height="53"
+            />
+          </picture>
+        </a>
+      </div>
     </section>
 
     <!-- What is Cadena Bitcoin -->
@@ -456,7 +623,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- Featured Articles -->
-    <section class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-[var(--g)] lg:px-[var(--g)] animated-section" :class="sectionInView[1] ? 'animate-in-right' : ''">
+    <section class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-[var(--g)] lg:px-[var(--g)] animated-section" :class="sectionInView[0] ? 'animate-in-right' : ''">
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
@@ -465,8 +632,8 @@ onBeforeUnmount(() => {
 
         <div class="relative flex items-center justify-center">
           <button @click="scrollLeft" class="hidden sm:flex absolute left-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md">◀</button>
-          <div class="w-full overflow-x-auto sm:overflow-visible px-2">
-            <div class="flex space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-x snap-mandatory sm:snap-none">
+          <div class="w-full overflow-visible sm:overflow-x-auto sm:overflow-y-visible px-2">
+            <div class="article-track grid gap-6 sm:flex sm:gap-0 sm:space-x-6 transition-all duration-300 ease-in-out sm:justify-center snap-none sm:snap-x sm:snap-mandatory lg:snap-none">
               <template v-for="article in visibleArticles" :key="article.id">
                 <router-link
                   v-if="article.internal"
@@ -591,6 +758,15 @@ onBeforeUnmount(() => {
 .hero-grid { --g: 24px; overflow: visible; }
 @media (min-width: 1024px) { .hero-grid { --g: 32px; } }
 
+.hero-shell {
+  padding-top: clamp(1rem, 5vw, 3.75rem);
+}
+@media (min-width: 1024px) {
+  .hero-shell {
+    padding-top: clamp(2rem, 4vw, 4.5rem);
+  }
+}
+
 /* ===== Background gradient ===== */
 .bg-page-gradient {
   background-color: #000;
@@ -680,6 +856,46 @@ onBeforeUnmount(() => {
 @media (max-width: 1023px) {
   .hero-shell {
     padding-bottom: clamp(4rem, 12vw, 6.5rem);
+  }
+}
+
+.partners-section {
+  margin-top: 1rem;
+}
+.partner-grid {
+  width: 100%;
+}
+
+.press-logo {
+  text-align: center;
+}
+.press-figure {
+  --logo-h: clamp(50px, 14vw, 96px);
+  height: var(--logo-h);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0 auto;
+  filter: grayscale(1) brightness(1.1);
+  opacity: 0.78;
+  transition: filter 180ms ease, opacity 180ms ease;
+}
+.press-figure--medium { --logo-h: clamp(62px, 18vw, 130px); }
+.press-figure--tall { --logo-h: clamp(100px, 26vw, 220px); }
+.press-figure--short { --logo-h: clamp(42px, 10vw, 74px); }
+.press-logo:hover .press-figure,
+.press-logo:focus-visible .press-figure {
+  filter: grayscale(0) brightness(1);
+  opacity: 1;
+}
+
+.article-track {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+@media (min-width: 640px) {
+  .article-track {
+    grid-template-columns: none;
   }
 }
 </style>

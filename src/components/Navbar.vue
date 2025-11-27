@@ -177,7 +177,23 @@
             <span class="hidden sm:inline select-none text-white/40">•</span>
 
             <!-- Pairing -->
-            <template v-if="showPairing">
+            <template v-if="isPending">
+              <div class="flex flex-wrap items-center gap-2 text-amber-100" role="status">
+                <svg class="w-5 h-5 md:w-6 md:h-6 text-amber-200" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 14a1.25 1.25 0 111.25-1.25A1.251 1.251 0 0112 16zm1-4.75a1 1 0 01-2 0v-5a1 1 0 012 0z"/>
+                </svg>
+                <span class="text-sm sm:text-base md:text-lg">
+                  Finish setup: sign out/in, then scan the QR using the Cadena Signer app.
+                </span>
+                <router-link
+                  to="/register?step=3"
+                  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white text-sm"
+                >
+                  View QR
+                </router-link>
+              </div>
+            </template>
+            <template v-else-if="showPairing">
               <div class="flex items-center gap-2" role="status" :aria-label="isPaired ? 'Device paired' : 'Device not paired'">
                 <span :class="['inline-block w-2.5 h-2.5 rounded-full', isPaired ? 'bg-green-400' : 'bg-red-400']" aria-hidden="true" />
                 <span class="text-white/90 font-medium">
@@ -337,6 +353,7 @@ import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
 import { getPrice } from '../api/price' // ⬅️ oracle price helper
+import { isSignerAuthCode } from '../lib/authCode'
 
 /** ---- Emits (kept for the Retry button in the template) ---- */
 const emit = defineEmits(['retry'])
@@ -489,8 +506,9 @@ const authCode = computed(() => {
   const n = Number(raw)
   return Number.isFinite(n) ? n : null
 })
-const isPaired = computed(() => authCode.value === 6)
-const showPairing = computed(() => authCode.value != null)
+const isPending = computed(() => authCode.value === 0)
+const isPaired = computed(() => isSignerAuthCode(authCode.value))
+const showPairing = computed(() => authCode.value != null && !isPending.value)
 
 /** ---- Zero available? ---- */
 const isZeroAvailable = computed(() => {

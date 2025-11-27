@@ -64,6 +64,7 @@ import { postContactEmail, isValidEmail } from '../api/publicContact'
 
 const props = defineProps<{
   open: boolean
+  defaultEmail?: string
 }>()
 
 const emit = defineEmits<{
@@ -85,7 +86,7 @@ watch(
       localError.value = ''
       apiError.value = ''
       successMessage.value = ''
-      email.value = ''
+      email.value = props.defaultEmail
       await nextTick()
       emailField.value?.focus()
     }

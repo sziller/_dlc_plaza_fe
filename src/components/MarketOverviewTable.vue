@@ -371,6 +371,7 @@ const props = defineProps({
   offersPollMs: { type: Number, default: 5000 },
   changeFlashMs: { type: Number, default: 600 },
   compact: { type: Boolean, default: true },
+  accentColor: { type: String, default: null },
 })
 
 // -------- Auth state ----------
@@ -693,7 +694,9 @@ const displayContractLabel = computed(() =>
 )
 
 const currentAccent = computed(() =>
-  CONTRACT_ACCENTS[selectedContract.value] || '#6738e4'
+  props.accentColor ||
+  CONTRACT_ACCENTS[selectedContract.value] ||
+  '#6738e4'
 )
 
 function toggleDropdown() { dropdownOpen.value = !dropdownOpen.value }
