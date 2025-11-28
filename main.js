@@ -29,7 +29,11 @@ let amplitudeAllowed = false;
 const bootstrapAmplitude = () => {
   if (amplitudeBootstrapped) return;
   amplitude.add(sessionReplayPlugin({ sampleRate: 1 }));
-  amplitude.init(AMPLITUDE_KEY, { autocapture: true });
+  amplitude.init(AMPLITUDE_KEY, undefined, {
+    autocapture: {
+      elementInteractions: true,
+    },
+  });
   amplitudeBootstrapped = true;
 };
 
@@ -57,6 +61,7 @@ const syncAmplitudeConsent = (state) => {
     amplitudeAllowed = false;
     if (amplitudeBootstrapped && typeof amplitude.reset === 'function') {
       amplitude.reset();
+      amplitudeBootstrapped = false;
     }
   }
 };
