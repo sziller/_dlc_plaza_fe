@@ -74,13 +74,17 @@ export function installStructuredData(router) {
         schema = generateOrganizationSchema();
       } else if (to.path.includes('/article/')) {
         // Generate article-specific schema for article pages
+        const site = 'https://cadenabitcoin.com';
+        const image = m.image ? `${site}${m.image}` : `${site}/og-image.png`;
+
         schema = generateArticleSchema({
           title: m.title || 'Cadena Bitcoin Article',
           description: m.description || 'Article by Cadena Bitcoin',
-          author: 'Cadena Bitcoin Team',
-          publishDate: new Date().toISOString(),
-          url: `https://cadenabitcoin.com${to.path}`,
-          image: '/og-image.png'
+          author: m.author || 'Cadena Bitcoin Team',
+          publishDate: m.publishedTime || new Date().toISOString(),
+          modifiedDate: m.modifiedTime || new Date().toISOString(),
+          url: `${site}${to.path}`,
+          image: image
         });
       } else {
         // Fallback to website schema for other pages

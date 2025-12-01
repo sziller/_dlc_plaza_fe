@@ -71,27 +71,22 @@
         </div>
       </div>
 
-      <!-- Prev -->
-      <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
+      <!-- Navigation Links -->
+      <div class="flex flex-col md:flex-row justify-between items-center mt-8 gap-4">
         <router-link
-          to="/article/cadena-bitcoin-security"
-          class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+          to="/knowledge-hub"
+          class="flex items-center gap-2 text-white/90 hover:text-white transition-all text-base font-medium group"
         >
-          <span class="text-2xl">←</span>
-          <span class="leading-tight">How Does it Work?</span>
+          <span class="text-2xl transform group-hover:-translate-x-1 transition-transform">←</span>
+          <span>Knowledge Hub</span>
         </router-link>
-      </div>
 
-      <!-- Next -->
-      <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
         <router-link
-          to="/article/cadena-improving-btc"
-          class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+          to="/article/borrow-against-bitcoin"
+          class="flex items-center gap-2 text-white/90 hover:text-white transition-all text-base font-medium group"
         >
-          <span class="leading-tight">
-            How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending
-          </span>
-          <span class="text-2xl">→</span>
+          <span>Borrow Against Bitcoin</span>
+          <span class="text-2xl transform group-hover:translate-x-1 transition-transform">→</span>
         </router-link>
       </div>
     </section>

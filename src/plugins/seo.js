@@ -42,6 +42,11 @@ export function installSeo(router) {
     setMeta('og:site_name', 'Cadena Bitcoin', 'property');
     setMeta('og:type', pageType, 'property');
     setMeta('og:image', site + image, 'property');
+    setMeta('og:image:secure_url', site + image, 'property');
+    setMeta('og:image:width', m.imageWidth || '1200', 'property');
+    setMeta('og:image:height', m.imageHeight || '630', 'property');
+    setMeta('og:image:alt', m.imageAlt || desc, 'property');
+    setMeta('og:image:type', m.imageType || 'image/webp', 'property');
     setMeta('og:locale', locale, 'property');
 
     // Twitter Card metadata
@@ -51,6 +56,25 @@ export function installSeo(router) {
     setMeta('twitter:title', title);
     setMeta('twitter:description', desc);
     setMeta('twitter:image', site + image);
+
+    // Article-specific metadata (only for article type)
+    if (pageType === 'article') {
+      if (m.publishedTime) setMeta('article:published_time', m.publishedTime, 'property');
+      if (m.modifiedTime) setMeta('article:modified_time', m.modifiedTime, 'property');
+      if (m.author) setMeta('article:author', m.author, 'property');
+      if (m.section) setMeta('article:section', m.section, 'property');
+      if (m.tags && Array.isArray(m.tags)) {
+        // Remove existing article:tag metas first
+        document.querySelectorAll('meta[property="article:tag"]').forEach(el => el.remove());
+        // Add new tags
+        m.tags.forEach(tag => {
+          const el = document.createElement('meta');
+          el.setAttribute('property', 'article:tag');
+          el.setAttribute('content', tag);
+          document.head.appendChild(el);
+        });
+      }
+    }
 
     // Additional SEO enhancements
     setMeta('theme-color', '#F7931A'); // Bitcoin orange

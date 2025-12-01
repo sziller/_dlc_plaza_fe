@@ -17,6 +17,14 @@ const Article3view       = () => import('../views/Article3view.vue')
 const Article4view       = () => import('../views/Article4view.vue')
 const Article5view       = () => import('../views/Article5view.vue')
 const Article6view       = () => import('../views/Article6view.vue')
+const Article7view       = () => import('../views/Article7view.vue')
+const Article8view       = () => import('../views/Article8view.vue')
+const Article10view      = () => import('../views/Article10view.vue')
+const Article12view      = () => import('../views/Article12view.vue')
+const Article14view      = () => import('../views/Article14view.vue')
+const Article15view      = () => import('../views/Article15view.vue')
+const Article16view      = () => import('../views/Article16view.vue')
+const Resources          = () => import('../views/Resources.vue')
 const Login              = () => import('../views/Login.vue')
 const MyProfile          = () => import('../views/MyProfile.vue')
 const Terms              = () => import('../views/Terms.vue')
@@ -94,6 +102,128 @@ const routes = [
     description: 'Why identification is becoming the default to access the internet.',
     robots: 'index,follow',
   }},
+
+  // Knowledge Hub (Resources Overview)
+  { path: '/knowledge-hub', name: 'KnowledgeHub', component: Resources, meta: {
+    title: 'Knowledge Hub — Cadena Bitcoin',
+    description: 'Comprehensive guides on Bitcoin-backed loans, collateral lending, DeFi, and unlocking Bitcoin liquidity. Learn from DLC lending experts.',
+    robots: 'index,follow',
+  }},
+
+  // New Resource Articles (7-16)
+  { path: '/article/borrow-against-bitcoin', name: 'Article7', component: Article7view, meta: {
+    title: 'Borrow Against Bitcoin: Get Cash Without Selling BTC | Cadena',
+    description: 'Borrow against your Bitcoin without selling or tax events. Rates from 4.9%, non-custodial, DLC-secured, instant approval. Unlock liquidity in minutes → [2025 Best Rates]',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article7.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Borrow against Bitcoin without selling - Get cash instantly with DLC-secured loans',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2024-12-01T08:00:00+00:00',
+    modifiedTime: '2024-12-01T08:00:00+00:00',
+    section: 'Bitcoin Lending',
+    tags: ['Bitcoin', 'Borrow', 'Collateral', 'Non-Custodial', 'DLC'],
+  }},
+  { path: '/article/bitcoin-collateral-loan', name: 'Article8', component: Article8view, meta: {
+    title: 'Bitcoin Collateral Loans: Best Rates 2025 (No Credit Check) | Cadena',
+    description: 'Get a Bitcoin collateral loan instantly with rates starting at 4.9%. Keep custody of your BTC, borrow up to 70% LTV, no selling required. Apply now → [Trusted by 25k+ borrowers]',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article8.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Bitcoin collateral loans with best rates 2025 - No credit check required',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2024-12-01T08:00:00+00:00',
+    modifiedTime: '2024-12-01T08:00:00+00:00',
+    section: 'Bitcoin Lending',
+    tags: ['Bitcoin', 'Collateral Loan', 'DeFi', 'Best Rates 2025'],
+  }},
+  { path: '/article/non-custodial-bitcoin-borrowing', name: 'Article10', component: Article10view, meta: {
+    title: 'Non-Custodial Bitcoin Borrowing: Keep Your Keys, Get Cash | Cadena',
+    description: 'Borrow against Bitcoin without ever transferring custody. DLC-secured, oracle-free liquidation, full self-custody throughout. The safest way to borrow in 2025.',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article10.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Non-custodial Bitcoin borrowing - Keep your keys while getting cash',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2024-12-01T08:00:00+00:00',
+    modifiedTime: '2024-12-01T08:00:00+00:00',
+    section: 'Bitcoin Security',
+    tags: ['Bitcoin', 'Non-Custodial', 'Self-Custody', 'DLC', 'Security'],
+  }},
+  { path: '/article/peer-to-peer-bitcoin-loans', name: 'Article12', component: Article12view, meta: {
+    title: 'Peer-to-Peer Bitcoin Loans: Direct, Trustless, DLC-Secured | Cadena',
+    description: 'True P2P Bitcoin loans – no middleman, no custodian. Set your own rates, get matched instantly, fully secured by Discreet Log Contracts. The purest form of Bitcoin lending.',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article12.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Peer-to-peer Bitcoin loans - Direct, trustless, DLC-secured lending',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2024-12-01T08:00:00+00:00',
+    modifiedTime: '2024-12-01T08:00:00+00:00',
+    section: 'DeFi',
+    tags: ['Bitcoin', 'P2P', 'Peer-to-Peer', 'DLC', 'Trustless'],
+  }},
+  { path: '/article/dlc-bitcoin-loans', name: 'Article14', component: Article14view, meta: {
+    title: 'DLC Bitcoin Loans: The Most Secure Way to Borrow BTC | Cadena',
+    description: 'DLC Bitcoin loans on Cadena – trustless, oracle-free, fully on-chain enforcement. No custodians, no liquidation bots, just Bitcoin script. The gold standard in Bitcoin lending.',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article14.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'DLC Bitcoin loans - The most secure way to borrow with Discreet Log Contracts',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2024-12-01T08:00:00+00:00',
+    modifiedTime: '2024-12-01T08:00:00+00:00',
+    section: 'Bitcoin Technology',
+    tags: ['Bitcoin', 'DLC', 'Discreet Log Contracts', 'Smart Contracts', 'Security'],
+  }},
+  { path: '/article/bitcoin-backed-loans', name: 'Article15', component: Article15view, meta: {
+    title: 'Bitcoin Backed Loans 2026: Instant USD with BTC Collateral | Cadena',
+    description: 'Get USD loans backed by your Bitcoin instantly. Rates from 4.9%, up to 70% LTV, no credit check, non-custodial. Keep stacking sats while spending fiat →',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article15.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Bitcoin backed loans 2026 - Instant USD with BTC collateral',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2024-12-01T08:00:00+00:00',
+    modifiedTime: '2024-12-01T08:00:00+00:00',
+    section: 'Bitcoin Lending',
+    tags: ['Bitcoin', 'BTC Collateral', '2026', 'Instant Loans', 'Best Rates'],
+  }},
+  { path: '/article/unlock-bitcoin-liquidity', name: 'Article16', component: Article16view, meta: {
+    title: 'Unlock Bitcoin Liquidity Without Selling (Tax-Free) 2026 | Cadena',
+    description: 'Unlock your Bitcoin\'s liquidity without triggering capital gains tax. Borrow up to 70% LTV at the lowest rates, keep full upside, stay non-custodial. Smart money moves in 2026.',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article16.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Unlock Bitcoin liquidity without selling - Tax-free borrowing in 2026',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2024-12-01T08:00:00+00:00',
+    modifiedTime: '2024-12-01T08:00:00+00:00',
+    section: 'Bitcoin Finance',
+    tags: ['Bitcoin', 'Liquidity', 'Tax-Free', 'Capital Gains', '2026'],
+  }},
+
   // Auth pages
   { path: '/login', name: 'Login', component: Login, meta: {
     title: 'Login — Cadena Bitcoin',
