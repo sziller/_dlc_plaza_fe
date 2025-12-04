@@ -4,9 +4,7 @@
     <div v-if="step === 1" class="max-w-xl mx-auto w-full space-y-0">
       <h1 class="text-3xl font-bold text-center">Create Your Account</h1>
       <p class="text-sm text-white/70 text-center">
-        You’ll receive a confirmation email first. After confirming, finish setup by
-        <span class="font-semibold">opening the Cadena <em>Signer</em> app and scanning a QR</span>.
-        Do <span class="font-semibold">not</span> use your phone’s camera—only the Signer app can complete this step.
+        You’re just a few steps away from your Bitcoin loan.
       </p>
 
       <form class="space-y-6" @submit.prevent="submitForm" novalidate>
@@ -114,13 +112,36 @@
     </div>
 
     <!-- 📬 Step 2: Email Sent Message -->
-    <div v-else-if="step === 2" class="max-w-xl mx-auto text-center space-y-0">
+    <div v-else-if="step === 2" class="max-w-xl mx-auto text-center space-y-6">
+      <!-- Email Confirmation Image -->
+      <div class="flex justify-center mb-4">
+        <picture>
+          <source
+            type="image/avif"
+            srcset="/img/emailConfirmation-640.avif 640w, /img/emailConfirmation-960.avif 960w, /img/emailConfirmation-1280.avif 1280w"
+          />
+          <source
+            type="image/webp"
+            srcset="/img/emailConfirmation-640.webp 640w, /img/emailConfirmation-960.webp 960w, /img/emailConfirmation-1280.webp 1280w"
+          />
+          <img
+            src="/img/emailConfirmation-960.webp"
+            srcset="/img/emailConfirmation-640.webp 640w, /img/emailConfirmation-960.webp 960w, /img/emailConfirmation-1280.webp 1280w"
+            sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 350px"
+            alt="Check your email for confirmation"
+            class="w-[280px] md:w-[320px] lg:w-[350px] h-auto select-none"
+            decoding="async"
+            loading="eager"
+          />
+        </picture>
+      </div>
+
       <h1 class="text-3xl font-bold">Check Your Inbox</h1>
-      <p class="text-lg">We’ve sent a confirmation link to:</p>
+      <p class="text-lg">We've sent a confirmation link to:</p>
       <p class="text-xl text-secondary font-bold break-all">{{ email }}</p>
       <p class="text-sm text-white/80">
-        It may take a few minutes to arrive. If you don’t see it, check your spam folder
-        or search your inbox for “Cadena”.
+        It may take a few minutes to arrive. If you don't see it, check your spam folder
+        or search your inbox for "Cadena".
       </p>
 
       <div class="pt-4 flex items-center justify-center">
