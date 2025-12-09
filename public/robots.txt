@@ -1,3 +1,12 @@
 User-agent: *
 Allow: /
+
+# Block auth pages from crawling
+Disallow: /login
+Disallow: /loginpage
+Disallow: /my-profile
+
+# Canonical host
+Host: https://cadenabitcoin.com
+
 Sitemap: https://cadenabitcoin.com/sitemap.xml
