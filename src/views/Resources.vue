@@ -179,6 +179,20 @@ const articles = [
     description: 'Discover strategies to unlock Bitcoin liquidity without selling. Tax implications, strategic borrowing, and maintaining long-term gains.',
     imageBase: 'article16',
     link: '/article/unlock-bitcoin-liquidity'
+  },
+  {
+    id: 17,
+    title: 'Cadena Bitcoin Presentation',
+    description: 'Slide deck overview of Cadena Bitcoin’s decentralized lending model and DLC security.',
+    imageBase: 'article10',
+    link: '/article/cadena-bitcoin-presentation'
+  },
+  {
+    id: 18,
+    title: 'Cadena Bitcoin Loan Walkthrough Presentation',
+    description: 'Step-by-step DLC loan walkthrough from offer to execution using Cadena.',
+    imageBase: 'article12',
+    link: '/article/cadena-bitcoin-loan-walkthrough'
   }
 ]
 

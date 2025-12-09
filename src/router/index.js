@@ -24,6 +24,8 @@ const Article12view      = () => import('../views/Article12view.vue')
 const Article14view      = () => import('../views/Article14view.vue')
 const Article15view      = () => import('../views/Article15view.vue')
 const Article16view      = () => import('../views/Article16view.vue')
+const Article17view      = () => import('../views/Article17view.vue')
+const Article18view      = () => import('../views/Article18view.vue')
 const Login              = () => import('../views/Login.vue')
 const MyProfile          = () => import('../views/MyProfile.vue')
 const Terms              = () => import('../views/Terms.vue')
@@ -220,6 +222,38 @@ const routes = [
     modifiedTime: '2024-12-01T08:00:00+00:00',
     section: 'Bitcoin Finance',
     tags: ['Bitcoin', 'Liquidity', 'Tax-Free', 'Capital Gains', '2026'],
+  }},
+  { path: '/article/cadena-bitcoin-presentation', name: 'Article17', component: Article17view, meta: {
+    title: 'Cadena Bitcoin Presentation | Knowledge Hub',
+    description: 'Slide deck overview of Cadena Bitcoin’s decentralized lending model, DLC security, and roadmap. View or download the presentation.',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article10.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Cadena Bitcoin presentation cover',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2025-01-15T08:00:00+00:00',
+    modifiedTime: '2025-01-15T08:00:00+00:00',
+    section: 'Bitcoin Lending',
+    tags: ['Bitcoin', 'Presentation', 'DLC', 'Non-Custodial'],
+  }},
+  { path: '/article/cadena-bitcoin-loan-walkthrough', name: 'Article18', component: Article18view, meta: {
+    title: 'Cadena Bitcoin Loan Walkthrough Presentation | Knowledge Hub',
+    description: 'Step-by-step DLC loan walkthrough: funding, signatures, and settlement on Cadena. View or download the slide deck.',
+    robots: 'index,follow',
+    type: 'article',
+    image: '/img/og-article12.webp',
+    imageWidth: '1200',
+    imageHeight: '630',
+    imageAlt: 'Cadena Bitcoin loan walkthrough presentation cover',
+    imageType: 'image/webp',
+    author: 'Cadena Bitcoin Team',
+    publishedTime: '2025-01-15T08:00:00+00:00',
+    modifiedTime: '2025-01-15T08:00:00+00:00',
+    section: 'Bitcoin Lending',
+    tags: ['Bitcoin', 'Loan Walkthrough', 'DLC', 'Non-Custodial'],
   }},
   // Auth pages
   { path: '/login', name: 'Login', component: Login, meta: {
