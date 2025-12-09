@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ComparisonTable: typeof import('./components/ComparisonTable.vue')['default']
     CookieBanner: typeof import('./components/CookieBanner.vue')['default']
     DLCDetails: typeof import('./components/DLCDetails.vue')['default']
     ISimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']

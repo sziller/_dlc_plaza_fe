@@ -61,29 +61,22 @@
         </div>
       </div>
 
-      <!-- Prev Article -->
-      <div class="mt-6 md:mt-0 md:absolute md:top-1/2 md:left-4 md:transform md:-translate-y-1/2">
+      <!-- Navigation Links -->
+      <div class="flex flex-col md:flex-row justify-between items-center mt-8 gap-4">
         <router-link
-          to="/article/we-need-to-talk-about-kyc"
-          class="flex items-center gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+          to="/knowledge-hub"
+          class="flex items-center gap-2 text-white/90 hover:text-white transition-all text-base font-medium group"
         >
-          <span class="text-2xl">←</span>
-          <span class="leading-tight">
-            We Need to Talk About KYC
-          </span>
+          <span class="text-2xl transform group-hover:-translate-x-1 transition-transform">←</span>
+          <span>Knowledge Hub</span>
         </router-link>
-      </div>
 
-      <!-- Next Article -->
-      <div class="mt-4 md:mt-0 md:absolute md:top-1/2 md:right-4 md:transform md:-translate-y-1/2 md:text-right">
         <router-link
-          to="/article/cadena-vs-others"
-          class="flex items-center md:justify-end gap-2 text-white hover:text-primary transition text-sm md:text-base font-medium max-w-[200px]"
+          to="/article/cadena-empowering-financial-freedom"
+          class="flex items-center gap-2 text-white/90 hover:text-white transition-all text-base font-medium group"
         >
-          <span class="leading-tight">
-            Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance
-          </span>
-          <span class="text-2xl">→</span>
+          <span>Empowering Financial Freedom</span>
+          <span class="text-2xl transform group-hover:translate-x-1 transition-transform">→</span>
         </router-link>
       </div>
     </div>
