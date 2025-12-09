@@ -40,8 +40,13 @@
       <!-- Details -->
       <div v-else-if="detail" class="space-y-4 text-sm md:text-base" :id="bodyId">
         <div><span class="font-semibold">DLC ID:</span> {{ detail.dlc_id }}</div>
-        <div><span class="font-semibold">Start Date:</span> {{ fmtDate(startTs) }}</div>
-        <div><span class="font-semibold">Maturity Date:</span> {{ fmtDate(maturityTs) }}</div>
+        <template v-if="isCreated">
+          <div><span class="font-semibold">Start Date:</span> {{ fmtDate(startTs) }}</div>
+          <div><span class="font-semibold">Maturity Date:</span> {{ fmtDate(maturityTs) }}</div>
+        </template>
+        <div v-else>
+          <span class="font-semibold">Offered at:</span> {{ fmtDate(offeredTs) }}
+        </div>
         <div><span class="font-semibold">Reference Index:</span> {{ detail.orcl_id || '—' }}</div>
 
         <div class="h-px bg-white/10 my-2"></div>
@@ -296,7 +301,9 @@ function fmtDate(tsSec) {
   const d = new Date(tsSec * 1000)
   return d.toLocaleString()
 }
-const startTs = computed(() => detail.value?.offered_at || detail.value?.created_at || null)
+const isCreated = computed(() => Boolean(detail.value?.accepted_at))
+const offeredTs = computed(() => detail.value?.offered_at || null)
+const startTs = computed(() => detail.value?.accepted_at || null)
 const maturityTs = computed(() => {
   // Keep actual maturity based on BE-provided duration (no display normalization here)
   const start = startTs.value

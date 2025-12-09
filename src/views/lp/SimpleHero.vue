@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import TheFooter from '../../components/TheFooter.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
 import { useAuth } from '../../composables/useAuth'
-import { downloadApp } from '../../api/downloadApp'
+import { blogArticles } from '../../data/exploreContent'
 
 // Store badge width sync
 const appleBadgeRef = ref(null)
@@ -13,14 +13,7 @@ const apkBadgeRef = ref(null)
 const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
 
 /* ---------- Articles ---------- */
-const articles = [
-  { id: 1, title: 'Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance', description: 'Understand what sets Cadena Bitcoin apart from other platforms.', imageBase: 'article1', link: '/article/cadena-decentralized-finance', internal: true },
-  { id: 2, title: 'Cadena Bitcoin - Empowering Individual Financial Freedom', description: ' Learn how Cadena Bitcoin lets you use Bitcoin flexibly.', imageBase: 'article2', link: '/article/cadena-empowering-financial-freedom', internal: true },
-  { id: 3, title: 'Cadena Bitcoin: Security', description: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principles', imageBase: 'article3', link: '/article/cadena-bitcoin-security', internal: true },
-  { id: 4, title: 'How Does it Work?', description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.', imageBase: 'article4', link: '/article/cadena-loan-lifecycle', internal: true },
-  { id: 5, title: 'We need to talk about KYC', description: 'Identification is quietly becoming the default requirement for access to the internet.', imageBase: 'article6', link: '/article/we-need-to-talk-about-kyc', internal: true },
-  { id: 6, title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending', description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.', imageBase: 'article5', link: '/article/cadena-improving-btc', internal: true },
-]
+const articles = blogArticles
 /* ---------- Auth / CTA ---------- */
 const { isLoggedIn, setUserFromApi } = useAuth()
 const heroCtaTo = computed(() => (isLoggedIn.value ? '/btcusd' : '/register'))
@@ -30,6 +23,8 @@ function onHeroCtaClick() {
 }
 
 const showMailingList = ref(false)
+const apkFilename = 'CadenaBitcoinLive(v102).apk'
+const apkDownloadUrl = '/downloads/CadenaBitcoinLive%28v102%29.apk'
 
 /* ---------- Carousel ---------- */
 const currentIndex = ref(0)
@@ -205,11 +200,13 @@ function syncStoreBadgeWidth() {
   } catch (_) {}
 }
 async function onDownloadApkClick() {
-  try {
-    await downloadApp()
-  } catch (err) {
-    console.error('APK download failed', err)
-  }
+  const a = document.createElement('a')
+  a.href = apkDownloadUrl
+  a.download = apkFilename
+  a.rel = 'nofollow'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 }
 onMounted(async () => {
   setUserFromApi()
@@ -352,10 +349,10 @@ onBeforeUnmount(() => {
                 <button
                   type="button"
                   class="apk-badge store-badge"
-                  aria-label="Download Android APK v101"
+                  aria-label="Download Android APK v102"
                   @click="onDownloadApkClick"
                 >
-                  <span class="apk-version">v101</span>
+                  <span class="apk-version">v102</span>
                   Download APK
                 </button>
               </div>
@@ -427,10 +424,10 @@ onBeforeUnmount(() => {
                     type="button"
                     class="apk-badge store-badge"
                     ref="apkBadgeRef"
-                    aria-label="Download Android APK v101"
+                    aria-label="Download Android APK v102"
                     @click="onDownloadApkClick"
                   >
-                    <span class="apk-version">v101</span>
+                    <span class="apk-version">v102</span>
                     Download APK
                   </button>
                 </div>
