@@ -84,6 +84,7 @@
               role="menu"
             >
               <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
+              <router-link to="/knowledge-hub" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Knowledge Hub</router-link>
               <router-link to="/contact" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">About Us</router-link>
               <router-link to="/signerapp" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Signer App</router-link>
             </div>
@@ -302,6 +303,8 @@
         <div>
           <div class="text-white/50 uppercase text-xs mt-6 mb-2">Explore Cadena</div>
           <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
+                    <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block pl-2 py-2 hover:text-secondary">Knowledge Hub</router-link>
+
           <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">About Us</router-link>
           <router-link @click="closeMobileMenu" to="/signerapp" class="block pl-2 py-2 hover:text-secondary">Signer App</router-link>
         </div>
