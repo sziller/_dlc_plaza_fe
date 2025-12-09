@@ -6,7 +6,7 @@ export function installSeo(router) {
     description:
       'Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains.',
     robots: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
-    image: '/og-image.png',
+    image: '/og-homepage.png',
     locale: 'en_US',
     type: 'website',
   };

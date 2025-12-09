@@ -125,11 +125,21 @@ const routes = [
   path: '/loginpage',
   name: 'LoginPage',
   component: () => import('../views/LoginPage.vue'),
+  meta: {
+    title: 'Login — Cadena Bitcoin',
+    description: 'Sign in to your Cadena Bitcoin account.',
+    robots: 'noindex,follow',
+  }
 },
 {
   path: '/signerapp',
   name: 'SignerApp',
   component: () => import('../views/SignerApp.vue'),
+  meta: {
+    title: 'Signer App — Cadena Bitcoin',
+    description: 'Cadena Bitcoin signer application for secure transactions.',
+    robots: 'index,follow',
+  }
 }
 ]
 
