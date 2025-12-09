@@ -42,6 +42,7 @@
             <ul class="space-y-2 text-white/80">
               <li><router-link to="/btcusd" class="hover:text-secondary">BTC/USD</router-link></li>
               <li><router-link to="/cadena-paper" class="hover:text-secondary">Cadena Paper</router-link></li>
+              <li><router-link to="/knowledge-hub" class="hover:text-secondary">Knowledge Hub</router-link></li>
             </ul>
           </div>
 

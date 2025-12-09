@@ -139,10 +139,10 @@
             class="apk-badge"
             :disabled="downloading"
             @click="handleApkDownload"
-            aria-label="Download Android APK v101"
+            aria-label="Download Android APK v102"
           >
             <span class="apk-version">
-              {{ downloading ? '...' : 'v101' }}
+              {{ downloading ? '...' : 'v102' }}
             </span>
             <span>
               {{ downloading ? 'Downloading…' : 'Download APK' }}
@@ -181,10 +181,11 @@
 <script setup lang="js">
 import { ref } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
-import { downloadApp } from '../api/downloadApp'
 
 const downloading = ref(false)
 const downloadError = ref('')
+const apkFilename = 'CadenaBitcoinLive(v102).apk'
+const apkDownloadUrl = '/downloads/CadenaBitcoinLive%28v102%29.apk'
 
 const handleApkDownload = async () => {
   if (downloading.value) return
@@ -193,22 +194,13 @@ const handleApkDownload = async () => {
   downloadError.value = ''
 
   try {
-    // match the type your TS expects: an object with optional filename
-    await downloadApp({ filename: 'CadenaBitcoinLive(v101).apk' })
-  } catch (err) {
-    // fallback to static file if API fails
-    try {
-      const fallbackUrl = '/downloads/CadenaBitcoinLive%28v101%29.apk'
-      const a = document.createElement('a')
-      a.href = fallbackUrl
-      a.download = 'CadenaBitcoinLive(v101).apk'
-      a.rel = 'nofollow'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-    } catch (err2) {
-      downloadError.value = 'Could not start download. Try again in a bit.'
-    }
+    const a = document.createElement('a')
+    a.href = apkDownloadUrl
+    a.download = apkFilename
+    a.rel = 'nofollow'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   } finally {
     downloading.value = false
   }
