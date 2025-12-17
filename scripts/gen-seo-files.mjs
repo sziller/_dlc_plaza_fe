@@ -2,7 +2,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const BASE = process.env.SITE_BASE || 'https://cadenabitcoin.com'
-const BLOG_SITEMAP_URL = process.env.BLOG_SITEMAP_URL || 'https://blog.cadenabitcoin.dev/blog/list-all'
+const BLOG_SITEMAP_URL = process.env.BLOG_SITEMAP_URL || 'https://blog.cadenabitcoin.dev/api/blog/posts'
 const NOINDEX = process.env.VITE_NOINDEX === '1'
 const STAGING_SEO = process.env.VITE_STAGING_SEO === '1'
 
@@ -56,11 +56,13 @@ const buildBlogUrls = async () => {
     const res = await fetch(BLOG_SITEMAP_URL)
     if (!res.ok) throw new Error(`blog sitemap fetch failed: ${res.status}`)
     const data = await res.json()
-    const posts = Array.isArray(data?.posts) ? data.posts : []
-    return posts.map((post) => {
-      const lastmod = post.updated_at ? `<lastmod>${post.updated_at}</lastmod>` : ''
-      return `<url><loc>${BASE}/article/${post.slug}</loc>${lastmod}<changefreq>weekly</changefreq><priority>0.8</priority></url>`
-    })
+    const posts = Array.isArray(data) ? data : []
+    return posts
+      .filter((post) => post?.slug)
+      .map((post) => {
+        const lastmod = post.updated_at ? `<lastmod>${post.updated_at}</lastmod>` : ''
+        return `<url><loc>${BASE}/article/${post.slug}</loc>${lastmod}<changefreq>weekly</changefreq><priority>0.8</priority></url>`
+      })
   } catch (error) {
     console.warn('Blog sitemap fetch failed, continuing without posts:', error?.message || error)
     return []
