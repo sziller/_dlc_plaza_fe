@@ -2,6 +2,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const BASE = process.env.SITE_BASE || 'https://cadenabitcoin.com'
+const BLOG_SITEMAP_URL = process.env.BLOG_SITEMAP_URL || 'https://blog.cadenabitcoin.dev/blog/list-all'
 const NOINDEX = process.env.VITE_NOINDEX === '1'
 const STAGING_SEO = process.env.VITE_STAGING_SEO === '1'
 
@@ -20,13 +21,7 @@ const routes = [
   { path: '/terms', priority: '0.3', changefreq: 'yearly' },
   { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
   { path: '/cookies', priority: '0.3', changefreq: 'yearly' },
-  // Articles
-  { path: '/article/cadena-decentralized-finance', priority: '0.8', changefreq: 'monthly' },
-  { path: '/article/cadena-improving-btc', priority: '0.8', changefreq: 'monthly' },
-  { path: '/article/cadena-empowering-financial-freedom', priority: '0.8', changefreq: 'monthly' },
-  { path: '/article/cadena-bitcoin-security', priority: '0.8', changefreq: 'monthly' },
-  { path: '/article/cadena-loan-lifecycle', priority: '0.8', changefreq: 'monthly' },
-  { path: '/article/we-need-to-talk-about-kyc', priority: '0.8', changefreq: 'monthly' },
+  { path: '/knowledge-hub', priority: '0.9', changefreq: 'weekly' },
 ]
 
 const distPublic = resolve('public')
@@ -49,12 +44,34 @@ Sitemap: ${BASE}/sitemap.xml
   : `User-agent: *\nDisallow: /\n`
 writeFileSync(resolve(distPublic, 'robots.txt'), robots)
 
-if (allowBots) {
-  const urls = routes.map(route => {
+const buildStaticUrls = () =>
+  routes.map(route => {
     const priority = route.priority ? `<priority>${route.priority}</priority>` : ''
     const changefreq = route.changefreq ? `<changefreq>${route.changefreq}</changefreq>` : ''
     return `<url><loc>${BASE}${route.path}</loc>${priority}${changefreq}</url>`
-  }).join('')
+  })
+
+const buildBlogUrls = async () => {
+  try {
+    const res = await fetch(BLOG_SITEMAP_URL)
+    if (!res.ok) throw new Error(`blog sitemap fetch failed: ${res.status}`)
+    const data = await res.json()
+    const posts = Array.isArray(data?.posts) ? data.posts : []
+    return posts.map((post) => {
+      const lastmod = post.updated_at ? `<lastmod>${post.updated_at}</lastmod>` : ''
+      return `<url><loc>${BASE}/article/${post.slug}</loc>${lastmod}<changefreq>weekly</changefreq><priority>0.8</priority></url>`
+    })
+  } catch (error) {
+    console.warn('Blog sitemap fetch failed, continuing without posts:', error?.message || error)
+    return []
+  }
+}
+
+if (allowBots) {
+  const urls = [
+    ...buildStaticUrls(),
+    ...(await buildBlogUrls())
+  ].join('')
   const sm = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`
   writeFileSync(resolve(distPublic, 'sitemap.xml'), sm)
