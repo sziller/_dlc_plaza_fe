@@ -32,6 +32,7 @@ const Terms              = () => import('../views/Terms.vue')
 const Privacy            = () => import('../views/Privacy.vue')
 const Cookies            = () => import('../views/Cookies.vue')
 const Resources          = () => import('../views/Resources.vue')
+const LoanExplained      = () => import('../views/LoanExplained.vue')
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: {
@@ -83,6 +84,12 @@ const routes = [
   { path: '/knowledge-hub', name: 'KnowledgeHub', component: Resources, meta: {
     title: 'Knowledge Hub — Cadena Bitcoin',
     description: 'Comprehensive guides on Bitcoin-backed loans, collateral lending, DeFi, and unlocking Bitcoin liquidity. Learn from DLC lending experts.',
+    robots: 'index,follow',
+  }},
+  // Loan Explained Landing Page (retargeting)
+  { path: '/loan-explained', name: 'LoanExplained', component: LoanExplained, meta: {
+    title: 'How Cadena Bitcoin Loans Work — Step by Step',
+    description: 'Learn how to borrow against Bitcoin without selling. Get liquidity, keep price exposure, no liquidations. See a real example with numbers.',
     robots: 'index,follow',
   }},
   { path: '/cadena-paper', name: 'CadenaPaper', component: TechnicalOverview, meta: {
