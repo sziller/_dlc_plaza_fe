@@ -357,8 +357,6 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { getTopupAddressQR } from '../api/qr'
-import { getUserQR } from '../api/qr'
-import { getToken } from '../api/token'
 import { getUserDlcs } from '../api/userDlcs'
 import { deleteSelf } from '../api/deleteSelf'
 import TheFooter from '../components/TheFooter.vue'
@@ -393,7 +391,7 @@ const addrLoading = ref(false)
 const addrError = ref(null)
 const copied = ref(false)
 
-// QR (like registration page)
+// QR (top-up address)
 const qrCode = ref(null)
 const qrError = ref(null)
 
@@ -408,7 +406,6 @@ async function reloadAll() {
   await nextTick()
   if (!isPending.value) {
     await fetchTopup()
-    await loadQrCode() // refresh QR too
   } else {
     address.value = ''
     qrCode.value = null
@@ -419,15 +416,32 @@ async function reloadAll() {
 // ---- Address fetch (keep) ----
 async function fetchTopup() {
   addrError.value = null
+  qrError.value = null
   addrLoading.value = true
   address.value = ''
+  qrCode.value = null
   copied.value = false
 
   try {
     const res = await getTopupAddressQR(-1)
-    address.value = String(res?.payload?.string || '')
+    const addr = String(res?.payload?.string || '')
+    if (!addr) throw new Error('Top-up address not found in response payload.')
+    address.value = addr
+
+    const svg = res?.payload?.qr_code
+    if (typeof svg !== 'string') {
+      qrError.value = 'QR code not found in response payload.'
+    } else {
+      try {
+        qrCode.value = buildSvgDataUri(svg)
+      } catch (err) {
+        qrError.value = err?.message || 'Failed to load QR code.'
+      }
+    }
   } catch (e) {
-    addrError.value = e && e.message ? e.message : String(e)
+    const msg = e && e.message ? e.message : String(e)
+    addrError.value = msg
+    qrError.value = msg
   } finally {
     addrLoading.value = false
   }
@@ -446,24 +460,6 @@ const buildSvgDataUri = (svgLike) => {
     return 'data:image/svg+xml,' + val
   }
   throw new Error('Unexpected QR format.')
-}
-
-async function loadQrCode() {
-  qrError.value = null
-  qrCode.value = null
-  try {
-    const token = getToken()
-    if (!token) {
-      qrError.value = 'You are not authenticated.'
-      return
-    }
-    const data = await getUserQR()
-    const svg = data?.payload?.qr_code
-    if (typeof svg !== 'string') throw new Error('QR code not found in response payload.')
-    qrCode.value = buildSvgDataUri(svg)
-  } catch (err) {
-    qrError.value = err?.message || 'Failed to load QR code.'
-  }
 }
 
 // ---- Copy address ----
@@ -672,7 +668,6 @@ onMounted(async () => {
   await load()
   if (!isPending.value) {
     await fetchTopup()
-    await loadQrCode()
   }
   await fetchPastDlcs()
 })
