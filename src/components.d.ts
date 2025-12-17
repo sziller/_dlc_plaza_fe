@@ -19,6 +19,7 @@ declare module 'vue' {
     Navbar: typeof import('./components/Navbar.vue')['default']
     OrderModal: typeof import('./components/OrderModal.vue')['default']
     Rates50Mini: typeof import('./components/Rates50Mini.vue')['default']
+    RelatedResources: typeof import('./components/RelatedResources.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SessionBanner: typeof import('./components/SessionBanner.vue')['default']

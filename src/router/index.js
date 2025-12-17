@@ -32,6 +32,24 @@ const Terms              = () => import('../views/Terms.vue')
 const Privacy            = () => import('../views/Privacy.vue')
 const Cookies            = () => import('../views/Cookies.vue')
 const Resources          = () => import('../views/Resources.vue')
+// Blog CMS pages
+const BlogListPage       = () => import('../pages/BlogListPage.vue')
+const BlogPostPage       = () => import('../pages/BlogPostPage.vue')
+const AdminLoginPage     = () => import('../pages/AdminLoginPage.vue')
+const AdminBlogListPage  = () => import('../pages/AdminBlogListPage.vue')
+const AdminBlogEditPage  = () => import('../pages/AdminBlogEditPage.vue')
+
+const hasBlogToken = () => {
+  if (typeof window === 'undefined' || !window.localStorage) return false
+  try {
+    return Boolean(window.localStorage.getItem('blog_token'))
+  } catch (error) {
+    if (import.meta?.env?.DEV) {
+      console.warn('Unable to access localStorage for blog token read', error)
+    }
+    return false
+  }
+}
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: {
@@ -79,11 +97,47 @@ const routes = [
     description: 'Everything you need to know about Cadena Bitcoin loans and lending.',
     robots: 'index,follow',
   }},
+  // Blog CMS (Knowledge Hub)
+  { path: '/knowledge-hub', name: 'BlogList', component: BlogListPage, meta: {
+    title: 'Knowledge Hub — Cadena Bitcoin',
+    description: 'Latest Cadena Bitcoin research, updates, and how-to guides.',
+    robots: 'index,follow',
+  }},
+  { path: '/article/:slug', name: 'BlogPost', component: BlogPostPage, props: true, meta: {
+    title: 'Article — Cadena Bitcoin',
+    description: 'In-depth Knowledge Hub articles from the Cadena Bitcoin team.',
+    robots: 'index,follow',
+  }},
+  { path: '/blog', redirect: '/knowledge-hub' },
+  { path: '/blog/:slug', redirect: (to) => `/article/${to.params.slug}` },
+  { path: '/admin/login', name: 'AdminLogin', component: AdminLoginPage, meta: {
+    title: 'Admin Login — Cadena Bitcoin',
+    description: 'Sign in to manage Knowledge Hub articles.',
+    robots: 'noindex,nofollow',
+  }},
+  { path: '/admin/blog', name: 'AdminBlogList', component: AdminBlogListPage, meta: {
+    title: 'Admin — Knowledge Hub',
+    description: 'Manage and publish Knowledge Hub articles.',
+    robots: 'noindex,nofollow',
+    requiresAdminAuth: true,
+  }},
+  { path: '/admin/blog/new', name: 'AdminBlogNew', component: AdminBlogEditPage, meta: {
+    title: 'New Knowledge Hub Article — Admin',
+    description: 'Create a new Knowledge Hub article.',
+    robots: 'noindex,nofollow',
+    requiresAdminAuth: true,
+  }},
+  { path: '/admin/blog/edit/:id', name: 'AdminBlogEdit', component: AdminBlogEditPage, props: true, meta: {
+    title: 'Edit Knowledge Hub Article — Admin',
+    description: 'Edit and publish Knowledge Hub content.',
+    robots: 'noindex,nofollow',
+    requiresAdminAuth: true,
+  }},
   // Knowledge Hub (Resources Overview)
-  { path: '/knowledge-hub', name: 'KnowledgeHub', component: Resources, meta: {
+  { path: '/knowledge-hub-legacy', name: 'KnowledgeHub', component: Resources, meta: {
     title: 'Knowledge Hub — Cadena Bitcoin',
     description: 'Comprehensive guides on Bitcoin-backed loans, collateral lending, DeFi, and unlocking Bitcoin liquidity. Learn from DLC lending experts.',
-    robots: 'index,follow',
+    robots: 'noindex,nofollow',
   }},
   { path: '/cadena-paper', name: 'CadenaPaper', component: TechnicalOverview, meta: {
     title: 'Cadena Paper — Technical Overview',
@@ -314,6 +368,8 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   if (to.meta?.requiresAuth && !getToken()) {
     next({ path: '/login', query: { redirect: to.fullPath } })
+  } else if (to.meta?.requiresAdminAuth && !hasBlogToken()) {
+    next({ path: '/admin/login', query: { redirect: to.fullPath } })
   } else {
     next()
   }
