@@ -386,4 +386,29 @@ router.afterEach(() => {
   }
 })
 
+// Recover from lazy-chunk load failures (e.g., after a new deploy).
+// Without this, users can click a nav item and nothing happens until they hard refresh.
+let lastChunkError = { path: '', at: 0 }
+router.onError((err, to) => {
+  const msg = String(err?.message || '')
+  const chunkFailed =
+    msg.includes('Failed to fetch dynamically imported module') ||
+    msg.includes('Importing a module script failed') ||
+    msg.includes('ChunkLoadError') ||
+    msg.includes('Loading chunk')
+
+  if (chunkFailed) {
+    const target = to?.fullPath || window.location.pathname + window.location.search
+    const now = Date.now()
+    const recentlyRetried = lastChunkError.path === target && (now - lastChunkError.at) < 2000
+    if (!recentlyRetried) {
+      lastChunkError = { path: target, at: now }
+      window.location.assign(target || '/')
+    }
+  } else {
+    // eslint-disable-next-line no-console
+    console.error('Router navigation error', err)
+  }
+})
+
 export default router
