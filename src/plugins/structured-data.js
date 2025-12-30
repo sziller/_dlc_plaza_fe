@@ -6,7 +6,7 @@ export function generateOrganizationSchema() {
     '@type': 'Organization',
     'name': 'Cadena Bitcoin',
     'url': 'https://cadenabitcoin.com',
-    'logo': 'https://cadenabitcoin.com/logo.png',
+    'logo': 'https://cadenabitcoin.com/img/logo-240.png',
     'description': 'Decentralized Bitcoin lending and borrowing marketplace',
     'foundingDate': '2023',
     'founders': [{
