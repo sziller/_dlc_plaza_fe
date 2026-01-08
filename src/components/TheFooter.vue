@@ -96,6 +96,7 @@
       <!-- 📎 Footer Bottom -->
       <div class="mt-12 border-t border-secondary/40 pt-6 text-sm text-center text-white/70">
         <small>&copy; {{ year }} Cadena Bitcoin. All rights reserved.</small>
+        <div class="mt-2 text-white/60">Version {{ version }}</div>
         <address class="not-italic mt-2 text-white/60">
           Cadena Bitcoin is operated by Cadena Bitcoin S.A. de C.V., an El Salvador–licensed Bitcoin service provider.
           Address: Calle Llama del Bosque Poniente, Urbanización Madre Selva III, Edificio Avante, Local 3-13,
@@ -109,6 +110,7 @@
 <script setup>
 import { computed } from 'vue'
 const year = computed(() => new Date().getFullYear())
+const version = '2.0.1'
 </script>
 
 <style scoped>
