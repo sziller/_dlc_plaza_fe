@@ -32,6 +32,8 @@ const Terms              = () => import('../views/Terms.vue')
 const Privacy            = () => import('../views/Privacy.vue')
 const Cookies            = () => import('../views/Cookies.vue')
 const Resources          = () => import('../views/Resources.vue')
+const LoanExplained      = () => import('../views/LoanExplained.vue')
+const LoanExplainedLender = () => import('../views/LoanExplainedLender.vue')
 // Blog CMS pages
 const BlogListPage       = () => import('../pages/BlogListPage.vue')
 const BlogPostPage       = () => import('../pages/BlogPostPage.vue')
@@ -138,6 +140,18 @@ const routes = [
     title: 'Knowledge Hub — Cadena Bitcoin',
     description: 'Comprehensive guides on Bitcoin-backed loans, collateral lending, DeFi, and unlocking Bitcoin liquidity. Learn from DLC lending experts.',
     robots: 'noindex,nofollow',
+  }},
+  // Loan Explained Landing Page (retargeting)
+  { path: '/loan-explained', name: 'LoanExplained', component: LoanExplained, meta: {
+    title: 'How Cadena Bitcoin Loans Work — Step by Step',
+    description: 'Learn how to borrow against Bitcoin without selling. Get liquidity, keep price exposure, no liquidations. See a real example with numbers.',
+    robots: 'index,follow',
+  }},
+  // Lender Explained Landing Page (retargeting)
+  { path: '/loan-explained-lender', name: 'LoanExplainedLender', component: LoanExplainedLender, meta: {
+    title: 'Earn Fixed Returns Lending Bitcoin — Cadena',
+    description: 'Generate 10% APR fixed returns with Bitcoin-backed lending. Guaranteed USD claims, no volatility exposure, trustless DLC enforcement.',
+    robots: 'index,follow',
   }},
   { path: '/cadena-paper', name: 'CadenaPaper', component: TechnicalOverview, meta: {
     title: 'Cadena Paper — Technical Overview',
