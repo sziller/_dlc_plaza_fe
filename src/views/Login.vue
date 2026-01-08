@@ -147,7 +147,14 @@ const submitLogin = async () => {
     // 4) Normalize + persist combined auth state (token + profile)
     auth.login(token, profilePayload)
 
-    // 5) Route based on auth_code if present (fallback to home)
+    // 5) Fire X conversion event for login
+    if (typeof window !== 'undefined' && window.twq) {
+      window.twq('event', 'tw-prcqf-qvmxx', {
+        email_address: profilePayload?.email ?? null
+      })
+    }
+
+    // 6) Route based on auth_code if present (fallback to home)
     const code = Number(profilePayload?.auth_code)
     if (code === 2) {
       await router.push({ path: '/register', query: { step: '3' } })
