@@ -34,6 +34,24 @@ const Cookies            = () => import('../views/Cookies.vue')
 const Resources          = () => import('../views/Resources.vue')
 const LoanExplained      = () => import('../views/LoanExplained.vue')
 const LoanExplainedLender = () => import('../views/LoanExplainedLender.vue')
+// Blog CMS pages
+const BlogListPage       = () => import('../pages/BlogListPage.vue')
+const BlogPostPage       = () => import('../pages/BlogPostPage.vue')
+const AdminLoginPage     = () => import('../pages/AdminLoginPage.vue')
+const AdminBlogListPage  = () => import('../pages/AdminBlogListPage.vue')
+const AdminBlogEditPage  = () => import('../pages/AdminBlogEditPage.vue')
+
+const hasBlogToken = () => {
+  if (typeof window === 'undefined' || !window.localStorage) return false
+  try {
+    return Boolean(window.localStorage.getItem('blog_token'))
+  } catch (error) {
+    if (import.meta?.env?.DEV) {
+      console.warn('Unable to access localStorage for blog token read', error)
+    }
+    return false
+  }
+}
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: {
@@ -81,11 +99,47 @@ const routes = [
     description: 'Everything you need to know about Cadena Bitcoin loans and lending.',
     robots: 'index,follow',
   }},
+  // Blog CMS (Knowledge Hub)
+  { path: '/knowledge-hub', name: 'BlogList', component: BlogListPage, meta: {
+    title: 'Knowledge Hub — Cadena Bitcoin',
+    description: 'Latest Cadena Bitcoin research, updates, and how-to guides.',
+    robots: 'index,follow',
+  }},
+  { path: '/article/:slug', name: 'BlogPost', component: BlogPostPage, props: true, meta: {
+    title: 'Article — Cadena Bitcoin',
+    description: 'In-depth Knowledge Hub articles from the Cadena Bitcoin team.',
+    robots: 'index,follow',
+  }},
+  { path: '/blog', redirect: '/knowledge-hub' },
+  { path: '/blog/:slug', redirect: (to) => `/article/${to.params.slug}` },
+  { path: '/admin/login', name: 'AdminLogin', component: AdminLoginPage, meta: {
+    title: 'Admin Login — Cadena Bitcoin',
+    description: 'Sign in to manage Knowledge Hub articles.',
+    robots: 'noindex,nofollow',
+  }},
+  { path: '/admin/blog', name: 'AdminBlogList', component: AdminBlogListPage, meta: {
+    title: 'Admin — Knowledge Hub',
+    description: 'Manage and publish Knowledge Hub articles.',
+    robots: 'noindex,nofollow',
+    requiresAdminAuth: true,
+  }},
+  { path: '/admin/blog/new', name: 'AdminBlogNew', component: AdminBlogEditPage, meta: {
+    title: 'New Knowledge Hub Article — Admin',
+    description: 'Create a new Knowledge Hub article.',
+    robots: 'noindex,nofollow',
+    requiresAdminAuth: true,
+  }},
+  { path: '/admin/blog/edit/:id', name: 'AdminBlogEdit', component: AdminBlogEditPage, props: true, meta: {
+    title: 'Edit Knowledge Hub Article — Admin',
+    description: 'Edit and publish Knowledge Hub content.',
+    robots: 'noindex,nofollow',
+    requiresAdminAuth: true,
+  }},
   // Knowledge Hub (Resources Overview)
-  { path: '/knowledge-hub', name: 'KnowledgeHub', component: Resources, meta: {
+  { path: '/knowledge-hub-legacy', name: 'KnowledgeHub', component: Resources, meta: {
     title: 'Knowledge Hub — Cadena Bitcoin',
     description: 'Comprehensive guides on Bitcoin-backed loans, collateral lending, DeFi, and unlocking Bitcoin liquidity. Learn from DLC lending experts.',
-    robots: 'index,follow',
+    robots: 'noindex,nofollow',
   }},
   // Loan Explained Landing Page (retargeting)
   { path: '/loan-explained', name: 'LoanExplained', component: LoanExplained, meta: {
@@ -328,6 +382,8 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   if (to.meta?.requiresAuth && !getToken()) {
     next({ path: '/login', query: { redirect: to.fullPath } })
+  } else if (to.meta?.requiresAdminAuth && !hasBlogToken()) {
+    next({ path: '/admin/login', query: { redirect: to.fullPath } })
   } else {
     next()
   }
@@ -341,6 +397,31 @@ router.afterEach(() => {
   const twq = typeof window !== 'undefined' && window.twq
   if (shouldTrackPageViews && twq) {
     twq('event', 'PageView')
+  }
+})
+
+// Recover from lazy-chunk load failures (e.g., after a new deploy).
+// Without this, users can click a nav item and nothing happens until they hard refresh.
+let lastChunkError = { path: '', at: 0 }
+router.onError((err, to) => {
+  const msg = String(err?.message || '')
+  const chunkFailed =
+    msg.includes('Failed to fetch dynamically imported module') ||
+    msg.includes('Importing a module script failed') ||
+    msg.includes('ChunkLoadError') ||
+    msg.includes('Loading chunk')
+
+  if (chunkFailed) {
+    const target = to?.fullPath || window.location.pathname + window.location.search
+    const now = Date.now()
+    const recentlyRetried = lastChunkError.path === target && (now - lastChunkError.at) < 2000
+    if (!recentlyRetried) {
+      lastChunkError = { path: target, at: now }
+      window.location.assign(target || '/')
+    }
+  } else {
+    // eslint-disable-next-line no-console
+    console.error('Router navigation error', err)
   }
 })
 

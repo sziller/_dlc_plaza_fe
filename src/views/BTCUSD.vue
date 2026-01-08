@@ -26,6 +26,13 @@ const { isLoggedIn, setUserFromApi } = useAuth()
 
 onMounted(() => {
   setUserFromApi()
+
+  // Fire X conversion event for dashboard view
+  if (typeof window !== 'undefined' && window.twq) {
+    window.twq('event', 'tw-prcqf-qvn13', {
+      email_address: null
+    })
+  }
 })
 </script>
 
