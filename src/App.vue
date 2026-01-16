@@ -14,7 +14,9 @@
     />
 
     <!-- Page content: pad for navbar base + (optional) info strip -->
-    <router-view class="px-4" :style="{ paddingTop: contentPad }" />
+    <div class="px-4" :style="{ paddingTop: contentPad }">
+      <router-view />
+    </div>
     <CookieBanner />
   </div>
 </template>
