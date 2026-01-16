@@ -442,6 +442,14 @@ watch(step, async (val) => {
   if (route.query.step !== next) {
     await router.replace({ query: { ...route.query, step: next } })
   }
+  if (val === 2) {
+    // Fire X conversion event for registration step 2
+    if (typeof window !== 'undefined' && window.twq) {
+      window.twq('event', 'tw-prcqf-qvn1b', {
+        email_address: email.value || null
+      })
+    }
+  }
   if (val === 3) {
     await loadQrCode()
     startStep3Polling()
