@@ -5,8 +5,15 @@ Allow: /
 Disallow: /login
 Disallow: /loginpage
 Disallow: /my-profile
+Disallow: /admin/
 
 # Canonical host
 Host: https://cadenabitcoin.com
 
+# Sitemaps and feeds
 Sitemap: https://cadenabitcoin.com/sitemap.xml
+
+# LLM/AI Discoverability
+# See https://llmstxt.org/ for the llms.txt standard
+# Machine-readable info: /llms.txt
+# Human + LLM readable: /for-llms
