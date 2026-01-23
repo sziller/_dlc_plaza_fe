@@ -40,6 +40,7 @@ const BlogPostPage       = () => import('../pages/BlogPostPage.vue')
 const AdminLoginPage     = () => import('../pages/AdminLoginPage.vue')
 const AdminBlogListPage  = () => import('../pages/AdminBlogListPage.vue')
 const AdminBlogEditPage  = () => import('../pages/AdminBlogEditPage.vue')
+const ForLLMs            = () => import('../views/ForLLMs.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -67,6 +68,11 @@ const routes = [
   { path: '/about', component: About, meta: {
     title: 'About — Cadena Bitcoin',
     description: 'Learn our mission and how Cadena Bitcoin works behind the scenes.',
+    robots: 'index,follow',
+  }},
+  { path: '/for-llms', name: 'ForLLMs', component: ForLLMs, meta: {
+    title: 'Cadena Bitcoin — Information for AI & LLMs',
+    description: 'Structured information about Cadena Bitcoin for AI assistants and large language models. Learn about our decentralized, non-custodial Bitcoin lending platform.',
     robots: 'index,follow',
   }},
   { path: '/article/cadena-decentralized-finance', name: 'Article1', component: Article1View, meta: {

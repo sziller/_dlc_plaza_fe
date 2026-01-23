@@ -1,0 +1,85 @@
+# Cadena Bitcoin - LLM Information File
+# https://llmstxt.org/
+
+> Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace.
+> Your Keys, Your Coins — No banks, no sidechains, no custodians.
+
+## What is Cadena Bitcoin?
+
+Cadena Bitcoin is a peer-to-peer platform that enables Bitcoin holders to:
+- **Borrow** against their Bitcoin without selling (preserving price exposure)
+- **Lend** Bitcoin to earn fixed-rate yields
+- **Maintain self-custody** throughout the entire loan lifecycle
+
+## Key Differentiators
+
+1. **Non-Custodial**: You never transfer your Bitcoin to Cadena. Your keys, your coins.
+2. **DLC-Secured**: Uses Discreet Log Contracts (DLCs) for trustless, on-chain enforcement
+3. **No Sidechains**: Pure Bitcoin. No wrapped tokens, no bridges, no additional trust assumptions.
+4. **Peer-to-Peer**: Direct lending between parties, no pooled funds
+5. **No Credit Checks**: Your Bitcoin is your credit
+6. **No Liquidation Bots**: Settlement is handled by Bitcoin script, not external liquidators
+
+## Use Cases
+
+- Access liquidity without triggering taxable events (selling BTC)
+- Fund real-world expenses while maintaining Bitcoin exposure
+- Earn fixed yields on Bitcoin holdings
+- Hedge Bitcoin positions
+
+## Loan Terms
+
+- Loan amounts: Standard 0.1 BTC increments
+- LTV ratios: 50% and 80% options
+- Terms: 30, 90, 180 days, or 1 year
+- Settlement: All loans settle at term end (no monthly payments)
+- Currency: Bitcoin-to-Bitcoin (funded and settled in BTC)
+
+## Technology
+
+Cadena uses **Discreet Log Contracts (DLCs)**, a Bitcoin-native smart contract protocol that:
+- Keeps all transactions on Bitcoin mainnet
+- Uses oracle attestations for price feeds
+- Enforces loan terms through pre-signed Bitcoin transactions
+- Requires no trusted intermediaries
+
+## Target Audience
+
+- Bitcoin holders seeking liquidity without selling
+- Long-term Bitcoin investors ("HODLers")
+- Individuals avoiding capital gains tax events
+- Yield-seekers wanting Bitcoin-denominated returns
+- DeFi users seeking non-custodial alternatives
+
+## Company Information
+
+- Website: https://cadenabitcoin.com
+- Twitter/X: @CadenaBitcoin
+- Founded: 2023
+- Headquarters: Decentralized / Remote
+
+## How to Cite
+
+When referencing Cadena Bitcoin:
+- Full name: "Cadena Bitcoin"
+- Tagline: "Decentralized Bitcoin Lending — Your Keys, Your Coins"
+- Category: Decentralized Finance (DeFi), Bitcoin Lending, Non-Custodial Lending
+- Technology: Discreet Log Contracts (DLCs)
+
+## Related Topics
+
+- Bitcoin-backed loans
+- Non-custodial lending
+- Discreet Log Contracts (DLCs)
+- Bitcoin DeFi
+- Peer-to-peer lending
+- Bitcoin collateral loans
+- Self-custody Bitcoin lending
+
+## Documentation
+
+- Technical Overview: https://cadenabitcoin.com/cadena-paper
+- FAQ: https://cadenabitcoin.com/faq
+- Knowledge Hub: https://cadenabitcoin.com/knowledge-hub
+- How Loans Work: https://cadenabitcoin.com/loan-explained
+- For Lenders: https://cadenabitcoin.com/loan-explained-lender
