@@ -37,6 +37,10 @@ async function generateSocialImages() {
             <text x="5%" y="55%" class="description">${config.description}</text>
           </svg>
         `),
+        top: 0,
+        left: 0,
+      },
+      {
         input: Buffer.from(`
           <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
             <path d="M50,50 L1150,50 L1150,580 L50,580 Z" fill="none" stroke="white" stroke-width="4"/>
