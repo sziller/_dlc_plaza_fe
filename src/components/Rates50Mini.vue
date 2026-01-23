@@ -253,7 +253,6 @@ const IS_STAGING = (() => {
 
 // accent by contract — MATCHED to your other component
 const CONTRACT_ACCENTS = {
-  '0.001': '#6738e4',
   '0.01' : '#6738e4',
   '0.10' : '#8387c4',
   '1.00' : '#000000',
@@ -308,10 +307,10 @@ const availableContracts = computed(() => {
   const set = new Set()
   for (const p of products.value || []) {
     const label = satsToBtcLabel(p.contract_value)
-    if (label) set.add(label)
+    if (label && Number(label) >= 0.01) set.add(label)
   }
   if (!set.size) {
-    const fb = IS_STAGING ? ['0.001', '0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
+    const fb = IS_STAGING ? ['0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
     return fb
   }
   return Array.from(set).sort((a,b)=>Number(a)-Number(b))

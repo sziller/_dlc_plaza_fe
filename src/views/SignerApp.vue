@@ -139,10 +139,10 @@
             class="apk-badge"
             :disabled="downloading"
             @click="handleApkDownload"
-            aria-label="Download Android APK v102"
+            :aria-label="`Download Android APK ${apkVersion || 'Latest'}`"
           >
             <span class="apk-version">
-              {{ downloading ? '...' : 'v102' }}
+              {{ downloading ? '...' : (apkVersion || 'Latest') }}
             </span>
             <span>
               {{ downloading ? 'Downloading…' : 'Download APK' }}
@@ -181,11 +181,12 @@
 <script setup lang="js">
 import { ref } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
+import { downloadApp } from '../api/downloadApp'
 
 const downloading = ref(false)
 const downloadError = ref('')
-const apkFilename = 'CadenaBitcoinLive(v102).apk'
-const apkDownloadUrl = '/downloads/CadenaBitcoinLive%28v102%29.apk'
+const apkFilename = ref('CadenaBitcoinLive(v102).apk')
+const apkVersion = ref('v102')
 
 const handleApkDownload = async () => {
   if (downloading.value) return
@@ -194,13 +195,9 @@ const handleApkDownload = async () => {
   downloadError.value = ''
 
   try {
-    const a = document.createElement('a')
-    a.href = apkDownloadUrl
-    a.download = apkFilename
-    a.rel = 'nofollow'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    await downloadApp({ filename: apkFilename.value })
+  } catch (e) {
+    downloadError.value = e?.message || 'Could not download the APK. Please try again.'
   } finally {
     downloading.value = false
   }

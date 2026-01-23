@@ -120,5 +120,10 @@ onMounted(() => {
 watch(isLoggedIn, () => syncPadFromCssVars())
 
 // Compute the pad-top the page needs beneath the fixed bars
-const contentPad = computed(() => `${navH.value + infoH.value}px`)
+// Remove top padding so sections sit flush under the fixed navbar
+const contentPad = computed(() => {
+  // still observe nav/info heights so reactivity stays in sync (even though we render without top padding)
+  void navH.value; void infoH.value;
+  return '0px'
+})
 </script>

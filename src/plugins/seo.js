@@ -77,7 +77,7 @@ export function installSeo(router) {
     }
 
     // Additional SEO enhancements
-    setMeta('theme-color', '#F7931A'); // Bitcoin orange
+    setMeta('theme-color', '#000000'); // primary
   });
 
   function setTitle(t){ document.title = t; }

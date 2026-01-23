@@ -44,7 +44,7 @@ const pageTestConfigs = [
       'og:description': 'Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains.',
       'og:type': 'website',
       'twitter:card': 'summary_large_image',
-      'theme-color': '#F7931A'
+      'theme-color': '#000000'
     },
     expectedSchemaTypes: ['Organization']
   }

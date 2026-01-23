@@ -7,6 +7,7 @@ import HeroRatesDisplay from '../components/HeroRatesDisplay.vue'
 import MailingListModal from '../components/MailingListModal.vue'
 import { blogArticles } from '../data/exploreContent'
 import { postContactEmail, isValidEmail } from '../api/publicContact'
+import { downloadApp } from '../api/downloadApp'
 
 /* ---------- Media ---------- */
 const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
@@ -23,8 +24,9 @@ function onHeroCtaClick() {
 }
 
 const showMailingList = ref(false)
-const apkFilename = 'CadenaBitcoinLive(v102).apk'
-const apkDownloadUrl = '/downloads/CadenaBitcoinLive%28v102%29.apk'
+const apkFilename = ref('CadenaBitcoinLive(v102).apk')
+const apkVersion = ref('2.0.3')
+const apkLoading = ref(false)
 
 const footerEmail = ref('')
 const footerSubscribeLoading = ref(false)
@@ -176,14 +178,16 @@ function handleLayoutChange() {
   fitDebounced()
   clampDebounced()
 }
-function startStaticApkDownload() {
-  const a = document.createElement('a')
-  a.href = apkDownloadUrl
-  a.download = apkFilename
-  a.rel = 'nofollow'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+async function handleApkDownload() {
+  if (apkLoading.value) return
+  apkLoading.value = true
+  try {
+    await downloadApp({ filename: apkFilename.value })
+  } catch (e) {
+    console.error('APK download failed', e)
+  } finally {
+    apkLoading.value = false
+  }
 }
 
 async function handleFooterSubscribe() {
@@ -247,7 +251,7 @@ onBeforeUnmount(() => {
 
 <template>
   <!-- Page wrapper with global gradient background -->
-  <div class="relative min-h-screen mt-2 text-white">
+  <div class="home-shell relative min-h-screen mt-2 text-white">
     <div class="fixed inset-0 -z-10 bg-page-gradient"></div>
 
     <!-- Hero Section -->
@@ -512,11 +516,12 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 class="apk-badge store-badge"
-                aria-label="Download Android APK v102"
-                @click="startStaticApkDownload"
+                :aria-label="`Download Android APK ${apkVersion || 'Latest'}`"
+                @click="handleApkDownload"
+                :disabled="apkLoading"
               >
-                <span class="apk-version">v102</span>
-                Download APK
+                <span class="apk-version">{{ apkVersion || 'Latest' }}</span>
+                {{ apkLoading ? 'Downloading…' : 'Download APK' }}
               </button>
             </div>
           </div>
@@ -658,5 +663,10 @@ onBeforeUnmount(() => {
   .hero-shell {
     padding-bottom: 4.5rem;
   }
+}
+
+/* Home top padding: keep hero centered under the fixed nav/info bars */
+.home-shell {
+  padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px) + clamp(32px, 8vh, 72px));
 }
 </style>

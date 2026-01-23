@@ -26,41 +26,20 @@
 
           <!-- Call -->
           <div class="pro-card group" v-reveal="{ delay: 60 }">
-            <div class="flex items-start gap-4">
-              <div class="icon-wrap">
-                <Phone class="w-5 h-5" aria-hidden="true" />
-              </div>
-              <div class="flex-1">
-                <h4 class="text-2xl font-semibold">Call</h4>
-                <p class="text-sm text-white/70 mt-1">Speak to our team anytime.</p>
-
-                <div class="mt-5 flex flex-wrap items-center gap-3">
-                  <a
-                    href="tel:+13058311410"
-                    class="btn-primary"
-                    aria-label="Call (305) 831-1410"
-                  >
-                    (305) 831-1410
-                  </a>
-
-                  <button
-                    @click="copyPhone"
-                    class="btn-ghost"
-                    :aria-label="copiedPhone ? 'Copied phone number' : 'Copy phone number'"
-                  >
-                    <component :is="copiedPhone ? Check : Copy" class="w-4 h-4" />
-                    <span class="text-sm font-medium">{{ copiedPhone ? 'Copied' : 'Copy' }}</span>
-                  </button>
-                </div>
-
-
-                <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
-                  <span class="inline-flex items-center gap-1">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400/80"></span> Live support
-                  </span>
-                  <span>Response time: &lt; 24h</span>
-                </div>
-              </div>
+            <div class="flex flex-col items-start gap-4">
+              <h4 class="text-2xl font-semibold">Book a Demo</h4>
+              <p class="text-sm text-white/70">
+                Schedule a 30-minute meeting with the Cadena team.
+              </p>
+              <a
+                href="https://calendly.com/cadenabitcoin-info/30min?month=2026-01"
+                class="btn-primary inline-flex items-center gap-2"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Book a Demo - Schedule a Meeting (opens Calendly in a new tab)"
+              >
+                Book a Demo — Schedule a Meeting
+              </a>
             </div>
           </div>
 
@@ -163,7 +142,7 @@
     </a>
 
     <a
-      href="https://github.com/CadenaWizard/oracle"
+      href="https://github.com/CadenaWizard/cryptlib"
       target="_blank"
       rel="noopener noreferrer nofollow"
       referrerpolicy="no-referrer"

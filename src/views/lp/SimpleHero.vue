@@ -5,6 +5,7 @@ import HeroRatesDisplay from '../../components/HeroRatesDisplay.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
 import { useAuth } from '../../composables/useAuth'
 import { blogArticles } from '../../data/exploreContent'
+import { downloadApp } from '../../api/downloadApp'
 
 /* ---------- Media ---------- */
 const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
@@ -20,8 +21,9 @@ function onHeroCtaClick() {
 }
 
 const showMailingList = ref(false)
-const apkFilename = 'CadenaBitcoinLive(v102).apk'
-const apkDownloadUrl = '/downloads/CadenaBitcoinLive%28v102%29.apk'
+const apkFilename = ref('CadenaBitcoinLive(v102).apk')
+const apkVersion = ref('v102')
+const apkLoading = ref(false)
 
 const footerEmail = ref('')
 const footerSubscribeLoading = ref(false)
@@ -192,13 +194,15 @@ function handleLayoutChange() {
 }
 
 async function onDownloadApkClick() {
-  const a = document.createElement('a')
-  a.href = apkDownloadUrl
-  a.download = apkFilename
-  a.rel = 'nofollow'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+  if (apkLoading.value) return
+  apkLoading.value = true
+  try {
+    await downloadApp({ filename: apkFilename.value })
+  } catch (e) {
+    console.error('APK download failed', e)
+  } finally {
+    apkLoading.value = false
+  }
 }
 
 async function handleFooterSubscribe() {
@@ -661,11 +665,12 @@ onBeforeUnmount(() => {
                 <button
                   type="button"
                   class="apk-badge store-badge"
-                  aria-label="Download Android APK v102"
+                  :aria-label="`Download Android APK ${apkVersion || 'Latest'}`"
                   @click="onDownloadApkClick"
+                  :disabled="apkLoading"
                 >
-                  <span class="apk-version">v102</span>
-                  Download APK
+                  <span class="apk-version">{{ apkVersion || 'Latest' }}</span>
+                  {{ apkLoading ? 'Downloading…' : 'Download APK' }}
                 </button>
               </div>
             </div>
@@ -718,11 +723,16 @@ onBeforeUnmount(() => {
 @media (min-width: 1024px) { .hero-grid { --g: 32px; } }
 
 .hero-shell {
-  padding-top: clamp(1rem, 5vw, 3.75rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 80vh;
+  padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px) + clamp(1rem, 5vw, 3.75rem));
+  padding-bottom: clamp(2.5rem, 6vw, 4.25rem);
 }
 @media (min-width: 1024px) {
   .hero-shell {
-    padding-top: clamp(2rem, 4vw, 4.5rem);
+    padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px) + clamp(2rem, 4vw, 4.5rem));
   }
 }
 

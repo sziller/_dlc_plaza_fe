@@ -2,12 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
+// Use the site primary color everywhere so social assets stay on brand
+const PRIMARY_HEX = '#000000';
+const PRIMARY_RGBA = { r: 0, g: 0, b: 0, alpha: 1 };
+
 const socialImageConfig = [
   {
     name: 'og-homepage.png',
     title: 'Cadena Bitcoin',
     description: 'Decentralized Bitcoin Lending',
-    background: '#F7931A', // Bitcoin orange
+    background: PRIMARY_HEX,
   },
   // Add more page-specific social image configs here
 ];
@@ -22,7 +26,7 @@ async function generateSocialImages() {
         width,
         height,
         channels: 4,
-        background: { r: 247, g: 147, b: 26, alpha: 1 }, // Bitcoin orange
+        background: PRIMARY_RGBA,
       }
     })
     .composite([

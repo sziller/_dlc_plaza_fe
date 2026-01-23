@@ -71,7 +71,7 @@
               </li>
               <li>
                 <a
-                  href="https://github.com/cadenabitcoin"
+                  href="https://github.com/CadenaWizard/cryptlib"
                   class="hover:text-secondary"
                   rel="noopener noreferrer"
                   target="_blank"

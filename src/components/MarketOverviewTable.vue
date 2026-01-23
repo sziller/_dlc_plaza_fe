@@ -74,34 +74,17 @@
                     </div>
                   </th>
 
-                  <!-- Left group header -->
+                  <!-- Group header -->
                   <th
                     colspan="2"
                     class="group-header rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg whitespace-nowrap"
                   >
                     <span class="gh-label">{{ leftGroupLabel }}</span>
                   </th>
-
-                  <th class="spacer px-1"></th>
-
-                  <!-- Right group header -->
-                  <th
-                    colspan="2"
-                    class="group-header rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg whitespace-nowrap"
-                  >
-                    <span class="gh-label">{{ rightGroupLabel }}</span>
-                  </th>
                 </tr>
 
                 <tr class="text-white text-md">
                   <th class="px-4 py-4 text-left">Term</th>
-                  <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">Lend</div>
-                  </th>
-                  <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">Borrow</div>
-                  </th>
-                  <th class="spacer px-1 py-4"></th>
                   <th class="px-4 py-4">
                     <div class="chip w-full text-center min-w-[6rem]">Lend</div>
                   </th>
@@ -149,35 +132,6 @@
                     </div>
                   </td>
 
-                  <td class="px-1 spacer"></td>
-
-                  <!-- Right group cells (80% LTV) -->
-                  <td
-                    v-for="(key) in rightKeys"
-                    :key="key"
-                    @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw hover-glow"
-                  >
-                    <div>
-                      <span
-                        :class="[
-                          flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''
-                        ]"
-                        class="text-3xl font-bold leading-tight rate"
-                      >
-                        {{ getEar(term, key) }}
-                      </span>
-
-                      <template v-if="term.label !== '365 Days'">
-                        <div class="text-[10px] text-white/70 -mt-1">
-                          Annualized yield
-                        </div>
-                        <div class="text-xs text-white/90 mt-1">
-                          {{ term[key] }} for {{ term.label }}
-                        </div>
-                      </template>
-                    </div>
-                  </td>
                 </tr>
               </tbody>
             </table>
@@ -274,43 +228,6 @@
                 </div>
               </div>
 
-              <!-- 80% LTV -->
-              <div class="rounded-md bg-white/5 p-3">
-                <div class="text-[11px] tracking-wide uppercase text-white/70 mb-2 font-semibold">
-                  {{ rightGroupLabel }}
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <button
-                    v-for="key in rightKeys"
-                    :key="`m-${term.label}-${key}`"
-                    type="button"
-                    @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw hover-glow"
-                  >
-                    <div class="space-y-1">
-                      <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                        {{ key.includes('a') ? 'Lend' : 'Borrow' }}
-                      </div>
-                      <span
-                        :class="[
-                          flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''
-                        ]"
-                        class="text-2xl font-bold leading-tight rate"
-                      >
-                        {{ getEar(term, key) }}
-                      </span>
-                      <template v-if="term.label !== '365 Days'">
-                        <div class="text-[10px] text-white/70 -mt-0.5">
-                          Annualized yield
-                        </div>
-                        <div class="text-[11px] text-white/90 mt-0.5">
-                          {{ term[key] }} for {{ term.label }}
-                        </div>
-                      </template>
-                    </div>
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -355,7 +272,6 @@ const IS_STAGING = (() => {
 
 // -------- Accent colors per known sizes ----------
 const CONTRACT_ACCENTS = {
-  '0.001': '#6738e4',
   '0.01':  '#6738e4',
   '0.10':  '#8387c4',
   '1.00':  '#000000',
@@ -365,9 +281,7 @@ const CONTRACT_ACCENTS = {
 const props = defineProps({
   title: { type: String, default: 'BTCUSD Market Overview' },
   leftGroupLabel: { type: String, default: '50% LTV' },
-  rightGroupLabel: { type: String, default: '80% LTV' },
   leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
-  rightKeys: { type: Array, default: () => ['ltv80a', 'ltv80b'] },
   offersPollMs: { type: Number, default: 5000 },
   changeFlashMs: { type: Number, default: 600 },
   compact: { type: Boolean, default: true },
@@ -422,7 +336,7 @@ const showModal = ref(false)
 const selectedRate = ref('')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
-const selectedLtv = ref(80)
+const selectedLtv = ref(50)
 const selectedOfferId = ref(null)
 const modalLoading = ref(false)
 const modalNotice  = ref({ type: '', text: '' })
@@ -432,7 +346,7 @@ function handleCellClick(row, key) {
   selectedRate.value = row[key]
   selectedAction.value = key.includes('a') ? 'Lend' : 'Borrow'
   selectedTermDays.value = getDaysFromLabel(row.label)
-  selectedLtv.value = key.startsWith('ltv50') ? 50 : 80
+  selectedLtv.value = 50
   const idKey = `${key}Id`
   selectedOfferId.value = row[idKey] || null
   showModal.value = true
@@ -478,7 +392,7 @@ async function handleOrderSubmit(data) {
   }
 
   const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
-  const ltv = selectedLtv.value || 80
+  const ltv = selectedLtv.value || 50
   const cntr = selectedContract.value || '0.10'
   const product_id = buildProductId(days, ltv, cntr)
   const tmp_cntr_id = genTmpCntrId()
@@ -504,10 +418,10 @@ async function handleOrderSubmit(data) {
 
 // -------- Table rows / offers polling ----------
 const terms = ref([
-  { label: '30 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null, ltv50aId:null, ltv50bId:null, ltv80aId:null, ltv80bId:null },
-  { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null, ltv50aId:null, ltv50bId:null, ltv80aId:null, ltv80bId:null },
-  { label: '180 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null, ltv50aId:null, ltv50bId:null, ltv80aId:null, ltv80bId:null },
-  { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv80a: '*', ltv80aEar: '*', ltv80b: '*', ltv80bEar: '*', ltv50pid: null, ltv80pid: null, ltv50aId:null, ltv50bId:null, ltv80aId:null, ltv80bId:null },
+  { label: '30 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
+  { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
+  { label: '180 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
+  { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
 ])
 
 const flashActive = ref(new Set())
@@ -608,16 +522,12 @@ function buildTermsFromOffers(offers, contractStr) {
   return TARGET_TERMS.map((d) => {
     const row = best[d] || {}
     const l50 = row[50] || { lend:{term:null,ear:null,id:null}, borrow:{term:null,ear:null,id:null}, pid:null }
-    const l80 = row[80] || { lend:{term:null,ear:null,id:null}, borrow:{term:null,ear:null,id:null}, pid:null }
     return {
       label: `${d} Days`,
       ltv50a: fmtPct2(l50.lend.term),   ltv50aEar: fmtPct2(l50.lend.ear),
       ltv50b: fmtPct2(l50.borrow.term), ltv50bEar: fmtPct2(l50.borrow.ear),
-      ltv80a: fmtPct2(l80.lend.term),   ltv80aEar: fmtPct2(l80.lend.ear),
-      ltv80b: fmtPct2(l80.borrow.term), ltv80bEar: fmtPct2(l80.borrow.ear),
-      ltv50pid: l50.pid, ltv80pid: l80.pid,
+      ltv50pid: l50.pid,
       ltv50aId: l50.lend.id, ltv50bId: l50.borrow.id,
-      ltv80aId: l80.lend.id, ltv80bId: l80.borrow.id,
     }
   })
 }
@@ -633,7 +543,7 @@ function markFlashOnce(cellId) {
   }, props.changeFlashMs)
 }
 function diffAndFlash(oldRows, newRows) {
-  const keys = ['ltv50a', 'ltv50b', 'ltv80a', 'ltv80b']
+  const keys = ['ltv50a', 'ltv50b']
   for (let i = 0; i < newRows.length; i++) {
     for (const base of keys) {
       const earKey = `${base}Ear`
@@ -674,6 +584,7 @@ const availableContracts = computed(() => {
   for (const p of products.value || []) {
     const label = satsToBtcLabel(p.contract_value)
     if (!label) continue
+    if (Number(label) < 0.01) continue
     set.add(label)
   }
   return Array.from(set).sort((a, b) => Number(a) - Number(b))
@@ -684,7 +595,7 @@ const contractOptions = computed(() => {
   if (arr.length) {
     return arr.map(v => ({ value: v, label: `${v} BTC` }))
   }
-  const fallback = IS_STAGING ? ['0.001', '0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
+  const fallback = IS_STAGING ? ['0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
   return fallback.map(v => ({ value: v, label: `${v} BTC` }))
 })
 
