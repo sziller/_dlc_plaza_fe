@@ -153,7 +153,7 @@
             <div class="inline-block bg-gradient-to-r from-secondary/20 to-purple-600/20 border border-secondary/40 rounded-2xl px-8 py-6">
               <p class="text-white/70 text-sm uppercase tracking-wide mb-2">Your Guaranteed Claim</p>
               <p class="text-3xl sm:text-4xl font-bold text-white mb-1">
-                ${{ formatUSD(lenderClaimUSD) }}
+                ${{ formatUSD(totalClaimUSD) }}
               </p>
               <p class="text-white/60 text-sm">USD worth of Bitcoin at maturity (no matter the price)</p>
             </div>
@@ -166,22 +166,25 @@
               <h3 class="text-xl font-bold text-secondary mb-4">What You Provide Today</h3>
               <div class="space-y-3 text-white/90">
                 <div class="flex justify-between items-center py-2 border-b border-white/10">
-                  <span>Amount You Lend</span>
+                  <span>Claim at Maturity</span>
                   <span class="font-mono font-bold">0.500 BTC</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-white/10">
-                  <span>Current Value</span>
-                  <span class="font-mono font-bold">${{ formatUSD(btcPriceRaw * 0.5) }}</span>
+                  <span>Claim Value Today</span>
+                  <span class="font-mono font-bold">${{ formatUSD(totalClaimUSD) }}</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-white/10">
-                  <span>Collateral Backing</span>
-                  <span class="font-mono text-white/60">1.0 BTC (200% LTV)</span>
+                  <span>Discounted for 10% Return</span>
+                  <span class="font-mono text-green-400">/ 1.10</span>
                 </div>
                 <div class="flex justify-between items-center py-3 bg-secondary/30 rounded-lg px-3 -mx-3">
-                  <span class="font-bold">Your Stake</span>
-                  <span class="font-mono font-bold text-xl">${{ formatUSD(btcPriceRaw * 0.5) }}</span>
+                  <span class="font-bold">Your Investment</span>
+                  <span class="font-mono font-bold text-xl">${{ formatUSD(investmentUSD) }}</span>
                 </div>
               </div>
+              <p class="text-xs text-white/50 mt-4 pt-4 border-t border-white/10">
+                You invest less today to lock in a 0.5 BTC claim at maturity. Your 10% return is built into the claim.
+              </p>
             </div>
 
             <!-- What You Get at Maturity -->
@@ -189,14 +192,14 @@
               <h3 class="text-xl font-bold text-secondary mb-4">At Maturity (Guaranteed)</h3>
               <div class="space-y-4 text-white/90">
                 <p>
-                  You receive a guaranteed claim on <strong>${{ formatUSD(lenderClaimUSD) }} worth of Bitcoin</strong> at settlement.
+                  You receive a guaranteed claim on <strong>{{ lenderClaimBTC.toFixed(3) }} BTC</strong> at settlement.
                 </p>
                 <p>
-                  An oracle reports the BTC price. <strong>You get exactly ${{ formatUSD(lenderClaimUSD) }} in BTC value</strong>, regardless of the market price.
+                  An oracle reports the BTC price. <strong>You get exactly {{ lenderClaimBTC.toFixed(3) }} BTC in value</strong>, regardless of the market price.
                 </p>
                 <div class="bg-secondary/20 border border-secondary/30 rounded-xl p-4 mt-4">
                   <p class="text-sm text-white/80">
-                    <strong>Key insight:</strong> If Bitcoin crashes, you still get your ${{ formatUSD(lenderClaimUSD) }} claim. If Bitcoin moons, borrowers capture the upside. You have zero volatility exposure.
+                    <strong>Key insight:</strong> If Bitcoin crashes, you still get your {{ lenderClaimBTC.toFixed(3) }} BTC claim. If Bitcoin moons, borrowers capture the upside. You have zero volatility exposure.
                   </p>
                 </div>
               </div>
@@ -266,10 +269,28 @@
           How Settlement Works
         </h2>
         <p class="text-white/70 text-center mb-12 max-w-2xl mx-auto">
-          See how you always receive your fixed ${{ formatUSD(lenderClaimUSD) }} claim based on Bitcoin's price at maturity.
+          See how you always receive your fixed {{ lenderClaimBTC.toFixed(3) }} BTC claim based on Bitcoin's price at maturity.
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Scenario: BTC Doubles -->
+          <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-emerald-400 text-2xl">&#x21C8;</span>
+              <h3 class="text-lg font-bold text-emerald-400">If BTC Doubles to ${{ formatUSD(scenarios.double.price) }}</h3>
+            </div>
+            <div class="space-y-2 text-white/80">
+              <div class="flex justify-between">
+                <span>You receive:</span>
+                <span class="font-mono">{{ scenarios.double.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
+              </div>
+              <div class="flex justify-between text-emerald-400 font-bold">
+                <span>Borrower gets:</span>
+                <span class="font-mono">{{ scenarios.double.borrowerBTC.toFixed(4) }} BTC</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Scenario: BTC Rises -->
           <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-4">
@@ -279,7 +300,7 @@
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.rise.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(lenderClaimUSD) }})</span>
+                <span class="font-mono">{{ scenarios.rise.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
               </div>
               <div class="flex justify-between text-green-400 font-bold">
                 <span>Borrower gets:</span>
@@ -297,7 +318,7 @@
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.flat.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(lenderClaimUSD) }})</span>
+                <span class="font-mono">{{ scenarios.flat.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
               </div>
               <div class="flex justify-between font-bold">
                 <span>Borrower gets:</span>
@@ -306,16 +327,16 @@
             </div>
           </div>
 
-          <!-- Scenario: BTC Falls -->
+          <!-- Scenario: BTC Falls 25% -->
           <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-4">
               <span class="text-yellow-400 text-2xl">&#x2193;</span>
-              <h3 class="text-lg font-bold text-yellow-400">If BTC Falls to ${{ formatUSD(scenarios.drop.price) }}</h3>
+              <h3 class="text-lg font-bold text-yellow-400">If BTC Falls 25% to ${{ formatUSD(scenarios.drop.price) }}</h3>
             </div>
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.drop.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(lenderClaimUSD) }})</span>
+                <span class="font-mono">{{ scenarios.drop.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
               </div>
               <div class="flex justify-between text-yellow-400 font-bold">
                 <span>Borrower gets:</span>
@@ -324,11 +345,11 @@
             </div>
           </div>
 
-          <!-- Scenario: BTC Crashes -->
+          <!-- Scenario: BTC Crashes 50% -->
           <div class="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-4">
               <span class="text-red-400 text-2xl">&#x2193;&#x2193;</span>
-              <h3 class="text-lg font-bold text-red-400">If BTC Falls to ${{ formatUSD(scenarios.crash.price) }}</h3>
+              <h3 class="text-lg font-bold text-red-400">If BTC Crashes 50% to ${{ formatUSD(scenarios.crash.price) }}</h3>
             </div>
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
@@ -341,94 +362,46 @@
               </div>
             </div>
             <p class="text-xs text-white/50 mt-3">
-              Even in worst-case scenario, you receive your full ${{ formatUSD(lenderClaimUSD) }} claim in BTC value.
+              Even in worst-case scenario, you receive your full ${{ formatUSD(totalClaimUSD) }} claim in BTC value.
             </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- COMPARISON TABLE -->
-    <section class="px-4 py-16 lg:py-20">
-      <div class="max-w-5xl mx-auto">
-        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-4">
-          How Cadena Compares
-        </h2>
-        <p class="text-white/70 text-center mb-12 max-w-2xl mx-auto">
-          See how Cadena Bitcoin lending compares to other investment options.
-        </p>
-        <ComparisonTable
-          title="Why Choose Cadena Bitcoin for Lending?"
-          subtitle="Fixed returns, no volatility, trustless enforcement"
-          :features="comparisonFeatures"
-          cta-text="Start Lending Today"
-          cta-link="/register"
-        />
-      </div>
-    </section>
-
     <!-- RISK DISCLOSURE -->
     <section class="px-4 py-16 lg:py-20 bg-white/[0.02]">
       <div class="max-w-5xl mx-auto">
-        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-12">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8">
           Risk Disclosure
         </h2>
-        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-8">
-          <p class="text-white/90 mb-6">
-            While Cadena provides structured, over-collateralized lending with trustless enforcement, all lending carries risks. Lenders should understand the following before participating:
+        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6">
+          <p class="text-white/90 mb-4">
+            All lending carries risks. Key considerations for lenders:
           </p>
 
-          <ul class="space-y-4 text-white/80">
-            <li class="flex gap-4">
+          <ul class="space-y-3 text-white/80 text-sm">
+            <li class="flex gap-3">
               <span class="text-yellow-400 font-bold flex-shrink-0">•</span>
-              <div>
-                <strong class="text-white block">Smart Contract Risk:</strong>
-                <span>DLCs are audited but depend on Bitcoin script and oracle attestations. Potential bugs or unforeseen vulnerabilities could affect settlement.</span>
-              </div>
+              <span><strong class="text-white">Smart Contract Risk:</strong> DLCs depend on Bitcoin script and oracle attestations. Potential bugs could affect settlement.</span>
             </li>
-            <li class="flex gap-4">
+            <li class="flex gap-3">
               <span class="text-yellow-400 font-bold flex-shrink-0">•</span>
-              <div>
-                <strong class="text-white block">Oracle Risk:</strong>
-                <span>Settlement relies on oracle price feeds. While multiple independent oracles mitigate this risk, oracle failure or manipulation could theoretically affect claims.</span>
-              </div>
+              <span><strong class="text-white">Oracle Risk:</strong> Settlement relies on price feeds. Oracle failure or manipulation could theoretically affect claims.</span>
             </li>
-            <li class="flex gap-4">
+            <li class="flex gap-3">
               <span class="text-yellow-400 font-bold flex-shrink-0">•</span>
-              <div>
-                <strong class="text-white block">Extreme Bitcoin Crash Risk:</strong>
-                <span>If BTC crashes below your fixed claim value, you may receive your full claim in BTC, but that BTC is worth less in fiat terms than expected.</span>
-              </div>
+              <span><strong class="text-white">Bitcoin Crash Risk:</strong> If BTC crashes significantly, you receive your full claim in BTC, but that BTC is worth less in fiat terms.</span>
             </li>
-            <li class="flex gap-4">
+            <li class="flex gap-3">
               <span class="text-yellow-400 font-bold flex-shrink-0">•</span>
-              <div>
-                <strong class="text-white block">Opportunity Cost:</strong>
-                <span>Bitcoin holders who lend forgo potential appreciation of that BTC. While you earn 10% in USD terms, you miss upside if BTC rallies significantly.</span>
-              </div>
-            </li>
-            <li class="flex gap-4">
-              <span class="text-yellow-400 font-bold flex-shrink-0">•</span>
-              <div>
-                <strong class="text-white block">Regulatory Risk:</strong>
-                <span>Cryptocurrency lending regulations are evolving and may affect operations, liquidity, or returns in future jurisdictions.</span>
-              </div>
-            </li>
-            <li class="flex gap-4">
-              <span class="text-yellow-400 font-bold flex-shrink-0">•</span>
-              <div>
-                <strong class="text-white block">Counterparty Risk (Borrower):</strong>
-                <span>While DLCs provide trustless enforcement, borrowed Bitcoin could theoretically be lost due to borrower user error or malicious behavior before collateral is locked.</span>
-              </div>
+              <span><strong class="text-white">Opportunity Cost:</strong> You forgo potential BTC appreciation. You earn 10% in USD terms but miss upside if BTC rallies significantly.</span>
             </li>
           </ul>
 
-          <div class="mt-8 pt-8 border-t border-yellow-500/30">
-            <p class="text-white font-bold mb-2">Disclaimer:</p>
-            <p class="text-white/80 text-sm">
-              Past performance is not indicative of future results. This is not financial advice. Only lend Bitcoin that you can afford to lose. Cryptocurrency is volatile and carries risk. Consult a financial advisor before making investment decisions.
-            </p>
-          </div>
+          <p class="text-white/60 text-xs mt-4 pt-4 border-t border-yellow-500/30">
+            Disclaimer: Past performance is not indicative of future results. This is not financial advice. Only lend Bitcoin you can afford to lose. Consult a financial advisor before making investment decisions.
+          </p>
         </div>
       </div>
     </section>
@@ -502,7 +475,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
-import ComparisonTable from '../components/ComparisonTable.vue'
 import { useAuth } from '../composables/useAuth'
 import { getPrice } from '../api/price'
 
@@ -536,13 +508,13 @@ const btcPriceFormatted = computed(() =>
 )
 
 // Loan constants (lender perspective)
-const lenderProvidesBTC = 0.5
+const lenderClaimBTC = 0.5
 const interestRate = 0.10
-const interestBTC = lenderProvidesBTC * interestRate // 0.05
-const totalClaimBTC = lenderProvidesBTC + interestBTC // 0.55
+const totalClaimBTC = lenderClaimBTC // 0.5 (claim includes interest baked in)
+const totalClaimUSD = computed(() => btcPriceRaw.value * totalClaimBTC)
 
-// USD values based on current price
-const lenderClaimUSD = computed(() => btcPriceRaw.value * totalClaimBTC)
+// Discounted investment (what lender puts in today)
+const investmentUSD = computed(() => totalClaimUSD.value / (1 + interestRate))
 
 // Format USD helper
 const formatUSD = (val) => val.toLocaleString(undefined, { maximumFractionDigits: 0 })
@@ -550,7 +522,13 @@ const formatUSD = (val) => val.toLocaleString(undefined, { maximumFractionDigits
 // Settlement scenarios (relative to current price)
 const scenarios = computed(() => {
   const price = btcPriceRaw.value
-  const claim = lenderClaimUSD.value
+  const claim = totalClaimUSD.value
+
+  const double = {
+    price: price * 2.0,
+    lenderBTC: claim / (price * 2.0),
+    borrowerBTC: 1 - (claim / (price * 2.0))
+  }
 
   const rise = {
     price: price * 1.5,
@@ -565,9 +543,9 @@ const scenarios = computed(() => {
   }
 
   const drop = {
-    price: price * 0.7,
-    lenderBTC: claim / (price * 0.7),
-    borrowerBTC: 1 - (claim / (price * 0.7))
+    price: price * 0.75,
+    lenderBTC: claim / (price * 0.75),
+    borrowerBTC: 1 - (claim / (price * 0.75))
   }
 
   const crash = {
@@ -576,81 +554,26 @@ const scenarios = computed(() => {
     borrowerBTC: 0
   }
 
-  return { rise, flat, drop, crash }
+  return { double, rise, flat, drop, crash }
 })
-
-// Comparison table features
-const comparisonFeatures = [
-  {
-    feature: 'Fixed APR Return',
-    cadena: '10%',
-    traditional: '0.1-2%',
-    defi: 'Variable'
-  },
-  {
-    feature: 'USD-Denominated Payout',
-    cadena: true,
-    traditional: true,
-    defi: false
-  },
-  {
-    feature: 'Bitcoin Volatility Exposure',
-    cadena: false,
-    traditional: false,
-    defi: true
-  },
-  {
-    feature: 'Liquidation Risk (Lender)',
-    cadena: false,
-    traditional: false,
-    defi: 'Protocol Risk'
-  },
-  {
-    feature: 'Non-Custodial Enforcement',
-    cadena: 'DLC Smart Contract',
-    traditional: 'Bank Custody',
-    defi: 'Varies'
-  },
-  {
-    feature: 'Trustless Settlement',
-    cadena: true,
-    traditional: false,
-    defi: true
-  }
-]
 
 // FAQ items
 const faqItems = [
   {
     id: 'faq-1',
     title: 'How is my 10% APR guaranteed?',
-    content: `The interest is calculated and locked into the DLC smart contract at creation. Your claim on $55,000 worth of Bitcoin at maturity includes both the principal (0.5 BTC) and interest (0.05 BTC) at the initial price. The smart contract enforces this automatically—no counterparty can change it.`,
+    content: `The interest is calculated and locked into the DLC smart contract at creation. Your claim on a fixed USD amount of Bitcoin at maturity includes both the principal and 10% return at the initial price. The smart contract enforces this automatically—no counterparty can change it.`,
     open: true
   },
   {
     id: 'faq-2',
     title: 'What if Bitcoin crashes below my claim value?',
-    content: `You receive the entire borrower collateral. For example, if your claim is $55,000 and BTC drops to $40,000, you'd receive all 1 BTC collateral (worth $40,000). While less than your claim in USD terms, you still receive the maximum possible value and your full BTC allotment.`
+    content: `You receive the entire borrower collateral. For example, if your claim is $46,916 and BTC drops to $40,000, you'd receive all 1 BTC collateral (worth $40,000). While less than your claim in USD terms, you still receive the maximum possible value.`
   },
   {
     id: 'faq-3',
-    title: 'Do I need to monitor my position?',
-    content: `No. Unlike borrowers, lenders have no liquidation risk or margin calls. Your position is fully passive—fund at the start, receive at maturity. You don't need to check prices or manage anything.`
-  },
-  {
-    id: 'faq-4',
     title: 'Can I withdraw early?',
     content: `Current loan terms are fixed-duration (typically 30-90 days). Early withdrawal is not supported in this initial version. Future iterations may include secondary markets where you can transfer your loan position to other lenders.`
-  },
-  {
-    id: 'faq-5',
-    title: 'How does this compare to staking or DeFi yields?',
-    content: `Cadena offers fixed USD-denominated returns backed by Bitcoin collateral. Unlike staking (which pays in the volatile asset) or variable DeFi yields, your return is predictable and not subject to token price fluctuation. You also have no protocol risk or liquidation exposure.`
-  },
-  {
-    id: 'faq-6',
-    title: 'What happens if Cadena disappears?',
-    content: `Your Bitcoin is locked in a DLC smart contract on the Bitcoin blockchain, not in Cadena's custody. Even if Cadena the company ceases operations, the contract will settle automatically at maturity based on oracle price data. The enforcement is trustless and doesn't depend on any company.`
   }
 ]
 

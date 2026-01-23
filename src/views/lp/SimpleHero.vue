@@ -1,13 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import TheFooter from '../../components/TheFooter.vue'
+import HeroRatesDisplay from '../../components/HeroRatesDisplay.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
 import { useAuth } from '../../composables/useAuth'
 import { blogArticles } from '../../data/exploreContent'
-
-// Store badge width sync
-const appleBadgeRef = ref(null)
-const apkBadgeRef = ref(null)
 
 /* ---------- Media ---------- */
 const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
@@ -25,6 +22,11 @@ function onHeroCtaClick() {
 const showMailingList = ref(false)
 const apkFilename = 'CadenaBitcoinLive(v102).apk'
 const apkDownloadUrl = '/downloads/CadenaBitcoinLive%28v102%29.apk'
+
+const footerEmail = ref('')
+const footerSubscribeLoading = ref(false)
+const footerSubscribeError = ref('')
+const footerSubscribeSuccess = ref('')
 
 /* ---------- Carousel ---------- */
 const currentIndex = ref(0)
@@ -187,18 +189,8 @@ let updateIsMobile
 function handleLayoutChange() {
   fitDebounced()
   clampDebounced()
-  syncStoreBadgeWidth()
 }
 
-function syncStoreBadgeWidth() {
-  try {
-    const el = appleBadgeRef?.value
-    const apk = apkBadgeRef?.value
-    if (!el || !apk) return
-    const w = el.getBoundingClientRect().width
-    if (w > 0) apk.style.width = w + 'px'
-  } catch (_) {}
-}
 async function onDownloadApkClick() {
   const a = document.createElement('a')
   a.href = apkDownloadUrl
@@ -207,6 +199,31 @@ async function onDownloadApkClick() {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
+}
+
+async function handleFooterSubscribe() {
+  footerSubscribeError.value = ''
+  footerSubscribeSuccess.value = ''
+
+  if (!isValidEmail(footerEmail.value)) {
+    footerSubscribeError.value = 'Please enter a valid email address.'
+    return
+  }
+
+  footerSubscribeLoading.value = true
+  try {
+    await postContactEmail(footerEmail.value)
+    footerSubscribeSuccess.value = 'Thanks! Check your inbox for Cadena updates.'
+    footerEmail.value = ''
+    setTimeout(() => {
+      footerSubscribeSuccess.value = ''
+    }, 5000)
+  } catch (err) {
+    const msg = err && typeof err === 'object' && 'message' in err ? err.message : null
+    footerSubscribeError.value = msg || 'Could not add your email. Please try again.'
+  } finally {
+    footerSubscribeLoading.value = false
+  }
 }
 onMounted(async () => {
   setUserFromApi()
@@ -228,21 +245,12 @@ onMounted(async () => {
   ro = new ResizeObserver(() => handleLayoutChange())
   if (leftStackRef.value) ro.observe(leftStackRef.value)
 
-  try {
-    if (appleBadgeRef?.value) {
-      const ob = new ResizeObserver(syncStoreBadgeWidth)
-      ob.observe(appleBadgeRef.value)
-      window.__badgeRO = ob
-    }
-  } catch (_) {}
-  syncStoreBadgeWidth()
-
   window.addEventListener('resize', handleLayoutChange)
   window.addEventListener('orientationchange', handleLayoutChange)
   window.addEventListener('focus', handleLayoutChange)
 
   if (document.fonts?.ready) {
-    document.fonts.ready.then(() => { handleLayoutChange(); syncStoreBadgeWidth(); }).catch(() => {})
+    document.fonts.ready.then(() => { handleLayoutChange() }).catch(() => {})
   }
 })
 
@@ -253,7 +261,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('orientationchange', handleLayoutChange)
   window.removeEventListener('focus', handleLayoutChange)
   if (ro) { try { ro.disconnect() } catch {} }
-  try { window.__badgeRO?.disconnect?.(); delete window.__badgeRO } catch (_) {}
 })
 </script>
 
@@ -262,185 +269,73 @@ onBeforeUnmount(() => {
   <div class="relative min-h-screen text-white">
     <div class="fixed inset-0 -z-10 bg-page-gradient"></div>
 
-    <!-- Simplified Hero Section -->
+    <!-- Hero Section -->
     <section class="hero-shell bg-transparent text-white">
-      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-        <div
-          ref="heroRef"
-          class="hero-grid sm:grid sm:grid-cols-12 items-center gap-[var(--g)] pt-[0px]"
-        >
-          <!-- Left: Simplified copy + CTA (tablet: full width, centered) -->
-          <div
-            class="
-              sm:col-span-5 lg:col-span-6
-              min-[640px]:max-[900px]:col-span-12
-              flex p-0 sm:items-start
-              min-[640px]:max-[900px]:justify-center
-              lg:-mt-20 xl:-mt-28
-            "
-          >
-            <div
-              class="
-                w-full max-w-none flex flex-col gap-5 sm:gap-6 scale-wrapper chart-base-scale
-                text-center sm:text-left
-                min-[640px]:max-[900px]:items-center  min-[640px]:max-[900px]:text-center
-              "
-              ref="leftStackRef"
-              :style="{
-                transform: heroStackScaleAmount === 1 ? 'none' : `scale(${heroStackScaleAmount.toFixed(3)})`,
-                transformOrigin: heroStackOrigin
-              }"
-            >
-              <!-- Simplified Hero Content -->
-              <div class="space-y-4 sm:space-y-6">
-                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
-                  Access Dollars Instantly<br />Without Selling Your Bitcoin
-                </h1>
-                <p class="text-lg sm:text-xl text-white/80 leading-relaxed max-w-xl">
-                  Securely borrow dollars using your bitcoin as collateral—save in bitcoin, spend in dollars, and move money globally.
-                </p>
-              </div>
+      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
 
-              <!-- Primary CTA -->
-              <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start w-full">
-                <router-link
-                  :to="heroCtaTo"
-                  class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
-                  @click="onHeroCtaClick"
-                >
-                  {{ heroCtaLabel }}
-                </router-link>
-              </div>
+        <!-- Desktop: side-by-side | Mobile: stacked -->
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-12">
 
-              <!-- Lender link -->
-              <p class="text-white/70 text-sm pt-2">
-                Looking to lend?
-                <router-link to="/register" class="text-secondary hover:underline font-medium">
-                  Click here
-                </router-link>
-              </p>
-              <p class="text-white/70 text-sm">
-                Want email updates?
-                <button
-                  type="button"
-                  class="text-secondary underline font-medium hover:text-secondary/80"
-                  @click="showMailingList = true"
-                >
-                  Join our mailing list
-                </button>
-              </p>
+          <!-- Left Column: Copy + Desktop Buttons -->
+          <div class="flex-1 text-center lg:text-left">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+              Decentralized Bitcoin Lending is Here
+            </h1>
+            <p class="mt-4 sm:mt-6 text-lg sm:text-xl text-white/80 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Securely borrow or lend your Bitcoin to unlock liquidity globally.
+            </p>
 
-              <!-- Store buttons: show on phone + tablet (<901px), hide on desktop -->
-              <div class="mt-6 flex items-center justify-center gap-3 sm:gap-4 min-[901px]:hidden store-row">
-                <a
-                  href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
-                  target="_blank" rel="noopener" aria-label="Download on the App Store"
-                  class="inline-block" style="line-height:0"
-                >
-                  <img
-                    src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
-                    alt="Download on the App Store"
-                    width="240" height="80"
-                    class="app-store-badge store-badge"
-                    decoding="async" loading="lazy"
-                  />
-                </a>
-
-                <button
-                  type="button"
-                  class="apk-badge store-badge"
-                  aria-label="Download Android APK v102"
-                  @click="onDownloadApkClick"
-                >
-                  <span class="apk-version">v102</span>
-                  Download APK
-                </button>
-              </div>
-              <!-- /Store buttons -->
+            <!-- Desktop Buttons (hidden on mobile) -->
+            <div class="hidden lg:flex gap-4 mt-8">
+              <router-link
+                :to="heroCtaTo"
+                class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
+                @click="onHeroCtaClick"
+              >
+                Borrow Now
+              </router-link>
+              <router-link
+                :to="heroCtaTo"
+                class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
+                @click="onHeroCtaClick"
+              >
+                Lend Now
+              </router-link>
             </div>
           </div>
 
-          <!-- Right: Phone column -->
-          <div
-            class="
-              sm:col-span-7 lg:col-span-6
-              hidden sm:flex
-              min-[640px]:max-[900px]:hidden
-              p-0 hero-right
-              lg:-mt-6 xl:-mt-10
-            "
-          >
-            <div class="flex items-start justify-end w-full">
-              <div class="flex flex-col items-center ml-auto">
-                <router-link to="/signerapp" class="group block cursor-pointer select-none" aria-label="Open Signer App page">
-                  <picture class="block">
-                    <source type="image/avif" :srcset="`
-                      /img/File-portrait-640.avif 640w,
-                      /img/File-portrait-960.avif 960w,
-                      /img/File-portrait-1280.avif 1280w
-                    `" />
-                    <source type="image/webp" :srcset="`
-                      /img/File-portrait-640.webp 640w,
-                      /img/File-portrait-960.webp 960w,
-                      /img/File-portrait-1280.webp 1280w
-                    `" />
-                    <img
-                      src="/img/File-portrait-960.webp"
-                      :srcset="`
-                        /img/File-portrait-640.webp 640w,
-                        /img/File-portrait-960.webp 960w,
-                        /img/File-portrait-1280.webp 1280w
-                      `"
-                      :style="{
-                        maxHeight: ((clampedPhoneH - 100) * heroPhoneScale) + 'px',
-                        height: ((clampedPhoneH - 60) * heroPhoneScale) + 'px',
-                        width: Math.round(((clampedPhoneH - 60) * 0.46) * heroPhoneScale) + 'px'
-                      }"
-                      width="420" height="840"
-                      fetchpriority="high" loading="eager" decoding="async"
-                      class="block object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                      alt="Cadena Signer App preview"
-                      draggable="false"
-                    />
-                  </picture>
-                </router-link>
-
-                <!-- Desktop-only store buttons (≥901px) under phone -->
-                <div class="mt-8 hidden min-[901px]:flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center w-full store-row">
-                  <a
-                    href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
-                    target="_blank" rel="noopener" aria-label="Download on the App Store"
-                    class="inline-block" style="line-height:0"
-                  >
-                    <img
-                      src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
-                      alt="Download on the App Store"
-                      width="240" height="80"
-                      class="app-store-badge store-badge" ref="appleBadgeRef" decoding="async" loading="lazy"
-                    />
-                  </a>
-
-                  <button
-                    type="button"
-                    class="apk-badge store-badge"
-                    ref="apkBadgeRef"
-                    aria-label="Download Android APK v102"
-                    @click="onDownloadApkClick"
-                  >
-                    <span class="apk-version">v102</span>
-                    Download APK
-                  </button>
-                </div>
-                <!-- /Desktop-only store buttons -->
-              </div>
-            </div>
+          <!-- Right Column: Rates Card -->
+          <div class="flex justify-center lg:justify-end w-full lg:w-auto lg:flex-shrink-0">
+            <HeroRatesDisplay
+              :compact="isMobile"
+              class="w-full max-w-sm sm:max-w-md lg:max-w-none lg:w-[360px]"
+            />
           </div>
         </div>
+
+        <!-- Mobile Buttons (hidden on desktop) -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:hidden">
+          <router-link
+            :to="heroCtaTo"
+            class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
+            @click="onHeroCtaClick"
+          >
+            Borrow Now
+          </router-link>
+          <router-link
+            :to="heroCtaTo"
+            class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
+            @click="onHeroCtaClick"
+          >
+            Lend Now
+          </router-link>
+        </div>
+
       </div>
     </section>
 
     <!-- 21Rates Graphic -->
-    <section class="partners-section w-full bg-transparent text-white pt-6 pb-4 px-4 sm:px-[var(--g)] lg:px-[var(--g)]">
+    <section class="partners-section w-full bg-transparent text-white pt-16 sm:pt-20 pb-4 px-4 sm:px-[var(--g)] lg:px-[var(--g)]">
       <div class="max-w-screen-xl mx-auto text-center mb-6 px-2 sm:px-6">
         <h2 class="text-3xl md:text-4xl font-extrabold">Partners</h2>
       </div>
@@ -683,7 +578,7 @@ onBeforeUnmount(() => {
                     <span class="inline-block text-white font-medium mt-3 hover:underline">Read more →</span>
                   </div>
                 </a>
-              </template>
+                </template>
             </div>
           </div>
           <button @click="scrollRight" class="hidden sm:flex absolute right-0 z-10 bg-secondary hover:bg-secondary/80 text-white p-3 rounded-full shadow-md">▶</button>
@@ -738,9 +633,76 @@ onBeforeUnmount(() => {
           <router-link :to="isLoggedIn ? '/btcusd' : '/register'" class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90">Borrow Bitcoin</router-link>
           <router-link :to="isLoggedIn ? '/btcusd' : '/register'" class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary">Lend Bitcoin</router-link>
         </div>
-      </div>
-    </section>
-  </div>
+        </div>
+      </section>
+
+      <!-- Footer Band: App Download & Newsletter -->
+      <section class="bg-secondary/20 border-y border-white/10">
+        <div class="max-w-screen-xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <!-- App Download -->
+            <div class="text-center md:text-left">
+              <h3 class="text-xl font-bold text-white mb-4">Get the App</h3>
+              <div class="flex items-center justify-center md:justify-start gap-3 sm:gap-4">
+                <a
+                  href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
+                  target="_blank" rel="noopener" aria-label="Download on the App Store"
+                  class="inline-block" style="line-height:0"
+                >
+                  <img
+                    src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
+                    alt="Download on the App Store"
+                    width="240" height="80"
+                    class="app-store-badge store-badge"
+                    decoding="async" loading="lazy"
+                  />
+                </a>
+
+                <button
+                  type="button"
+                  class="apk-badge store-badge"
+                  aria-label="Download Android APK v102"
+                  @click="onDownloadApkClick"
+                >
+                  <span class="apk-version">v102</span>
+                  Download APK
+                </button>
+              </div>
+            </div>
+
+            <!-- Newsletter Signup -->
+            <div class="text-center md:text-right">
+              <h3 class="text-xl font-bold text-white mb-4">Stay Updated</h3>
+              <form class="flex flex-col sm:flex-row gap-3 sm:justify-end" @submit.prevent="handleFooterSubscribe">
+                <input
+                  v-model.trim="footerEmail"
+                  type="email"
+                  inputmode="email"
+                  placeholder="Enter your email"
+                  required
+                  class="flex-1 max-w-md rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition"
+                  :disabled="footerSubscribeLoading"
+                />
+                <button
+                  type="submit"
+                  class="inline-flex items-center justify-center rounded-full bg-secondary px-6 py-3 text-base font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none disabled:opacity-50 min-w-[140px]"
+                  :disabled="footerSubscribeLoading"
+                >
+                  <span v-if="footerSubscribeLoading">Subscribing…</span>
+                  <span v-else>Subscribe</span>
+                </button>
+              </form>
+              <div v-if="footerSubscribeError" class="mt-2 text-sm text-red-300" aria-live="polite">
+                {{ footerSubscribeError }}
+              </div>
+              <div v-else-if="footerSubscribeSuccess" class="mt-2 text-sm text-green-300" aria-live="polite">
+                {{ footerSubscribeSuccess }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
   <TheFooter />
 
@@ -857,7 +819,7 @@ onBeforeUnmount(() => {
 }
 
 .partners-section {
-  margin-top: 1rem;
+  margin-top: 0;
 }
 .partner-grid {
   width: 100%;

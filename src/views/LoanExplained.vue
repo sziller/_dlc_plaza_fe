@@ -161,27 +161,53 @@
 
           <!-- Loan Breakdown -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- What You Get -->
+            <!-- Into Smart Contract -->
             <div class="bg-black/20 rounded-2xl p-6">
-              <h3 class="text-xl font-bold text-secondary mb-4">What You Get Today</h3>
+              <h3 class="text-xl font-bold text-secondary mb-4">Into Smart Contract</h3>
               <div class="space-y-3 text-white/90">
                 <div class="flex justify-between items-center py-2 border-b border-white/10">
                   <span>Loan Amount (50% of 1 BTC)</span>
-                  <span class="font-mono font-bold">0.500 BTC</span>
+                  <span class="font-mono font-bold">0.50000000 BTC</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-white/10">
-                  <span>Minus Interest (10% APR)</span>
-                  <span class="font-mono text-white/60">-0.050 BTC</span>
+                  <span>Plus Discounted Interest (10% APY)</span>
+                  <span class="font-mono font-bold text-secondary">+0.04545454 BTC</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                  <span>Plus Cadena Fee</span>
+                  <span class="font-mono font-bold text-secondary">+0.00500000 BTC</span>
+                </div>
+                <div class="flex justify-between items-center py-3 bg-secondary/30 rounded-lg px-3 -mx-3">
+                  <span class="font-bold">You Lock in Contract</span>
+                  <span class="font-mono font-bold text-xl">0.55045454 BTC</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Liquidity You Receive -->
+            <div class="bg-black/20 rounded-2xl p-6">
+              <h3 class="text-xl font-bold text-green-400 mb-4">Liquidity You Receive Today</h3>
+              <div class="space-y-3 text-white/90">
+                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                  <span>Loan Amount (50% of 1 BTC)</span>
+                  <span class="font-mono font-bold">0.50000000 BTC</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                  <span>Minus Interest (10% APY)</span>
+                  <span class="font-mono text-white/60">-0.04545454 BTC</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-white/10">
                   <span>Minus Cadena Fee</span>
-                  <span class="font-mono text-white/60">-0.005 BTC</span>
+                  <span class="font-mono text-white/60">-0.00500000 BTC</span>
                 </div>
-                <div class="flex justify-between items-center py-3 bg-secondary/30 rounded-lg px-3 -mx-3">
-                  <span class="font-bold">You Receive</span>
-                  <span class="font-mono font-bold text-xl">0.445 BTC</span>
+                <div class="flex justify-between items-center py-3 bg-green-500/30 rounded-lg px-3 -mx-3">
+                  <span class="font-bold text-green-400">You Receive Now</span>
+                  <span class="font-mono font-bold text-xl text-green-400">0.44954546 BTC</span>
                 </div>
               </div>
+              <p class="text-xs text-white/50 mt-4 pt-4 border-t border-white/10">
+                Note: You need to sell this amount to get USD liquidity, which is handled in a later step.
+              </p>
             </div>
 
             <!-- Lender's Claim -->
@@ -269,7 +295,25 @@
           See how your loan settles based on Bitcoin's price at maturity. Lender always gets their ${{ formatUSD(lenderClaimUSD) }} worth of BTC. You get the rest.
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Scenario: BTC Doubles -->
+          <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-emerald-400 text-2xl">&#x21C8;</span>
+              <h3 class="text-lg font-bold text-emerald-400">If BTC Doubles to ${{ formatUSD(scenarios.double.price) }}</h3>
+            </div>
+            <div class="space-y-2 text-white/80">
+              <div class="flex justify-between">
+                <span>Lender gets:</span>
+                <span class="font-mono">{{ scenarios.double.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(lenderClaimUSD) }})</span>
+              </div>
+              <div class="flex justify-between text-emerald-400 font-bold">
+                <span>You get back:</span>
+                <span class="font-mono">{{ scenarios.double.borrowerBTC.toFixed(4) }} BTC (${{ formatUSD(scenarios.double.borrowerUSD) }})</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Scenario: BTC Rises -->
           <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-4">
@@ -306,11 +350,11 @@
             </div>
           </div>
 
-          <!-- Scenario: BTC Falls -->
+          <!-- Scenario: BTC Falls 25% -->
           <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-4">
               <span class="text-yellow-400 text-2xl">&#x2193;</span>
-              <h3 class="text-lg font-bold text-yellow-400">If BTC Falls to ${{ formatUSD(scenarios.drop.price) }}</h3>
+              <h3 class="text-lg font-bold text-yellow-400">If BTC Falls 25% to ${{ formatUSD(scenarios.drop.price) }}</h3>
             </div>
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
@@ -324,11 +368,11 @@
             </div>
           </div>
 
-          <!-- Scenario: BTC Crashes -->
+          <!-- Scenario: BTC Crashes 50% -->
           <div class="bg-red-500/10 border border-red-500/30 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-4">
               <span class="text-red-400 text-2xl">&#x2193;&#x2193;</span>
-              <h3 class="text-lg font-bold text-red-400">If BTC Falls to ${{ formatUSD(scenarios.crash.price) }}</h3>
+              <h3 class="text-lg font-bold text-red-400">If BTC Crashes 50% to ${{ formatUSD(scenarios.crash.price) }}</h3>
             </div>
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
@@ -409,9 +453,13 @@ const btcPriceFormatted = computed(() =>
 
 // Loan calculations (50% LTV, 10% interest, 0.005 BTC fee)
 const loanNotionalBTC = 0.5
-const interestBTC = 0.05
+const interestRate = 0.10
+const interestBTC = loanNotionalBTC * (interestRate / (1 + interestRate)) // 0.0454545...
 const feeBTC = 0.005
-const borrowerReceivesBTC = loanNotionalBTC - interestBTC - feeBTC // 0.445
+const borrowerReceivesBTC = loanNotionalBTC - interestBTC - feeBTC // 0.4495455...
+
+// Smart contract deposit (what borrower locks)
+const smartContractDeposit = loanNotionalBTC + interestBTC + feeBTC // 0.5504545...
 
 // USD values based on current price
 const lenderClaimUSD = computed(() => btcPriceRaw.value * 0.5)
@@ -424,6 +472,13 @@ const formatUSD = (val) => val.toLocaleString(undefined, { maximumFractionDigits
 const scenarios = computed(() => {
   const price = btcPriceRaw.value
   const claim = lenderClaimUSD.value
+
+  const double = {
+    price: price * 2.0,
+    lenderBTC: claim / (price * 2.0),
+    borrowerBTC: 1 - (claim / (price * 2.0)),
+    borrowerUSD: (1 - (claim / (price * 2.0))) * (price * 2.0)
+  }
 
   const rise = {
     price: price * 1.5,
@@ -440,10 +495,10 @@ const scenarios = computed(() => {
   }
 
   const drop = {
-    price: price * 0.7,
-    lenderBTC: claim / (price * 0.7),
-    borrowerBTC: 1 - (claim / (price * 0.7)),
-    borrowerUSD: (1 - (claim / (price * 0.7))) * (price * 0.7)
+    price: price * 0.75,
+    lenderBTC: claim / (price * 0.75),
+    borrowerBTC: 1 - (claim / (price * 0.75)),
+    borrowerUSD: (1 - (claim / (price * 0.75))) * (price * 0.75)
   }
 
   const crash = {
@@ -453,7 +508,7 @@ const scenarios = computed(() => {
     borrowerUSD: 0
   }
 
-  return { rise, flat, drop, crash }
+  return { double, rise, flat, drop, crash }
 })
 
 onMounted(() => {

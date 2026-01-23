@@ -1,0 +1,181 @@
+<template>
+  <section class="w-full h-full flex items-center">
+    <div class="w-full max-w-[320px] text-left">
+      <div
+        class="
+          rounded-xl border border-secondary/60 shadow-lg bg-dark/80 p-6 sm:p-8
+          transition-all duration-500 ease-out
+        "
+        :class="{
+          'opacity-0 translate-y-4': !mounted,
+          'opacity-100 translate-y-0': mounted
+        }"
+      >
+        <h3 class="text-2xl sm:text-3xl font-bold text-white mb-6 text-center">
+          Current Rates
+        </h3>
+
+        <div class="space-y-6">
+          <div
+            class="
+              rounded-lg bg-white/5 p-5 border border-white/10
+              transition-all duration-300 hover:bg-white/10
+            "
+          >
+            <div class="text-sm font-semibold text-white/70 mb-2 uppercase tracking-wide">
+              Borrow
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-4xl sm:text-5xl font-bold text-secondary">
+                {{ animatedBorrowRate }}
+              </span>
+              <span class="text-xl text-white/80">%</span>
+            </div>
+            <div class="text-sm text-white/60 mt-1">
+              <span class="whitespace-nowrap">30-day term</span>,
+              <span>annualized yield</span>
+            </div>
+          </div>
+
+          <div
+            class="
+              rounded-lg bg-white/5 p-5 border border-white/10
+              transition-all duration-300 hover:bg-white/10
+            "
+          >
+            <div class="text-sm font-semibold text-white/70 mb-2 uppercase tracking-wide">
+              Lend
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="text-4xl sm:text-5xl font-bold text-secondary">
+                {{ animatedLendRate }}
+              </span>
+              <span class="text-xl text-white/80">%</span>
+            </div>
+            <div class="text-sm text-white/60 mt-1">
+              <span class="whitespace-nowrap">30-day term</span>,
+              <span>annualized yield</span>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="loading" class="mt-6 text-center text-white/60 text-sm">
+          Loading rates...
+        </div>
+        <div v-if="apiError" class="mt-6 text-center text-red-300 text-sm">
+          Rates temporarily unavailable
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { getOffers } from '../api/offers'
+
+const props = defineProps({
+  pollMs: { type: Number, default: 5000 }
+})
+
+const mounted = ref(false)
+const loading = ref(true)
+const apiError = ref(false)
+const borrowRate = ref('*.**')
+const lendRate = ref('*.**')
+const animatedBorrowRate = ref('*.**')
+const animatedLendRate = ref('*.**')
+
+let intervalId = null
+let fetching = false
+
+const TARGET_TERMS = [30]
+const LTV = 50
+
+function parseLtv(pid) {
+  const m = String(pid || '').match(/ltv-(\d{1,3})/i)
+  return m ? Number(m[1]) : null
+}
+
+function parseTermRawFromPid(pid) {
+  const m = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
+  return m ? Math.round(Number(m[1])) : null
+}
+
+function annualize360(termPct, days) {
+  if (!Number.isFinite(termPct) || !days) return null
+  if (days >= 360 && days <= 366) return termPct
+  return termPct * (360 / days)
+}
+
+function fmtPct2(n) {
+  return Number.isFinite(n) ? `${n.toFixed(2)}` : '*'
+}
+
+async function loadRates() {
+  loading.value = false
+
+  // Set hardcoded rates
+  borrowRate.value = '10.10'
+  lendRate.value = '7.90'
+  animatedBorrowRate.value = '10.10'
+  animatedLendRate.value = '7.90'
+
+  // No need to fetch from API
+  apiError.value = false
+}
+
+function animateRate(targetRef, targetValue) {
+  const duration = 800
+  const startTime = performance.now()
+  const startValue = parseFloat(targetRef.value) || 0
+  const endValue = parseFloat(targetValue)
+
+  function update(currentTime) {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const easeOut = 1 - Math.pow(1 - progress, 3)
+
+    if (Number.isFinite(endValue)) {
+      const currentValue = startValue + (endValue - startValue) * easeOut
+      targetRef.value = currentValue.toFixed(2)
+    } else {
+      targetRef.value = '*'
+    }
+
+    if (progress < 1) {
+      requestAnimationFrame(update)
+    } else {
+      targetRef.value = targetValue
+    }
+  }
+
+  requestAnimationFrame(update)
+}
+
+onMounted(async () => {
+  mounted.value = true
+  await loadRates()
+})
+
+onUnmounted(() => {
+  // No interval to clear since we're not polling
+})
+</script>
+
+<style scoped>
+.animate-pulse {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+</style>
