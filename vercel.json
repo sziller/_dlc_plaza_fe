@@ -1,12 +1,21 @@
 {
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.cadenabitcoin.com" }],
+      "destination": "https://cadenabitcoin.com/:path*",
+      "permanent": true
+    },
+    { "source": "/blog", "destination": "/knowledge-hub", "permanent": true },
+    { "source": "/blog/:slug", "destination": "/article/:slug", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/downloads/(.*)", "destination": "/downloads/$1" },
     { "source": "/(.*)", "destination": "/" },
-     { "source": "/pdfjs/(.*)", "destination": "/pdfjs/$1" },
+    { "source": "/pdfjs/(.*)", "destination": "/pdfjs/$1" },
     { "source": "/whitepaper.pdf", "destination": "/whitepaper.pdf" },
     { "source": "/((?!pdfjs/|whitepaper\\.pdf).*)", "destination": "/index.html" }
   ],
-
   "headers": [
     {
       "source": "/downloads/(.*)\\.apk",
@@ -16,6 +25,5 @@
       ]
     }
   ],
-
- "git": { "deploymentEnabled": false }
+  "git": { "deploymentEnabled": false }
 }

@@ -22,7 +22,9 @@ export function installSeo(router) {
     const title = m.title || defaults.title;
     const desc = m.description || defaults.description;
     const robots = m.robots || defaults.robots;
-    const canonical = site + (to.path === '/' ? '/' : to.path);
+    // Normalize: remove trailing slash except for root
+    const normalizedPath = to.path === '/' ? '/' : to.path.replace(/\/$/, '');
+    const canonical = site + normalizedPath;
     
     // Dynamic image selection
     const image = m.image || defaults.image;
