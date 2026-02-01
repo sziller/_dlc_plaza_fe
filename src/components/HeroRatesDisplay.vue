@@ -10,7 +10,7 @@
       class="font-bold text-white text-center"
       :class="compact ? 'text-xl mb-1' : 'text-2xl sm:text-3xl mb-2'"
     >
-      Current Rates
+      Market Rates
     </h3>
     <div
       class="text-white/70 text-center"
