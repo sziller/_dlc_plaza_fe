@@ -174,23 +174,69 @@
 
         <ul class="space-y-2 text-sm text-white/90">
           <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
-          <li><span class="font-semibold text-white">Amount:</span> {{ formatBtc(amountBtc) }}</li>
-          <li><span class="font-semibold text-white">Commission/Fees:</span> 0.50%</li>
+          <li><span class="font-semibold text-white">Amount:</span> {{ formatAmountDisplay(amountBtc, amountUsd) }}</li>
+          <li><span class="font-semibold text-white">Commission/Fees:</span> 1.00%</li>
           <li><span class="font-semibold text-white">Maturity Date:</span> {{ maturityDate }}</li>
-          <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ termRateStr }}</li>
-          <li><span class="font-semibold text-white">Annualized Yield:</span> {{ annualizedYield(termRateStr, termDays) }}</li>
+          <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ reviewTermRateStr }}</li>
+          <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYield(termDays) }}</li>
           <li><span class="font-semibold text-white">Role:</span> {{ actionType }}</li>
           <li><span class="font-semibold text-white">Collateral Contribution:</span> {{ collateralContribution }}</li>
         </ul>
 
+        <!-- Inline Rate Editor (shown when Edit Rate is clicked) -->
+        <div v-if="showInlineRateEditor" class="bg-white/5 border border-white/10 rounded-lg p-4 mt-4">
+          <div class="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              aria-label="Decrease rate"
+              @click="decrement"
+              @pointerdown.prevent="startHold(-1)"
+              @pointerup="stopHold"
+              @pointerleave="stopHold"
+              :disabled="minusDisabled"
+              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
+            >−</button>
+
+            <input
+              type="text"
+              inputmode="decimal"
+              pattern="[0-9]*[.]?[0-9]*"
+              v-model="rateInput"
+              @input="onRateInput"
+              @focus="onRateFocus"
+              @blur="onRateBlur"
+              class="w-32 text-center px-3 py-2 rounded bg-white/10 border border-white/20 focus:outline-none font-bold tabular-nums"
+              aria-label="Rate percentage"
+            />
+
+            <button
+              type="button"
+              aria-label="Increase rate"
+              @click="increment"
+              @pointerdown.prevent="startHold(1)"
+              @pointerup="stopHold"
+              @pointerleave="stopHold"
+              :disabled="plusDisabled"
+              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
+            >+</button>
+          </div>
+          <div class="text-center mt-3">
+            <button
+              type="button"
+              @click="showInlineRateEditor = false"
+              class="text-sm text-secondary hover:text-secondary/80 font-semibold"
+            >Done</button>
+          </div>
+        </div>
+
         <div class="flex justify-between items-center mt-6">
           <button
             type="button"
-            @click="step = 1"
+            @click="skipToReview ? (showInlineRateEditor = !showInlineRateEditor) : (step = 1)"
             :disabled="loading"
             class="text-white hover:text-secondary text-sm underline disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Back
+            {{ skipToReview ? 'Edit Rate' : 'Back' }}
           </button>
           <button
             v-if="!isSuccess"
@@ -236,20 +282,24 @@ const props = defineProps({
    * Passed from parent table: '1.00' | '0.10' | '0.01'
    */
   contractSize: { type: String, default: '0.10' },
+  skipToReview: { type: Boolean, default: false },
+  btcPrice: { type: Number, default: null },
+  requestedUsd: { type: Number, default: null },
 })
 const emit = defineEmits(['close', 'submit'])
 
 const { loading, notice, termDays, actionType, rate, ltv, contractSize } = toRefs(props)
 
-const orderType = ref('market')
-const step = ref(1)
+const orderType = ref(props.skipToReview ? 'limit' : 'market')
+const step = ref(props.skipToReview ? 2 : 1)
+const showInlineRateEditor = ref(false)
 const isBorrower = computed(() => (actionType.value || '').toLowerCase() === 'borrow')
 const isSuccess = computed(() => notice.value?.type === 'success')
 
 const RATE_DECIMALS = 4
 const ANNUAL_DECIMALS = 2
 const STEP = 0.1
-const FEE_PCT = 0.005
+const FEE_PCT = 0.01
 
 const titleId = `order-modal-title-${Math.random().toString(36).slice(2)}`
 const descId  = `order-modal-desc-${Math.random().toString(36).slice(2)}`
@@ -310,6 +360,7 @@ function toNum(rateStr) {
 }
 function roundRate(n) { return Number.isNaN(n) ? NaN : parseFloat(n.toFixed(RATE_DECIMALS)) }
 function fmt(n) { return Number.isNaN(n) ? '*' : `${n.toFixed(RATE_DECIMALS)}%` }
+function fmtReview(n) { return Number.isNaN(n) ? '*' : `${n.toFixed(2)}%` }
 function formatBtc(n) {
   const x = Number(n)
   return Number.isFinite(x) ? `${x.toFixed(8)} BTC` : '*'
@@ -331,7 +382,7 @@ const marketIsZeroish = computed(() => {
 })
 watch(marketIsZeroish, (zr) => { if (zr) orderType.value = 'limit' }, { immediate: true })
 
-const rateNum = ref(marketRateNum.value)
+const rateNum = ref(props.skipToReview ? toNum(props.rate) || marketRateNum.value : marketRateNum.value)
 const rateInput = ref('')
 const rateInputFocused = ref(false)
 
@@ -498,12 +549,43 @@ function annualizedYield(rateStr, days) {
   return `${annual.toFixed(ANNUAL_DECIMALS)}%`
 }
 
+const reviewTermRateStr = computed(() =>
+  orderType.value === 'market' ? fmtReview(marketRateNum.value) : fmtReview(rateNum.value)
+)
+function reviewAnnualizedYield(days) {
+  const r = orderType.value === 'market' ? marketRateNum.value : rateNum.value
+  if (Number.isNaN(r) || !Number.isFinite(days) || days <= 0) return '*'
+  if (isYearish(days)) return `${r.toFixed(2)}%`
+  const annual = r * (360 / days)
+  return `${annual.toFixed(2)}%`
+}
+
 /* ==== amount from contract size ==== */
 const amountBtc = computed(() => {
   const n = Number(contractSize.value)
   if (Number.isFinite(n) && n > 0) return n
   return 0.1
 })
+
+const amountUsd = computed(() => {
+  if (props.btcPrice && Number.isFinite(props.btcPrice)) {
+    return Number(amountBtc.value) * props.btcPrice
+  }
+  return null
+})
+
+function formatAmountDisplay(btc, usd) {
+  const btcStr = formatBtc(btc)
+  if (props.requestedUsd != null && Number.isFinite(props.requestedUsd)) {
+    const usdStr = props.requestedUsd.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+    return usdStr
+  }
+  if (usd != null && Number.isFinite(usd)) {
+    const usdStr = usd.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+    return usdStr
+  }
+  return btcStr
+}
 
 const ltvRatio = computed(() => {
   let v = Number(ltv.value)
@@ -570,7 +652,7 @@ function submitOrder () {
     amount: formatBtc(amountBtc.value),
     amountNumeric: Number(amountBtc.value),
     ltvUsed: ltvRatio.value,
-    feePct: '0.50%',
+    feePct: '1.00%',
     collateralContribution: collateralContribution.value,
     collateralContributionBtcNum: isBorrower.value ? borrowerBtc : lenderBtc,
     collateralContributionPct: Number.isFinite(isBorrower.value ? borrowerPct : lenderPct)

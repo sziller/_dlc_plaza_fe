@@ -27,25 +27,9 @@
             draggable="false"
             referrerpolicy="no-referrer"
           />
-          <div class="flex flex-col items-start space-y-1">
-            <div class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
-              Cadena Bitcoin
-            </div>
-            <div class="text-sm font-medium flex items-center gap-1">
-              <img
-                src="https://flagcdn.com/us.svg"
-                alt="US Flag"
-                class="w-4 h-4 inline-block"
-                width="16" height="12"
-                decoding="async"
-                loading="lazy"
-                draggable="false"
-                referrerpolicy="no-referrer"
-              />
-              <span class="text-white">BTCUSD:</span>
-              <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
-            </div>
-          </div>
+          <span class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
+            Cadena Bitcoin
+          </span>
         </router-link>
 
         <!-- Burger -->
@@ -65,28 +49,25 @@
 
         <!-- Desktop Nav -->
         <div class="hidden md:flex space-x-6 items-center">
-          <!-- Hide Home when logged in -->
           <router-link v-if="!isLoggedIn" :class="linkClass" to="/">Home</router-link>
+          <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
+          <router-link :class="linkClass" to="/cadena-paper">Cadena Paper</router-link>
+          <router-link :class="linkClass" to="/knowledge-hub">Knowledge Base</router-link>
 
-          <!-- BTCUSD (no dropdown) -->
-          <router-link :class="linkClass" to="/btcusd">BTCUSD</router-link>
-
-          <!-- Explore Cadena -->
+          <!-- Socials dropdown -->
           <div class="relative group">
             <button :class="['flex items-center space-x-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
-              <span>Explore Cadena</span>
+              <span>Socials</span>
               <svg class="w-4 h-4 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
               </svg>
             </button>
             <div
-              class="absolute top-full left-0 mt-2 w-64 bg-black text-white border border-secondary/40 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+              class="absolute top-full left-0 mt-2 w-48 bg-black text-white border border-secondary/40 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
               role="menu"
             >
-              <router-link to="/cadena-paper" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
-              <router-link to="/knowledge-hub" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Knowledge Hub</router-link>
-              <router-link to="/contact" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">About Us</router-link>
-              <router-link to="/signerapp" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Signer App</router-link>
+              <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">X (Twitter)</a>
+              <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">YouTube</a>
             </div>
           </div>
         </div>
@@ -279,7 +260,6 @@
         class="fixed inset-0 bg-black text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-lg pt-[var(--nav-h)]"
         @keyup.esc="closeMobileMenu"
       >
-        <!-- Hide Home when logged in -->
         <router-link
           v-if="!isLoggedIn"
           @click="closeMobileMenu"
@@ -287,31 +267,19 @@
           class="block text-lg font-semibold hover:text-secondary"
         >Home</router-link>
 
-        <!-- BTCUSD section (no extras) -->
-        <div>
-          <div class="text-white/50 uppercase text-xs mb-2">Markets</div>
-          <router-link
-            @click="closeMobileMenu"
-            to="/btcusd"
-            class="block pl-2 py-2 hover:text-secondary flex items-center gap-2"
-          >
-            <img src="https://flagcdn.com/us.svg" alt="US Flag" class="w-4 h-4" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
-            BTCUSD
-          </router-link>
-        </div>
+        <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
+        <router-link @click="closeMobileMenu" to="/cadena-paper" class="block text-lg font-semibold hover:text-secondary">Cadena Paper</router-link>
+        <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block text-lg font-semibold hover:text-secondary">Knowledge Base</router-link>
 
         <div>
-          <div class="text-white/50 uppercase text-xs mt-6 mb-2">Explore Cadena</div>
-          <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
-                    <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block pl-2 py-2 hover:text-secondary">Knowledge Hub</router-link>
-
-          <router-link @click="closeMobileMenu" to="/contact" class="block pl-2 py-2 hover:text-secondary">About Us</router-link>
-          <router-link @click="closeMobileMenu" to="/signerapp" class="block pl-2 py-2 hover:text-secondary">Signer App</router-link>
+          <div class="text-white/50 uppercase text-xs mt-4 mb-2">Socials</div>
+          <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">X (Twitter)</a>
+          <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">YouTube</a>
         </div>
 
         <router-link
-          @click="closeMobileMenu"
           v-if="!isLoggedIn"
+          @click="closeMobileMenu"
           to="/login"
           class="block text-lg font-semibold hover:text-secondary"
         >

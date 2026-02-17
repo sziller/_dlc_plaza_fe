@@ -4,8 +4,8 @@ import TheFooter from '../../components/TheFooter.vue'
 import HeroRatesDisplay from '../../components/HeroRatesDisplay.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
 import { useAuth } from '../../composables/useAuth'
+import { postContactEmail, isValidEmail } from '../../api/publicContact'
 import { blogArticles } from '../../data/exploreContent'
-import { downloadApp } from '../../api/downloadApp'
 
 /* ---------- Media ---------- */
 const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
@@ -21,10 +21,6 @@ function onHeroCtaClick() {
 }
 
 const showMailingList = ref(false)
-const apkFilename = ref('CadenaBitcoinLive(v102).apk')
-const apkVersion = ref('v102')
-const apkLoading = ref(false)
-
 const footerEmail = ref('')
 const footerSubscribeLoading = ref(false)
 const footerSubscribeError = ref('')
@@ -91,6 +87,16 @@ function toggle(i) {
   s.has(i) ? s.delete(i) : s.add(i)
   openSet.value = s
 }
+
+/* ---------- Partners ---------- */
+const partners = [
+  { name: '21Rates', href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp', alt: '21Rates' },
+  { name: 'Adopting Bitcoin', href: 'https://sv25.adoptingbitcoin.org/', imgSrc: '/img/adopting-640.webp', alt: 'Adopting Bitcoin' },
+  { name: 'Surfdojo', href: 'https://surfdojo.org/', imgSrc: '/img/surfdojo-640.webp', alt: 'Surfdojo' },
+  { name: 'Bitcoin Treasuries', href: 'https://bitcointreasuries.net/directory#C', imgSrc: '/img/treasuries-640.webp', alt: 'Bitcoin Treasuries' },
+  { name: 'Spark Services', href: 'https://getsparkservices.com/', imgSrc: '/img/partners/spark-logo.png', alt: 'Spark Services' },
+  { name: 'Asobitcoin', href: 'https://www.asobitcoin.org/', imgSrc: '/img/partners/asobitcoin-logo.webp', alt: 'Asobitcoin' },
+]
 function onEnter(el) {
   el.style.height = '0px'
   el.style.opacity = '0'
@@ -193,18 +199,6 @@ function handleLayoutChange() {
   clampDebounced()
 }
 
-async function onDownloadApkClick() {
-  if (apkLoading.value) return
-  apkLoading.value = true
-  try {
-    await downloadApp({ filename: apkFilename.value })
-  } catch (e) {
-    console.error('APK download failed', e)
-  } finally {
-    apkLoading.value = false
-  }
-}
-
 async function handleFooterSubscribe() {
   footerSubscribeError.value = ''
   footerSubscribeSuccess.value = ''
@@ -275,7 +269,7 @@ onBeforeUnmount(() => {
 
     <!-- Hero Section -->
     <section class="hero-shell bg-transparent text-white">
-      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4">
 
         <!-- Desktop: side-by-side | Mobile: stacked -->
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-12">
@@ -283,11 +277,30 @@ onBeforeUnmount(() => {
           <!-- Left Column: Copy + Desktop Buttons -->
           <div class="flex-1 text-center lg:text-left">
             <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
-              Decentralized Bitcoin Lending is Here
+              Bitcoin Native Lending
             </h1>
-            <p class="mt-4 sm:mt-6 text-lg sm:text-xl text-white/80 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Securely borrow or lend your Bitcoin to unlock liquidity globally.
-            </p>
+            <ul class="mt-4 sm:mt-6 space-y-2 text-lg sm:text-xl text-white/80 max-w-xl mx-auto lg:mx-0">
+              <li class="flex items-center gap-3">
+                <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                Borrow for increased Bitcoin exposure
+              </li>
+              <li class="flex items-center gap-3">
+                <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                Lend for guaranteed fiat returns
+              </li>
+              <li class="flex items-center gap-3">
+                <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                No KYC
+              </li>
+              <li class="flex items-center gap-3">
+                <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                No liquidations or margin calls
+              </li>
+              <li class="flex items-center gap-3">
+                <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                Globally accessible
+              </li>
+            </ul>
 
             <!-- Desktop Buttons (hidden on mobile) -->
             <div class="hidden lg:flex gap-4 mt-8">
@@ -296,14 +309,14 @@ onBeforeUnmount(() => {
                 class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
                 @click="onHeroCtaClick"
               >
-                Borrow Now
+                Borrow Bitcoin Exposure
               </router-link>
               <router-link
                 :to="heroCtaTo"
                 class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
                 @click="onHeroCtaClick"
               >
-                Lend Now
+                Lend for Fix Returns
               </router-link>
             </div>
           </div>
@@ -324,166 +337,81 @@ onBeforeUnmount(() => {
             class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
             @click="onHeroCtaClick"
           >
-            Borrow Now
+            Borrow Bitcoin Exposure
           </router-link>
           <router-link
             :to="heroCtaTo"
             class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
             @click="onHeroCtaClick"
           >
-            Lend Now
+            Lend for Fixed Fiat Returns
           </router-link>
         </div>
 
       </div>
     </section>
 
-    <!-- 21Rates Graphic -->
-    <section class="partners-section w-full bg-transparent text-white pt-16 sm:pt-20 pb-4 px-4 sm:px-[var(--g)] lg:px-[var(--g)]">
-      <div class="max-w-screen-xl mx-auto text-center mb-6 px-2 sm:px-6">
+    <!-- Newsletter -->
+    <section class="bg-transparent">
+      <div class="max-w-screen-xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div class="max-w-lg mx-auto text-center">
+          <h3 class="text-xl font-bold text-white mb-4">Stay Updated</h3>
+          <form class="flex flex-col sm:flex-row gap-3 sm:justify-center" @submit.prevent="handleFooterSubscribe">
+            <input
+              v-model.trim="footerEmail"
+              type="email"
+              inputmode="email"
+              placeholder="Enter your email"
+              required
+              class="flex-1 max-w-md rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition"
+              :disabled="footerSubscribeLoading"
+            />
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center rounded-full bg-secondary px-6 py-3 text-base font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none disabled:opacity-50 min-w-[140px]"
+              :disabled="footerSubscribeLoading"
+            >
+              <span v-if="footerSubscribeLoading">Subscribing…</span>
+              <span v-else>Subscribe</span>
+            </button>
+          </form>
+          <div v-if="footerSubscribeError" class="mt-2 text-sm text-red-300" aria-live="polite">
+            {{ footerSubscribeError }}
+          </div>
+          <div v-else-if="footerSubscribeSuccess" class="mt-2 text-sm text-green-300" aria-live="polite">
+            {{ footerSubscribeSuccess }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Partners Marquee -->
+    <section class="w-full bg-transparent text-white pt-2 sm:pt-4 pb-4 px-4">
+      <div class="max-w-screen-xl mx-auto text-center mb-3 px-2 sm:px-6">
         <h2 class="text-3xl md:text-4xl font-extrabold">Partners</h2>
       </div>
-      <div class="partner-grid max-w-screen-xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-10 sm:gap-y-12 items-center px-2 sm:px-6">
-        <a
-          href="https://21rates.com/companies/1067/cadena-bitcoin"
-          target="_blank"
-          rel="noopener"
-          class="block press-logo"
-          aria-label="View Cadena Bitcoin on 21Rates"
-        >
-          <picture class="press-figure press-figure--medium">
-            <source
-              type="image/avif"
-              srcset="
-                /img/21rates-640.avif 640w,
-                /img/21rates-960.avif 960w
-              "
-              sizes="(max-width: 640px) 70vw, 320px"
-            />
-            <source
-              type="image/webp"
-              srcset="
-                /img/21rates-640.webp 640w,
-                /img/21rates-960.webp 960w
-              "
-              sizes="(max-width: 640px) 70vw, 480px"
-            />
-            <img
-              src="/img/21rates-640.webp"
-              alt="21Rates"
-              class="w-auto h-full object-contain"
-              loading="lazy"
-              decoding="async"
-              width="402"
-              height="82"
-            />
-          </picture>
-        </a>
-        <a
-          href="https://sv25.adoptingbitcoin.org/"
-          target="_blank"
-          rel="noopener"
-          class="block press-logo"
-          aria-label="View Cadena Bitcoin on Adopting Bitcoin"
-        >
-          <picture class="press-figure press-figure--tall">
-            <source
-              type="image/avif"
-              srcset="
-                /img/adopting-640.avif 640w,
-                /img/adopting-960.avif 960w
-              "
-              sizes="(max-width: 640px) 70vw, 320px"
-            />
-            <source
-              type="image/webp"
-              srcset="
-                /img/adopting-640.webp 640w,
-                /img/adopting-960.webp 960w
-              "
-              sizes="(max-width: 640px) 70vw, 320px"
-            />
-            <img
-              src="/img/adopting-640.webp"
-              alt="Adopting Bitcoin"
-              class="w-auto h-full object-contain"
-              loading="lazy"
-              decoding="async"
-              width="1048"
-              height="330"
-            />
-          </picture>
-        </a>
-        <a
-          href="https://surfdojo.org/"
-          target="_blank"
-          rel="noopener"
-          class="block press-logo"
-          aria-label="Visit Surfdojo"
-        >
-          <picture class="press-figure press-figure--medium">
-            <source
-              type="image/avif"
-              srcset="
-                /img/surfdojo-640.avif 640w,
-                /img/surfdojo-960.avif 960w
-              "
-              sizes="(max-width: 640px) 70vw, 320px"
-            />
-            <source
-              type="image/webp"
-              srcset="
-                /img/surfdojo-640.webp 640w,
-                /img/surfdojo-960.webp 960w
-              "
-              sizes="(max-width: 640px) 70vw, 320px"
-            />
-            <img
-              src="/img/surfdojo-640.webp"
-              alt="Surfdojo"
-              class="w-auto h-full object-contain"
-              loading="lazy"
-              decoding="async"
-              width="558"
-              height="149"
-            />
-          </picture>
-        </a>
-        <a
-          href="https://bitcointreasuries.net/directory#C"
-          target="_blank"
-          rel="noopener"
-          class="block press-logo"
-          aria-label="View Cadena Bitcoin on Bitcoin Treasuries"
-        >
-          <picture class="press-figure press-figure--short">
-            <source
-              type="image/avif"
-              srcset="
-                /img/treasuries-640.avif 640w,
-                /img/treasuries-960.avif 960w
-              "
-              sizes="(max-width: 640px) 70vw, 320px"
-            />
-            <source
-              type="image/webp"
-              srcset="
-                /img/treasuries-640.webp 640w,
-                /img/treasuries-960.webp 960w
-              "
-              sizes="(max-width: 640px) 70vw, 320px"
-            />
-            <img
-              src="/img/treasuries-640.webp"
-              alt="Bitcoin Treasuries"
-              class="w-auto h-full object-contain"
-              loading="lazy"
-              decoding="async"
-              width="509"
-              height="53"
-            />
-          </picture>
-        </a>
+      <div class="marquee-container max-w-screen-xl mx-auto overflow-hidden">
+        <div class="marquee-track flex items-center gap-12 sm:gap-16">
+          <template v-for="copy in 2" :key="copy">
+            <a
+              v-for="p in partners"
+              :key="`${copy}-${p.name}`"
+              :href="p.href"
+              target="_blank"
+              rel="noopener"
+              class="flex-shrink-0 marquee-logo"
+              :aria-label="p.name"
+            >
+              <img
+                :src="p.imgSrc"
+                :alt="p.alt"
+                class="h-12 sm:h-16 w-auto object-contain grayscale brightness-110 opacity-80 hover:grayscale-0 hover:brightness-100 hover:opacity-100 transition-all duration-200"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </template>
+        </div>
       </div>
     </section>
 
@@ -519,7 +447,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- Featured Articles -->
-    <section class="bg-transparent text-white px-4 pt-20 pb-8 sm:px-[var(--g)] lg:px-[var(--g)] animated-section" :class="sectionInView[0] ? 'animate-in-right' : ''">
+    <section class="bg-transparent text-white px-4 pt-12 pb-8 sm:px-[var(--g)] lg:px-[var(--g)] animated-section" :class="sectionInView[0] ? 'animate-in-right' : ''">
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-extrabold">Featured Articles</h2>
@@ -640,73 +568,6 @@ onBeforeUnmount(() => {
         </div>
       </section>
 
-      <!-- Footer Band: App Download & Newsletter -->
-      <section class="bg-secondary/20 border-y border-white/10">
-        <div class="max-w-screen-xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <div class="grid md:grid-cols-2 gap-8 items-center">
-            <!-- App Download -->
-            <div class="text-center md:text-left">
-              <h3 class="text-xl font-bold text-white mb-4">Get the App</h3>
-              <div class="flex items-center justify-center md:justify-start gap-3 sm:gap-4">
-                <a
-                  href="https://apps.apple.com/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211"
-                  target="_blank" rel="noopener" aria-label="Download on the App Store"
-                  class="inline-block" style="line-height:0"
-                >
-                  <img
-                    src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
-                    alt="Download on the App Store"
-                    width="240" height="80"
-                    class="app-store-badge store-badge"
-                    decoding="async" loading="lazy"
-                  />
-                </a>
-
-                <button
-                  type="button"
-                  class="apk-badge store-badge"
-                  :aria-label="`Download Android APK ${apkVersion || 'Latest'}`"
-                  @click="onDownloadApkClick"
-                  :disabled="apkLoading"
-                >
-                  <span class="apk-version">{{ apkVersion || 'Latest' }}</span>
-                  {{ apkLoading ? 'Downloading…' : 'Download APK' }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Newsletter Signup -->
-            <div class="text-center md:text-right">
-              <h3 class="text-xl font-bold text-white mb-4">Stay Updated</h3>
-              <form class="flex flex-col sm:flex-row gap-3 sm:justify-end" @submit.prevent="handleFooterSubscribe">
-                <input
-                  v-model.trim="footerEmail"
-                  type="email"
-                  inputmode="email"
-                  placeholder="Enter your email"
-                  required
-                  class="flex-1 max-w-md rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition"
-                  :disabled="footerSubscribeLoading"
-                />
-                <button
-                  type="submit"
-                  class="inline-flex items-center justify-center rounded-full bg-secondary px-6 py-3 text-base font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none disabled:opacity-50 min-w-[140px]"
-                  :disabled="footerSubscribeLoading"
-                >
-                  <span v-if="footerSubscribeLoading">Subscribing…</span>
-                  <span v-else>Subscribe</span>
-                </button>
-              </form>
-              <div v-if="footerSubscribeError" class="mt-2 text-sm text-red-300" aria-live="polite">
-                {{ footerSubscribeError }}
-              </div>
-              <div v-else-if="footerSubscribeSuccess" class="mt-2 text-sm text-green-300" aria-live="polite">
-                {{ footerSubscribeSuccess }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
 
   <TheFooter />
@@ -726,13 +587,13 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 80vh;
-  padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px) + clamp(1rem, 5vw, 3.75rem));
-  padding-bottom: clamp(2.5rem, 6vw, 4.25rem);
+  min-height: 60vh;
+  padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px) + clamp(0.25rem, 1vw, 0.75rem));
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 @media (min-width: 1024px) {
   .hero-shell {
-    padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px) + clamp(2rem, 4vw, 4.5rem));
+    padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px) + clamp(0.25rem, 1vw, 1rem));
   }
 }
 
@@ -824,38 +685,26 @@ onBeforeUnmount(() => {
 
 @media (max-width: 1023px) {
   .hero-shell {
-    padding-bottom: clamp(4rem, 12vw, 6.5rem);
+    padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
   }
 }
 
-.partners-section {
-  margin-top: 0;
+.marquee-container {
+  mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
 }
-.partner-grid {
-  width: 100%;
+.marquee-track {
+  animation: marquee-scroll 30s linear infinite;
+  width: max-content;
 }
-
-.press-logo {
-  text-align: center;
+.marquee-track:hover {
+  animation-play-state: paused;
 }
-.press-figure {
-  --logo-h: clamp(50px, 14vw, 96px);
-  height: var(--logo-h);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  margin: 0 auto;
-  filter: grayscale(1) brightness(1.1);
-  opacity: 0.78;
-  transition: filter 180ms ease, opacity 180ms ease;
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-.press-figure--medium { --logo-h: clamp(62px, 18vw, 130px); }
-.press-figure--tall { --logo-h: clamp(100px, 26vw, 220px); }
-.press-figure--short { --logo-h: clamp(42px, 10vw, 74px); }
-.press-logo:hover .press-figure,
-.press-logo:focus-visible .press-figure {
-  filter: grayscale(0) brightness(1);
-  opacity: 1;
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation-play-state: paused; }
 }
 
 .article-track {

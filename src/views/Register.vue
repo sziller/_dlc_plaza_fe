@@ -241,18 +241,6 @@
           </span>
         </li>
 
-        <li class="flex items-center gap-3">
-          <div
-            class="flex items-center justify-center size-10 rounded-full border-2 transition-all duration-300"
-            :class="{
-              'bg-secondary text-white border-secondary': step === 3,
-              'bg-gray-200 text-gray-400 border-gray-300': step < 3
-            }"
-          >
-            <span>3</span>
-          </div>
-          <span class="hidden sm:inline" :class="step === 3 ? 'text-white' : 'text-gray-400'">Scan QR</span>
-        </li>
       </ol>
     </div>
   </section>
