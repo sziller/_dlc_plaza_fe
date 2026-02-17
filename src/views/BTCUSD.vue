@@ -5,9 +5,8 @@
 
     <!-- Content Section -->
     <section class="flex-1 px-4 py-4">
-      <div class="w-full max-w-screen-xl mx-auto space-y-12 pb-10">
+      <div class="w-full max-w-screen-xl mx-auto pb-10">
         <MarketOverviewTable />
-        <UsersDLCS v-if="isLoggedIn" />
       </div>
     </section>
   </main>
@@ -18,11 +17,10 @@
 <script setup>
 import { onMounted } from 'vue'
 import MarketOverviewTable from '../components/MarketOverviewTable.vue'
-import UsersDLCS from '../components/UsersDLCS.vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 
-const { isLoggedIn, setUserFromApi } = useAuth()
+const { setUserFromApi } = useAuth()
 
 onMounted(() => {
   setUserFromApi()

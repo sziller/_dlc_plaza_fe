@@ -35,8 +35,12 @@
         </div>
         <div class="flex items-baseline justify-center gap-0.5">
           <span
-            class="font-bold text-secondary"
-            :class="compact ? 'text-2xl' : 'text-3xl sm:text-4xl'"
+            class="font-bold transition-colors duration-500"
+            style="font-variant-numeric: tabular-nums"
+            :class="[
+              compact ? 'text-2xl' : 'text-3xl sm:text-4xl',
+              borrowFlash === 'green' ? 'text-green-400' : borrowFlash === 'red' ? 'text-red-400' : 'text-secondary'
+            ]"
           >
             {{ animatedBorrowRate }}
           </span>
@@ -61,8 +65,12 @@
         </div>
         <div class="flex items-baseline justify-center gap-0.5">
           <span
-            class="font-bold text-secondary"
-            :class="compact ? 'text-2xl' : 'text-3xl sm:text-4xl'"
+            class="font-bold transition-colors duration-500"
+            style="font-variant-numeric: tabular-nums"
+            :class="[
+              compact ? 'text-2xl' : 'text-3xl sm:text-4xl',
+              lendFlash === 'green' ? 'text-green-400' : lendFlash === 'red' ? 'text-red-400' : 'text-secondary'
+            ]"
           >
             {{ animatedLendRate }}
           </span>
@@ -84,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   compact: { type: Boolean, default: false }
@@ -93,19 +101,57 @@ const props = defineProps({
 const mounted = ref(false)
 const loading = ref(true)
 const apiError = ref(false)
+
+const borrowRate = ref(10.9)
+const lendRate = ref(11.0)
 const animatedBorrowRate = ref('*.*')
 const animatedLendRate = ref('*.*')
+const borrowFlash = ref('')
+const lendFlash = ref('')
+
+let tickInterval = null
+let borrowFlashTimer = null
+let lendFlashTimer = null
+
+const deltas = [-0.2, -0.1, 0, 0.1, 0.2]
+
+function tickRates() {
+  const bDelta = deltas[Math.floor(Math.random() * deltas.length)]
+  const lDelta = deltas[Math.floor(Math.random() * deltas.length)]
+
+  if (bDelta !== 0) {
+    borrowRate.value = Math.round(Math.min(12.5, Math.max(9.5, borrowRate.value + bDelta)) * 10) / 10
+    animatedBorrowRate.value = borrowRate.value.toFixed(1)
+    borrowFlash.value = bDelta > 0 ? 'green' : 'red'
+    clearTimeout(borrowFlashTimer)
+    borrowFlashTimer = setTimeout(() => { borrowFlash.value = '' }, 600)
+  }
+
+  if (lDelta !== 0) {
+    lendRate.value = Math.round(Math.min(13.0, Math.max(10.0, lendRate.value + lDelta)) * 10) / 10
+    animatedLendRate.value = lendRate.value.toFixed(1)
+    lendFlash.value = lDelta > 0 ? 'green' : 'red'
+    clearTimeout(lendFlashTimer)
+    lendFlashTimer = setTimeout(() => { lendFlash.value = '' }, 600)
+  }
+}
 
 async function loadRates() {
   loading.value = false
-  // Hardcoded rates for 1 Year term
-  animatedBorrowRate.value = '10.9'
-  animatedLendRate.value = '11.0'
+  animatedBorrowRate.value = borrowRate.value.toFixed(1)
+  animatedLendRate.value = lendRate.value.toFixed(1)
   apiError.value = false
 }
 
 onMounted(async () => {
   mounted.value = true
   await loadRates()
+  tickInterval = setInterval(tickRates, 3000)
+})
+
+onBeforeUnmount(() => {
+  clearInterval(tickInterval)
+  clearTimeout(borrowFlashTimer)
+  clearTimeout(lendFlashTimer)
 })
 </script>

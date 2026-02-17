@@ -3,12 +3,12 @@
   <section class="w-full h-full" :class="{ compact }">
     <div class="w-full h-full mx-auto">
       <div
-        class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col"
+        class="rounded-xl border border-white/10 shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col"
         :style="{ '--secondary': currentAccent }"
       >
         <!-- Header: title only -->
         <div class="mb-6 shrink-0">
-          <div class="text-3xl font-extrabold text-center title-text">
+          <div class="text-3xl lg:text-4xl font-extrabold text-center title-text">
             {{ title }}
           </div>
         </div>
@@ -24,210 +24,68 @@
           </p>
         </div>
         <div v-else class="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
-          <!-- ✅ Desktop/Tablet -->
-          <div class="hidden sm:block overflow-x-hidden">
-            <table class="w-full table-fixed border-separate border-spacing-y-4 border-spacing-x-2">
-              <thead>
-                <tr>
-                  <!-- LEFT CONTROL CELL (over Term) -->
-                  <th class="px-2 py-4 text-left align-middle">
-                    <div class="relative inline-block">
-                      <button
-                        type="button"
-                        class="custom-dd-trigger custom-dd-trigger--lg"
-                        @click="toggleDropdown"
-                      >
-                        <span>{{ displayContractLabel }}</span>
-                        <svg class="w-6 h-6 shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                          <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                      </button>
+          <!-- Simplified CTA layout -->
+          <div class="flex flex-col items-center gap-8 py-8 sm:py-12">
+            <!-- USD Amount Input + Slider -->
+            <div class="w-full max-w-md bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8">
+              <label class="block text-white/70 text-sm font-semibold uppercase tracking-wide mb-4 text-center">Choose your amount</label>
 
-                      <!-- Dropdown + explanatory box wrapper (desktop only) -->
-                      <div v-if="dropdownOpen" class="custom-dd-wrap sm:flex hidden">
-                        <div class="custom-dd-menu custom-dd-menu--th">
-                          <button
-                            v-for="opt in contractOptions"
-                            :key="opt.value"
-                            type="button"
-                            class="custom-dd-item"
-                            :class="opt.value === selectedContract ? 'active' : ''"
-                            @click="selectContract(opt.value)"
-                          >
-                            {{ opt.label }}
-                          </button>
-                        </div>
+              <!-- Large USD input -->
+              <div class="flex items-center justify-center gap-1">
+                <span class="text-4xl sm:text-5xl font-bold text-white/50">$</span>
+                <input
+                  type="text"
+                  inputmode="numeric"
+                  :value="usdInputFocused ? usdInputRaw : usdInputRaw"
+                  @input="onUsdInput"
+                  @focus="onUsdFocus"
+                  @blur="onUsdBlur"
+                  class="text-4xl sm:text-5xl font-bold bg-transparent border-none outline-none text-white text-center w-full max-w-[280px] tabular-nums"
+                  aria-label="USD amount"
+                />
+              </div>
 
-                        <!-- Info box -->
-                        <aside class="custom-dd-infobox" role="note" aria-live="polite">
-                          <div class="infobox-title">What you’re changing</div>
-                          <p class="infobox-text">
-                            <strong>Contract size</strong> is the notional BTC for each deal. It
-                            filters quotes to this size and is baked into the product ID you’ll trade.
-                          </p>
-                          <ul class="infobox-list">
-                            <li>We’ll show the best Lend/Borrow quotes that match this size.</li>
-                            <li>You can switch sizes anytime; the table will refresh.</li>
-                          </ul>
-                        </aside>
-                      </div>
-                    </div>
-                  </th>
+              <!-- BTC equivalent -->
+              <div class="text-center text-white/60 text-sm mt-2 tabular-nums">
+                ≈ {{ btcEquivalentDisplay }}
+              </div>
 
-                  <!-- Group header -->
-                  <th
-                    colspan="2"
-                    class="group-header rounded-md text-white text-center px-4 py-4 align-middle font-bold text-lg whitespace-nowrap"
-                  >
-                    <span class="gh-label">{{ leftGroupLabel }}</span>
-                  </th>
-                </tr>
-
-                <tr class="text-white text-md">
-                  <th class="px-4 py-4 text-left">Term</th>
-                  <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">Lend</div>
-                  </th>
-                  <th class="px-4 py-4">
-                    <div class="chip w-full text-center min-w-[6rem]">Borrow</div>
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody class="text-white/90 text-lg">
-                <tr
-                  v-for="(term, index) in terms"
-                  :key="term.label"
-                  class="transition duration-200"
-                >
-                  <td class="px-4 py-4 text-left font-semibold">
-                    {{ term.label }}
-                  </td>
-
-                  <!-- Left group cells (50% LTV) -->
-                  <td
-                    v-for="(key) in leftKeys"
-                    :key="key"
-                    @click="handleCellClick(term, key)"
-                    class="px-4 py-4 text-center bg-white/10 rounded-md transition-transform transform hover:scale-105 cursor-pointer minw hover-glow"
-                  >
-                    <div>
-                      <span
-                        :class="[
-                          flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''
-                        ]"
-                        class="text-3xl font-bold leading-tight rate"
-                      >
-                        {{ getEar(term, key) }}
-                      </span>
-
-                      <template v-if="term.label !== '365 Days'">
-                        <div class="text-[10px] text-white/70 -mt-1">
-                          Annualized yield
-                        </div>
-                        <div class="text-xs text-white/90 mt-1">
-                          {{ term[key] }} for {{ term.label }}
-                        </div>
-                      </template>
-                    </div>
-                  </td>
-
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- 📱 Mobile -->
-          <div class="sm:hidden space-y-4">
-            <!-- mobile control row (global) -->
-            <div class="flex items-center justify-between">
-              <div class="text-white/70 text-xs uppercase tracking-wide">Contract size</div>
-              <div class="relative inline-block">
-                <button
-                  type="button"
-                  class="custom-dd-trigger"
-                  @click="toggleDropdown"
-                >
-                  <span>{{ displayContractLabel }}</span>
-                  <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                    <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </button>
-
-                <div v-if="dropdownOpen" class="custom-dd-menu custom-dd-menu--th">
-                  <button
-                    v-for="opt in contractOptions"
-                    :key="`m-${opt.value}`"
-                    type="button"
-                    class="custom-dd-item"
-                    :class="opt.value === selectedContract ? 'active' : ''"
-                    @click="selectContract(opt.value)"
-                  >
-                    {{ opt.label }}
-                  </button>
+              <!-- Range slider -->
+              <div class="mt-6">
+                <input
+                  type="range"
+                  :min="AMOUNT_MIN"
+                  :max="AMOUNT_MAX"
+                  :step="AMOUNT_STEP"
+                  :value="usdAmount"
+                  @input="onSliderInput"
+                  class="amount-slider w-full"
+                  :style="{ '--fill': sliderFillPct + '%' }"
+                  aria-label="Amount slider"
+                />
+                <div class="flex justify-between text-xs text-white/50 mt-1 tabular-nums">
+                  <span>$1,000</span>
+                  <span>$100,000</span>
                 </div>
-
-                <!-- Mobile info box under the button -->
-                <aside v-if="dropdownOpen" class="custom-dd-infobox-mobile mt-2" role="note" aria-live="polite">
-                  <div class="infobox-title">What you’re changing</div>
-                  <p class="infobox-text">
-                    <strong>Contract size</strong> sets the BTC notional for each deal and filters the quotes shown below.
-                  </p>
-                  <ul class="infobox-list">
-                    <li>Size changes BTC amounts, not the % rate.</li>
-                    <li>Table refreshes to this size.</li>
-                  </ul>
-                </aside>
               </div>
             </div>
 
-            <div
-              v-for="(term, index) in terms"
-              :key="`m-${term.label}`"
-              class="rounded-lg bg-white/5 p-3"
-            >
-              <div class="text-base font-semibold text-white mb-2">
-                {{ term.label }}
-              </div>
-
-              <!-- 50% LTV -->
-              <div class="rounded-md bg-white/5 p-0 mb-3">
-                <div class="text-[10px] tracking-wide uppercase text-white/70 mb-2 font-semibold">
-                  {{ leftGroupLabel }}
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <button
-                    v-for="key in leftKeys"
-                    :key="`m-${term.label}-${key}`"
-                    type="button"
-                    @click="handleCellClick(term, key)"
-                    class="px-3 py-3 text-center bg-white/10 rounded-md transition-transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer minw hover-glow"
-                  >
-                    <div class="space-y-1">
-                      <div class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                        {{ key.includes('a') ? 'Lend' : 'Borrow' }}
-                      </div>
-                      <span
-                        :class="[
-                          flashActive.has(`${index}-${key}`) ? 'text-secondary flash-text' : ''
-                        ]"
-                        class="text-2xl font-bold leading-tight rate"
-                      >
-                        {{ getEar(term, key) }}
-                      </span>
-                      <template v-if="term.label !== '365 Days'">
-                        <div class="text-[10px] text-white/70 -mt-0.5">
-                          Annualized yield
-                        </div>
-                        <div class="text-[11px] text-white/90 mt-0.5">
-                          {{ term[key] }} for {{ term.label }}
-                        </div>
-                      </template>
-                    </div>
-                  </button>
-                </div>
-              </div>
-
+            <!-- CTA buttons -->
+            <div class="w-full max-w-md flex flex-col sm:flex-row gap-4">
+              <button
+                type="button"
+                @click="handleSimpleBorrow"
+                class="flex-1 bg-secondary hover:bg-secondary/90 text-white px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
+              >
+                Borrow Bitcoin Exposure
+              </button>
+              <button
+                type="button"
+                @click="handleSimpleLend"
+                class="flex-1 border-2 border-secondary text-white hover:bg-secondary/10 px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
+              >
+                Lend for Fixed Fiat Returns
+              </button>
             </div>
           </div>
 
@@ -241,6 +99,9 @@
             :notice="modalNotice"
             :ltv="selectedLtv"
             :contract-size="selectedContract"
+            :skip-to-review="true"
+            :btc-price="btcPriceUsd"
+            :requested-usd="usdAmount"
             @close="showModal = false"
             @submit="handleOrderSubmit"
           />
@@ -260,6 +121,7 @@ import { acceptOffer } from '../api/acceptOffer'
 import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { getServerStatus } from '../api/serverStatus'
+import { getPrice } from '../api/price'
 
 const router = useRouter()
 
@@ -270,16 +132,19 @@ const IS_STAGING = (() => {
   return !IS_PROD
 })()
 
-// -------- Accent colors per known sizes ----------
-const CONTRACT_ACCENTS = {
-  '0.01':  '#6738e4',
-  '0.10':  '#8387c4',
-  '1.00':  '#000000',
-}
+// -------- USD Amount Input + Slider ----------
+const AMOUNT_MIN = 1000
+const AMOUNT_MAX = 100000
+const AMOUNT_STEP = 1000
+const AMOUNT_DEFAULT = 5000
+
+const usdAmount = ref(AMOUNT_DEFAULT)
+const usdInputRaw = ref('5,000')
+const usdInputFocused = ref(false)
 
 // -------- Props ----------
 const props = defineProps({
-  title: { type: String, default: 'BTCUSD Market Overview' },
+  title: { type: String, default: 'Bitcoin Native Loans' },
   leftGroupLabel: { type: String, default: '50% LTV' },
   leftKeys: { type: Array, default: () => ['ltv50a', 'ltv50b'] },
   offersPollMs: { type: Number, default: 5000 },
@@ -331,6 +196,24 @@ async function checkServerStatus() {
   }
 }
 
+// -------- Simplified flow constants ----------
+const SIMPLE_BORROW_RATE = 12.0
+const SIMPLE_LEND_RATE = 8.0
+const SIMPLE_TERM_DAYS = 365
+
+// -------- BTC price polling ----------
+const btcPriceUsd = ref(null)
+let btcPriceIntervalId = null
+
+async function fetchBtcPrice() {
+  try {
+    const price = await getPrice()
+    if (Number.isFinite(price) && price > 0) btcPriceUsd.value = price
+  } catch (e) {
+    console.debug('BTC price fetch failed:', e)
+  }
+}
+
 // -------- Modal state ----------
 const showModal = ref(false)
 const selectedRate = ref('')
@@ -349,6 +232,28 @@ function handleCellClick(row, key) {
   selectedLtv.value = 50
   const idKey = `${key}Id`
   selectedOfferId.value = row[idKey] || null
+  showModal.value = true
+}
+
+function handleSimpleBorrow() {
+  modalNotice.value = { type: '', text: '' }
+  selectedContract.value = nearestContractSize.value
+  selectedRate.value = `${SIMPLE_BORROW_RATE.toFixed(4)}%`
+  selectedAction.value = 'Borrow'
+  selectedTermDays.value = SIMPLE_TERM_DAYS
+  selectedLtv.value = 50
+  selectedOfferId.value = null
+  showModal.value = true
+}
+
+function handleSimpleLend() {
+  modalNotice.value = { type: '', text: '' }
+  selectedContract.value = nearestContractSize.value
+  selectedRate.value = `${SIMPLE_LEND_RATE.toFixed(4)}%`
+  selectedAction.value = 'Lend'
+  selectedTermDays.value = SIMPLE_TERM_DAYS
+  selectedLtv.value = 50
+  selectedOfferId.value = null
   showModal.value = true
 }
 
@@ -554,22 +459,10 @@ function diffAndFlash(oldRows, newRows) {
   }
 }
 
-// -------- Persist selected contract size ----------
-const STORAGE_KEY = 'mo:selectedContract'
-function loadPreferredContract() {
-  try {
-    const v = localStorage.getItem(STORAGE_KEY)
-    return v && typeof v === 'string' ? v : null
-  } catch { return null }
-}
-function savePreferredContract(v) {
-  try { localStorage.setItem(STORAGE_KEY, String(v)) } catch {}
-}
 
 // -------- Product catalog → dynamic contract sizes ----------
 const products = ref([])
-const selectedContract = ref(loadPreferredContract() || '0.10')
-const dropdownOpen = ref(false)
+const selectedContract = ref('0.10')
 
 function satsToBtcLabel(sats) {
   const n = Number(sats)
@@ -590,32 +483,76 @@ const availableContracts = computed(() => {
   return Array.from(set).sort((a, b) => Number(a) - Number(b))
 })
 
-const contractOptions = computed(() => {
-  const arr = availableContracts.value
-  if (arr.length) {
-    return arr.map(v => ({ value: v, label: `${v} BTC` }))
-  }
-  const fallback = IS_STAGING ? ['0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
-  return fallback.map(v => ({ value: v, label: `${v} BTC` }))
+const currentAccent = computed(() => props.accentColor || '#6738e4')
+
+// -------- USD Amount computed helpers ----------
+const btcEquivalent = computed(() => {
+  if (!btcPriceUsd.value || btcPriceUsd.value <= 0) return 0
+  return usdAmount.value / btcPriceUsd.value
 })
 
-const displayContractLabel = computed(() =>
-  (contractOptions.value.find(o => o.value === selectedContract.value)?.label) ||
-  (contractOptions.value[0]?.label ?? '0.10 BTC')
-)
+const nearestContractSize = computed(() => {
+  const contracts = availableContracts.value.length
+    ? availableContracts.value
+    : ['0.01', '0.10', '1.00']
+  const target = btcEquivalent.value
+  let closest = contracts[0]
+  let minDiff = Infinity
+  for (const c of contracts) {
+    const diff = Math.abs(Number(c) - target)
+    if (diff < minDiff) {
+      minDiff = diff
+      closest = c
+    }
+  }
+  return closest
+})
 
-const currentAccent = computed(() =>
-  props.accentColor ||
-  CONTRACT_ACCENTS[selectedContract.value] ||
-  '#6738e4'
-)
+const btcEquivalentDisplay = computed(() => {
+  const btc = btcEquivalent.value
+  if (!btcPriceUsd.value || btcPriceUsd.value <= 0) return '—'
+  return `${btc.toFixed(4)} BTC`
+})
 
-function toggleDropdown() { dropdownOpen.value = !dropdownOpen.value }
-function selectContract(v) {
-  selectedContract.value = v
-  savePreferredContract(v)
-  dropdownOpen.value = false
-  loadOffersOnce()
+const sliderFillPct = computed(() => {
+  return ((usdAmount.value - AMOUNT_MIN) / (AMOUNT_MAX - AMOUNT_MIN)) * 100
+})
+
+function roundToStep(val) {
+  return Math.round(val / AMOUNT_STEP) * AMOUNT_STEP
+}
+function clampAmount(val) {
+  return Math.min(AMOUNT_MAX, Math.max(AMOUNT_MIN, val))
+}
+function formatUsd(val) {
+  return val.toLocaleString('en-US')
+}
+function onUsdInput(e) {
+  let raw = String(e.target.value || '').replace(/[^\d]/g, '')
+  if (raw === '') {
+    usdInputRaw.value = ''
+    return
+  }
+  const num = parseInt(raw, 10)
+  if (Number.isFinite(num)) {
+    usdAmount.value = num
+    usdInputRaw.value = raw
+  }
+}
+function onUsdFocus() {
+  usdInputFocused.value = true
+  usdInputRaw.value = String(usdAmount.value)
+}
+function onUsdBlur() {
+  usdInputFocused.value = false
+  const clamped = clampAmount(roundToStep(usdAmount.value))
+  usdAmount.value = clamped
+  usdInputRaw.value = formatUsd(clamped)
+}
+function onSliderInput(e) {
+  const val = Number(e.target.value)
+  usdAmount.value = val
+  usdInputRaw.value = usdInputFocused.value ? String(val) : formatUsd(val)
 }
 
 // -------- Fetch products once, then offers --------
@@ -624,17 +561,6 @@ async function prefetchProducts() {
     const res = await postProductQueryV0([]) // [] => all products
     const payload = Array.isArray(res?.payload) ? res.payload : []
     products.value = payload
-
-    // validate persisted choice against current options
-    const opts = contractOptions.value
-    const stored = loadPreferredContract()
-    const valid = stored && opts.find(o => o.value === stored)
-
-    if (valid && stored !== selectedContract.value) {
-      selectedContract.value = stored // triggers watch → save + refresh
-    } else if (!opts.find(o => o.value === selectedContract.value) && opts.length) {
-      selectedContract.value = opts[0].value // triggers watch
-    }
   } catch (e) {
     console.debug('Product catalog prefetch failed:', e)
   }
@@ -664,16 +590,6 @@ function onVisChange() {
   if (!document.hidden) loadOffersOnce()
 }
 
-// keep tabs/windows in sync for this preference only
-function onContractStorage(e) {
-  if (e.key === STORAGE_KEY) {
-    const v = e.newValue
-    if (v && v !== selectedContract.value) {
-      selectedContract.value = v // watch handles save + refresh
-    }
-  }
-}
-
 // -------- Lifecycle ----------
 onMounted(async () => {
   updateAuthState()
@@ -683,7 +599,6 @@ onMounted(async () => {
 
   document.addEventListener('visibilitychange', onVisChange)
   window.addEventListener('focus', loadOffersOnce)
-  window.addEventListener('storage', onContractStorage)
 
   await checkServerStatus()
   if (serverStatus.value !== 'up') {
@@ -693,6 +608,9 @@ onMounted(async () => {
   await prefetchProducts()
   await loadOffersOnce()
   offersIntervalId = setInterval(loadOffersOnce, props.offersPollMs)
+
+  fetchBtcPrice()
+  btcPriceIntervalId = setInterval(fetchBtcPrice, 30000)
 })
 
 onUnmounted(() => {
@@ -702,9 +620,9 @@ onUnmounted(() => {
 
   document.removeEventListener('visibilitychange', onVisChange)
   window.removeEventListener('focus', loadOffersOnce)
-  window.removeEventListener('storage', onContractStorage)
 
   if (offersIntervalId) clearInterval(offersIntervalId)
+  if (btcPriceIntervalId) clearInterval(btcPriceIntervalId)
   flashActive.value = new Set()
 })
 
@@ -730,9 +648,8 @@ function genTmpCntrId() {
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
 }
 
-// Save + refresh whenever selection changes programmatically
-watch(selectedContract, (v) => {
-  savePreferredContract(v)
+// Refresh offers whenever selection changes
+watch(selectedContract, () => {
   loadOffersOnce()
 })
 
@@ -885,137 +802,53 @@ defineExpose({ loadOffersOnce, getEar })
   color: var(--secondary, #6738e4) !important;
 }
 
-/* Dropdown sizing + feel (bigger) */
-.custom-dd-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #6738e4;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 0.6rem;
-  padding: 0.55rem 0.9rem;
-  font-size: 1rem;
-  color: #fff;
-  line-height: 1.2;
-  transition: border 120ms ease, background 120ms ease, transform 80ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.custom-dd-trigger:hover {
-  border-color: rgba(255,255,255,.32);
-  background: rgba(103,56,228,.32);
-}
-.custom-dd-trigger:active { transform: translateY(0.5px); }
-
-/* Larger variant used near the table header */
-.custom-dd-trigger--lg {
-  padding: 0.75rem 1.15rem;
-  font-size: 1.125rem; /* ~18px */
-  border-radius: 0.7rem;
-  min-width: 11rem;
-}
-
-.custom-dd-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
-  min-width: 12rem;
-  background: rgba(11,12,18,0.96);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 0.7rem;
-  box-shadow: 0 20px 45px rgba(0,0,0,.40);
-  backdrop-filter: blur(6px);
-  z-index: 40;
-  overflow: hidden;
-}
-
-/* When used under header control, anchor under the button's left edge */
-.custom-dd-menu--th {
-  left: 0;
-  right: auto;
-}
-
-.custom-dd-item {
+/* ===== Amount slider ===== */
+.amount-slider {
+  -webkit-appearance: none;
+  appearance: none;
   width: 100%;
-  text-align: left;
-  padding: 0.7rem 1rem;
-  font-size: 1rem;
-  line-height: 1.3;
-  color: rgba(255,255,255,.92);
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(
+    to right,
+    #6738e4 0%,
+    #6738e4 var(--fill, 0%),
+    rgba(255,255,255,0.15) var(--fill, 0%),
+    rgba(255,255,255,0.15) 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+.amount-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #6738e4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.amount-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.amount-slider::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+}
+.amount-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #6738e4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+.amount-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
   background: transparent;
-  transition: background 120ms ease, color 120ms ease;
-}
-.custom-dd-item + .custom-dd-item {
-  border-top: 1px solid rgba(0,0,0,.40)
-}
-.custom-dd-item:hover {
-  background: rgba(103,56,228,.16);
-}
-.custom-dd-item.active {
-  background: rgba(103,56,228,.32);
-  color: #fff;
-  font-weight: 600;
-}
-
-/* Wrapper to sit the menu and info box side-by-side (desktop) */
-.custom-dd-wrap {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 0.5rem;
-  display: flex;
-  gap: 0.75rem;
-  align-items: stretch;
-  z-index: 45; /* above table header */
-}
-
-/* Desktop info panel */
-.custom-dd-infobox {
-  width: 22rem;
-  padding: 0.85rem 1rem;
-  border-radius: 0.7rem;
-  background: rgba(13,14,20,0.9);
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: 0 20px 45px rgba(0,0,0,.35);
-  color: rgba(255,255,255,.92);
-  backdrop-filter: blur(6px);
-}
-.infobox-title {
-  font-weight: 800;
-  margin-bottom: 0.35rem;
-  font-size: 0.95rem;
-  letter-spacing: -0.01em;
-}
-.infobox-text {
-  font-size: 0.86rem;
-  line-height: 1.3;
-  margin-bottom: 0.4rem;
-}
-.infobox-list {
-  font-size: 0.82rem;
-  line-height: 1.35;
-  padding-left: 1rem;
-  list-style: disc;
-  color: rgba(255,255,255,.85);
-}
-
-/* Mobile info panel */
-.custom-dd-infobox-mobile {
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(13,14,20,0.9);
-  color: rgba(255,255,255,.92);
-  border-radius: 0.7rem;
-  padding: 0.75rem 0.85rem;
-  box-shadow: 0 12px 28px rgba(0,0,0,.35);
-}
-
-/* Better touch targets on small screens */
-@media (max-width: 640px) {
-  .custom-dd-trigger--lg {
-    padding: 0.85rem 1.2rem;
-    font-size: 1.15rem;
-    min-width: 12rem;
-  }
-  .custom-dd-menu { min-width: 14rem; }
 }
 </style>
