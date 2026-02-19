@@ -102,8 +102,14 @@
             :skip-to-review="true"
             :btc-price="btcPriceUsd"
             :requested-usd="usdAmount"
-            @close="showModal = false"
+            :allocation-result="allocationResult"
+            :allocation-loading="allocationLoading"
+            :balance-check-result="balanceCheckResult"
+            :balance-loading="balanceLoading"
+            @close="handleModalClose"
             @submit="handleOrderSubmit"
+            @confirm="handleOrderConfirm"
+            @check-balance="handleBalanceCheck"
           />
         </div>
       </div>
@@ -122,6 +128,8 @@ import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { getServerStatus } from '../api/serverStatus'
 import { getPrice } from '../api/price'
+import { postLiquidityAllocation } from '../api/liquidityAllocation'
+import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 
 const router = useRouter()
 
@@ -224,6 +232,12 @@ const selectedOfferId = ref(null)
 const modalLoading = ref(false)
 const modalNotice  = ref({ type: '', text: '' })
 
+// -------- Allocation + Balance state ----------
+const allocationResult = ref(null)
+const allocationLoading = ref(false)
+const balanceCheckResult = ref(null)
+const balanceLoading = ref(false)
+
 function handleCellClick(row, key) {
   modalNotice.value = { type: '', text: '' }
   selectedRate.value = row[key]
@@ -319,6 +333,78 @@ async function handleOrderSubmit(data) {
   } finally {
     modalLoading.value = false
   }
+}
+
+async function handleOrderConfirm(data) {
+  if (!getToken()) {
+    showModal.value = false
+    router.push('/login')
+    return
+  }
+
+  allocationLoading.value = true
+  allocationResult.value = null
+  modalNotice.value = { type: '', text: '' }
+
+  const days = Number(data.durationDays) || SIMPLE_TERM_DAYS
+  const ltv = selectedLtv.value || 50
+  const role = String(data.action || '').toLowerCase()
+  const interest = data.rateNumeric
+
+  const params = {
+    ini_role: role,
+    interest,
+    foreign_collateral: Math.round(usdAmount.value),
+    oracle: 'oracle_dlcp',
+    base_product: buildBaseProductId(days, ltv),
+    margin_percent: 5,
+  }
+
+  try {
+    const res = await postLiquidityAllocation(params)
+    allocationResult.value = res.payload
+  } catch (e) {
+    const msg = e?.response?.data?.detail || e?.message || 'Allocation request failed.'
+    modalNotice.value = { type: 'error', text: msg }
+  } finally {
+    allocationLoading.value = false
+  }
+}
+
+async function handleBalanceCheck() {
+  balanceLoading.value = true
+  balanceCheckResult.value = null
+
+  try {
+    const res = await getOwnDerivedBalance()
+    const satoshis = res?.payload ?? 0
+    const isBorrow = (selectedAction.value || '').toLowerCase() === 'borrow'
+
+    // Determine required collateral from allocation result
+    let requiredSats = 0
+    if (allocationResult.value?.total_allocated_collateral) {
+      requiredSats = allocationResult.value.total_allocated_collateral
+    }
+
+    balanceCheckResult.value = {
+      satoshis,
+      sufficient: satoshis >= requiredSats,
+      connected: true,
+    }
+  } catch (e) {
+    balanceCheckResult.value = { satoshis: 0, sufficient: false, connected: false }
+  } finally {
+    balanceLoading.value = false
+  }
+}
+
+function handleModalClose() {
+  showModal.value = false
+  allocationResult.value = null
+  allocationLoading.value = false
+  balanceCheckResult.value = null
+  balanceLoading.value = false
+  modalNotice.value = { type: '', text: '' }
 }
 
 // -------- Table rows / offers polling ----------
@@ -633,6 +719,10 @@ function buildProductId(days, ltv, contractStr) {
   const decimals = (Number.isFinite(cleanContract) && cleanContract < 0.01) ? 3 : 2
   const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(decimals) : '0.10'
   return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}_c-${cPart}`
+}
+function buildBaseProductId(days, ltv) {
+  const normalizedDays = isYearish(days) ? 365 : days
+  return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}_c-xxx`
 }
 function getDaysFromLabel(label) {
   const m = String(label || '').match(/(\d+)/)
