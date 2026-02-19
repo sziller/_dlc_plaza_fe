@@ -5,12 +5,12 @@
     @click.self="closeSelf"
   >
     <div
-      class="bg-dark text-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-6 relative"
+      class="bg-dark text-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-6 relative overflow-y-auto max-h-[90vh]"
       role="dialog"
       aria-modal="true"
       :aria-labelledby="titleId"
       :aria-describedby="descId"
-      :aria-busy="loading ? 'true' : 'false'"
+      :aria-busy="loading || allocationLoading ? 'true' : 'false'"
       ref="dialogRef"
       @keydown.tab.prevent="onTab"
       @keydown.esc.prevent="closeSelf"
@@ -19,8 +19,8 @@
       <button
         type="button"
         @click="closeSelf"
-        :disabled="loading"
-        class="absolute top-4 right-4 text-white hover:text-secondary text-xl font-bold disabled:opacity-50"
+        :disabled="loading || allocationLoading"
+        class="absolute top-4 right-4 text-white hover:text-secondary text-xl font-bold disabled:opacity-50 z-10"
         aria-label="Close dialog"
       >
         ×
@@ -158,8 +158,8 @@
         </div>
       </div>
 
-      <!-- Step 2: Review -->
-      <div v-else>
+      <!-- Step 2: Review + Confirm -->
+      <div v-else-if="step === 2">
         <h2 :id="titleId" class="text-2xl font-bold text-center mb-4">Review Your Order</h2>
 
         <div
@@ -173,18 +173,37 @@
         </div>
 
         <ul class="space-y-2 text-sm text-white/90">
-          <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
-          <li><span class="font-semibold text-white">Amount:</span> {{ formatAmountDisplay(amountBtc, amountUsd) }}</li>
-          <li><span class="font-semibold text-white">Commission/Fees:</span> 1.00%</li>
-          <li><span class="font-semibold text-white">Maturity Date:</span> {{ maturityDate }}</li>
-          <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ reviewTermRateStr }}</li>
-          <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYield(termDays) }}</li>
           <li><span class="font-semibold text-white">Role:</span> {{ actionType }}</li>
-          <li><span class="font-semibold text-white">Collateral Contribution:</span> {{ collateralContribution }}</li>
+          <li><span class="font-semibold text-white">Amount:</span> {{ formatAmountDisplay(amountBtc, amountUsd) }}</li>
+          <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
+          <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ reviewTermRateStr }}</li>
+          <li><span class="font-semibold text-white">Cadena Fee:</span> {{ displayFee }}</li>
+          <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYieldWithFee }}</li>
         </ul>
 
-        <!-- Inline Rate Editor (shown when Edit Rate is clicked) -->
-        <div v-if="showInlineRateEditor" class="bg-white/5 border border-white/10 rounded-lg p-4 mt-4">
+        <!-- Collateral Requirement Block -->
+        <div class="mt-4 p-4 rounded-lg bg-secondary/10 border border-secondary/30">
+          <p class="text-base font-semibold text-white">{{ collateralRequirementText }}</p>
+        </div>
+
+        <!-- Edit Rate Warning + Checkbox Flow -->
+        <div v-if="showEditRateWarning" class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mt-4">
+          <p class="text-sm text-white/90 mb-3">
+            Changing the interest rate will convert your order to a limit order instead of matching at the current market rate.
+            Limit orders are filled on a best-efforts basis and are not guaranteed to execute.
+          </p>
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              v-model="editRateAcknowledged"
+              class="mt-0.5 accent-secondary"
+            />
+            <span class="text-sm text-white/80">I understand this will become a limit order</span>
+          </label>
+        </div>
+
+        <!-- Inline Rate Editor (shown after acknowledging warning) -->
+        <div v-if="showEditRateWarning && editRateAcknowledged" class="bg-white/5 border border-white/10 rounded-lg p-4 mt-4">
           <div class="flex items-center justify-between gap-3">
             <button
               type="button"
@@ -223,7 +242,214 @@
           <div class="text-center mt-3">
             <button
               type="button"
-              @click="showInlineRateEditor = false"
+              @click="finishEditRate"
+              class="text-sm text-secondary hover:text-secondary/80 font-semibold"
+            >Done</button>
+          </div>
+        </div>
+
+        <!-- Allocation Results (shown after Confirm returns response) -->
+        <div v-if="allocationResult" class="mt-4 bg-white/5 border border-white/10 rounded-lg p-4">
+          <h3 class="font-semibold text-sm text-white mb-3">Liquidity Allocation</h3>
+          <table class="w-full text-xs text-white/80">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="text-left py-1 font-semibold">Qty</th>
+                <th class="text-right py-1 font-semibold">Notional</th>
+                <th class="text-right py-1 font-semibold">Collateral</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(tier, idx) in allocationResult.allocation" :key="idx" class="border-b border-white/5">
+                <td class="py-1.5">{{ tier.quantity }}×</td>
+                <td class="text-right py-1.5 tabular-nums">{{ formatSatsToBtc(tier.notional) }} BTC</td>
+                <td class="text-right py-1.5 tabular-nums">{{ formatSatsToBtc(tier.allocated_collateral) }} BTC</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mt-2 pt-2 border-t border-white/10 text-xs space-y-1">
+            <div class="flex justify-between">
+              <span class="text-white/60">Total Allocated Collateral</span>
+              <span class="font-semibold tabular-nums">{{ formatSatsToBtc(allocationResult.total_allocated_collateral) }} BTC</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-white/60">Unallocated Collateral</span>
+              <span class="tabular-nums">{{ formatSatsToBtc(allocationResult.unallocated_collateral) }} BTC</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-6">
+          <button
+            type="button"
+            @click="handleEditRateClick"
+            :disabled="loading || allocationLoading"
+            class="text-white hover:text-secondary text-sm underline disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ skipToReview && !showEditRateWarning ? 'Edit Rate' : (showEditRateWarning ? 'Cancel Edit' : 'Back') }}
+          </button>
+
+          <!-- Confirm button (before allocation) -->
+          <button
+            v-if="!allocationResult"
+            type="button"
+            @click="handleConfirm"
+            :disabled="loading || allocationLoading"
+            class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span v-if="!allocationLoading">Confirm</span>
+            <span v-else class="inline-flex items-center gap-2">
+              <span class="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span>
+              Confirming…
+            </span>
+          </button>
+
+          <!-- Continue button (after allocation) -->
+          <button
+            v-else
+            type="button"
+            @click="goToStep3"
+            class="bg-secondary hover:bg-secondary/90 text-white px-6 py-2 rounded font-semibold"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Collateral Check + Final Submit -->
+      <div v-else-if="step === 3">
+        <h2 :id="titleId" class="text-2xl font-bold text-center mb-4">Submit Your Order</h2>
+
+        <div
+          v-if="notice?.text"
+          :class="notice?.type === 'error' ? 'bg-red-500/15 border-red-500/40' : 'bg-green-500/15 border-green-500/40'"
+          class="border rounded p-3 text-sm mb-3"
+          role="status"
+          aria-live="polite"
+        >
+          {{ notice.text }}
+        </div>
+
+        <!-- Balance Check Loading -->
+        <div v-if="balanceLoading" class="flex flex-col items-center gap-3 py-8">
+          <div class="h-8 w-8 rounded-full border-4 border-white/30 border-t-white animate-spin"></div>
+          <div class="text-sm text-white/80">Checking wallet balance…</div>
+        </div>
+
+        <!-- Wallet Not Connected -->
+        <div v-else-if="balanceCheckResult && !balanceCheckResult.connected" class="space-y-4">
+          <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
+            <p class="text-sm text-white/90 font-semibold mb-2">Wallet Not Connected</p>
+            <p class="text-xs text-white/70">Connect your Bitcoin wallet to verify your collateral balance.</p>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+            <p class="text-sm text-white/60 italic">How to connect your wallet (video coming soon)</p>
+          </div>
+        </div>
+
+        <!-- Insufficient Collateral -->
+        <div v-else-if="balanceCheckResult && !balanceCheckResult.sufficient" class="space-y-4">
+          <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+            <p class="text-sm text-white/90 font-semibold mb-2">Insufficient Collateral</p>
+            <p class="text-xs text-white/70">
+              Your wallet balance is {{ formatSatsToBtc(balanceCheckResult.satoshis) }} BTC,
+              but this order requires more collateral.
+            </p>
+          </div>
+          <div class="bg-white/5 border border-white/10 rounded-lg p-4 text-center">
+            <p class="text-sm text-white/60 italic">How to top up your wallet (video coming soon)</p>
+          </div>
+        </div>
+
+        <!-- Sufficient Balance — Show summary + Submit -->
+        <div v-else-if="balanceCheckResult && balanceCheckResult.sufficient" class="space-y-4">
+          <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+            <p class="text-sm text-green-400 font-semibold">Wallet balance verified</p>
+            <p class="text-xs text-white/70 mt-1">Balance: {{ formatSatsToBtc(balanceCheckResult.satoshis) }} BTC</p>
+          </div>
+
+          <!-- Order Summary -->
+          <ul class="space-y-2 text-sm text-white/90">
+            <li><span class="font-semibold text-white">Role:</span> {{ actionType }}</li>
+            <li><span class="font-semibold text-white">Amount:</span> {{ formatAmountDisplay(amountBtc, amountUsd) }}</li>
+            <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
+            <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ reviewTermRateStr }}</li>
+            <li><span class="font-semibold text-white">Cadena Fee:</span> {{ displayFee }}</li>
+            <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYieldWithFee }}</li>
+          </ul>
+
+          <!-- Allocation summary -->
+          <div v-if="allocationResult" class="bg-white/5 border border-white/10 rounded-lg p-3">
+            <div class="text-xs space-y-1">
+              <div class="flex justify-between">
+                <span class="text-white/60">Total Allocated Collateral</span>
+                <span class="font-semibold tabular-nums">{{ formatSatsToBtc(allocationResult.total_allocated_collateral) }} BTC</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-white/60">Unallocated Collateral</span>
+                <span class="tabular-nums">{{ formatSatsToBtc(allocationResult.unallocated_collateral) }} BTC</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Rate Warning + Checkbox Flow (Step 3) -->
+        <div v-if="showEditRateWarning" class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mt-4">
+          <p class="text-sm text-white/90 mb-3">
+            Changing the interest rate will convert your order to a limit order instead of matching at the current market rate.
+            Limit orders are filled on a best-efforts basis and are not guaranteed to execute.
+          </p>
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              v-model="editRateAcknowledged"
+              class="mt-0.5 accent-secondary"
+            />
+            <span class="text-sm text-white/80">I understand this will become a limit order</span>
+          </label>
+        </div>
+
+        <!-- Inline Rate Editor (Step 3) -->
+        <div v-if="showEditRateWarning && editRateAcknowledged" class="bg-white/5 border border-white/10 rounded-lg p-4 mt-4">
+          <div class="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              aria-label="Decrease rate"
+              @click="decrement"
+              @pointerdown.prevent="startHold(-1)"
+              @pointerup="stopHold"
+              @pointerleave="stopHold"
+              :disabled="minusDisabled"
+              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
+            >−</button>
+
+            <input
+              type="text"
+              inputmode="decimal"
+              pattern="[0-9]*[.]?[0-9]*"
+              v-model="rateInput"
+              @input="onRateInput"
+              @focus="onRateFocus"
+              @blur="onRateBlur"
+              class="w-32 text-center px-3 py-2 rounded bg-white/10 border border-white/20 focus:outline-none font-bold tabular-nums"
+              aria-label="Rate percentage"
+            />
+
+            <button
+              type="button"
+              aria-label="Increase rate"
+              @click="increment"
+              @pointerdown.prevent="startHold(1)"
+              @pointerup="stopHold"
+              @pointerleave="stopHold"
+              :disabled="plusDisabled"
+              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
+            >+</button>
+          </div>
+          <div class="text-center mt-3">
+            <button
+              type="button"
+              @click="finishEditRate"
               class="text-sm text-secondary hover:text-secondary/80 font-semibold"
             >Done</button>
           </div>
@@ -232,14 +458,14 @@
         <div class="flex justify-between items-center mt-6">
           <button
             type="button"
-            @click="skipToReview ? (showInlineRateEditor = !showInlineRateEditor) : (step = 1)"
+            @click="handleStep3EditOrBack"
             :disabled="loading"
             class="text-white hover:text-secondary text-sm underline disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {{ skipToReview ? 'Edit Rate' : 'Back' }}
+            {{ showEditRateWarning ? 'Cancel Edit' : 'Edit Rate' }}
           </button>
           <button
-            v-if="!isSuccess"
+            v-if="balanceCheckResult?.sufficient && !isSuccess"
             type="button"
             @click="submitOrder"
             :disabled="loading"
@@ -254,6 +480,7 @@
         </div>
       </div>
 
+      <!-- Loading overlay -->
       <div
         v-if="loading"
         class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl"
@@ -278,21 +505,25 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   notice:  { type: Object,  default: () => ({ type: '', text: '' }) },
   ltv: { type: Number, default: 0.5 },
-  /**
-   * Passed from parent table: '1.00' | '0.10' | '0.01'
-   */
   contractSize: { type: String, default: '0.10' },
   skipToReview: { type: Boolean, default: false },
   btcPrice: { type: Number, default: null },
   requestedUsd: { type: Number, default: null },
+  allocationResult: { type: Object, default: null },
+  allocationLoading: { type: Boolean, default: false },
+  balanceCheckResult: { type: Object, default: null },
+  balanceLoading: { type: Boolean, default: false },
 })
-const emit = defineEmits(['close', 'submit'])
+const emit = defineEmits(['close', 'submit', 'confirm', 'checkBalance'])
 
-const { loading, notice, termDays, actionType, rate, ltv, contractSize } = toRefs(props)
+const { loading, notice, termDays, actionType, rate, ltv, contractSize,
+        allocationResult, allocationLoading, balanceCheckResult, balanceLoading, skipToReview } = toRefs(props)
 
 const orderType = ref(props.skipToReview ? 'limit' : 'market')
 const step = ref(props.skipToReview ? 2 : 1)
-const showInlineRateEditor = ref(false)
+const showEditRateWarning = ref(false)
+const editRateAcknowledged = ref(false)
+const rateWasEdited = ref(false)
 const isBorrower = computed(() => (actionType.value || '').toLowerCase() === 'borrow')
 const isSuccess = computed(() => notice.value?.type === 'success')
 
@@ -368,6 +599,10 @@ function formatBtc(n) {
 function roundBtc(n) {
   const x = Number(n)
   return Number.isFinite(x) ? Number(x.toFixed(8)) : NaN
+}
+function formatSatsToBtc(sats) {
+  if (!Number.isFinite(sats)) return '0'
+  return (sats / 1e8).toFixed(8)
 }
 
 const marketRateNum = computed(() => {
@@ -526,11 +761,6 @@ function stopHold() {
 onUnmounted(stopHold)
 
 const loanDuration = computed(() => `${displayDays(termDays.value)} Days`)
-const maturityDate = computed(() => {
-  const d = new Date()
-  d.setDate(d.getDate() + (Number.isFinite(termDays.value) ? termDays.value : 0))
-  return d.toLocaleDateString()
-})
 
 const termRateStr = computed(() =>
   orderType.value === 'market' ? marketRateStr.value : fmt(rateNum.value)
@@ -552,13 +782,17 @@ function annualizedYield(rateStr, days) {
 const reviewTermRateStr = computed(() =>
   orderType.value === 'market' ? fmtReview(marketRateNum.value) : fmtReview(rateNum.value)
 )
-function reviewAnnualizedYield(days) {
+
+/* ==== Fee & Yield logic (role-aware) ==== */
+const displayFee = computed(() => isBorrower.value ? '1.00%' : '0.00%')
+
+const reviewAnnualizedYieldWithFee = computed(() => {
   const r = orderType.value === 'market' ? marketRateNum.value : rateNum.value
-  if (Number.isNaN(r) || !Number.isFinite(days) || days <= 0) return '*'
-  if (isYearish(days)) return `${r.toFixed(2)}%`
-  const annual = r * (360 / days)
-  return `${annual.toFixed(2)}%`
-}
+  if (Number.isNaN(r) || !Number.isFinite(termDays.value) || termDays.value <= 0) return '*'
+  const base = isYearish(termDays.value) ? r : r * (360 / termDays.value)
+  const withFee = isBorrower.value ? base + 1 : base
+  return `${withFee.toFixed(2)}%`
+})
 
 /* ==== amount from contract size ==== */
 const amountBtc = computed(() => {
@@ -630,6 +864,75 @@ const collateralContribution = computed(() => {
   return formatBtc(val)
 })
 
+/* ==== Collateral Requirement Text ==== */
+const collateralRequirementText = computed(() => {
+  const val = isBorrower.value ? borrowerContributionBtcNum.value : lenderContributionBtcNum.value
+  if (!Number.isFinite(val)) return 'Collateral requirement unavailable.'
+  return `To complete the loan, you are required to contribute ${val.toFixed(5)} Bitcoin collateral.`
+})
+
+/* ==== Edit Rate Flow ==== */
+function handleEditRateClick() {
+  if (showEditRateWarning.value) {
+    // Cancel edit
+    showEditRateWarning.value = false
+    editRateAcknowledged.value = false
+  } else if (skipToReview.value || step.value === 2) {
+    showEditRateWarning.value = true
+    editRateAcknowledged.value = false
+  } else {
+    step.value = 1
+  }
+}
+
+function handleStep3EditOrBack() {
+  if (showEditRateWarning.value) {
+    showEditRateWarning.value = false
+    editRateAcknowledged.value = false
+  } else {
+    showEditRateWarning.value = true
+    editRateAcknowledged.value = false
+  }
+}
+
+function finishEditRate() {
+  showEditRateWarning.value = false
+  editRateAcknowledged.value = false
+  rateWasEdited.value = true
+  // If rate was edited after allocation, clear allocation so user must re-Confirm
+  if (allocationResult.value) {
+    emit('confirm', buildConfirmPayload())
+  }
+}
+
+/* ==== Confirm Handler ==== */
+function buildConfirmPayload() {
+  const finalRateStr = termRateStr.value
+  const m = finalRateStr.match(/([\d.]+)/)
+  const rateNumeric = m ? parseFloat(m[1]) : NaN
+
+  return {
+    action: actionType.value,
+    rate: finalRateStr,
+    rateNumeric,
+    durationDays: displayDays(termDays.value),
+    amountUsd: props.requestedUsd,
+    ltvUsed: ltvRatio.value,
+    rateWasEdited: rateWasEdited.value,
+  }
+}
+
+function handleConfirm() {
+  emit('confirm', buildConfirmPayload())
+}
+
+/* ==== Step 3 transition ==== */
+function goToStep3() {
+  step.value = 3
+  emit('checkBalance')
+}
+
+/* ==== Final Submit ==== */
 function submitOrder () {
   const finalRateStr = termRateStr.value
   const m = finalRateStr.match(/([\d.]+)/)
@@ -647,12 +950,11 @@ function submitOrder () {
     rateNumeric,
     duration: loanDuration.value,
     durationDays: displayDays(termDays.value),
-    maturityDate: maturityDate.value,
     annualizedYield: annualizedYield(finalRateStr, termDays.value),
     amount: formatBtc(amountBtc.value),
     amountNumeric: Number(amountBtc.value),
     ltvUsed: ltvRatio.value,
-    feePct: '1.00%',
+    feePct: displayFee.value,
     collateralContribution: collateralContribution.value,
     collateralContributionBtcNum: isBorrower.value ? borrowerBtc : lenderBtc,
     collateralContributionPct: Number.isFinite(isBorrower.value ? borrowerPct : lenderPct)
@@ -660,6 +962,7 @@ function submitOrder () {
       : null,
     lenderContributionBtcNum: lenderBtc,
     borrowerContributionBtcNum: borrowerBtc,
+    rateWasEdited: rateWasEdited.value,
   })
 }
 </script>
