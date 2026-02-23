@@ -325,6 +325,7 @@ onBeforeUnmount(() => {
           <div class="flex justify-center lg:justify-end w-full lg:w-auto lg:flex-shrink-0">
             <HeroRatesDisplay
               :compact="isMobile"
+              :link-to="heroCtaTo"
               class="w-full max-w-sm sm:max-w-md lg:max-w-none lg:w-[360px]"
             />
           </div>

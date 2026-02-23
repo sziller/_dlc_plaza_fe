@@ -27,9 +27,25 @@
             draggable="false"
             referrerpolicy="no-referrer"
           />
-          <span class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
-            Cadena Bitcoin
-          </span>
+          <div class="flex flex-col items-start space-y-1">
+            <div class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
+              Cadena Bitcoin
+            </div>
+            <div class="text-sm font-medium flex items-center gap-1">
+              <img
+                src="https://flagcdn.com/us.svg"
+                alt="US Flag"
+                class="w-4 h-4 inline-block"
+                width="16" height="12"
+                decoding="async"
+                loading="lazy"
+                draggable="false"
+                referrerpolicy="no-referrer"
+              />
+              <span class="text-white">BTCUSD:</span>
+              <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
+            </div>
+          </div>
         </router-link>
 
         <!-- Burger -->
@@ -49,7 +65,6 @@
 
         <!-- Desktop Nav -->
         <div class="hidden md:flex space-x-6 items-center">
-          <router-link v-if="!isLoggedIn" :class="linkClass" to="/">Home</router-link>
           <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
           <router-link :class="linkClass" to="/cadena-paper">Cadena Paper</router-link>
           <router-link :class="linkClass" to="/knowledge-hub">Knowledge Base</router-link>
@@ -260,13 +275,6 @@
         class="fixed inset-0 bg-black text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-lg pt-[var(--nav-h)]"
         @keyup.esc="closeMobileMenu"
       >
-        <router-link
-          v-if="!isLoggedIn"
-          @click="closeMobileMenu"
-          to="/"
-          class="block text-lg font-semibold hover:text-secondary"
-        >Home</router-link>
-
         <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
         <router-link @click="closeMobileMenu" to="/cadena-paper" class="block text-lg font-semibold hover:text-secondary">Cadena Paper</router-link>
         <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block text-lg font-semibold hover:text-secondary">Knowledge Base</router-link>

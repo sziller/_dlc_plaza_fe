@@ -106,10 +106,17 @@
             :allocation-loading="allocationLoading"
             :balance-check-result="balanceCheckResult"
             :balance-loading="balanceLoading"
+            :topup-address="topupAddress"
+            :topup-qr-svg="topupQrSvg"
+            :user-auth-code="userAuthCode"
+            :show-funding-screen="showFundingScreen"
             @close="handleModalClose"
             @submit="handleOrderSubmit"
+            @review="handleReviewOrder"
             @confirm="handleOrderConfirm"
             @check-balance="handleBalanceCheck"
+            @recheck-balance="handleRecheckBalance"
+            @retry-order="handleRecheckAndRetry"
           />
         </div>
       </div>
@@ -130,6 +137,8 @@ import { getServerStatus } from '../api/serverStatus'
 import { getPrice } from '../api/price'
 import { postLiquidityAllocation } from '../api/liquidityAllocation'
 import { getOwnDerivedBalance } from '../api/userDerivedBalance'
+import { getTopupAddressQR } from '../api/qr'
+import { useAuth } from '../composables/useAuth'
 
 const router = useRouter()
 
@@ -224,6 +233,8 @@ async function fetchBtcPrice() {
 
 // -------- Modal state ----------
 const showModal = ref(false)
+const showFundingScreen = ref(false)
+const lastOrderPayload = ref(null)
 const selectedRate = ref('')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
@@ -237,6 +248,12 @@ const allocationResult = ref(null)
 const allocationLoading = ref(false)
 const balanceCheckResult = ref(null)
 const balanceLoading = ref(false)
+
+// -------- Topup + Auth state ----------
+const topupAddress = ref('')
+const topupQrSvg = ref('')
+const { user: authUser } = useAuth()
+const userAuthCode = computed(() => authUser.value?.auth_code ?? 0)
 
 function handleCellClick(row, key) {
   modalNotice.value = { type: '', text: '' }
@@ -275,6 +292,9 @@ async function handleOrderSubmit(data) {
   const type = (data.orderType || '').toLowerCase()
   modalNotice.value = { type: '', text: '' }
 
+  // Save payload for potential auto-retry after funding
+  lastOrderPayload.value = data
+
   if (!getToken()) {
     showModal.value = false
     router.push('/login')
@@ -293,9 +313,15 @@ async function handleOrderSubmit(data) {
       const res = await acceptOffer({ dlc_id: String(selectedOfferId.value) })
       console.log('Offer accepted:', res)
       modalNotice.value = { type: 'success', text: 'Market order accepted.' }
+      fetchTopupAddress()
     } catch (e) {
-      const msg = e?.response?.data?.detail || e?.message || 'Accept failed.'
-      modalNotice.value = { type: 'error', text: msg }
+      const detail = e?.response?.data?.detail || e?.message || ''
+      if (/insufficient funds/i.test(detail)) {
+        showFundingScreen.value = true
+        fetchTopupAddress()
+      } else {
+        modalNotice.value = { type: 'error', text: detail || 'Accept failed.' }
+      }
     } finally {
       modalLoading.value = false
     }
@@ -327,15 +353,21 @@ async function handleOrderSubmit(data) {
     const res = await postOffer(params)
     console.log('Offer posted:', res)
     modalNotice.value = { type: 'success', text: 'Limit order posted' }
+    fetchTopupAddress()
   } catch (e) {
-    const msg = e?.response?.data?.detail || e?.message || 'Offer failed.'
-    modalNotice.value = { type: 'error', text: msg }
+    const detail = e?.response?.data?.detail || e?.message || ''
+    if (/insufficient funds/i.test(detail)) {
+      showFundingScreen.value = true
+      fetchTopupAddress()
+    } else {
+      modalNotice.value = { type: 'error', text: detail || 'Offer failed.' }
+    }
   } finally {
     modalLoading.value = false
   }
 }
 
-async function handleOrderConfirm(data) {
+async function handleReviewOrder(data) {
   if (!getToken()) {
     showModal.value = false
     router.push('/login')
@@ -362,12 +394,25 @@ async function handleOrderConfirm(data) {
 
   try {
     const res = await postLiquidityAllocation(params)
-    allocationResult.value = res.payload
+    const raw = res.payload
+    const cd = raw.contract_details || {}
+    allocationResult.value = {
+      ...cd,
+      available_btc_liquidity: raw.available_btc_liquidity ?? 0,
+      is_covered: !!raw.is_covered,
+    }
   } catch (e) {
     const msg = e?.response?.data?.detail || e?.message || 'Allocation request failed.'
     modalNotice.value = { type: 'error', text: msg }
   } finally {
     allocationLoading.value = false
+  }
+}
+
+async function handleOrderConfirm(data) {
+  // Allocation already happened on review; re-run if rate was edited
+  if (!allocationResult.value) {
+    await handleReviewOrder(data)
   }
 }
 
@@ -382,8 +427,8 @@ async function handleBalanceCheck() {
 
     // Determine required collateral from allocation result
     let requiredSats = 0
-    if (allocationResult.value?.total_allocated_collateral) {
-      requiredSats = allocationResult.value.total_allocated_collateral
+    if (allocationResult.value?.required_btc_liquidity) {
+      requiredSats = allocationResult.value.required_btc_liquidity
     }
 
     balanceCheckResult.value = {
@@ -398,13 +443,60 @@ async function handleBalanceCheck() {
   }
 }
 
+async function fetchTopupAddress() {
+  try {
+    const res = await getTopupAddressQR(-1)
+    topupAddress.value = res?.payload?.string || ''
+    topupQrSvg.value = res?.payload?.qr_code || ''
+  } catch (e) {
+    console.debug('Topup address fetch failed:', e)
+  }
+}
+
+async function handleRecheckBalance() {
+  try {
+    const res = await getOwnDerivedBalance()
+    const satoshis = res?.payload ?? 0
+    const needed = allocationResult.value?.required_btc_liquidity ?? 0
+    if (satoshis >= needed) {
+      allocationResult.value = {
+        ...allocationResult.value,
+        is_covered: true,
+        available_btc_liquidity: satoshis,
+      }
+    }
+  } catch (e) {
+    console.debug('Balance recheck failed:', e)
+  }
+}
+
+async function handleRecheckAndRetry() {
+  modalNotice.value = { type: '', text: '' }
+  await handleRecheckBalance()
+  if (allocationResult.value?.is_covered) {
+    showFundingScreen.value = false
+    if (lastOrderPayload.value) {
+      await handleOrderSubmit(lastOrderPayload.value)
+    }
+  } else {
+    modalNotice.value = {
+      type: 'error',
+      text: 'Balance is still insufficient. Please send BTC to the address above and try again.',
+    }
+  }
+}
+
 function handleModalClose() {
   showModal.value = false
+  showFundingScreen.value = false
+  lastOrderPayload.value = null
   allocationResult.value = null
   allocationLoading.value = false
   balanceCheckResult.value = null
   balanceLoading.value = false
   modalNotice.value = { type: '', text: '' }
+  topupAddress.value = ''
+  topupQrSvg.value = ''
 }
 
 // -------- Table rows / offers polling ----------
