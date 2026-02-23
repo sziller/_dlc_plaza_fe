@@ -23,7 +23,7 @@
     <div :class="compact ? 'flex gap-2' : 'flex gap-3 sm:gap-4'">
       <!-- Borrow Card -->
       <router-link
-        to="/register"
+        :to="linkTo"
         class="flex-1 rounded-lg bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-secondary/40 cursor-pointer block"
         :class="compact ? 'p-2.5' : 'p-3 sm:p-4'"
       >
@@ -53,7 +53,7 @@
 
       <!-- Lend Card -->
       <router-link
-        to="/register"
+        :to="linkTo"
         class="flex-1 rounded-lg bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-secondary/40 cursor-pointer block"
         :class="compact ? 'p-2.5' : 'p-3 sm:p-4'"
       >
@@ -95,7 +95,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
-  compact: { type: Boolean, default: false }
+  compact: { type: Boolean, default: false },
+  linkTo: { type: String, default: '/register' }
 })
 
 const mounted = ref(false)
