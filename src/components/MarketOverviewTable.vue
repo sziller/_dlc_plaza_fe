@@ -402,6 +402,7 @@ async function handleReviewOrder(data) {
       is_covered: !!raw.is_covered,
     }
   } catch (e) {
+    console.error('[handleReviewOrder] allocation failed:', e?.response?.data || e)
     const msg = e?.response?.data?.detail || e?.message || 'Allocation request failed.'
     modalNotice.value = { type: 'error', text: msg }
   } finally {

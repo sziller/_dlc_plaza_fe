@@ -34,8 +34,16 @@ export const postLiquidityAllocation = async (
         }
       } else if (error.response?.status === 401) {
         throw new Error('Unauthorized');
+      } else if (error.response?.status === 422) {
+        const errorDetail = error.response.data?.detail;
+        if (Array.isArray(errorDetail)) {
+          throw new Error(errorDetail[0].msg);
+        } else {
+          throw new Error(`Validation Error: ${errorDetail}`);
+        }
       } else if (error.response?.status === 500) {
-        throw new Error('Internal Server Error');
+        const detail = error.response.data?.detail;
+        throw new Error(detail || 'Internal Server Error');
       }
     }
     console.error('Error:', error);
