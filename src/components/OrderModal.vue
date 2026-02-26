@@ -173,7 +173,7 @@
           <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/30 space-y-2">
             <div class="flex justify-between text-sm">
               <span class="text-white/70">Collateral required</span>
-              <span class="font-mono text-white">{{ formatSatsToBtc(allocationResult?.required_btc_liquidity ?? 0) }} BTC</span>
+              <span class="font-mono text-white">{{ Number.isFinite(computedCollateralBtc) ? computedCollateralBtc.toFixed(8) : '0' }} BTC</span>
             </div>
             <div class="flex justify-between text-sm">
               <span class="text-white/70">Your balance</span>
@@ -275,7 +275,7 @@
         <div v-else-if="allocationResult" class="mt-4 space-y-3">
           <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/30">
             <p class="text-base font-semibold text-white">
-              Collateral Required: {{ formatSatsToBtc(allocationResult.required_btc_liquidity) }} BTC
+              Collateral Required: {{ Number.isFinite(computedCollateralBtc) ? computedCollateralBtc.toFixed(8) : '0' }} BTC
             </p>
             <p class="text-sm text-white/70 mt-1">
               Available BTC Liquidity: {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
@@ -498,7 +498,7 @@ const isSuccess = computed(() => notice.value?.type === 'success')
 const isPaired = computed(() => isSignerAuthCode(props.userAuthCode))
 const collateralShortfall = computed(() => {
   if (!allocationResult.value) return 0
-  const diff = allocationResult.value.required_btc_liquidity - allocationResult.value.available_btc_liquidity
+  const diff = computedCollateralSats.value - allocationResult.value.available_btc_liquidity
   return Math.max(0, diff)
 })
 const isCollateralCovered = computed(() => !!allocationResult.value?.is_covered)
@@ -876,11 +876,30 @@ const collateralContribution = computed(() => {
   return formatBtc(val)
 })
 
+const computedCollateralBtc = computed(() => {
+  const principal = props.requestedUsd
+  const rate = termRateDecimal.value          // e.g. 0.12
+  const price = props.btcPrice
+  if (!Number.isFinite(principal) || !Number.isFinite(rate) || !Number.isFinite(price) || price <= 0) return NaN
+
+  const borrowerRate = rate + 0.01   // annualized yield = term rate + 1% Cadena fee
+  const collateralUsd = isBorrower.value
+    ? principal + 2 * (principal * borrowerRate)
+    : principal
+
+  return roundBtc(collateralUsd / price)
+})
+
+const computedCollateralSats = computed(() => {
+  const btc = computedCollateralBtc.value
+  return Number.isFinite(btc) ? Math.round(btc * 1e8) : 0
+})
+
 /* ==== Collateral Requirement Text ==== */
 const collateralRequirementText = computed(() => {
-  const val = isBorrower.value ? borrowerContributionBtcNum.value : lenderContributionBtcNum.value
+  const val = computedCollateralBtc.value
   if (!Number.isFinite(val)) return 'Collateral requirement unavailable.'
-  return `To complete the loan, you are required to contribute ${val.toFixed(5)} Bitcoin collateral.`
+  return `To complete the loan, you are required to contribute ${val.toFixed(8)} Bitcoin collateral.`
 })
 
 /* ==== Edit Rate Flow ==== */

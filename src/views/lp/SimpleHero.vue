@@ -70,14 +70,13 @@ function handleScroll() {
 
 /* ---------- FAQ ---------- */
 const faqs = [
-  { q: 'What is the loan amount?', a: 'Loans are standard 0.1 Bitcoin.' },
-  { q: 'Can I repay my loan early?', a: 'All loans settle at the end of the term (30 days, 90 days, 180 days or 1 year).' },
+  { q: 'What is the loan amount?', a: 'Loans are in any $1,00 USD denomination.' },
+  { q: 'Can I repay my loan early?', a: 'All loans settle at the end of the 365 day term.' },
   { q: 'Are there monthly payments?', a: 'There are no payments. All loans settle at the end of the term.' },
-  { q: 'What is the Loan To Value?', a: 'We offer 50% and 80% loan to value loans.' },
-  { q: 'How is collateral managed?', a: 'Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin\'s core security principle: Your Keys, Your Coins. You control your private keys and funds. Cadena Bitcoin does not hold or access your private keys or seed phrase.' },
+  { q: 'What is the Loan To Value?', a: 'Loans are 50% value loans.' },
+  { q: 'How is collateral managed?', a: 'You control your private keys and funds. Cadena Bitcoin does not hold or access your private keys or seed phrase. Bitcoin is locked in smart contracts onchain.' },
   { q: 'What currency can I get my loan in?', a: 'Loans are funded in Bitcoin and settled in Bitcoin.' },
-  { q: 'How do I get a Bitcoin-backed loan?', a: 'Register online and download the signer app.' },
-  { q: 'How long does it take to get a loan?', a: 'Minutes. Funding transactions are broadcast as soon as both peers sign the contract.' },
+  { q: 'How long does it take to get a loan?', a: 'Minutes. Funding transactions are broadcast as soon as the contracts are signed.' },
   { q: 'Is there a credit check?', a: 'No. Your bitcoin is your credit.' },
 ]
 const openSet = ref(new Set([0]))
@@ -290,10 +289,6 @@ onBeforeUnmount(() => {
               </li>
               <li class="flex items-center gap-3">
                 <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                No KYC
-              </li>
-              <li class="flex items-center gap-3">
-                <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                 No liquidations or margin calls
               </li>
               <li class="flex items-center gap-3">
@@ -309,14 +304,14 @@ onBeforeUnmount(() => {
                 class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
                 @click="onHeroCtaClick"
               >
-                Borrow Bitcoin Exposure
+                Lend for Fix Returns
               </router-link>
               <router-link
                 :to="heroCtaTo"
                 class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
                 @click="onHeroCtaClick"
               >
-                Lend for Fix Returns
+                Borrow Bitcoin Exposure
               </router-link>
             </div>
           </div>
@@ -338,14 +333,14 @@ onBeforeUnmount(() => {
             class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
             @click="onHeroCtaClick"
           >
-            Borrow Bitcoin Exposure
+            Lend for Fixed Fiat Returns
           </router-link>
           <router-link
             :to="heroCtaTo"
             class="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-secondary px-8 py-4 text-lg font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none whitespace-nowrap"
             @click="onHeroCtaClick"
           >
-            Lend for Fixed Fiat Returns
+            Borrow Bitcoin Exposure
           </router-link>
         </div>
 

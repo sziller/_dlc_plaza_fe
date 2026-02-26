@@ -21,36 +21,6 @@
 
     <!-- Side-by-side rate cards -->
     <div :class="compact ? 'flex gap-2' : 'flex gap-3 sm:gap-4'">
-      <!-- Borrow Card -->
-      <router-link
-        :to="linkTo"
-        class="flex-1 rounded-lg bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-secondary/40 cursor-pointer block"
-        :class="compact ? 'p-2.5' : 'p-3 sm:p-4'"
-      >
-        <div
-          class="bg-secondary/70 text-white font-semibold rounded-md text-center"
-          :class="compact ? 'text-xs py-1.5 px-2 mb-2' : 'text-sm py-2 px-3 mb-3'"
-        >
-          Borrow
-        </div>
-        <div class="flex items-baseline justify-center gap-0.5">
-          <span
-            class="font-bold transition-colors duration-500"
-            style="font-variant-numeric: tabular-nums"
-            :class="[
-              compact ? 'text-2xl' : 'text-3xl sm:text-4xl',
-              borrowFlash === 'green' ? 'text-green-400' : borrowFlash === 'red' ? 'text-red-400' : 'text-secondary'
-            ]"
-          >
-            {{ animatedBorrowRate }}
-          </span>
-          <span
-            class="text-white/80"
-            :class="compact ? 'text-sm' : 'text-lg'"
-          >%</span>
-        </div>
-      </router-link>
-
       <!-- Lend Card -->
       <router-link
         :to="linkTo"
@@ -73,6 +43,36 @@
             ]"
           >
             {{ animatedLendRate }}
+          </span>
+          <span
+            class="text-white/80"
+            :class="compact ? 'text-sm' : 'text-lg'"
+          >%</span>
+        </div>
+      </router-link>
+
+      <!-- Borrow Card -->
+      <router-link
+        :to="linkTo"
+        class="flex-1 rounded-lg bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-secondary/40 cursor-pointer block"
+        :class="compact ? 'p-2.5' : 'p-3 sm:p-4'"
+      >
+        <div
+          class="bg-secondary/70 text-white font-semibold rounded-md text-center"
+          :class="compact ? 'text-xs py-1.5 px-2 mb-2' : 'text-sm py-2 px-3 mb-3'"
+        >
+          Borrow
+        </div>
+        <div class="flex items-baseline justify-center gap-0.5">
+          <span
+            class="font-bold transition-colors duration-500"
+            style="font-variant-numeric: tabular-nums"
+            :class="[
+              compact ? 'text-2xl' : 'text-3xl sm:text-4xl',
+              borrowFlash === 'green' ? 'text-green-400' : borrowFlash === 'red' ? 'text-red-400' : 'text-secondary'
+            ]"
+          >
+            {{ animatedBorrowRate }}
           </span>
           <span
             class="text-white/80"
@@ -104,7 +104,7 @@ const loading = ref(true)
 const apiError = ref(false)
 
 const borrowRate = ref(10.9)
-const lendRate = ref(11.0)
+const lendRate = ref(9.1)
 const animatedBorrowRate = ref('*.*')
 const animatedLendRate = ref('*.*')
 const borrowFlash = ref('')
@@ -129,11 +129,17 @@ function tickRates() {
   }
 
   if (lDelta !== 0) {
-    lendRate.value = Math.round(Math.min(13.0, Math.max(10.0, lendRate.value + lDelta)) * 10) / 10
+    lendRate.value = Math.round(Math.min(13.0, Math.max(7.5, lendRate.value + lDelta)) * 10) / 10
     animatedLendRate.value = lendRate.value.toFixed(1)
     lendFlash.value = lDelta > 0 ? 'green' : 'red'
     clearTimeout(lendFlashTimer)
     lendFlashTimer = setTimeout(() => { lendFlash.value = '' }, 600)
+  }
+
+  // Ensure lend rate is always lower than borrow rate
+  if (lendRate.value >= borrowRate.value - 1.8) {
+    lendRate.value = Math.round((borrowRate.value - 1.8) * 10) / 10
+    animatedLendRate.value = lendRate.value.toFixed(1)
   }
 }
 

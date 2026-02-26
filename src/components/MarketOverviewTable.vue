@@ -74,17 +74,17 @@
             <div class="w-full max-w-md flex flex-col sm:flex-row gap-4">
               <button
                 type="button"
-                @click="handleSimpleBorrow"
+                @click="handleSimpleLend"
                 class="flex-1 bg-secondary hover:bg-secondary/90 text-white px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
               >
-                Borrow Bitcoin Exposure
+                Lend for Fixed Fiat Returns
               </button>
               <button
                 type="button"
-                @click="handleSimpleLend"
+                @click="handleSimpleBorrow"
                 class="flex-1 border-2 border-secondary text-white hover:bg-secondary/10 px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
               >
-                Lend for Fixed Fiat Returns
+                Borrow Bitcoin Exposure
               </button>
             </div>
           </div>
@@ -425,10 +425,14 @@ async function handleBalanceCheck() {
     const satoshis = res?.payload ?? 0
     const isBorrow = (selectedAction.value || '').toLowerCase() === 'borrow'
 
-    // Determine required collateral from allocation result
+    // Compute required collateral locally using the same formula as OrderModal
     let requiredSats = 0
-    if (allocationResult.value?.required_btc_liquidity) {
-      requiredSats = allocationResult.value.required_btc_liquidity
+    if (btcPriceUsd.value && btcPriceUsd.value > 0) {
+      const rate = parseFloat(selectedRate.value) / 100
+      const borrowerRate = rate + 0.01
+      const isBorrowRole = (selectedAction.value || '').toLowerCase() === 'borrow'
+      const collateralUsd = isBorrowRole ? usdAmount.value + 2 * (usdAmount.value * borrowerRate) : usdAmount.value
+      requiredSats = Math.round((collateralUsd / btcPriceUsd.value) * 1e8)
     }
 
     balanceCheckResult.value = {
@@ -457,7 +461,15 @@ async function handleRecheckBalance() {
   try {
     const res = await getOwnDerivedBalance()
     const satoshis = res?.payload ?? 0
-    const needed = allocationResult.value?.required_btc_liquidity ?? 0
+    // Compute needed collateral locally using the same formula as OrderModal
+    let needed = 0
+    if (btcPriceUsd.value && btcPriceUsd.value > 0) {
+      const rate = parseFloat(selectedRate.value) / 100
+      const borrowerRate = rate + 0.01
+      const isBorrowRole = (selectedAction.value || '').toLowerCase() === 'borrow'
+      const collateralUsd = isBorrowRole ? usdAmount.value + 2 * (usdAmount.value * borrowerRate) : usdAmount.value
+      needed = Math.round((collateralUsd / btcPriceUsd.value) * 1e8)
+    }
     if (satoshis >= needed) {
       allocationResult.value = {
         ...allocationResult.value,
