@@ -110,6 +110,7 @@
             :topup-qr-svg="topupQrSvg"
             :user-auth-code="userAuthCode"
             :show-funding-screen="showFundingScreen"
+            :show-auth-prompt="showAuthPrompt"
             @close="handleModalClose"
             @submit="handleOrderSubmit"
             @review="handleReviewOrder"
@@ -234,6 +235,7 @@ async function fetchBtcPrice() {
 // -------- Modal state ----------
 const showModal = ref(false)
 const showFundingScreen = ref(false)
+const showAuthPrompt = ref(false)
 const lastOrderPayload = ref(null)
 const selectedRate = ref('')
 const selectedAction = ref('Lend')
@@ -296,8 +298,7 @@ async function handleOrderSubmit(data) {
   lastOrderPayload.value = data
 
   if (!getToken()) {
-    showModal.value = false
-    router.push('/login')
+    showAuthPrompt.value = true
     return
   }
 
@@ -368,12 +369,6 @@ async function handleOrderSubmit(data) {
 }
 
 async function handleReviewOrder(data) {
-  if (!getToken()) {
-    showModal.value = false
-    router.push('/login')
-    return
-  }
-
   allocationLoading.value = true
   allocationResult.value = null
   modalNotice.value = { type: '', text: '' }
@@ -502,6 +497,7 @@ async function handleRecheckAndRetry() {
 function handleModalClose() {
   showModal.value = false
   showFundingScreen.value = false
+  showAuthPrompt.value = false
   lastOrderPayload.value = null
   allocationResult.value = null
   allocationLoading.value = false

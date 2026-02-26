@@ -14,7 +14,7 @@ const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
 const articles = blogArticles
 /* ---------- Auth / CTA ---------- */
 const { isLoggedIn, setUserFromApi } = useAuth()
-const heroCtaTo = computed(() => (isLoggedIn.value ? '/btcusd' : '/register'))
+const heroCtaTo = computed(() => '/btcusd')
 const heroCtaLabel = computed(() => (isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'))
 function onHeroCtaClick() {
   // placeholder for analytics/tracking when CTA is clicked
@@ -210,6 +210,15 @@ async function handleFooterSubscribe() {
   footerSubscribeLoading.value = true
   try {
     await postContactEmail(footerEmail.value)
+
+    // Also send to Attio CRM (fire-and-forget)
+    const attioEmail = footerEmail.value
+    fetch('https://hooks.attio.com/w/f2661d8b-9de8-4673-9281-3d3624c2e90b/50d3fdcf-686c-491f-b561-68badcff0cff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: attioEmail }),
+    }).catch(() => {})
+
     footerSubscribeSuccess.value = 'Thanks! Check your inbox for Cadena updates.'
     footerEmail.value = ''
     setTimeout(() => {
@@ -558,8 +567,8 @@ onBeforeUnmount(() => {
           Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-          <router-link :to="isLoggedIn ? '/btcusd' : '/register'" class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90">Borrow Bitcoin</router-link>
-          <router-link :to="isLoggedIn ? '/btcusd' : '/register'" class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary">Lend Bitcoin</router-link>
+          <router-link to="/btcusd" class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90">Borrow Bitcoin</router-link>
+          <router-link to="/btcusd" class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-secondary">Lend Bitcoin</router-link>
         </div>
         </div>
       </section>

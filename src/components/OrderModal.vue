@@ -244,6 +244,41 @@
           </div>
         </div>
 
+        <!-- Auth Prompt: shown when unauthenticated user tries to confirm -->
+        <div v-else-if="showAuthPrompt" class="space-y-5 text-center">
+          <div class="flex justify-center">
+            <div class="w-16 h-16 rounded-full bg-secondary/20 border border-secondary/40 flex items-center justify-center">
+              <svg class="w-8 h-8 text-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+              </svg>
+            </div>
+          </div>
+
+          <h2 :id="titleId" class="text-2xl font-bold">You're One Step Away</h2>
+          <p class="text-white/70 text-sm leading-relaxed max-w-xs mx-auto">
+            Your order is ready to go. Log in or create a free account to lock in your rate and complete your {{ actionType?.toLowerCase() }} order.
+          </p>
+
+          <div class="flex flex-col gap-3 pt-2">
+            <router-link
+              to="/login"
+              class="w-full bg-secondary hover:bg-secondary/90 text-white px-6 py-3 rounded-lg font-semibold transition-colors text-center"
+              @click="closeSelf"
+            >
+              Log In
+            </router-link>
+            <router-link
+              to="/register"
+              class="w-full border border-white/20 hover:bg-white/10 text-white px-6 py-3 rounded-lg font-semibold transition-colors text-center"
+              @click="closeSelf"
+            >
+              Create Free Account
+            </router-link>
+          </div>
+
+          <p class="text-white/50 text-xs">No liqudiations · Bitcoin native · Globally accessible</p>
+        </div>
+
         <!-- Normal Review content (hidden when funding screen is active) -->
         <template v-else>
         <h2 :id="titleId" class="text-2xl font-bold text-center mb-4">Review Your Order</h2>
@@ -481,11 +516,12 @@ const props = defineProps({
   topupQrSvg: { type: String, default: '' },
   userAuthCode: { type: Number, default: 0 },
   showFundingScreen: { type: Boolean, default: false },
+  showAuthPrompt: { type: Boolean, default: false },
 })
 const emit = defineEmits(['close', 'submit', 'confirm', 'review', 'checkBalance', 'recheckBalance', 'retryOrder'])
 
 const { loading, notice, termDays, actionType, rate, ltv, contractSize,
-        allocationResult, allocationLoading, balanceCheckResult, balanceLoading, skipToReview, showFundingScreen } = toRefs(props)
+        allocationResult, allocationLoading, balanceCheckResult, balanceLoading, skipToReview, showFundingScreen, showAuthPrompt } = toRefs(props)
 
 const orderType = ref(props.skipToReview ? 'limit' : 'market')
 const step = ref(props.skipToReview ? 2 : 1)

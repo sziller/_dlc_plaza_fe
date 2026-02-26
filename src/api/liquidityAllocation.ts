@@ -7,20 +7,16 @@ export const postLiquidityAllocation = async (
   params: LiquidityAllocationRequest
 ): Promise<LiquidityAllocationResponse> => {
   const token = getToken();
-  if (!token) {
-    throw new Error('Unauthorized');
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
   }
 
   try {
     const response = await axios.post(
-      `${API_URL}/app/dlcp/v0/liqu_alloc_reqest`,
+      `${API_URL}/app/dlcp/v0/liqu_alloc_simulate`,
       params,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
+      { headers }
     );
     return response.data;
   } catch (error) {
@@ -32,8 +28,6 @@ export const postLiquidityAllocation = async (
         } else {
           throw new Error(`Bad Request: ${errorDetail}`);
         }
-      } else if (error.response?.status === 401) {
-        throw new Error('Unauthorized');
       } else if (error.response?.status === 422) {
         const errorDetail = error.response.data?.detail;
         if (Array.isArray(errorDetail)) {
