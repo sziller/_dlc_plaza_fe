@@ -254,7 +254,7 @@ const balanceLoading = ref(false)
 // -------- Topup + Auth state ----------
 const topupAddress = ref('')
 const topupQrSvg = ref('')
-const { user: authUser } = useAuth()
+const { user: authUser, setUserFromApi } = useAuth()
 const userAuthCode = computed(() => authUser.value?.auth_code ?? 0)
 
 function handleCellClick(row, key) {
@@ -304,6 +304,34 @@ async function handleOrderSubmit(data) {
 
   modalLoading.value = true
 
+  // Direct collateral check: compare required sats against available liquidity
+  if (allocationResult.value) {
+    const rate = toNum(data.rate) / 100
+    const borrowerRate = rate + 0.01
+    const isBorrowRole = String(data.action || '').toLowerCase() === 'borrow'
+    const collateralUsd = isBorrowRole
+      ? usdAmount.value + 2 * (usdAmount.value * borrowerRate)
+      : usdAmount.value
+    const requiredSats = btcPriceUsd.value > 0
+      ? Math.round((collateralUsd / btcPriceUsd.value) * 1e8)
+      : Infinity
+    const availableSats = allocationResult.value.available_btc_liquidity ?? 0
+
+    if (availableSats < requiredSats) {
+      showFundingScreen.value = true
+      fetchTopupAddress()
+      modalLoading.value = false
+      return
+    }
+  }
+
+  if (!allocationResult.value?.is_covered) {
+    showFundingScreen.value = true
+    fetchTopupAddress()
+    modalLoading.value = false
+    return
+  }
+
   if (type === 'market') {
     if (!selectedOfferId.value) {
       modalLoading.value = false
@@ -315,6 +343,7 @@ async function handleOrderSubmit(data) {
       console.log('Offer accepted:', res)
       modalNotice.value = { type: 'success', text: 'Market order accepted.' }
       fetchTopupAddress()
+      setUserFromApi()
     } catch (e) {
       const detail = e?.response?.data?.detail || e?.message || ''
       if (/insufficient funds/i.test(detail)) {
@@ -355,6 +384,7 @@ async function handleOrderSubmit(data) {
     console.log('Offer posted:', res)
     modalNotice.value = { type: 'success', text: 'Limit order posted' }
     fetchTopupAddress()
+    setUserFromApi()
   } catch (e) {
     const detail = e?.response?.data?.detail || e?.message || ''
     if (/insufficient funds/i.test(detail)) {
@@ -391,10 +421,21 @@ async function handleReviewOrder(data) {
     const res = await postLiquidityAllocation(params)
     const raw = res.payload
     const cd = raw.contract_details || {}
+
+    // Use the API's available_btc_liquidity, but if it's 0, fall back
+    // to the user's actual balance_derived (same logic as handleRecheckBalance)
+    let availableBtc = raw.available_btc_liquidity ?? 0
+    if (!availableBtc) {
+      try {
+        const balRes = await getOwnDerivedBalance()
+        availableBtc = balRes?.payload ?? 0
+      } catch (_) { /* keep 0 */ }
+    }
+
     allocationResult.value = {
       ...cd,
-      available_btc_liquidity: raw.available_btc_liquidity ?? 0,
-      is_covered: !!raw.is_covered,
+      available_btc_liquidity: availableBtc,
+      is_covered: !!raw.is_covered && availableBtc >= (cd.required_btc_liquidity ?? Infinity),
     }
   } catch (e) {
     console.error('[handleReviewOrder] allocation failed:', e?.response?.data || e)

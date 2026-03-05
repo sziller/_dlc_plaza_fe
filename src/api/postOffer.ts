@@ -37,7 +37,7 @@ export const postOffer = async (params: PostOfferParams) => {
       } else if (error.response?.status === 401) {
         throw new Error('Unauthorized');
       } else if (error.response?.status === 500) {
-        throw new Error('Internal Server Error');
+        throw error;
       }
     }
     console.error('Error:', error);

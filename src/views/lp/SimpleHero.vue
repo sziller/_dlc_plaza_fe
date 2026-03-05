@@ -70,7 +70,7 @@ function handleScroll() {
 
 /* ---------- FAQ ---------- */
 const faqs = [
-  { q: 'What is the loan amount?', a: 'Loans are in any $1,00 USD denomination.' },
+  { q: 'What is the loan amount?', a: 'Loans are in any $1,000 USD denomination.' },
   { q: 'Can I repay my loan early?', a: 'All loans settle at the end of the 365 day term.' },
   { q: 'Are there monthly payments?', a: 'There are no payments. All loans settle at the end of the term.' },
   { q: 'What is the Loan To Value?', a: 'Loans are 50% value loans.' },
@@ -299,6 +299,10 @@ onBeforeUnmount(() => {
               <li class="flex items-center gap-3">
                 <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                 No liquidations or margin calls
+              </li>
+              <li class="flex items-center gap-3">
+                <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                Full self custody
               </li>
               <li class="flex items-center gap-3">
                 <svg class="w-6 h-6 shrink-0 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>

@@ -48,7 +48,7 @@ onMounted(() => {
 })
 
 const faqs = [
-  { q: 'What is the loan amount?', a: 'Loans are in any $1,00 USD denomination.' },
+  { q: 'What is the loan amount?', a: 'Loans are in any $1,000 USD denomination.' },
   { q: 'Can I repay my loan early?', a: 'All loans settle at the end of the 365 day term.' },
   { q: 'Are there monthly payments?', a: 'There are no payments. All loans settle at the end of the term.' },
   { q: 'What is the Loan To Value?', a: 'Loans are 50% value loans.' },

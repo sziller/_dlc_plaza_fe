@@ -344,6 +344,9 @@ const emit = defineEmits(['retry'])
 const props = defineProps({
   showFiat: { type: Boolean, default: false },
   btcUsd: { type: Number, default: null },
+  loading: { type: Boolean, default: false },
+  error: { type: String, default: '' },
+  canRetry: { type: Boolean, default: true },
 })
 
 /** ---- Auth + router ---- */
