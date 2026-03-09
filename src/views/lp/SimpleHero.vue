@@ -357,6 +357,30 @@ onBeforeUnmount(() => {
           </router-link>
         </div>
 
+        <!-- Social Proof -->
+        <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 mt-10 sm:mt-12">
+          <!-- Testimonial 1 -->
+          <div class="flex-1 bg-white/[0.04] backdrop-blur-sm border border-white/10 rounded-xl px-6 py-5">
+            <svg class="w-6 h-6 text-secondary/60 mb-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M11.3 2.6C6.1 5.1 3 9.5 3 14.3c0 3 2 5.1 4.4 5.1 2.2 0 3.9-1.7 3.9-3.8 0-2-1.5-3.6-3.4-3.8-.3 0-.5 0-.8.1.5-2.6 2.7-5.4 5.6-7l-1.4-2.3zm10 0C16 5.1 13 9.5 13 14.3c0 3 2 5.1 4.4 5.1 2.2 0 3.9-1.7 3.9-3.8 0-2-1.5-3.6-3.4-3.8-.3 0-.5 0-.8.1.5-2.6 2.7-5.4 5.6-7l-1.4-2.3z"/>
+            </svg>
+            <p class="text-white/80 text-sm sm:text-base leading-relaxed">
+              A Bitcoin lending platform where you do not give up custody of your BTC. What a unique concept.
+            </p>
+            <p class="mt-3 text-sm text-white/50 font-medium">Antonio, Canada</p>
+          </div>
+          <!-- Testimonial 2 -->
+          <div class="flex-1 bg-white/[0.04] backdrop-blur-sm border border-white/10 rounded-xl px-6 py-5">
+            <svg class="w-6 h-6 text-secondary/60 mb-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M11.3 2.6C6.1 5.1 3 9.5 3 14.3c0 3 2 5.1 4.4 5.1 2.2 0 3.9-1.7 3.9-3.8 0-2-1.5-3.6-3.4-3.8-.3 0-.5 0-.8.1.5-2.6 2.7-5.4 5.6-7l-1.4-2.3zm10 0C16 5.1 13 9.5 13 14.3c0 3 2 5.1 4.4 5.1 2.2 0 3.9-1.7 3.9-3.8 0-2-1.5-3.6-3.4-3.8-.3 0-.5 0-.8.1.5-2.6 2.7-5.4 5.6-7l-1.4-2.3z"/>
+            </svg>
+            <p class="text-white/80 text-sm sm:text-base leading-relaxed">
+              I think this product is going very far.
+            </p>
+            <p class="mt-3 text-sm text-white/50 font-medium">Frederick, Denmark</p>
+          </div>
+        </div>
+
       </div>
     </section>
 

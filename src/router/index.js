@@ -34,6 +34,7 @@ const Cookies            = () => import('../views/Cookies.vue')
 const Resources          = () => import('../views/Resources.vue')
 const LoanExplained      = () => import('../views/LoanExplained.vue')
 const LoanExplainedLender = () => import('../views/LoanExplainedLender.vue')
+const Security           = () => import('../views/Security.vue')
 const SazminingLP = () => import('../views/lp/Sazmining.vue')
 // Blog CMS pages
 const BlogListPage       = () => import('../pages/BlogListPage.vue')
@@ -104,6 +105,11 @@ const routes = [
   { path: '/faq', name: 'FAQ', component: FAQ, meta: {
     title: 'FAQ — Cadena Bitcoin',
     description: 'Everything you need to know about Cadena Bitcoin loans and lending.',
+    robots: 'index,follow',
+  }},
+  { path: '/security', name: 'Security', component: Security, meta: {
+    title: 'Security — Cadena Bitcoin',
+    description: 'Your Bitcoin stays in your hands. Learn how Cadena uses Discreet Log Contracts for self-custody lending with no margin calls.',
     robots: 'index,follow',
   }},
   // Blog CMS (Knowledge Hub)

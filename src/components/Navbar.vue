@@ -83,6 +83,9 @@
             >
               <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">X (Twitter)</a>
               <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">YouTube</a>
+              <a href="https://www.instagram.com/cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Instagram</a>
+              <a href="https://www.facebook.com/people/CadenaBitcoin/61568348506268" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Facebook</a>
+              <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">GitHub</a>
             </div>
           </div>
         </div>
@@ -283,6 +286,9 @@
           <div class="text-white/50 uppercase text-xs mt-4 mb-2">Socials</div>
           <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">X (Twitter)</a>
           <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">YouTube</a>
+          <a href="https://www.instagram.com/cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Instagram</a>
+          <a href="https://www.facebook.com/people/CadenaBitcoin/61568348506268" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Facebook</a>
+          <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">GitHub</a>
         </div>
 
         <router-link

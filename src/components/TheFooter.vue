@@ -34,6 +34,7 @@
             <ul class="space-y-2 text-white/80">
               <li><router-link to="/faq" class="hover:text-secondary">FAQ</router-link></li>
               <li><router-link to="/contact" class="hover:text-secondary">Contact Us</router-link></li>
+              <li><router-link to="/security" class="hover:text-secondary">Security</router-link></li>
             </ul>
           </div>
 
@@ -110,7 +111,7 @@
 <script setup>
 import { computed } from 'vue'
 const year = computed(() => new Date().getFullYear())
-const version = '2.1.1'
+const version = '2.1.2'
 </script>
 
 <style scoped>
