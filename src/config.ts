@@ -6,7 +6,7 @@ if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
 } else if (host === 'staging.purabitcoin.com') {
   API_URL = 'https://staging.purabitcoin.com'
 } else if (host === 'localhost' || host === '127.0.0.1') {
-  API_URL = 'http://localhost:8000'  // local dev
+  API_URL = ''  // local dev — Vite proxy forwards /app to localhost:8000
 } else {
   API_URL = 'https://staging.purabitcoin.com' // default to staging
 }

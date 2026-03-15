@@ -136,7 +136,7 @@ import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { getServerStatus } from '../api/serverStatus'
 import { getPrice } from '../api/price'
-import { postLiquidityAllocation } from '../api/liquidityAllocation'
+import { postLiquidityAllocation, postLiquidityAllocationAuth, postLiquidityAllocationV1 } from '../api/liquidityAllocation'
 import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
@@ -406,19 +406,37 @@ async function handleReviewOrder(data) {
   const days = Number(data.durationDays) || SIMPLE_TERM_DAYS
   const ltv = selectedLtv.value || 50
   const role = String(data.action || '').toLowerCase()
-  const interest = data.rateNumeric
-
-  const params = {
-    ini_role: role,
-    interest,
-    foreign_collateral: Math.round(usdAmount.value),
-    oracle: 'oracle_dlcp',
-    base_product: buildBaseProductId(days, ltv),
-    margin_percent: 5,
+  const interest = data.rateNumeric ?? toNum(data.rate)
+  if (Number.isNaN(interest)) {
+    modalNotice.value = { type: 'error', text: 'Invalid interest rate.' }
+    allocationLoading.value = false
+    return
   }
 
+  const baseProduct = buildBaseProductId(days, ltv)
+  const foreignCollateral = Math.round(usdAmount.value)
+
   try {
-    const res = await postLiquidityAllocation(params)
+    let res
+    if (getToken()) {
+      res = await postLiquidityAllocationAuth({
+        ini_role: role,
+        interest,
+        foreign_collateral: foreignCollateral,
+        oracle: ['oracle_dlcp'],
+        base_product: baseProduct,
+        margin_percent: 5,
+      })
+    } else {
+      res = await postLiquidityAllocation({
+        ini_role: role,
+        interest,
+        foreign_collateral: foreignCollateral,
+        oracle: 'oracle_dlcp',
+        base_product: baseProduct,
+        margin_percent: 5,
+      })
+    }
     const raw = res.payload
     const cd = raw.contract_details || {}
 
@@ -429,7 +447,7 @@ async function handleReviewOrder(data) {
       try {
         const balRes = await getOwnDerivedBalance()
         availableBtc = balRes?.payload ?? 0
-      } catch (_) { /* keep 0 */ }
+      } catch (e) { console.error('[handleReviewOrder] balance fallback failed:', e) }
     }
 
     allocationResult.value = {
@@ -447,9 +465,46 @@ async function handleReviewOrder(data) {
 }
 
 async function handleOrderConfirm(data) {
-  // Allocation already happened on review; re-run if rate was edited
+  // Re-run simulation if not yet done (e.g. rate was edited)
   if (!allocationResult.value) {
     await handleReviewOrder(data)
+  }
+
+  // Lock liquidity via v1 endpoint
+  if (!getToken()) return
+
+  const days = Number(data.durationDays) || SIMPLE_TERM_DAYS
+  const ltv = selectedLtv.value || 50
+  const role = String(data.action || '').toLowerCase()
+  const interest = data.rateNumeric ?? toNum(data.rate)
+  if (Number.isNaN(interest)) {
+    modalNotice.value = { type: 'error', text: 'Invalid interest rate.' }
+    modalLoading.value = false
+    return
+  }
+
+  const requiredSats = allocationResult.value?.required_btc_liquidity ?? 0
+  if (requiredSats <= 0) return
+
+  modalLoading.value = true
+  try {
+    await postLiquidityAllocationV1({
+      ini_role: role,
+      interest,
+      oracle: ['oracle_dlcp'],
+      base_product: buildBaseProductId(days, ltv),
+      liquidity_sat: requiredSats,
+    })
+  } catch (e) {
+    const detail = e?.response?.data?.detail || e?.message || ''
+    if (/insufficient funds/i.test(detail)) {
+      showFundingScreen.value = true
+      fetchTopupAddress()
+    } else {
+      modalNotice.value = { type: 'error', text: detail || 'Liquidity allocation failed.' }
+    }
+  } finally {
+    modalLoading.value = false
   }
 }
 

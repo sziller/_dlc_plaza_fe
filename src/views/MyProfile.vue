@@ -81,6 +81,12 @@
             <div><span class="font-semibold">Wallet Balance:</span> {{ formatBtc(profile.payload.balance_onchain) }} BTC</div>
           </section>
 
+          <!-- Liquidity Allocations -->
+          <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
+            <h2 class="text-2xl font-bold">Liquidity Allocations</h2>
+            <UsersLiquidity />
+          </section>
+
           <!-- Referrals -->
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
             <h2 class="text-2xl font-bold">Referrals</h2>
@@ -362,6 +368,7 @@ import { deleteSelf } from '../api/deleteSelf'
 import TheFooter from '../components/TheFooter.vue'
 import DlcDetails from '../components/DLCDetails.vue'
 import MailingListModal from '../components/MailingListModal.vue'
+import UsersLiquidity from '../components/UsersLiquidity.vue'
 import { isSignerAuthCode } from '../lib/authCode'
 
 // ---- Router & Auth ----

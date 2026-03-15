@@ -9,6 +9,15 @@ export interface LiquidityAllocationRequest {
   margin_percent: number
 }
 
+export interface LiquidityAllocationAuthRequest {
+  ini_role: 'lend' | 'borrow'
+  interest: number
+  foreign_collateral: number
+  oracle: string[]
+  base_product: string
+  margin_percent: number
+}
+
 export interface AllocationTier {
   notional_foreign: number
   required_foreign_net_collateral: number
@@ -53,4 +62,60 @@ export interface LiquidityAllocationResponse {
   timestamp: number
   payload: AllocationRawResponse
   message: string
+}
+
+// ---- v1 real allocation (locks liquidity) ----
+
+export interface LiquidityAllocationV1Request {
+  ini_role: 'lend' | 'borrow'
+  interest: number
+  oracle?: string[]
+  base_product?: string
+  liquidity_sat: number
+}
+
+export interface LiquidityAllocationV1Payload {
+  id: number
+  uuid: string
+  service_type: string
+  oracle_hash: string
+  oracle_serialized: string
+  interest_bp: number
+  ini_role: string
+  ltv_percent: number
+  duration_days: number
+  liquidity_sat: number
+  timestamp: number
+}
+
+export interface LiquidityAllocationV1Response {
+  payload: LiquidityAllocationV1Payload
+  message: string
+  timestamp: number
+}
+
+// ---- v1 user liquidity query ----
+
+export interface LiquidityAllocationQueryRequest {
+  fields?: string[] | null
+}
+
+export interface UserLiquidityAllocation {
+  id: number
+  uuid: string
+  service_type: string
+  oracle_hash: string
+  oracle_serialized: string
+  interest_bp: number
+  ini_role: string
+  ltv_percent: number
+  duration_days: number
+  liquidity_sat: number
+  timestamp: number
+}
+
+export interface UserLiquidityQueryResponse {
+  payload: { allocations: UserLiquidityAllocation[] }
+  message: string
+  timestamp: number
 }

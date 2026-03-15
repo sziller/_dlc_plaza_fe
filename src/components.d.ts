@@ -27,5 +27,6 @@ declare module 'vue' {
     TheFooter: typeof import('./components/TheFooter.vue')['default']
     UseCasesAccordion: typeof import('./components/UseCasesAccordion.vue')['default']
     UsersDLCS: typeof import('./components/UsersDLCS.vue')['default']
+    UsersLiquidity: typeof import('./components/UsersLiquidity.vue')['default']
   }
 }
