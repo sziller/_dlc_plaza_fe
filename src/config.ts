@@ -10,7 +10,8 @@ if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
 } else {
   API_URL = 'https://staging.purabitcoin.com' // default to staging
 }
-export{ API_URL };
+export { API_URL };
+export const DEFAULT_ORACLE = 'oracle_dlcp';
 const CLIENT_ID = 'string';
 export { CLIENT_ID };
 const CLIENT_SECRET = 'string';

@@ -4,16 +4,7 @@ export interface LiquidityAllocationRequest {
   ini_role: 'lend' | 'borrow'
   interest: number
   foreign_collateral: number
-  oracle: 'oracle_dlcp' | 'oracle_dfx'
-  base_product: string
-  margin_percent: number
-}
-
-export interface LiquidityAllocationAuthRequest {
-  ini_role: 'lend' | 'borrow'
-  interest: number
-  foreign_collateral: number
-  oracle: string[]
+  oracle: string
   base_product: string
   margin_percent: number
 }
@@ -116,6 +107,25 @@ export interface UserLiquidityAllocation {
 
 export interface UserLiquidityQueryResponse {
   payload: { allocations: UserLiquidityAllocation[] }
+  message: string
+  timestamp: number
+}
+
+// ---- v1 liquidity market ----
+
+export interface LiquidityMarketResponse {
+  payload: {
+    lend: Record<string, number>
+    borrow: Record<string, number>
+  }
+  message: string
+  timestamp: number
+}
+
+// ---- v1 liquidity withdrawal ----
+
+export interface LiquidityWithdrawalV1Response {
+  payload: { removed_sat: number; remaining_sat: number }
   message: string
   timestamp: number
 }

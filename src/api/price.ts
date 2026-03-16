@@ -1,22 +1,13 @@
 import axios from 'axios';
-const  ORACLE_API_URL = 'https://oracle.purabitcoin.com';
+import { API_URL, DEFAULT_ORACLE } from '../config';
 
-// const ORACLE_API_URL = process.env.REACT_APP_ORACLE_API_URL;
-
-// This function sends a GET request to the server to get the current price of BTC in USD
-// It returns the price if successful, otherwise throws an error
-// The function logs the error to the console
 export const getPrice = async (): Promise<number> => {
   try {
     const response = await axios.get(
-      `${ORACLE_API_URL}/api/v0/price/current/BTCUSD`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+      `${API_URL}/app/dlcp/v1/oracle-price`,
+      { params: { oracle: DEFAULT_ORACLE, symbol: 'BTCUSD' } }
     );
-    return response.data;
+    return response.data.payload.price;
   } catch (error) {
     console.error('Failed to fetch price:', error);
     throw new Error('Failed to fetch price');

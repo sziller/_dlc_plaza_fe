@@ -136,10 +136,11 @@ import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { getServerStatus } from '../api/serverStatus'
 import { getPrice } from '../api/price'
-import { postLiquidityAllocation, postLiquidityAllocationAuth, postLiquidityAllocationV1 } from '../api/liquidityAllocation'
+import { postLiquidityAllocation, postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
 import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
+import { DEFAULT_ORACLE } from '../config'
 
 const router = useRouter()
 
@@ -417,47 +418,52 @@ async function handleReviewOrder(data) {
   const foreignCollateral = Math.round(usdAmount.value)
 
   try {
-    let res
     if (getToken()) {
-      res = await postLiquidityAllocationAuth({
-        ini_role: role,
-        interest,
-        foreign_collateral: foreignCollateral,
-        oracle: ['oracle_dlcp'],
-        base_product: baseProduct,
-        margin_percent: 5,
-      })
-    } else {
-      res = await postLiquidityAllocation({
-        ini_role: role,
-        interest,
-        foreign_collateral: foreignCollateral,
-        oracle: 'oracle_dlcp',
-        base_product: baseProduct,
-        margin_percent: 5,
-      })
-    }
-    const raw = res.payload
-    const cd = raw.contract_details || {}
+      // v1 auth path: compute required collateral locally, check balance
+      const liquiditySat = Math.round((foreignCollateral / btcPriceUsd.value) * 1e8)
 
-    // Use the API's available_btc_liquidity, but if it's 0, fall back
-    // to the user's actual balance_derived (same logic as handleRecheckBalance)
-    let availableBtc = raw.available_btc_liquidity ?? 0
-    if (!availableBtc) {
+      let availableBtc = 0
       try {
-        const balRes = await getOwnDerivedBalance()
-        availableBtc = balRes?.payload ?? 0
-      } catch (e) { console.error('[handleReviewOrder] balance fallback failed:', e) }
-    }
+        await setUserFromApi()
+        availableBtc = authUser.value?.balance_derived ?? 0
+      } catch (e) { console.error('[handleReviewOrder] balance check failed:', e) }
 
-    allocationResult.value = {
-      ...cd,
-      available_btc_liquidity: availableBtc,
-      is_covered: !!raw.is_covered && availableBtc >= (cd.required_btc_liquidity ?? Infinity),
+      allocationResult.value = {
+        required_btc_liquidity: liquiditySat,
+        available_btc_liquidity: availableBtc,
+        is_covered: availableBtc >= liquiditySat,
+      }
+    } else {
+      // v0 unauth path: simulation only
+      const res = await postLiquidityAllocation({
+        ini_role: role,
+        interest,
+        foreign_collateral: foreignCollateral,
+        oracle: DEFAULT_ORACLE,
+        base_product: baseProduct,
+        margin_percent: 5,
+      })
+      const raw = res.payload
+      const cd = raw.contract_details || {}
+
+      let availableBtc = raw.available_btc_liquidity ?? 0
+      if (!availableBtc) {
+        try {
+          const balRes = await getOwnDerivedBalance()
+          availableBtc = balRes?.payload ?? 0
+        } catch (e) { console.error('[handleReviewOrder] balance fallback failed:', e) }
+      }
+
+      allocationResult.value = {
+        ...cd,
+        available_btc_liquidity: availableBtc,
+        is_covered: !!raw.is_covered && availableBtc >= (cd.required_btc_liquidity ?? Infinity),
+      }
     }
   } catch (e) {
     console.error('[handleReviewOrder] allocation failed:', e?.response?.data || e)
-    const msg = e?.response?.data?.detail || e?.message || 'Allocation request failed.'
+    const errData = e?.response?.data
+    const msg = errData?.detail || errData?.message || e?.message || 'Allocation request failed.'
     modalNotice.value = { type: 'error', text: msg }
   } finally {
     allocationLoading.value = false
@@ -491,7 +497,7 @@ async function handleOrderConfirm(data) {
     await postLiquidityAllocationV1({
       ini_role: role,
       interest,
-      oracle: ['oracle_dlcp'],
+      oracle: [DEFAULT_ORACLE],
       base_product: buildBaseProductId(days, ltv),
       liquidity_sat: requiredSats,
     })
@@ -513,8 +519,8 @@ async function handleBalanceCheck() {
   balanceCheckResult.value = null
 
   try {
-    const res = await getOwnDerivedBalance()
-    const satoshis = res?.payload ?? 0
+    await setUserFromApi()
+    const satoshis = authUser.value?.balance_derived ?? 0
     const isBorrow = (selectedAction.value || '').toLowerCase() === 'borrow'
 
     // Compute required collateral locally using the same formula as OrderModal
@@ -551,8 +557,8 @@ async function fetchTopupAddress() {
 
 async function handleRecheckBalance() {
   try {
-    const res = await getOwnDerivedBalance()
-    const satoshis = res?.payload ?? 0
+    await setUserFromApi()
+    const satoshis = authUser.value?.balance_derived ?? 0
     // Compute needed collateral locally using the same formula as OrderModal
     let needed = 0
     if (btcPriceUsd.value && btcPriceUsd.value > 0) {
@@ -720,6 +726,32 @@ function buildTermsFromOffers(offers, contractStr) {
   })
 }
 
+function buildTermsFromLiquidityMarket(marketResults) {
+  return TARGET_TERMS.map((d) => {
+    const entry = marketResults[d] || {}
+    const lendBuckets = entry.lend || {}
+    const borrowBuckets = entry.borrow || {}
+
+    // Best lend rate = highest rate with liquidity
+    const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
+    const bestLendRate = lendRates.length ? lendRates[0] : null
+    const bestLendEar = bestLendRate != null ? annualize360(bestLendRate, d) : null
+
+    // Best borrow rate = lowest rate with liquidity
+    const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+    const bestBorrowRate = borrowRates.length ? borrowRates[0] : null
+    const bestBorrowEar = bestBorrowRate != null ? annualize360(bestBorrowRate, d) : null
+
+    return {
+      label: `${d} Days`,
+      ltv50a: fmtPct2(bestLendRate),   ltv50aEar: fmtPct2(bestLendEar),
+      ltv50b: fmtPct2(bestBorrowRate), ltv50bEar: fmtPct2(bestBorrowEar),
+      ltv50pid: null,
+      ltv50aId: null, ltv50bId: null,
+    }
+  })
+}
+
 function markFlashOnce(cellId) {
   const next = new Set(flashActive.value)
   next.add(cellId)
@@ -854,16 +886,26 @@ async function loadOffersOnce() {
   if (isFetchingOffers) return
   isFetchingOffers = true
   try {
-    const token = getToken()
-    const res = token
-      ? await getUserOffers('both', false)
-      : await getOffers('both')
-    if (!res || !Array.isArray(res.payload)) throw new Error('Bad payload')
-    const nextTerms = buildTermsFromOffers(res.payload, selectedContract.value)
+    // Fetch v1 liquidity-market for each term
+    const marketResults = {}
+    const ltv = 50
+    const cntr = selectedContract.value || '0.10'
+    const fetches = TARGET_TERMS.map(async (d) => {
+      const pid = buildProductId(d, ltv, cntr)
+      try {
+        const res = await getLiquidityMarket(pid)
+        marketResults[d] = res?.payload || {}
+      } catch (e) {
+        console.debug(`liquidity-market fetch failed for ${pid}:`, e)
+        marketResults[d] = {}
+      }
+    })
+    await Promise.all(fetches)
+    const nextTerms = buildTermsFromLiquidityMarket(marketResults)
     diffAndFlash(terms.value, nextTerms)
     terms.value = nextTerms
   } catch (e) {
-    console.error('Failed to load offers:', e)
+    console.error('Failed to load liquidity market:', e)
   } finally {
     isFetchingOffers = false
   }
