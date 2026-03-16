@@ -369,8 +369,7 @@ async function handleOrderSubmit(data) {
 
   const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
   const ltv = selectedLtv.value || 50
-  const cntr = selectedContract.value || '0.10'
-  const product_id = buildProductId(days, ltv, cntr)
+  const product_id = buildBaseProductId(days, ltv)
   const tmp_cntr_id = genTmpCntrId()
 
   const params = {
@@ -378,6 +377,30 @@ async function handleOrderSubmit(data) {
     tmp_cntr_id,
     ini_role: String(data.action || '').toLowerCase(),
     interest,
+  }
+
+  // Lock liquidity before posting offer (mirrors handleOrderConfirm)
+  const requiredSats = allocationResult.value?.required_btc_liquidity ?? 0
+  if (requiredSats > 0) {
+    try {
+      await postLiquidityAllocationV1({
+        ini_role: String(data.action || '').toLowerCase(),
+        interest,
+        oracle: [DEFAULT_ORACLE],
+        base_product: buildBaseProductId(days, ltv),
+        liquidity_sat: requiredSats,
+      })
+    } catch (e) {
+      const detail = e?.response?.data?.detail || e?.message || ''
+      if (/insufficient funds/i.test(detail)) {
+        showFundingScreen.value = true
+        fetchTopupAddress()
+      } else {
+        modalNotice.value = { type: 'error', text: detail || 'Liquidity allocation failed.' }
+      }
+      modalLoading.value = false
+      return
+    }
   }
 
   try {
@@ -809,7 +832,7 @@ const btcEquivalent = computed(() => {
 const nearestContractSize = computed(() => {
   const contracts = availableContracts.value.length
     ? availableContracts.value
-    : ['0.01', '0.10', '1.00']
+    : ['0.10', '1.00']
   const target = btcEquivalent.value
   let closest = contracts[0]
   let minDiff = Infinity
@@ -889,9 +912,8 @@ async function loadOffersOnce() {
     // Fetch v1 liquidity-market for each term
     const marketResults = {}
     const ltv = 50
-    const cntr = selectedContract.value || '0.10'
     const fetches = TARGET_TERMS.map(async (d) => {
-      const pid = buildProductId(d, ltv, cntr)
+      const pid = buildBaseProductId(d, ltv)
       try {
         const res = await getLiquidityMarket(pid)
         marketResults[d] = res?.payload || {}

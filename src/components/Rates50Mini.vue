@@ -310,7 +310,7 @@ const availableContracts = computed(() => {
     if (label && Number(label) >= 0.01) set.add(label)
   }
   if (!set.size) {
-    const fb = IS_STAGING ? ['0.01', '0.10', '1.00'] : ['0.01', '0.10', '1.00']
+    const fb = IS_STAGING ? ['0.10', '1.00'] : ['0.10', '1.00']
     return fb
   }
   return Array.from(set).sort((a,b)=>Number(a)-Number(b))
