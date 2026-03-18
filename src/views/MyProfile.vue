@@ -101,6 +101,11 @@
             <UsersLiquidity />
           </section>
 
+          <!-- Users DLCs -->
+          <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
+            <UsersDLCS />
+          </section>
+
           <!-- Referrals -->
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
             <h2 class="text-2xl font-bold">Referrals</h2>
@@ -390,6 +395,7 @@ import TheFooter from '../components/TheFooter.vue'
 import DlcDetails from '../components/DLCDetails.vue'
 import MailingListModal from '../components/MailingListModal.vue'
 import UsersLiquidity from '../components/UsersLiquidity.vue'
+import UsersDLCS from '../components/UsersDLCS.vue'
 import { isSignerAuthCode } from '../lib/authCode'
 
 // ---- Router & Auth ----
