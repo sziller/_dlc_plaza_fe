@@ -226,10 +226,9 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
-import { getOffers, getUserOffers } from '../api/offers'
 import { getToken } from '../api/token'
-import { acceptOffer } from '../api/acceptOffer'
-import { postOffer } from '../api/postOffer'
+import { postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
+import { DEFAULT_ORACLE } from '../config'
 import { postProductQueryV0 } from '../api/productQuery' // ApiEnvelope<ProductLendBorrowDtoLtd[]>
 
 const props = defineProps({
@@ -360,7 +359,6 @@ const showModal = ref(false)
 const selectedRate = ref('*')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
-const selectedOfferId = ref(null)
 const modalLoading = ref(false)
 const modalNotice = ref({ type: '', text: '' })
 
@@ -371,9 +369,6 @@ function getDaysFromLabel(label) {
 
 /* ---------- Table data (unchanged sizes) ---------- */
 const rows = ref([
-  { label: '30 Days',  lendTerm: '*', lendEar: '*', borrowTerm: '*', borrowEar: '*', lendId: null, borrowId: null, pid: null },
-  { label: '90 Days',  lendTerm: '*', lendEar: '*', borrowTerm: '*', borrowEar: '*', lendId: null, borrowId: null, pid: null },
-  { label: '180 Days', lendTerm: '*', lendEar: '*', borrowTerm: '*', borrowEar: '*', lendId: null, borrowId: null, pid: null },
   { label: '365 Days', lendTerm: '*', lendEar: '*', borrowTerm: '*', borrowEar: '*', lendId: null, borrowId: null, pid: null },
 ])
 
@@ -381,38 +376,11 @@ const flash = ref(new Set())
 let intervalId = null
 let fetching = false
 
-const TARGET_TERMS = [30, 90, 180, 365]
+const TARGET_TERMS = [365]
 const fmtPct2 = (n) => (Number.isFinite(n) ? `${n.toFixed(2)}%` : '*')
 const isYearish = (d) => Number.isFinite(d) && d >= 360 && d <= 366
 const PID_PREFIX = 'LendBorrowBTCUSD:'
 
-/* ---------- parsing helpers ---------- */
-function parseLtv(pid) {
-  const m = String(pid || '').match(/ltv-(\d{1,3})/i)
-  return m ? Number(m[1]) : null
-}
-function parseTermRawFromPid(pid) {
-  const m = String(pid || '').match(/d-(\d+(\.\d+)?)/i)
-  return m ? Math.round(Number(m[1])) : null
-}
-function parseContractFromPid(pid) {
-  const m = String(pid || '').match(/c-([\d.]+)/i)
-  if (m) {
-    const num = Number(m[1])
-    if (Number.isFinite(num)) {
-      const decimals = num < 0.01 ? 3 : 2
-      return num.toFixed(decimals)
-    }
-  }
-  return '0.10'
-}
-function normalizeRawDays(pid, duration) {
-  const fromPid = parseTermRawFromPid(pid)
-  if (fromPid) return fromPid
-  const d = Number(duration)
-  return Number.isFinite(d) ? Math.round(d) : 30
-}
-function mapDaysForUi(d) { return isYearish(d) ? 365 : d }
 function annualize360(termPct, days) {
   if (!Number.isFinite(termPct) || !days) return null
   if (isYearish(days)) return termPct
@@ -421,65 +389,35 @@ function annualize360(termPct, days) {
 
 /* ---------- product id ---------- */
 function buildProductId(days, ltv, contractStr) {
-  const normalizedDays = isYearish(days) ? 365 : days
-  const cleanContract = Number(contractStr)
-  const decimals = (Number.isFinite(cleanContract) && cleanContract < 0.01) ? 3 : 2
-  const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(decimals) : '0.10'
-  return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}_c-${cPart}`
+  return `${PID_PREFIX}ltv-50_d-365_c-xxx`
 }
 
-/* ---------- rows from offers (filter by chosen LTV + contract) ---------- */
-function buildRows(offers, ltv, contractStr) {
-  const best = {}
-  for (const o of offers || []) {
-    const l = parseLtv(o.product_id)
-    if (l !== ltv) continue
+/* ---------- rows from v1 liquidity-market data ---------- */
+function buildRowsFromMarket(marketResults) {
+  return TARGET_TERMS.map((d) => {
+    const entry = marketResults[d] || {}
+    const lendBuckets = entry.lend || {}
+    const borrowBuckets = entry.borrow || {}
 
-    const contract = parseContractFromPid(o.product_id)
-    if (contract !== contractStr) continue
+    // Best lend rate = highest rate with liquidity
+    const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
+    const bestLendRate = lendRates.length ? lendRates[0] : null
+    const bestLendEar = bestLendRate != null ? annualize360(bestLendRate, d) : null
 
-    const rawDays = normalizeRawDays(o.product_id, o.duration)
-    const uiDays  = mapDaysForUi(rawDays)
-    if (!TARGET_TERMS.includes(uiDays)) continue
+    // Best borrow rate = lowest rate with liquidity
+    const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+    const bestBorrowRate = borrowRates.length ? borrowRates[0] : null
+    const bestBorrowEar = bestBorrowRate != null ? annualize360(bestBorrowRate, d) : null
 
-    best[uiDays] ??= {
-      lend: { term:null, ear:null, id:null },
-      borrow: { term:null, ear:null, id:null },
-      pid: o.product_id,
-    }
-
-    const side = o.ini_role === 'borrow' ? 'lend' : o.ini_role === 'lend' ? 'borrow' : null
-    if (!side) continue
-
-    const ear = annualize360(o.interest, rawDays)
-    if (side === 'lend') {
-      if (best[uiDays].lend.term == null || o.interest > best[uiDays].lend.term) {
-        best[uiDays].lend.term = o.interest
-        best[uiDays].lend.ear  = ear
-        best[uiDays].lend.id   = o.dlc_id
-        best[uiDays].pid       = o.product_id
-      }
-    } else {
-      if (best[uiDays].borrow.term == null || o.interest < best[uiDays].borrow.term) {
-        best[uiDays].borrow.term = o.interest
-        best[uiDays].borrow.ear  = ear
-        best[uiDays].borrow.id   = o.dlc_id
-        best[uiDays].pid         = best[uiDays].pid || o.product_id
-      }
-    }
-  }
-
-  return TARGET_TERMS.map(d => {
-    const b = best[d] || { lend:{}, borrow:{}, pid: buildProductId(d, ltv, contractStr) }
     return {
       label: `${d} Days`,
-      lendTerm: fmtPct2(b.lend.term),
-      lendEar:  fmtPct2(b.lend.ear),
-      borrowTerm: fmtPct2(b.borrow.term),
-      borrowEar:  fmtPct2(b.borrow.ear),
-      lendId: b.lend.id || null,
-      borrowId: b.borrow.id || null,
-      pid: b.pid || buildProductId(d, ltv, contractStr),
+      lendTerm: fmtPct2(bestLendRate),
+      lendEar: fmtPct2(bestLendEar),
+      borrowTerm: fmtPct2(bestBorrowRate),
+      borrowEar: fmtPct2(bestBorrowEar),
+      lendId: null,
+      borrowId: null,
+      pid: buildProductId(d, selectedLtv.value, selectedContract.value),
     }
   })
 }
@@ -532,10 +470,20 @@ async function loadOnce() {
   if (fetching) return
   fetching = true
   try {
-    const token = getToken()
-    const res = token ? await getUserOffers('both', false) : await getOffers('both')
-    const list = Array.isArray(res?.payload) ? res.payload : []
-    const nextRows = buildRows(list, selectedLtv.value, selectedContract.value)
+    const ltv = selectedLtv.value
+    const marketResults = {}
+    const fetches = TARGET_TERMS.map(async (d) => {
+      const pid = buildProductId(d, ltv, selectedContract.value)
+      try {
+        const res = await getLiquidityMarket(pid)
+        marketResults[d] = res?.payload || {}
+      } catch (e) {
+        console.debug(`liquidity-market fetch failed for ${pid}:`, e)
+        marketResults[d] = {}
+      }
+    })
+    await Promise.all(fetches)
+    const nextRows = buildRowsFromMarket(marketResults)
     flashDiff(rows.value, nextRows)
     rows.value = nextRows
   } catch (e) {
@@ -550,16 +498,13 @@ function handleCellClick(row, side) {
   selectedRate.value = side === 'lend' ? row.lendTerm : row.borrowTerm
   selectedAction.value = side === 'lend' ? 'Lend' : 'Borrow'
   selectedTermDays.value = getDaysFromLabel(row.label)
-  selectedOfferId.value = side === 'lend' ? row.lendId : row.borrowId
   modalNotice.value = { type: '', text: '' }
   showModal.value = true
 }
 
 async function handleOrderSubmit(data) {
-  const type = (data.orderType || '').toLowerCase()
   modalNotice.value = { type: '', text: '' }
 
-  // if not logged in, send to login
   if (!getToken()) {
     showModal.value = false
     router.push('/login')
@@ -568,56 +513,31 @@ async function handleOrderSubmit(data) {
 
   modalLoading.value = true
 
-  // MARKET → accept the offer we have
-  if (type === 'market') {
-    if (!selectedOfferId.value) {
-      modalLoading.value = false
-      modalNotice.value = { type: 'error', text: 'Missing offer id' }
-      return
-    }
-    try {
-      await acceptOffer({ dlc_id: String(selectedOfferId.value) })
-      modalNotice.value = { type: 'success', text: 'Market order accepted.' }
-    } catch (e) {
-      const msg = e?.response?.data?.detail || e?.message || 'Accept failed.'
-      modalNotice.value = { type: 'error', text: msg }
-    } finally {
-      modalLoading.value = false
-    }
+  const interest = toNum(data.rate)
+  if (!Number.isFinite(interest)) {
+    modalLoading.value = false
+    modalNotice.value = { type: 'error', text: 'Invalid rate.' }
     return
   }
 
-  // LIMIT → postOffer
-  if (type === 'limit') {
-    const interest = toNum(data.rate)
-    if (!Number.isFinite(interest)) {
-      modalLoading.value = false
-      modalNotice.value = { type: 'error', text: 'Invalid rate.' }
-      return
-    }
+  const days = Number(data.durationDays) || selectedTermDays.value
+  const ltv = selectedLtv.value
+  const cntr = selectedContract.value
 
-    const days = Number(data.durationDays) || selectedTermDays.value
-    const ltv = selectedLtv.value
-    const cntr = selectedContract.value
-    const product_id = buildProductId(days, ltv, cntr)
-    const tmp_cntr_id = genTmpCntrId()
-
-    const params = {
-      product_id,
-      tmp_cntr_id,
-      ini_role: String(data.action || '').toLowerCase(), // 'lend' or 'borrow'
+  try {
+    await postLiquidityAllocationV1({
+      ini_role: String(data.action || '').toLowerCase(),
       interest,
-    }
-
-    try {
-      await postOffer(params)
-      modalNotice.value = { type: 'success', text: 'Limit order posted.' }
-    } catch (e) {
-      const msg = e?.response?.data?.detail || e?.message || 'Offer failed.'
-      modalNotice.value = { type: 'error', text: msg }
-    } finally {
-      modalLoading.value = false
-    }
+      oracle: [DEFAULT_ORACLE],
+      base_product: buildProductId(days, ltv, cntr),
+      liquidity_sat: 0,
+    })
+    modalNotice.value = { type: 'success', text: 'Order submitted.' }
+  } catch (e) {
+    const msg = e?.response?.data?.detail || e?.message || 'Order failed.'
+    modalNotice.value = { type: 'error', text: msg }
+  } finally {
+    modalLoading.value = false
   }
 }
 
@@ -625,12 +545,6 @@ function toNum(rateStr) {
   const m = String(rateStr ?? '').match(/([\d.]+)/)
   return m ? parseFloat(m[1]) : NaN
 }
-function genTmpCntrId() {
-  const bytes = new Uint8Array(16)
-  crypto.getRandomValues(bytes)
-  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
-}
-
 onMounted(async () => {
   await prefetchProducts()
   await loadOnce()

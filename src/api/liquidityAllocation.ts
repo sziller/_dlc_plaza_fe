@@ -104,7 +104,7 @@ export const postLiquidityAllocationV1 = async (
 export const getLiquidityMarket = async (
   productId: string,
   oracle: string = DEFAULT_ORACLE,
-  depth: number = 5,
+  depth: number = 1,
   role?: 'lend' | 'borrow'
 ): Promise<LiquidityMarketResponse> => {
   const params: Record<string, string | number> = { product_id: productId, oracle, depth };

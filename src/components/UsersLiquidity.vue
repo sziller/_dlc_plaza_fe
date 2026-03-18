@@ -20,6 +20,7 @@
                   :aria-sort="sortKey === col.key ? (sortAsc ? 'ascending' : 'descending') : 'none'"
                 >
                   <button
+                    v-if="col.label"
                     type="button"
                     class="cursor-pointer select-none hover:text-secondary transition inline-flex items-center gap-1"
                     @click="sortBy(col.key)"
@@ -45,25 +46,35 @@
                 class="hover:bg-white/5 transition border-b border-white/10"
               >
                 <td class="px-4 py-3">{{ row.role }}</td>
-                <td class="px-4 py-3">{{ row.product }}</td>
+                <td class="px-4 py-3 tabular-nums">{{ row.dollar }}</td>
                 <td class="px-4 py-3">{{ row.interest }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ row.liquidity }}</td>
                 <td class="px-4 py-3">{{ row.date }}</td>
+                <td class="px-4 py-3">
+                  <button
+                    type="button"
+                    :disabled="cancelling.has(row.uuid)"
+                    class="px-3 py-1 text-xs font-semibold rounded border border-red-500/60 text-red-400 hover:bg-red-500/15 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    @click="cancelAllocation(row)"
+                  >
+                    {{ cancelling.has(row.uuid) ? 'Cancelling…' : 'Cancel' }}
+                  </button>
+                </td>
               </tr>
               <tr v-if="sortedData.length === 0">
-                <td class="px-4 py-6 text-white/70" colspan="5">No liquidity allocations found.</td>
+                <td class="px-4 py-6 text-white/70" colspan="6">No liquidity allocations found.</td>
               </tr>
             </tbody>
 
             <tbody v-else-if="loading">
               <tr>
-                <td class="px-4 py-6 text-white/70" colspan="5">Loading…</td>
+                <td class="px-4 py-6 text-white/70" colspan="6">Loading…</td>
               </tr>
             </tbody>
 
             <tbody v-else>
               <tr>
-                <td class="px-4 py-6 text-red-400" colspan="5">{{ error }}</td>
+                <td class="px-4 py-6 text-red-400" colspan="6">{{ error }}</td>
               </tr>
             </tbody>
           </table>
@@ -76,13 +87,16 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { postUserLiquQuery } from '../api/userLiquQuery'
+import { postLiquidityWithdrawalV1 } from '../api/liquidityAllocation'
+import { getPrice } from '../api/price'
 
 const columns = Object.freeze([
-  { label: 'Role', key: 'role' },
-  { label: 'Product', key: 'product' },
-  { label: 'Interest (bp)', key: 'interestBp' },
+  { label: 'Type', key: 'role' },
+  { label: 'Dollar', key: 'dollarValue' },
+  { label: 'Interest (%)', key: 'interestBp' },
   { label: 'Liquidity (BTC)', key: 'liquiditySat' },
   { label: 'Date', key: 'timestamp' },
+  { label: '', key: 'actions' },
 ])
 
 const rows = ref([])
@@ -91,6 +105,8 @@ const error = ref(null)
 const sortKey = ref('timestamp')
 const sortAsc = ref(false)
 const pollMs = 30000
+const btcPrice = ref(0)
+const cancelling = ref(new Set())
 
 function satsToBtc(sats) {
   const n = Number(sats)
@@ -109,28 +125,40 @@ function capitalize(s) {
   return v.charAt(0).toUpperCase() + v.slice(1)
 }
 
+function fmtDollar(sats) {
+  const n = Number(sats)
+  if (!Number.isFinite(n) || !btcPrice.value) return '—'
+  const usd = (n / 1e8) * btcPrice.value
+  return '$' + usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 function toRow(a) {
   return {
     uuid: a.uuid,
     role: capitalize(a.ini_role),
-    product: a.service_type || '—',
-    interest: String(a.interest_bp ?? '—'),
+    dollar: fmtDollar(a.liquidity_sat),
+    dollarValue: btcPrice.value ? (Number(a.liquidity_sat) / 1e8) * btcPrice.value : 0,
+    interest: (a.interest_bp / 100).toFixed(2) + '%',
     interestBp: Number(a.interest_bp) || 0,
     liquidity: satsToBtc(a.liquidity_sat),
     liquiditySat: Number(a.liquidity_sat) || 0,
     date: fmtDate(a.timestamp),
     timestamp: Number(a.timestamp) || 0,
+    // keep raw values for cancel
+    _raw: a,
   }
 }
 
 // sorting
 function sortBy(key) {
+  if (key === 'actions') return
   if (sortKey.value === key) sortAsc.value = !sortAsc.value
   else { sortKey.value = key; sortAsc.value = true }
 }
 
 function normForSort(row, key) {
-  if (key === 'role' || key === 'product') return String(row[key] || '').toLowerCase()
+  if (key === 'role') return String(row[key] || '').toLowerCase()
+  if (key === 'dollarValue') return row.dollarValue
   if (key === 'interestBp') return row.interestBp
   if (key === 'liquiditySat') return row.liquiditySat
   if (key === 'timestamp') return row.timestamp
@@ -147,10 +175,43 @@ const sortedData = computed(() => {
   })
 })
 
+// cancel allocation
+async function cancelAllocation(row) {
+  if (!window.confirm('Are you sure you want to cancel this allocation?')) return
+  const raw = row._raw
+  const next = new Set(cancelling.value)
+  next.add(row.uuid)
+  cancelling.value = next
+  try {
+    await postLiquidityWithdrawalV1({
+      ini_role: raw.ini_role,
+      interest: raw.interest_bp / 100,
+      liquidity_sat: raw.liquidity_sat,
+    })
+    await load(true)
+  } catch (e) {
+    alert(e?.message || 'Failed to cancel allocation.')
+  } finally {
+    const after = new Set(cancelling.value)
+    after.delete(row.uuid)
+    cancelling.value = after
+  }
+}
+
 // fetching
 let pollId = null
 let isFetching = false
 let hasLoadedOnce = false
+let rawAllocations = []
+
+async function fetchBtcPrice() {
+  try {
+    const price = await getPrice()
+    if (Number.isFinite(price) && price > 0) btcPrice.value = price
+  } catch (e) {
+    console.debug('BTC price fetch failed:', e)
+  }
+}
 
 async function load(initial = false) {
   if (isFetching) return
@@ -159,8 +220,10 @@ async function load(initial = false) {
   isFetching = true
   if (initial) { loading.value = true; error.value = null }
   try {
+    await fetchBtcPrice()
     const res = await postUserLiquQuery()
     const allocations = Array.isArray(res?.payload?.allocations) ? res.payload.allocations : []
+    rawAllocations = allocations
     rows.value = allocations.map(toRow)
     hasLoadedOnce = true
   } catch (e) {

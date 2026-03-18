@@ -81,9 +81,23 @@
             <div><span class="font-semibold">Wallet Balance:</span> {{ formatBtc(profile.payload.balance_onchain) }} BTC</div>
           </section>
 
+          <!-- Create Loan -->
+          <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
+            <h2 class="text-2xl font-bold">Create Loan</h2>
+            <p class="text-white/70 text-sm">
+              Borrow against your Bitcoin or lend for fixed fiat returns.
+            </p>
+            <router-link
+              to="/btcusd"
+              class="inline-flex items-center gap-2 self-start rounded-full border border-white/40 px-6 py-2 text-sm font-semibold text-white transition hover:border-secondary hover:text-secondary"
+            >
+              Create Loan
+            </router-link>
+          </section>
+
           <!-- Liquidity Allocations -->
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
-            <h2 class="text-2xl font-bold">Liquidity Allocations</h2>
+            <h2 class="text-2xl font-bold">Locked Collateral</h2>
             <UsersLiquidity />
           </section>
 
@@ -152,8 +166,15 @@
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-4">
             <h2 class="text-2xl font-bold">Add funds</h2>
 
-            <div v-if="addrError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
-              {{ addrError }}
+            <div v-if="addrError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm flex items-center justify-between gap-3">
+              <span>{{ addrError }}</span>
+              <button
+                type="button"
+                class="shrink-0 rounded border border-white/30 px-3 py-1 text-white hover:bg-white/10 transition"
+                @click="fetchTopup"
+              >
+                Retry
+              </button>
             </div>
 
             <div v-else-if="addrLoading" class="text-white/80 text-sm">Fetching top-up address…</div>
@@ -430,7 +451,8 @@ async function fetchTopup() {
   copied.value = false
 
   try {
-    const res = await getTopupAddressQR(-1)
+    const res = await getTopupAddressQR()
+
     const addr = String(res?.payload?.string || '')
     if (!addr) throw new Error('Top-up address not found in response payload.')
     address.value = addr
@@ -447,7 +469,7 @@ async function fetchTopup() {
     }
   } catch (e) {
     const msg = e && e.message ? e.message : String(e)
-    addrError.value = msg
+    addrError.value = 'Could not load your deposit address. Please try again or contact support.'
     qrError.value = msg
   } finally {
     addrLoading.value = false

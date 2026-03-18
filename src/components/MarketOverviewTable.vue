@@ -108,6 +108,8 @@
             :balance-loading="balanceLoading"
             :topup-address="topupAddress"
             :topup-qr-svg="topupQrSvg"
+            :topup-loading="topupLoading"
+            :topup-error="topupError"
             :user-auth-code="userAuthCode"
             :show-funding-screen="showFundingScreen"
             :show-auth-prompt="showAuthPrompt"
@@ -129,9 +131,6 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
-import { getOffers, getUserOffers } from '../api/offers'
-import { postOffer } from '../api/postOffer'
-import { acceptOffer } from '../api/acceptOffer'
 import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { getServerStatus } from '../api/serverStatus'
@@ -242,7 +241,6 @@ const selectedRate = ref('')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
 const selectedLtv = ref(50)
-const selectedOfferId = ref(null)
 const modalLoading = ref(false)
 const modalNotice  = ref({ type: '', text: '' })
 
@@ -255,6 +253,8 @@ const balanceLoading = ref(false)
 // -------- Topup + Auth state ----------
 const topupAddress = ref('')
 const topupQrSvg = ref('')
+const topupLoading = ref(false)
+const topupError = ref('')
 const { user: authUser, setUserFromApi } = useAuth()
 const userAuthCode = computed(() => authUser.value?.auth_code ?? 0)
 
@@ -264,8 +264,6 @@ function handleCellClick(row, key) {
   selectedAction.value = key.includes('a') ? 'Lend' : 'Borrow'
   selectedTermDays.value = getDaysFromLabel(row.label)
   selectedLtv.value = 50
-  const idKey = `${key}Id`
-  selectedOfferId.value = row[idKey] || null
   showModal.value = true
 }
 
@@ -276,7 +274,6 @@ function handleSimpleBorrow() {
   selectedAction.value = 'Borrow'
   selectedTermDays.value = SIMPLE_TERM_DAYS
   selectedLtv.value = 50
-  selectedOfferId.value = null
   showModal.value = true
 }
 
@@ -287,7 +284,6 @@ function handleSimpleLend() {
   selectedAction.value = 'Lend'
   selectedTermDays.value = SIMPLE_TERM_DAYS
   selectedLtv.value = 50
-  selectedOfferId.value = null
   showModal.value = true
 }
 
@@ -320,7 +316,7 @@ async function handleOrderSubmit(data) {
 
     if (availableSats < requiredSats) {
       showFundingScreen.value = true
-      fetchTopupAddress()
+      await fetchTopupAddress()
       modalLoading.value = false
       return
     }
@@ -328,30 +324,38 @@ async function handleOrderSubmit(data) {
 
   if (!allocationResult.value?.is_covered) {
     showFundingScreen.value = true
-    fetchTopupAddress()
+    await fetchTopupAddress()
     modalLoading.value = false
     return
   }
 
   if (type === 'market') {
-    if (!selectedOfferId.value) {
+    const interest = toNum(data.rate)
+    if (!Number.isFinite(interest)) {
       modalLoading.value = false
-      modalNotice.value = { type: 'error', text: 'Missing offer id' }
+      modalNotice.value = { type: 'error', text: 'Invalid rate.' }
       return
     }
+    const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
+    const ltv = selectedLtv.value || 50
+    const requiredSats = allocationResult.value?.required_btc_liquidity ?? 0
     try {
-      const res = await acceptOffer({ dlc_id: String(selectedOfferId.value) })
-      console.log('Offer accepted:', res)
-      modalNotice.value = { type: 'success', text: 'Market order accepted.' }
-      fetchTopupAddress()
+      await postLiquidityAllocationV1({
+        ini_role: String(data.action || '').toLowerCase(),
+        interest,
+        oracle: [DEFAULT_ORACLE],
+        base_product: buildBaseProductId(days, ltv),
+        liquidity_sat: requiredSats,
+      })
+      modalNotice.value = { type: 'success', text: 'Order submitted.' }
       setUserFromApi()
     } catch (e) {
       const detail = e?.response?.data?.detail || e?.message || ''
       if (/insufficient funds/i.test(detail)) {
         showFundingScreen.value = true
-        fetchTopupAddress()
+        await fetchTopupAddress()
       } else {
-        modalNotice.value = { type: 'error', text: detail || 'Accept failed.' }
+        modalNotice.value = { type: 'error', text: detail || 'Order failed.' }
       }
     } finally {
       modalLoading.value = false
@@ -369,53 +373,25 @@ async function handleOrderSubmit(data) {
 
   const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
   const ltv = selectedLtv.value || 50
-  const product_id = buildBaseProductId(days, ltv)
-  const tmp_cntr_id = genTmpCntrId()
-
-  const params = {
-    product_id,
-    tmp_cntr_id,
-    ini_role: String(data.action || '').toLowerCase(),
-    interest,
-  }
-
-  // Lock liquidity before posting offer (mirrors handleOrderConfirm)
   const requiredSats = allocationResult.value?.required_btc_liquidity ?? 0
-  if (requiredSats > 0) {
-    try {
-      await postLiquidityAllocationV1({
-        ini_role: String(data.action || '').toLowerCase(),
-        interest,
-        oracle: [DEFAULT_ORACLE],
-        base_product: buildBaseProductId(days, ltv),
-        liquidity_sat: requiredSats,
-      })
-    } catch (e) {
-      const detail = e?.response?.data?.detail || e?.message || ''
-      if (/insufficient funds/i.test(detail)) {
-        showFundingScreen.value = true
-        fetchTopupAddress()
-      } else {
-        modalNotice.value = { type: 'error', text: detail || 'Liquidity allocation failed.' }
-      }
-      modalLoading.value = false
-      return
-    }
-  }
 
   try {
-    const res = await postOffer(params)
-    console.log('Offer posted:', res)
-    modalNotice.value = { type: 'success', text: 'Limit order posted' }
-    fetchTopupAddress()
+    await postLiquidityAllocationV1({
+      ini_role: String(data.action || '').toLowerCase(),
+      interest,
+      oracle: [DEFAULT_ORACLE],
+      base_product: buildBaseProductId(days, ltv),
+      liquidity_sat: requiredSats,
+    })
+    modalNotice.value = { type: 'success', text: 'Order submitted.' }
     setUserFromApi()
   } catch (e) {
     const detail = e?.response?.data?.detail || e?.message || ''
     if (/insufficient funds/i.test(detail)) {
       showFundingScreen.value = true
-      fetchTopupAddress()
+      await fetchTopupAddress()
     } else {
-      modalNotice.value = { type: 'error', text: detail || 'Offer failed.' }
+      modalNotice.value = { type: 'error', text: detail || 'Order failed.' }
     }
   } finally {
     modalLoading.value = false
@@ -426,6 +402,12 @@ async function handleReviewOrder(data) {
   allocationLoading.value = true
   allocationResult.value = null
   modalNotice.value = { type: '', text: '' }
+
+  if (!getToken()) {
+    showAuthPrompt.value = true
+    allocationLoading.value = false
+    return
+  }
 
   const days = Number(data.durationDays) || SIMPLE_TERM_DAYS
   const ltv = selectedLtv.value || 50
@@ -528,7 +510,7 @@ async function handleOrderConfirm(data) {
     const detail = e?.response?.data?.detail || e?.message || ''
     if (/insufficient funds/i.test(detail)) {
       showFundingScreen.value = true
-      fetchTopupAddress()
+      await fetchTopupAddress()
     } else {
       modalNotice.value = { type: 'error', text: detail || 'Liquidity allocation failed.' }
     }
@@ -569,12 +551,20 @@ async function handleBalanceCheck() {
 }
 
 async function fetchTopupAddress() {
+  topupLoading.value = true
+  topupError.value = ''
   try {
-    const res = await getTopupAddressQR(-1)
+    const res = await getTopupAddressQR()
     topupAddress.value = res?.payload?.string || ''
     topupQrSvg.value = res?.payload?.qr_code || ''
+    if (!topupAddress.value) {
+      topupError.value = 'Could not load your deposit address. Please try again or visit your profile page.'
+    }
   } catch (e) {
     console.debug('Topup address fetch failed:', e)
+    topupError.value = 'Could not load your deposit address. Please try again or visit your profile page.'
+  } finally {
+    topupLoading.value = false
   }
 }
 
@@ -631,13 +621,11 @@ function handleModalClose() {
   modalNotice.value = { type: '', text: '' }
   topupAddress.value = ''
   topupQrSvg.value = ''
+  topupError.value = ''
 }
 
 // -------- Table rows / offers polling ----------
 const terms = ref([
-  { label: '30 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
-  { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
-  { label: '180 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
   { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
 ])
 
@@ -657,7 +645,7 @@ function getEar(row, key) {
   const v = row[`${key}Ear`]
   return v ?? '*'
 }
-const TARGET_TERMS = [30, 90, 180, 365]
+const TARGET_TERMS = [365]
 
 function parseLtv(pid) {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
@@ -975,15 +963,10 @@ onUnmounted(() => {
 
 // -------- Local helpers ----------
 function buildProductId(days, ltv, contractStr) {
-  const normalizedDays = isYearish(days) ? 365 : days
-  const cleanContract = Number(contractStr)
-  const decimals = (Number.isFinite(cleanContract) && cleanContract < 0.01) ? 3 : 2
-  const cPart = Number.isFinite(cleanContract) ? cleanContract.toFixed(decimals) : '0.10'
-  return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}_c-${cPart}`
+  return `${PID_PREFIX}ltv-50_d-365_c-xxx`
 }
 function buildBaseProductId(days, ltv) {
-  const normalizedDays = isYearish(days) ? 365 : days
-  return `${PID_PREFIX}ltv-${ltv}_d-${normalizedDays}_c-xxx`
+  return `${PID_PREFIX}ltv-50_d-365_c-xxx`
 }
 function getDaysFromLabel(label) {
   const m = String(label || '').match(/(\d+)/)
@@ -993,12 +976,6 @@ function toNum(rateStr) {
   const m = String(rateStr ?? '').match(/([\d.]+)/)
   return m ? parseFloat(m[1]) : NaN
 }
-function genTmpCntrId() {
-  const bytes = new Uint8Array(16)
-  crypto.getRandomValues(bytes)
-  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
-}
-
 // Refresh offers whenever selection changes
 watch(selectedContract, () => {
   loadOffersOnce()

@@ -14,7 +14,7 @@
       <div class="px-6 py-4 flex justify-between items-center">
         <!-- Logo & BTC Price (clickable; when logged in -> BTCUSD) -->
         <router-link
-          :to="isLoggedIn ? '/btcusd' : '/'"
+          to="/"
           class="flex items-center space-x-4 group focus:outline-none focus:ring-2 focus:ring-secondary/60 rounded-md"
           aria-label="Go to Home"
         >
@@ -66,8 +66,7 @@
         <!-- Desktop Nav -->
         <div class="hidden md:flex space-x-6 items-center">
           <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
-          <router-link :class="linkClass" to="/cadena-paper">Cadena Paper</router-link>
-          <router-link :class="linkClass" to="/knowledge-hub">Knowledge Base</router-link>
+          <router-link :class="linkClass" to="/btcusd">Create Loan</router-link>
 
           <!-- Socials dropdown -->
           <div class="relative group">
@@ -279,8 +278,7 @@
         @keyup.esc="closeMobileMenu"
       >
         <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
-        <router-link @click="closeMobileMenu" to="/cadena-paper" class="block text-lg font-semibold hover:text-secondary">Cadena Paper</router-link>
-        <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block text-lg font-semibold hover:text-secondary">Knowledge Base</router-link>
+        <router-link @click="closeMobileMenu" to="/btcusd" class="block text-lg font-semibold hover:text-secondary">Create Loan</router-link>
 
         <div>
           <div class="text-white/50 uppercase text-xs mt-4 mb-2">Socials</div>

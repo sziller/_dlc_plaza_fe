@@ -200,14 +200,27 @@
             <p class="text-sm text-white/80 mb-3">Send BTC to your Cadena address:</p>
 
             <!-- QR Code -->
-            <div v-if="qrDataUri" class="flex justify-center mb-3">
+            <div v-if="topupLoading" class="flex justify-center mb-3">
+              <div class="bg-white/5 rounded-lg p-3 w-full max-w-[260px] aspect-square overflow-hidden flex items-center justify-center">
+                <div class="flex flex-col items-center gap-3">
+                  <div class="h-6 w-6 rounded-full border-3 border-white/30 border-t-white animate-spin"></div>
+                  <span class="text-sm text-white/60">Loading address…</span>
+                </div>
+              </div>
+            </div>
+            <div v-else-if="qrDataUri" class="flex justify-center mb-3">
               <div class="bg-white rounded-lg p-3 w-full max-w-[260px] aspect-square overflow-hidden flex items-center justify-center">
                 <img :src="qrDataUri" alt="Deposit QR code" class="w-full h-full block object-contain" />
               </div>
             </div>
 
             <!-- Address + Copy -->
-            <div v-if="topupAddress" class="bg-white/5 border border-white/10 rounded-lg p-3">
+            <div v-if="topupLoading" class="bg-white/5 border border-white/10 rounded-lg p-3">
+              <div class="flex items-center gap-2 justify-center">
+                <span class="text-xs text-white/50">Loading address…</span>
+              </div>
+            </div>
+            <div v-else-if="topupAddress" class="bg-white/5 border border-white/10 rounded-lg p-3">
               <div class="flex items-center gap-2">
                 <p class="text-xs text-white font-mono break-all select-all flex-1">{{ topupAddress }}</p>
                 <button
@@ -219,6 +232,11 @@
                   {{ addressCopied ? 'Copied!' : 'Copy' }}
                 </button>
               </div>
+            </div>
+
+            <!-- Error state: both endpoints failed -->
+            <div v-if="!topupLoading && !qrDataUri && !topupAddress && topupError" class="bg-red-500/15 border border-red-500/40 rounded-lg p-3">
+              <p class="text-sm text-white/90">{{ topupError }}</p>
             </div>
           </div>
 
@@ -514,6 +532,8 @@ const props = defineProps({
   balanceLoading: { type: Boolean, default: false },
   topupAddress: { type: String, default: '' },
   topupQrSvg: { type: String, default: '' },
+  topupLoading: { type: Boolean, default: false },
+  topupError: { type: String, default: '' },
   userAuthCode: { type: Number, default: 0 },
   showFundingScreen: { type: Boolean, default: false },
   showAuthPrompt: { type: Boolean, default: false },
@@ -521,7 +541,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'submit', 'confirm', 'review', 'checkBalance', 'recheckBalance', 'retryOrder'])
 
 const { loading, notice, termDays, actionType, rate, ltv, contractSize,
-        allocationResult, allocationLoading, balanceCheckResult, balanceLoading, skipToReview, showFundingScreen, showAuthPrompt } = toRefs(props)
+        allocationResult, allocationLoading, balanceCheckResult, balanceLoading, skipToReview, showFundingScreen, showAuthPrompt, topupLoading, topupError } = toRefs(props)
 
 const orderType = ref(props.skipToReview ? 'limit' : 'market')
 const step = ref(props.skipToReview ? 2 : 1)
