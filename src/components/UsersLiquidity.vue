@@ -4,7 +4,7 @@
       <div class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col">
         <!-- Title -->
         <div class="text-3xl font-extrabold text-center mb-6 shrink-0">
-          Liquidity Allocations
+          Open Orders
         </div>
 
         <!-- Table Wrapper -->
@@ -62,7 +62,7 @@
                 </td>
               </tr>
               <tr v-if="sortedData.length === 0">
-                <td class="px-4 py-6 text-white/70" colspan="6">No liquidity allocations found.</td>
+                <td class="px-4 py-6 text-white/70" colspan="6">No open orders found.</td>
               </tr>
             </tbody>
 
@@ -229,7 +229,7 @@ async function load(initial = false) {
   } catch (e) {
     console.error('postUserLiquQuery failed:', e)
     if (!hasLoadedOnce) {
-      error.value = e?.message || 'Failed to fetch liquidity allocations.'
+      error.value = e?.message || 'Failed to fetch open orders.'
       rows.value = []
     }
   } finally {

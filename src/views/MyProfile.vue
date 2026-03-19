@@ -95,7 +95,7 @@
             </router-link>
           </section>
 
-          <!-- Liquidity Allocations -->
+          <!-- Open Orders -->
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
             <h2 class="text-2xl font-bold">Locked Collateral</h2>
             <UsersLiquidity />
