@@ -179,14 +179,22 @@
 </template>
 
 <script setup lang="js">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
-import { downloadApp } from '../api/downloadApp'
+import { downloadApp, fetchLatestAppInfo } from '../api/downloadApp'
 
 const downloading = ref(false)
 const downloadError = ref('')
-const apkFilename = ref('CadenaBitcoinLive(v102).apk')
-const apkVersion = ref('v102')
+const apkVersion = ref('')
+
+onMounted(async () => {
+  try {
+    const info = await fetchLatestAppInfo()
+    apkVersion.value = info.versionLabel || 'Latest'
+  } catch {
+    apkVersion.value = 'Latest'
+  }
+})
 
 const handleApkDownload = async () => {
   if (downloading.value) return
@@ -195,9 +203,13 @@ const handleApkDownload = async () => {
   downloadError.value = ''
 
   try {
-    await downloadApp({ filename: apkFilename.value })
+    const result = await downloadApp()
+    apkVersion.value = result.versionLabel || 'Latest'
   } catch (e) {
-    downloadError.value = e?.message || 'Could not download the APK. Please try again.'
+    const isNotFound = e?.name === 'HttpError' && e?.status === 404
+    downloadError.value = isNotFound
+      ? 'APK not yet available. Please check back soon.'
+      : (e?.message || 'Could not download the APK. Please try again.')
   } finally {
     downloading.value = false
   }
