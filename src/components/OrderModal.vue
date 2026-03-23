@@ -173,7 +173,7 @@
           <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/30 space-y-2">
             <div class="flex justify-between text-sm">
               <span class="text-white/70">Collateral required</span>
-              <span class="font-mono text-white">{{ Number.isFinite(computedCollateralBtc) ? computedCollateralBtc.toFixed(8) : '0' }} BTC</span>
+              <span class="font-mono text-white">{{ Number.isFinite(computedCollateralBtc) ? formatBtcValue(computedCollateralBtc) : '0' }} BTC</span>
             </div>
             <div class="flex justify-between text-sm">
               <span class="text-white/70">Your balance</span>
@@ -315,6 +315,7 @@
           <li><span class="font-semibold text-white">Role:</span> {{ actionType }}</li>
           <li><span class="font-semibold text-white">Amount:</span> {{ formatAmountDisplay(amountBtc, amountUsd) }}</li>
           <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
+          <li><span class="font-semibold text-white">LTV:</span> 50%</li>
           <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ reviewTermRateStr }}</li>
           <li><span class="font-semibold text-white">Cadena Fee:</span> {{ displayFee }}</li>
           <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYieldWithFee }}</li>
@@ -328,7 +329,7 @@
         <div v-else-if="allocationResult" class="mt-4 space-y-3">
           <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/30">
             <p class="text-base font-semibold text-white">
-              Collateral Required: {{ Number.isFinite(computedCollateralBtc) ? computedCollateralBtc.toFixed(8) : '0' }} BTC
+              Collateral Required: {{ Number.isFinite(computedCollateralBtc) ? formatBtcValue(computedCollateralBtc) : '0' }} BTC
             </p>
             <p class="text-sm text-white/70 mt-1">
               Available BTC Liquidity: {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
@@ -514,6 +515,7 @@
 <script setup>
 import { ref, watch, computed, onMounted, onUnmounted, toRefs } from 'vue'
 import { isSignerAuthCode } from '../lib/authCode'
+import { formatBtcValue, satsForm } from '../functions/amount_formatting'
 
 const props = defineProps({
   rate: String,
@@ -595,6 +597,8 @@ const RATE_DECIMALS = 4
 const ANNUAL_DECIMALS = 2
 const STEP = 0.1
 const FEE_PCT = 0.01
+const RATE_MIN = 0
+const RATE_MAX = 25
 
 const titleId = `order-modal-title-${Math.random().toString(36).slice(2)}`
 const descId  = `order-modal-desc-${Math.random().toString(36).slice(2)}`
@@ -662,7 +666,7 @@ function fmt(n) { return Number.isNaN(n) ? '*' : `${n.toFixed(RATE_DECIMALS)}%` 
 function fmtReview(n) { return Number.isNaN(n) ? '*' : `${n.toFixed(2)}%` }
 function formatBtc(n) {
   const x = Number(n)
-  return Number.isFinite(x) ? `${x.toFixed(8)} BTC` : '*'
+  return Number.isFinite(x) ? `${formatBtcValue(x)} BTC` : '*'
 }
 function roundBtc(n) {
   const x = Number(n)
@@ -670,7 +674,7 @@ function roundBtc(n) {
 }
 function formatSatsToBtc(sats) {
   if (!Number.isFinite(sats)) return '0'
-  return (sats / 1e8).toFixed(8)
+  return satsForm(sats)
 }
 
 const marketRateNum = computed(() => {
@@ -740,43 +744,26 @@ function onRateBlur() {
 }
 
 function clampRate(val) {
-  let min = 0
-  let max = 100
-  if (!marketIsZeroish.value) {
-    if (isBorrower.value) {
-      max = marketRateNum.value
-    } else {
-      min = marketRateNum.value
-    }
-  }
   if (!Number.isFinite(val)) return Number.isNaN(val) ? NaN : val
-  return Math.min(Math.max(val, min), max)
+  return Math.min(Math.max(val, RATE_MIN), RATE_MAX)
 }
 
 const plusDisabled = computed(() => {
   if (orderType.value !== 'limit') return true
   const current = Number.isFinite(rateNum.value) ? rateNum.value : 0
-  if (isBorrower.value) return marketIsZeroish.value ? current >= 100 : current >= marketRateNum.value
-  return current >= 100
+  return current >= RATE_MAX
 })
 const minusDisabled = computed(() => {
   if (orderType.value !== 'limit') return true
   const current = Number.isFinite(rateNum.value) ? rateNum.value : 0
-  if (isBorrower.value) return current <= 0
-  const floor = marketIsZeroish.value ? 0 : marketRateNum.value
-  return current <= floor
+  return current <= RATE_MIN
 })
 function increment() { incrementBy(STEP) }
 function decrement() { decrementBy(STEP) }
 function incrementBy(delta) {
   if (orderType.value !== 'limit') return
   const base = Number.isFinite(rateNum.value) ? rateNum.value : 0
-  const next = roundRate(base + delta)
-  if (isBorrower.value) {
-    rateNum.value = marketIsZeroish.value ? Math.min(100, next) : Math.min(marketRateNum.value, next)
-  } else {
-    rateNum.value = Math.min(100, next)
-  }
+  rateNum.value = Math.min(RATE_MAX, roundRate(base + delta))
   if (rateInputFocused.value || rateInput.value.trim() === '') {
     rateInput.value = rateNum.value.toFixed(RATE_DECIMALS)
   }
@@ -784,13 +771,7 @@ function incrementBy(delta) {
 function decrementBy(delta) {
   if (orderType.value !== 'limit') return
   const base = Number.isFinite(rateNum.value) ? rateNum.value : 0
-  const next = roundRate(base - delta)
-  if (isBorrower.value) {
-    rateNum.value = Math.max(0, next)
-  } else {
-    const floor = marketIsZeroish.value ? 0 : marketRateNum.value
-    rateNum.value = Math.max(floor, next)
-  }
+  rateNum.value = Math.max(RATE_MIN, roundRate(base - delta))
   if (rateInputFocused.value || rateInput.value.trim() === '') {
     rateInput.value = rateNum.value.toFixed(RATE_DECIMALS)
   }
@@ -955,7 +936,7 @@ const computedCollateralSats = computed(() => {
 const collateralRequirementText = computed(() => {
   const val = computedCollateralBtc.value
   if (!Number.isFinite(val)) return 'Collateral requirement unavailable.'
-  return `To complete the loan, you are required to contribute ${val.toFixed(8)} Bitcoin collateral.`
+  return `To complete the loan, you are required to contribute ${formatBtcValue(val)} Bitcoin collateral.`
 })
 
 /* ==== Edit Rate Flow ==== */

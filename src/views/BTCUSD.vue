@@ -7,6 +7,7 @@
     <section class="flex-1 px-4 py-4">
       <div class="w-full max-w-screen-xl mx-auto pb-10">
         <MarketOverviewTable />
+        <p class="text-center text-xs text-white/50 mt-4">1 year &middot; 50% LTV</p>
       </div>
     </section>
   </main>

@@ -93,6 +93,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { deleteDlc } from '../api/dlcDelete'  // adjust path if needed
+import { satsForm } from '../functions/amount_formatting'
 
 const props = defineProps({
   dlc: { type: Object, required: true },
@@ -294,7 +295,7 @@ function pct2(n) {
 }
 function satsToBtc(sats) {
   const x = Number(sats)
-  return Number.isFinite(x) ? (x / 1e8).toFixed(8) : '0.00000000'
+  return Number.isFinite(x) ? satsForm(sats) : '0.00\u2009000\u2009000'
 }
 function fmtDate(tsSec) {
   if (!tsSec) return '—'

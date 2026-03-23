@@ -390,6 +390,7 @@ import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { getTopupAddressQR } from '../api/qr'
 import { getUserDlcs } from '../api/userDlcs'
+import { satsForm } from '../functions/amount_formatting'
 import { deleteSelf } from '../api/deleteSelf'
 import TheFooter from '../components/TheFooter.vue'
 import DlcDetails from '../components/DLCDetails.vue'
@@ -515,7 +516,7 @@ async function copyAddress() {
 }
 
 function formatBtc(sats) {
-  return (Number(sats) / 1e8).toFixed(8)
+  return satsForm(sats)
 }
 
 // ---- Referrals ----

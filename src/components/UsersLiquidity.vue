@@ -89,6 +89,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { postUserLiquQuery } from '../api/userLiquQuery'
 import { postLiquidityWithdrawalV1 } from '../api/liquidityAllocation'
 import { getPrice } from '../api/price'
+import { satsForm } from '../functions/amount_formatting'
 
 const columns = Object.freeze([
   { label: 'Type', key: 'role' },
@@ -109,9 +110,7 @@ const btcPrice = ref(0)
 const cancelling = ref(new Set())
 
 function satsToBtc(sats) {
-  const n = Number(sats)
-  if (!Number.isFinite(n)) return '—'
-  return (n / 1e8).toFixed(8)
+  return satsForm(sats)
 }
 
 function fmtDate(ts) {

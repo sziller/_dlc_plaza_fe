@@ -192,14 +192,14 @@
               <h3 class="text-xl font-bold text-secondary mb-4">At Maturity (Guaranteed)</h3>
               <div class="space-y-4 text-white/90">
                 <p>
-                  You receive a guaranteed claim on <strong>{{ lenderClaimBTC.toFixed(3) }} BTC</strong> at settlement.
+                  You receive a guaranteed claim on <strong>{{ formatBtcValue(lenderClaimBTC) }} BTC</strong> at settlement.
                 </p>
                 <p>
-                  An oracle reports the BTC price. <strong>You get exactly {{ lenderClaimBTC.toFixed(3) }} BTC in value</strong>, regardless of the market price.
+                  An oracle reports the BTC price. <strong>You get exactly {{ formatBtcValue(lenderClaimBTC) }} BTC in value</strong>, regardless of the market price.
                 </p>
                 <div class="bg-secondary/20 border border-secondary/30 rounded-xl p-4 mt-4">
                   <p class="text-sm text-white/80">
-                    <strong>Key insight:</strong> If Bitcoin crashes, you still get your {{ lenderClaimBTC.toFixed(3) }} BTC claim. If Bitcoin moons, borrowers capture the upside. You have zero volatility exposure.
+                    <strong>Key insight:</strong> If Bitcoin crashes, you still get your {{ formatBtcValue(lenderClaimBTC) }} BTC claim. If Bitcoin moons, borrowers capture the upside. You have zero volatility exposure.
                   </p>
                 </div>
               </div>
@@ -269,7 +269,7 @@
           How Settlement Works
         </h2>
         <p class="text-white/70 text-center mb-12 max-w-2xl mx-auto">
-          See how you always receive your fixed {{ lenderClaimBTC.toFixed(3) }} BTC claim based on Bitcoin's price at maturity.
+          See how you always receive your fixed {{ formatBtcValue(lenderClaimBTC) }} BTC claim based on Bitcoin's price at maturity.
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -282,11 +282,11 @@
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.double.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.double.lenderBTC) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
               </div>
               <div class="flex justify-between text-emerald-400 font-bold">
                 <span>Borrower gets:</span>
-                <span class="font-mono">{{ scenarios.double.borrowerBTC.toFixed(4) }} BTC</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.double.borrowerBTC) }} BTC</span>
               </div>
             </div>
           </div>
@@ -300,11 +300,11 @@
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.rise.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.rise.lenderBTC) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
               </div>
               <div class="flex justify-between text-green-400 font-bold">
                 <span>Borrower gets:</span>
-                <span class="font-mono">{{ scenarios.rise.borrowerBTC.toFixed(4) }} BTC</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.rise.borrowerBTC) }} BTC</span>
               </div>
             </div>
           </div>
@@ -318,11 +318,11 @@
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.flat.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.flat.lenderBTC) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
               </div>
               <div class="flex justify-between font-bold">
                 <span>Borrower gets:</span>
-                <span class="font-mono">{{ scenarios.flat.borrowerBTC.toFixed(4) }} BTC</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.flat.borrowerBTC) }} BTC</span>
               </div>
             </div>
           </div>
@@ -336,11 +336,11 @@
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.drop.lenderBTC.toFixed(4) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.drop.lenderBTC) }} BTC (${{ formatUSD(totalClaimUSD) }})</span>
               </div>
               <div class="flex justify-between text-yellow-400 font-bold">
                 <span>Borrower gets:</span>
-                <span class="font-mono">{{ scenarios.drop.borrowerBTC.toFixed(4) }} BTC</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.drop.borrowerBTC) }} BTC</span>
               </div>
             </div>
           </div>
@@ -354,11 +354,11 @@
             <div class="space-y-2 text-white/80">
               <div class="flex justify-between">
                 <span>You receive:</span>
-                <span class="font-mono">{{ scenarios.crash.lenderBTC.toFixed(4) }} BTC (entire collateral)</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.crash.lenderBTC) }} BTC (entire collateral)</span>
               </div>
               <div class="flex justify-between text-red-400 font-bold">
                 <span>Borrower gets:</span>
-                <span class="font-mono">{{ scenarios.crash.borrowerBTC.toFixed(4) }} BTC</span>
+                <span class="font-mono">{{ formatBtcValue(scenarios.crash.borrowerBTC) }} BTC</span>
               </div>
             </div>
             <p class="text-xs text-white/50 mt-3">
@@ -477,6 +477,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 import { getPrice } from '../api/price'
+import { formatBtcValue } from '../functions/amount_formatting'
 
 const { isLoggedIn, setUserFromApi } = useAuth()
 const ctaLink = computed(() => isLoggedIn.value ? '/btcusd' : '/register')

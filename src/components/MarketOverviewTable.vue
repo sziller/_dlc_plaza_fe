@@ -133,6 +133,7 @@ import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
 import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
+import { formatBtcValue } from '../functions/amount_formatting'
 import { getServerStatus } from '../api/serverStatus'
 import { getPrice } from '../api/price'
 import { postLiquidityAllocation, postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
@@ -219,6 +220,15 @@ const SIMPLE_BORROW_RATE = 12.0
 const SIMPLE_LEND_RATE = 8.0
 const SIMPLE_TERM_DAYS = 365
 
+function resolveEffectiveRate(marketRateStr, fallback, role) {
+  const market = toNum(marketRateStr)
+  if (!Number.isFinite(market) || market <= 0) {
+    return `${fallback.toFixed(4)}%`
+  }
+  const isBetter = role === 'lend' ? market > fallback : market < fallback
+  return isBetter ? `${market.toFixed(4)}%` : `${fallback.toFixed(4)}%`
+}
+
 // -------- BTC price polling ----------
 const btcPriceUsd = ref(null)
 let btcPriceIntervalId = null
@@ -270,7 +280,8 @@ function handleCellClick(row, key) {
 function handleSimpleBorrow() {
   modalNotice.value = { type: '', text: '' }
   selectedContract.value = nearestContractSize.value
-  selectedRate.value = `${SIMPLE_BORROW_RATE.toFixed(4)}%`
+  const yearRow = terms.value.find(r => r.label === '365 Days')
+  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50b, SIMPLE_BORROW_RATE, 'borrow')
   selectedAction.value = 'Borrow'
   selectedTermDays.value = SIMPLE_TERM_DAYS
   selectedLtv.value = 50
@@ -280,7 +291,8 @@ function handleSimpleBorrow() {
 function handleSimpleLend() {
   modalNotice.value = { type: '', text: '' }
   selectedContract.value = nearestContractSize.value
-  selectedRate.value = `${SIMPLE_LEND_RATE.toFixed(4)}%`
+  const yearRow = terms.value.find(r => r.label === '365 Days')
+  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50a, SIMPLE_LEND_RATE, 'lend')
   selectedAction.value = 'Lend'
   selectedTermDays.value = SIMPLE_TERM_DAYS
   selectedLtv.value = 50
@@ -837,7 +849,7 @@ const nearestContractSize = computed(() => {
 const btcEquivalentDisplay = computed(() => {
   const btc = btcEquivalent.value
   if (!btcPriceUsd.value || btcPriceUsd.value <= 0) return '—'
-  return `${btc.toFixed(4)} BTC`
+  return `${formatBtcValue(btc)} BTC`
 })
 
 const sliderFillPct = computed(() => {

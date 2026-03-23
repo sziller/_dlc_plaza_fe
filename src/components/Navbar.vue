@@ -336,6 +336,7 @@ import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
 import { getPrice } from '../api/price' // ⬅️ oracle price helper
+import { formatBtcValue } from '../functions/amount_formatting'
 import { isSignerAuthCode } from '../lib/authCode'
 
 /** ---- Emits (kept for the Retry button in the template) ---- */
@@ -581,8 +582,7 @@ function satsToBtc (s) {
 }
 function formatBtc (n) {
   if (n == null) return '—'
-  const s = n.toFixed(8)
-  return s.replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1')
+  return formatBtcValue(n)
 }
 const btc = (sats) => {
   const n = satsToBtc(sats)

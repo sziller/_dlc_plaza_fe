@@ -295,10 +295,10 @@
             <tbody>
               <tr v-for="scenario in priceScenarios" :key="scenario.price" class="border-b border-white/10 hover:bg-white/5">
                 <td class="py-4 px-4 font-bold">${{ formatUSD(scenario.price) }}</td>
-                <td class="py-4 px-4 text-right font-mono text-red-400">{{ scenario.collateralOwed.toFixed(3) }} BTC</td>
-                <td class="py-4 px-4 text-right font-mono text-green-400">{{ scenario.youKeep.toFixed(3) }} BTC</td>
+                <td class="py-4 px-4 text-right font-mono text-red-400">{{ formatBtcValue(scenario.collateralOwed) }} BTC</td>
+                <td class="py-4 px-4 text-right font-mono text-green-400">{{ formatBtcValue(scenario.youKeep) }} BTC</td>
                 <td class="py-4 px-4 text-right font-mono text-blue-400">{{ miningYields.total }} BTC</td>
-                <td class="py-4 px-4 text-right font-mono font-bold">{{ scenario.totalBTC.toFixed(3) }} BTC</td>
+                <td class="py-4 px-4 text-right font-mono font-bold">{{ formatBtcValue(scenario.totalBTC) }} BTC</td>
                 <td class="py-4 px-4 text-right font-mono font-bold text-secondary">${{ formatUSD(scenario.dollarValue) }}</td>
               </tr>
             </tbody>
@@ -312,11 +312,11 @@
             <div class="grid grid-cols-2 gap-2 text-sm">
               <div>
                 <span class="text-white/60">Collateral Owed:</span>
-                <span class="font-mono text-red-400 ml-2">{{ scenario.collateralOwed.toFixed(3) }}</span>
+                <span class="font-mono text-red-400 ml-2">{{ formatBtcValue(scenario.collateralOwed) }}</span>
               </div>
               <div>
                 <span class="text-white/60">You Keep:</span>
-                <span class="font-mono text-green-400 ml-2">{{ scenario.youKeep.toFixed(3) }}</span>
+                <span class="font-mono text-green-400 ml-2">{{ formatBtcValue(scenario.youKeep) }}</span>
               </div>
               <div>
                 <span class="text-white/60">Mined:</span>
@@ -324,7 +324,7 @@
               </div>
               <div>
                 <span class="text-white/60">Total:</span>
-                <span class="font-mono font-bold ml-2">{{ scenario.totalBTC.toFixed(3) }}</span>
+                <span class="font-mono font-bold ml-2">{{ formatBtcValue(scenario.totalBTC) }}</span>
               </div>
               <div class="col-span-2 mt-2 pt-2 border-t border-white/10">
                 <span class="text-white/60">Value:</span>
@@ -509,6 +509,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import TheFooter from '../../components/TheFooter.vue'
 import { useAuth } from '../../composables/useAuth'
 import { getPrice } from '../../api/price'
+import { formatBtcValue } from '../../functions/amount_formatting'
 import cadenaLogo from '../../assets/logos/cadena_bitcoin_logo_2.png'
 
 const { isLoggedIn, setUserFromApi } = useAuth()

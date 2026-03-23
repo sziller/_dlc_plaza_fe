@@ -228,6 +228,7 @@ import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
 import { getToken } from '../api/token'
 import { postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
+import { formatBtcValue } from '../functions/amount_formatting'
 import { DEFAULT_ORACLE } from '../config'
 import { postProductQueryV0 } from '../api/productQuery' // ApiEnvelope<ProductLendBorrowDtoLtd[]>
 
@@ -314,7 +315,7 @@ const availableContracts = computed(() => {
   }
   return Array.from(set).sort((a,b)=>Number(a)-Number(b))
 })
-const contractOptions = computed(() => availableContracts.value.map(v => ({ value: v, label: `${v} BTC` })))
+const contractOptions = computed(() => availableContracts.value.map(v => ({ value: v, label: `${formatBtcValue(Number(v))} BTC` })))
 
 /* ---------- Dropdown state ---------- */
 const selectedLtv = ref(50)
