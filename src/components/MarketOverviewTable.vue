@@ -768,12 +768,12 @@ function buildTermsFromLiquidityMarket(marketResults) {
 
     // Best lend rate = highest rate with liquidity
     const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
-    const bestLendRate = lendRates.length ? lendRates[0] : null
+    const bestLendRate = lendRates.length ? lendRates[0] / 100 : null
     const bestLendEar = bestLendRate != null ? annualize360(bestLendRate, d) : null
 
     // Best borrow rate = lowest rate with liquidity
     const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
-    const bestBorrowRate = borrowRates.length ? borrowRates[0] : null
+    const bestBorrowRate = borrowRates.length ? borrowRates[0] / 100 : null
     const bestBorrowEar = bestBorrowRate != null ? annualize360(bestBorrowRate, d) : null
 
     return {
