@@ -111,7 +111,7 @@
 <script setup>
 import { computed } from 'vue'
 const year = computed(() => new Date().getFullYear())
-const version = '2.2.1'
+const version = '2.2.2'
 </script>
 
 <style scoped>

@@ -945,7 +945,11 @@ const collateralContribution = computed(() => {
 })
 
 const computedCollateralBtc = computed(() => {
-  const L = Number(amountBtc.value)                // LOAN in BTC
+  const price = props.btcPrice
+  const principal = props.requestedUsd
+  if (!Number.isFinite(principal) || !Number.isFinite(price) || price <= 0) return NaN
+
+  const L = principal / price                       // LOAN in BTC from requested USD
   const r = termRateDecimal.value                   // interest as fraction
   const ltv = ltvRatio.value                        // LTV as fraction
   if (!Number.isFinite(L) || !Number.isFinite(r) || !Number.isFinite(ltv) || ltv <= 0) return NaN
@@ -956,10 +960,7 @@ const computedCollateralBtc = computed(() => {
   }
 
   // Lender: collateral = loan amount
-  const price = props.btcPrice
-  const principal = props.requestedUsd
-  if (!Number.isFinite(principal) || !Number.isFinite(price) || price <= 0) return NaN
-  return roundBtc(principal / price)
+  return roundBtc(L)
 })
 
 const computedCollateralSats = computed(() => {
