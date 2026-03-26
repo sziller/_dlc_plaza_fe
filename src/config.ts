@@ -12,6 +12,14 @@ if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
 }
 export { API_URL };
 export const DEFAULT_ORACLE = 'oracle_dlcp';
+
+export const ORACLE_LABELS = {
+  oracle_dlcp: 'DLCP Oracle',
+}
+
+export function oracleDisplayName(id) {
+  return ORACLE_LABELS[id] || id
+}
 const CLIENT_ID = 'string';
 export { CLIENT_ID };
 const CLIENT_SECRET = 'string';

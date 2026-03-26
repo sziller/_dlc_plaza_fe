@@ -102,6 +102,9 @@
             :skip-to-review="true"
             :btc-price="btcPriceUsd"
             :requested-usd="usdAmount"
+            :oracle-id="selectedOracle"
+            :oracle-label="selectedOracleLabel"
+            :fiat-currency="selectedFiat"
             :allocation-result="allocationResult"
             :allocation-loading="allocationLoading"
             :balance-check-result="balanceCheckResult"
@@ -140,7 +143,7 @@ import { postLiquidityAllocation, postLiquidityAllocationV1, getLiquidityMarket 
 import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
-import { DEFAULT_ORACLE } from '../config'
+import { DEFAULT_ORACLE, oracleDisplayName } from '../config'
 
 const router = useRouter()
 
@@ -251,6 +254,9 @@ const selectedRate = ref('')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
 const selectedLtv = ref(50)
+const selectedOracle = ref(DEFAULT_ORACLE)
+const selectedFiat   = ref('USD')
+const selectedOracleLabel = computed(() => oracleDisplayName(selectedOracle.value))
 const modalLoading = ref(false)
 const modalNotice  = ref({ type: '', text: '' })
 
@@ -355,7 +361,7 @@ async function handleOrderSubmit(data) {
       await postLiquidityAllocationV1({
         ini_role: String(data.action || '').toLowerCase(),
         interest,
-        oracle: [DEFAULT_ORACLE],
+        oracle: [selectedOracle.value],
         base_product: buildBaseProductId(days, ltv),
         liquidity_sat: requiredSats,
       })
@@ -391,7 +397,7 @@ async function handleOrderSubmit(data) {
     await postLiquidityAllocationV1({
       ini_role: String(data.action || '').toLowerCase(),
       interest,
-      oracle: [DEFAULT_ORACLE],
+      oracle: [selectedOracle.value],
       base_product: buildBaseProductId(days, ltv),
       liquidity_sat: requiredSats,
     })
@@ -456,7 +462,7 @@ async function handleReviewOrder(data) {
         ini_role: role,
         interest,
         foreign_collateral: foreignCollateral,
-        oracle: DEFAULT_ORACLE,
+        oracle: selectedOracle.value,
         base_product: baseProduct,
         margin_percent: 5,
       })
@@ -514,7 +520,7 @@ async function handleOrderConfirm(data) {
     await postLiquidityAllocationV1({
       ini_role: role,
       interest,
-      oracle: [DEFAULT_ORACLE],
+      oracle: [selectedOracle.value],
       base_product: buildBaseProductId(days, ltv),
       liquidity_sat: requiredSats,
     })
@@ -646,6 +652,11 @@ let offersIntervalId = null
 let isFetchingOffers = false
 
 const PID_PREFIX = 'LendBorrowBTCUSD:'
+
+function parseFiatFromPrefix(prefix) {
+  const m = prefix.match(/LendBorrowBTC(\w+):/)
+  return m ? m[1] : 'USD'
+}
 
 function isYearish(days) {
   const d = Number(days)
@@ -899,6 +910,16 @@ async function prefetchProducts() {
     const res = await postProductQueryV0([]) // [] => all products
     const payload = Array.isArray(res?.payload) ? res.payload : []
     products.value = payload
+    if (payload.length > 0) {
+      const first = payload[0]
+      if (Array.isArray(first.orcl_id) && first.orcl_id.length > 0) {
+        selectedOracle.value = first.orcl_id[0]
+      }
+      if (Number.isFinite(first.ltv) && first.ltv > 0) {
+        selectedLtv.value = first.ltv
+      }
+      selectedFiat.value = parseFiatFromPrefix(PID_PREFIX)
+    }
   } catch (e) {
     console.debug('Product catalog prefetch failed:', e)
   }

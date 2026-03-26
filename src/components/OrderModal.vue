@@ -314,8 +314,15 @@
         <ul class="space-y-2 text-sm text-white/90">
           <li><span class="font-semibold text-white">Role:</span> {{ actionType }}</li>
           <li><span class="font-semibold text-white">Amount:</span> {{ formatAmountDisplay(amountBtc, amountUsd) }}</li>
+          <!-- FIAT → BTC conversion breakdown -->
+          <li v-if="fiatToBtcBreakdown" class="text-xs text-white/60 pl-4 -mt-1">
+            {{ fiatToBtcBreakdown.fiatAmount.toLocaleString('en-US', { style: 'currency', currency: fiatLabel, maximumFractionDigits: 0 }) }}
+            ÷ {{ fiatToBtcBreakdown.oraclePrice.toLocaleString('en-US', { style: 'currency', currency: fiatLabel, maximumFractionDigits: 0 }) }}/BTC
+            = {{ formatBtcValue(fiatToBtcBreakdown.btcResult) }} BTC
+          </li>
           <li><span class="font-semibold text-white">Loan Duration:</span> {{ loanDuration }}</li>
-          <li><span class="font-semibold text-white">LTV:</span> 50%</li>
+          <li><span class="font-semibold text-white">LTV:</span> {{ ltvDisplayStr }}</li>
+          <li><span class="font-semibold text-white">Price Feed:</span> {{ oracleDisplayStr }}</li>
           <li><span class="font-semibold text-white">Interest Rate for Term:</span> {{ reviewTermRateStr }}</li>
           <li><span class="font-semibold text-white">Cadena Fee:</span> {{ displayFee }}</li>
           <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYieldWithFee }}</li>
@@ -330,6 +337,9 @@
           <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/30">
             <p class="text-base font-semibold text-white">
               Collateral Required: {{ Number.isFinite(computedCollateralBtc) ? formatBtcValue(computedCollateralBtc) : '0' }} BTC
+            </p>
+            <p v-if="btcPrice && Number.isFinite(computedCollateralBtc)" class="text-xs text-white/60 mt-0.5">
+              ≈ {{ (computedCollateralBtc * btcPrice).toLocaleString('en-US', { style: 'currency', currency: fiatLabel, maximumFractionDigits: 0 }) }} {{ fiatLabel }}
             </p>
             <p class="text-sm text-white/70 mt-1">
               Available BTC Liquidity: {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
@@ -539,6 +549,9 @@ const props = defineProps({
   userAuthCode: { type: Number, default: 0 },
   showFundingScreen: { type: Boolean, default: false },
   showAuthPrompt: { type: Boolean, default: false },
+  oracleId:     { type: String, default: '' },
+  oracleLabel:  { type: String, default: '' },
+  fiatCurrency: { type: String, default: 'USD' },
 })
 const emit = defineEmits(['close', 'submit', 'confirm', 'review', 'checkBalance', 'recheckBalance', 'retryOrder'])
 
@@ -857,14 +870,32 @@ const amountUsd = computed(() => {
   return null
 })
 
+const fiatToBtcBreakdown = computed(() => {
+  const fiat = props.requestedUsd
+  const price = props.btcPrice
+  if (!Number.isFinite(fiat) || !Number.isFinite(price) || price <= 0) return null
+  return { fiatAmount: fiat, oraclePrice: price, btcResult: fiat / price }
+})
+
+const ltvDisplayStr = computed(() => {
+  const v = Number(props.ltv)
+  if (!Number.isFinite(v) || v <= 0) return '—'
+  return v <= 1 ? `${(v * 100).toFixed(0)}%` : `${v}%`
+})
+
+const oracleDisplayStr = computed(() => props.oracleLabel || props.oracleId || '—')
+
+const fiatLabel = computed(() => props.fiatCurrency || 'USD')
+
 function formatAmountDisplay(btc, usd) {
   const btcStr = formatBtc(btc)
+  const cur = props.fiatCurrency || 'USD'
   if (props.requestedUsd != null && Number.isFinite(props.requestedUsd)) {
-    const usdStr = props.requestedUsd.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+    const usdStr = props.requestedUsd.toLocaleString('en-US', { style: 'currency', currency: cur, maximumFractionDigits: 0 })
     return usdStr
   }
   if (usd != null && Number.isFinite(usd)) {
-    const usdStr = usd.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+    const usdStr = usd.toLocaleString('en-US', { style: 'currency', currency: cur, maximumFractionDigits: 0 })
     return usdStr
   }
   return btcStr
@@ -914,17 +945,21 @@ const collateralContribution = computed(() => {
 })
 
 const computedCollateralBtc = computed(() => {
-  const principal = props.requestedUsd
-  const rate = termRateDecimal.value          // e.g. 0.12
+  const L = Number(amountBtc.value)                // LOAN in BTC
+  const r = termRateDecimal.value                   // interest as fraction
+  const ltv = ltvRatio.value                        // LTV as fraction
+  if (!Number.isFinite(L) || !Number.isFinite(r) || !Number.isFinite(ltv) || ltv <= 0) return NaN
+
+  if (isBorrower.value) {
+    // LOAN * (1 + 2*interest + feerate*(1+interest)/LTV)
+    return roundBtc(L * (1 + 2 * r + FEE_PCT * (1 + r) / ltv))
+  }
+
+  // Lender: collateral = loan amount
   const price = props.btcPrice
-  if (!Number.isFinite(principal) || !Number.isFinite(rate) || !Number.isFinite(price) || price <= 0) return NaN
-
-  const borrowerRate = rate + 0.01   // annualized yield = term rate + 1% Cadena fee
-  const collateralUsd = isBorrower.value
-    ? principal + 2 * (principal * borrowerRate)
-    : principal
-
-  return roundBtc(collateralUsd / price)
+  const principal = props.requestedUsd
+  if (!Number.isFinite(principal) || !Number.isFinite(price) || price <= 0) return NaN
+  return roundBtc(principal / price)
 })
 
 const computedCollateralSats = computed(() => {
@@ -984,6 +1019,9 @@ function buildConfirmPayload() {
     amountUsd: props.requestedUsd,
     ltvUsed: ltvRatio.value,
     rateWasEdited: rateWasEdited.value,
+    oracleId: props.oracleId,
+    fiatCurrency: props.fiatCurrency,
+    btcPrice: props.btcPrice,
   }
 }
 
@@ -1018,6 +1056,9 @@ function submitOrder () {
     lenderContributionBtcNum: lenderBtc,
     borrowerContributionBtcNum: borrowerBtc,
     rateWasEdited: rateWasEdited.value,
+    oracleId: props.oracleId,
+    fiatCurrency: props.fiatCurrency,
+    btcPrice: props.btcPrice,
   })
 }
 </script>
