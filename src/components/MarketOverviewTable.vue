@@ -144,6 +144,7 @@ import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
 import { DEFAULT_ORACLE, oracleDisplayName } from '../config'
+import { generateIdempotencyKey } from '../lib/idempotencyKey'
 
 const router = useRouter()
 
@@ -260,6 +261,9 @@ const selectedOracleLabel = computed(() => oracleDisplayName(selectedOracle.valu
 const modalLoading = ref(false)
 const modalNotice  = ref({ type: '', text: '' })
 
+// -------- Idempotency key ----------
+const currentIdempotencyKey = ref(null)
+
 // -------- Allocation + Balance state ----------
 const allocationResult = ref(null)
 const allocationLoading = ref(false)
@@ -308,6 +312,11 @@ function handleSimpleLend() {
 async function handleOrderSubmit(data) {
   const type = (data.orderType || '').toLowerCase()
   modalNotice.value = { type: '', text: '' }
+
+  // Generate idempotency key if not already set (preserves key on retry)
+  if (!currentIdempotencyKey.value) {
+    currentIdempotencyKey.value = await generateIdempotencyKey()
+  }
 
   // Save payload for potential auto-retry after funding
   lastOrderPayload.value = data
@@ -364,16 +373,22 @@ async function handleOrderSubmit(data) {
         oracle: [selectedOracle.value],
         base_product: buildBaseProductId(days, ltv),
         liquidity_sat: requiredSats,
-      })
+      }, currentIdempotencyKey.value)
+      currentIdempotencyKey.value = null
       modalNotice.value = { type: 'success', text: 'Order submitted.' }
       setUserFromApi()
     } catch (e) {
-      const detail = e?.response?.data?.detail || e?.message || ''
-      if (/insufficient funds/i.test(detail)) {
-        showFundingScreen.value = true
-        await fetchTopupAddress()
+      if (e?.status === 409 || e?.response?.status === 409) {
+        currentIdempotencyKey.value = null
+        modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
       } else {
-        modalNotice.value = { type: 'error', text: detail || 'Order failed.' }
+        const detail = e?.response?.data?.detail || e?.message || ''
+        if (/insufficient funds/i.test(detail)) {
+          showFundingScreen.value = true
+          await fetchTopupAddress()
+        } else {
+          modalNotice.value = { type: 'error', text: detail || 'Order failed.' }
+        }
       }
     } finally {
       modalLoading.value = false
@@ -400,16 +415,22 @@ async function handleOrderSubmit(data) {
       oracle: [selectedOracle.value],
       base_product: buildBaseProductId(days, ltv),
       liquidity_sat: requiredSats,
-    })
+    }, currentIdempotencyKey.value)
+    currentIdempotencyKey.value = null
     modalNotice.value = { type: 'success', text: 'Order submitted.' }
     setUserFromApi()
   } catch (e) {
-    const detail = e?.response?.data?.detail || e?.message || ''
-    if (/insufficient funds/i.test(detail)) {
-      showFundingScreen.value = true
-      await fetchTopupAddress()
+    if (e?.status === 409 || e?.response?.status === 409) {
+      currentIdempotencyKey.value = null
+      modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
     } else {
-      modalNotice.value = { type: 'error', text: detail || 'Order failed.' }
+      const detail = e?.response?.data?.detail || e?.message || ''
+      if (/insufficient funds/i.test(detail)) {
+        showFundingScreen.value = true
+        await fetchTopupAddress()
+      } else {
+        modalNotice.value = { type: 'error', text: detail || 'Order failed.' }
+      }
     }
   } finally {
     modalLoading.value = false
@@ -502,6 +523,11 @@ async function handleOrderConfirm(data) {
   // Lock liquidity via v1 endpoint
   if (!getToken()) return
 
+  // Generate idempotency key if not already set (preserves key on retry)
+  if (!currentIdempotencyKey.value) {
+    currentIdempotencyKey.value = await generateIdempotencyKey()
+  }
+
   const days = Number(data.durationDays) || SIMPLE_TERM_DAYS
   const ltv = selectedLtv.value || 50
   const role = String(data.action || '').toLowerCase()
@@ -523,14 +549,20 @@ async function handleOrderConfirm(data) {
       oracle: [selectedOracle.value],
       base_product: buildBaseProductId(days, ltv),
       liquidity_sat: requiredSats,
-    })
+    }, currentIdempotencyKey.value)
+    currentIdempotencyKey.value = null
   } catch (e) {
-    const detail = e?.response?.data?.detail || e?.message || ''
-    if (/insufficient funds/i.test(detail)) {
-      showFundingScreen.value = true
-      await fetchTopupAddress()
+    if (e?.status === 409 || e?.response?.status === 409) {
+      currentIdempotencyKey.value = null
+      modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
     } else {
-      modalNotice.value = { type: 'error', text: detail || 'Liquidity allocation failed.' }
+      const detail = e?.response?.data?.detail || e?.message || ''
+      if (/insufficient funds/i.test(detail)) {
+        showFundingScreen.value = true
+        await fetchTopupAddress()
+      } else {
+        modalNotice.value = { type: 'error', text: detail || 'Liquidity allocation failed.' }
+      }
     }
   } finally {
     modalLoading.value = false
@@ -632,6 +664,7 @@ function handleModalClose() {
   showFundingScreen.value = false
   showAuthPrompt.value = false
   lastOrderPayload.value = null
+  currentIdempotencyKey.value = null
   allocationResult.value = null
   allocationLoading.value = false
   balanceCheckResult.value = null

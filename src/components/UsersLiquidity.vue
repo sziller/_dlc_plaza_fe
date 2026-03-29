@@ -88,6 +88,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { postUserLiquQuery } from '../api/userLiquQuery'
 import { postLiquidityWithdrawalV1 } from '../api/liquidityAllocation'
+import { generateIdempotencyKey } from '../lib/idempotencyKey'
 import { getPrice } from '../api/price'
 import { satsForm } from '../functions/amount_formatting'
 
@@ -182,11 +183,12 @@ async function cancelAllocation(row) {
   next.add(row.uuid)
   cancelling.value = next
   try {
+    const idempotencyKey = await generateIdempotencyKey()
     await postLiquidityWithdrawalV1({
       ini_role: raw.ini_role,
       interest: raw.interest_bp / 100,
       liquidity_sat: raw.liquidity_sat,
-    })
+    }, idempotencyKey)
     await load(true)
   } catch (e) {
     alert(e?.message || 'Failed to cancel allocation.')

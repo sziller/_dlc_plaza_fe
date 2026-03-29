@@ -53,7 +53,8 @@ export const postLiquidityAllocation = async (
 };
 
 export const postLiquidityAllocationV1 = async (
-  params: LiquidityAllocationV1Request
+  params: LiquidityAllocationV1Request,
+  idempotencyKey?: string
 ): Promise<LiquidityAllocationV1Response> => {
   const token = getToken();
   if (!token) throw new Error('Authentication required for liquidity allocation.');
@@ -61,6 +62,7 @@ export const postLiquidityAllocationV1 = async (
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
+    ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
   };
 
   try {
@@ -72,7 +74,13 @@ export const postLiquidityAllocationV1 = async (
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      if (error.response?.status === 400) {
+      if (error.response?.status === 409) {
+        const detail = error.response.data?.detail;
+        throw Object.assign(
+          new Error(detail || 'Duplicate request — please try again.'),
+          { status: 409 }
+        );
+      } else if (error.response?.status === 400) {
         const data = error.response.data;
         const errorDetail = data?.detail;
         if (Array.isArray(errorDetail)) {
@@ -114,7 +122,8 @@ export const getLiquidityMarket = async (
 };
 
 export const postLiquidityWithdrawalV1 = async (
-  params: LiquidityAllocationV1Request
+  params: LiquidityAllocationV1Request,
+  idempotencyKey?: string
 ): Promise<LiquidityWithdrawalV1Response> => {
   const token = getToken();
   if (!token) throw new Error('Authentication required for liquidity withdrawal.');
@@ -122,6 +131,7 @@ export const postLiquidityWithdrawalV1 = async (
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
+    ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
   };
 
   try {
@@ -133,7 +143,13 @@ export const postLiquidityWithdrawalV1 = async (
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      if (error.response?.status === 400) {
+      if (error.response?.status === 409) {
+        const detail = error.response.data?.detail;
+        throw Object.assign(
+          new Error(detail || 'Duplicate request — please try again.'),
+          { status: 409 }
+        );
+      } else if (error.response?.status === 400) {
         const errorDetail = error.response.data.detail;
         if (Array.isArray(errorDetail)) {
           throw new Error(errorDetail[0].msg);

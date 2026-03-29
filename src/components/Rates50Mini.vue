@@ -228,6 +228,7 @@ import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
 import { getToken } from '../api/token'
 import { postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
+import { generateIdempotencyKey } from '../lib/idempotencyKey'
 import { formatBtcValue } from '../functions/amount_formatting'
 import { DEFAULT_ORACLE } from '../config'
 import { postProductQueryV0 } from '../api/productQuery' // ApiEnvelope<ProductLendBorrowDtoLtd[]>
@@ -362,6 +363,7 @@ const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
 const modalLoading = ref(false)
 const modalNotice = ref({ type: '', text: '' })
+const currentIdempotencyKey = ref(null)
 
 function getDaysFromLabel(label) {
   const m = String(label || '').match(/(\d+)/)
@@ -512,6 +514,11 @@ async function handleOrderSubmit(data) {
     return
   }
 
+  // Generate idempotency key if not already set (preserves key on retry)
+  if (!currentIdempotencyKey.value) {
+    currentIdempotencyKey.value = await generateIdempotencyKey()
+  }
+
   modalLoading.value = true
 
   const interest = toNum(data.rate)
@@ -532,11 +539,17 @@ async function handleOrderSubmit(data) {
       oracle: [DEFAULT_ORACLE],
       base_product: buildProductId(days, ltv, cntr),
       liquidity_sat: 0,
-    })
+    }, currentIdempotencyKey.value)
+    currentIdempotencyKey.value = null
     modalNotice.value = { type: 'success', text: 'Order submitted.' }
   } catch (e) {
-    const msg = e?.response?.data?.detail || e?.message || 'Order failed.'
-    modalNotice.value = { type: 'error', text: msg }
+    if (e?.status === 409 || e?.response?.status === 409) {
+      currentIdempotencyKey.value = null
+      modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
+    } else {
+      const msg = e?.response?.data?.detail || e?.message || 'Order failed.'
+      modalNotice.value = { type: 'error', text: msg }
+    }
   } finally {
     modalLoading.value = false
   }
