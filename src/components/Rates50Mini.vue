@@ -402,15 +402,15 @@ function buildRowsFromMarket(marketResults) {
     const lendBuckets = entry.lend || {}
     const borrowBuckets = entry.borrow || {}
 
-    // Best lend rate = highest rate with liquidity
-    const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
-    const bestLendRate = lendRates.length ? lendRates[0] : null
-    const bestLendEar = bestLendRate != null ? annualize360(bestLendRate, d) : null
+    // Lend column = best rate for lender = highest from BORROW bucket
+    const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
+    const bestLendRate = borrowRates.length ? borrowRates[0] : 12
+    const bestLendEar = annualize360(bestLendRate, d)
 
-    // Best borrow rate = lowest rate with liquidity
-    const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
-    const bestBorrowRate = borrowRates.length ? borrowRates[0] : null
-    const bestBorrowEar = bestBorrowRate != null ? annualize360(bestBorrowRate, d) : null
+    // Borrow column = best rate for borrower = lowest from LEND bucket
+    const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+    const bestBorrowRate = lendRates.length ? lendRates[0] : 12
+    const bestBorrowEar = annualize360(bestBorrowRate, d)
 
     return {
       label: `${d} Days`,

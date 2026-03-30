@@ -221,7 +221,7 @@ async function checkServerStatus() {
 
 // -------- Simplified flow constants ----------
 const SIMPLE_BORROW_RATE = 12.0
-const SIMPLE_LEND_RATE = 8.0
+const SIMPLE_LEND_RATE = 12.0
 const SIMPLE_TERM_DAYS = 365
 
 function resolveEffectiveRate(marketRateStr, fallback, role) {
@@ -229,8 +229,7 @@ function resolveEffectiveRate(marketRateStr, fallback, role) {
   if (!Number.isFinite(market) || market <= 0) {
     return `${fallback.toFixed(4)}%`
   }
-  const isBetter = role === 'lend' ? market > fallback : market < fallback
-  return isBetter ? `${market.toFixed(4)}%` : `${fallback.toFixed(4)}%`
+  return `${market.toFixed(4)}%`
 }
 
 // -------- BTC price polling ----------
@@ -799,15 +798,15 @@ function buildTermsFromLiquidityMarket(marketResults) {
     const lendBuckets = entry.lend || {}
     const borrowBuckets = entry.borrow || {}
 
-    // Best lend rate = highest rate with liquidity
-    const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
-    const bestLendRate = lendRates.length ? lendRates[0] / 100 : null
-    const bestLendEar = bestLendRate != null ? annualize360(bestLendRate, d) : null
+    // Lend column (ltv50a) = best rate for lender = highest from BORROW bucket
+    const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
+    const bestLendRate = borrowRates.length ? borrowRates[0] / 100 : 12.0
+    const bestLendEar = annualize360(bestLendRate, d)
 
-    // Best borrow rate = lowest rate with liquidity
-    const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
-    const bestBorrowRate = borrowRates.length ? borrowRates[0] / 100 : null
-    const bestBorrowEar = bestBorrowRate != null ? annualize360(bestBorrowRate, d) : null
+    // Borrow column (ltv50b) = best rate for borrower = lowest from LEND bucket
+    const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
+    const bestBorrowRate = lendRates.length ? lendRates[0] / 100 : 12.0
+    const bestBorrowEar = annualize360(bestBorrowRate, d)
 
     return {
       label: `${d} Days`,

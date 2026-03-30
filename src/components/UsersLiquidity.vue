@@ -96,7 +96,7 @@ const columns = Object.freeze([
   { label: 'Type', key: 'role' },
   { label: 'Dollar', key: 'dollarValue' },
   { label: 'Interest (%)', key: 'interestBp' },
-  { label: 'Liquidity (BTC)', key: 'liquiditySat' },
+  { label: 'Collateral (BTC)', key: 'liquiditySat' },
   { label: 'Date', key: 'timestamp' },
   { label: '', key: 'actions' },
 ])
@@ -112,6 +112,21 @@ const cancelling = ref(new Set())
 
 function satsToBtc(sats) {
   return satsForm(sats)
+}
+
+const FEE_PCT = 0.01
+
+function computeCollateralSats(a) {
+  const L = Number(a.liquidity_sat)
+  if (!Number.isFinite(L) || L <= 0) return 0
+
+  const r = (Number(a.interest_bp) || 0) / 10000
+  const ltv = (Number(a.ltv_percent) || 50) / 100
+
+  if (String(a.ini_role).toLowerCase() === 'borrow') {
+    return Math.round(L * (1 + 2 * r + FEE_PCT * (1 + r) / ltv))
+  }
+  return L
 }
 
 function fmtDate(ts) {
@@ -133,18 +148,18 @@ function fmtDollar(sats) {
 }
 
 function toRow(a) {
+  const collateralSats = computeCollateralSats(a)
   return {
     uuid: a.uuid,
     role: capitalize(a.ini_role),
-    dollar: fmtDollar(a.liquidity_sat),
-    dollarValue: btcPrice.value ? (Number(a.liquidity_sat) / 1e8) * btcPrice.value : 0,
+    dollar: fmtDollar(collateralSats),
+    dollarValue: btcPrice.value ? (collateralSats / 1e8) * btcPrice.value : 0,
     interest: (a.interest_bp / 100).toFixed(2) + '%',
     interestBp: Number(a.interest_bp) || 0,
-    liquidity: satsToBtc(a.liquidity_sat),
-    liquiditySat: Number(a.liquidity_sat) || 0,
+    liquidity: satsToBtc(collateralSats),
+    liquiditySat: collateralSats,
     date: fmtDate(a.timestamp),
     timestamp: Number(a.timestamp) || 0,
-    // keep raw values for cancel
     _raw: a,
   }
 }
