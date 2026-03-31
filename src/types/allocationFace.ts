@@ -129,3 +129,12 @@ export interface LiquidityWithdrawalV1Response {
   message: string
   timestamp: number
 }
+
+// ---- v1 liquidity allocation delete ----
+
+export interface LiquidityAllocationDeleteRequest {
+  ini_role: 'lend' | 'borrow'
+  interest: number
+  oracle?: string[]
+  base_product?: string
+}

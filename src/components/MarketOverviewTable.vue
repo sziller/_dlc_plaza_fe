@@ -148,6 +148,19 @@ import { generateIdempotencyKey } from '../lib/idempotencyKey'
 
 const router = useRouter()
 
+// -------- Collateral helper (matches OrderModal formula) ----------
+const FEE_PCT = 0.01
+
+function computeRequiredCollateralSats(loanSats, rateDecimal, ltv, isBorrow) {
+  if (!Number.isFinite(loanSats) || loanSats <= 0) return 0
+  const r = Number.isFinite(rateDecimal) ? rateDecimal : 0
+  const l = Number.isFinite(ltv) && ltv > 0 ? ltv : 0.5
+  if (isBorrow) {
+    return Math.round(loanSats * (1 + 2 * r + FEE_PCT * (1 + r) / l))
+  }
+  return loanSats
+}
+
 // -------- Env: staging vs prod ----------
 const IS_STAGING = (() => {
   const host = (typeof location !== 'undefined' ? location.hostname : '').toLowerCase()
@@ -330,14 +343,10 @@ async function handleOrderSubmit(data) {
   // Direct collateral check: compare required sats against available liquidity
   if (allocationResult.value) {
     const rate = toNum(data.rate) / 100
-    const borrowerRate = rate + 0.01
     const isBorrowRole = String(data.action || '').toLowerCase() === 'borrow'
-    const collateralUsd = isBorrowRole
-      ? usdAmount.value + 2 * (usdAmount.value * borrowerRate)
-      : usdAmount.value
-    const requiredSats = btcPriceUsd.value > 0
-      ? Math.round((collateralUsd / btcPriceUsd.value) * 1e8)
-      : Infinity
+    const loanSats = allocationResult.value.required_btc_liquidity ?? 0
+    const ltvDecimal = (selectedLtv.value || 50) / 100
+    const requiredSats = computeRequiredCollateralSats(loanSats, rate, ltvDecimal, isBorrowRole)
     const availableSats = allocationResult.value.available_btc_liquidity ?? 0
 
     if (availableSats < requiredSats) {
@@ -364,7 +373,7 @@ async function handleOrderSubmit(data) {
     }
     const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
     const ltv = selectedLtv.value || 50
-    const requiredSats = allocationResult.value?.required_btc_liquidity ?? 0
+    const requiredSats = allocationResult.value?.required_collateral_sats ?? 0
     try {
       await postLiquidityAllocationV1({
         ini_role: String(data.action || '').toLowerCase(),
@@ -382,7 +391,7 @@ async function handleOrderSubmit(data) {
         modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
       } else {
         const detail = e?.response?.data?.detail || e?.message || ''
-        if (/insufficient funds/i.test(detail)) {
+        if (/insufficient/i.test(detail)) {
           showFundingScreen.value = true
           await fetchTopupAddress()
         } else {
@@ -405,7 +414,7 @@ async function handleOrderSubmit(data) {
 
   const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
   const ltv = selectedLtv.value || 50
-  const requiredSats = allocationResult.value?.required_btc_liquidity ?? 0
+  const requiredSats = allocationResult.value?.required_collateral_sats ?? 0
 
   try {
     await postLiquidityAllocationV1({
@@ -424,7 +433,7 @@ async function handleOrderSubmit(data) {
       modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
     } else {
       const detail = e?.response?.data?.detail || e?.message || ''
-      if (/insufficient funds/i.test(detail)) {
+      if (/insufficient/i.test(detail)) {
         showFundingScreen.value = true
         await fetchTopupAddress()
       } else {
@@ -464,6 +473,10 @@ async function handleReviewOrder(data) {
     if (getToken()) {
       // v1 auth path: compute required collateral locally, check balance
       const liquiditySat = Math.round((foreignCollateral / btcPriceUsd.value) * 1e8)
+      const ltvDecimal = (selectedLtv.value || 50) / 100
+      const rateDecimal = interest / 100
+      const isBorrow = role === 'borrow'
+      const collateralSats = computeRequiredCollateralSats(liquiditySat, rateDecimal, ltvDecimal, isBorrow)
 
       let availableBtc = 0
       try {
@@ -473,8 +486,9 @@ async function handleReviewOrder(data) {
 
       allocationResult.value = {
         required_btc_liquidity: liquiditySat,
+        required_collateral_sats: collateralSats,
         available_btc_liquidity: availableBtc,
-        is_covered: availableBtc >= liquiditySat,
+        is_covered: availableBtc >= collateralSats,
       }
     } else {
       // v0 unauth path: simulation only
@@ -537,7 +551,7 @@ async function handleOrderConfirm(data) {
     return
   }
 
-  const requiredSats = allocationResult.value?.required_btc_liquidity ?? 0
+  const requiredSats = allocationResult.value?.required_collateral_sats ?? 0
   if (requiredSats <= 0) return
 
   modalLoading.value = true
@@ -556,7 +570,7 @@ async function handleOrderConfirm(data) {
       modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
     } else {
       const detail = e?.response?.data?.detail || e?.message || ''
-      if (/insufficient funds/i.test(detail)) {
+      if (/insufficient/i.test(detail)) {
         showFundingScreen.value = true
         await fetchTopupAddress()
       } else {
@@ -581,10 +595,10 @@ async function handleBalanceCheck() {
     let requiredSats = 0
     if (btcPriceUsd.value && btcPriceUsd.value > 0) {
       const rate = parseFloat(selectedRate.value) / 100
-      const borrowerRate = rate + 0.01
       const isBorrowRole = (selectedAction.value || '').toLowerCase() === 'borrow'
-      const collateralUsd = isBorrowRole ? usdAmount.value + 2 * (usdAmount.value * borrowerRate) : usdAmount.value
-      requiredSats = Math.round((collateralUsd / btcPriceUsd.value) * 1e8)
+      const loanSats = Math.round((usdAmount.value / btcPriceUsd.value) * 1e8)
+      const ltvDecimal = (selectedLtv.value || 50) / 100
+      requiredSats = computeRequiredCollateralSats(loanSats, rate, ltvDecimal, isBorrowRole)
     }
 
     balanceCheckResult.value = {
@@ -625,10 +639,10 @@ async function handleRecheckBalance() {
     let needed = 0
     if (btcPriceUsd.value && btcPriceUsd.value > 0) {
       const rate = parseFloat(selectedRate.value) / 100
-      const borrowerRate = rate + 0.01
       const isBorrowRole = (selectedAction.value || '').toLowerCase() === 'borrow'
-      const collateralUsd = isBorrowRole ? usdAmount.value + 2 * (usdAmount.value * borrowerRate) : usdAmount.value
-      needed = Math.round((collateralUsd / btcPriceUsd.value) * 1e8)
+      const loanSats = Math.round((usdAmount.value / btcPriceUsd.value) * 1e8)
+      const ltvDecimal = (selectedLtv.value || 50) / 100
+      needed = computeRequiredCollateralSats(loanSats, rate, ltvDecimal, isBorrowRole)
     }
     if (satoshis >= needed) {
       allocationResult.value = {

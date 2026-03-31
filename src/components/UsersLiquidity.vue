@@ -87,10 +87,12 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { postUserLiquQuery } from '../api/userLiquQuery'
-import { postLiquidityWithdrawalV1 } from '../api/liquidityAllocation'
-import { generateIdempotencyKey } from '../lib/idempotencyKey'
+import { deleteLiquidityAllocation } from '../api/liquidityAllocation'
 import { getPrice } from '../api/price'
 import { satsForm } from '../functions/amount_formatting'
+import { useAuth } from '../composables/useAuth'
+
+const { setUserFromApi } = useAuth()
 
 const columns = Object.freeze([
   { label: 'Type', key: 'role' },
@@ -114,21 +116,6 @@ function satsToBtc(sats) {
   return satsForm(sats)
 }
 
-const FEE_PCT = 0.01
-
-function computeCollateralSats(a) {
-  const L = Number(a.liquidity_sat)
-  if (!Number.isFinite(L) || L <= 0) return 0
-
-  const r = (Number(a.interest_bp) || 0) / 10000
-  const ltv = (Number(a.ltv_percent) || 50) / 100
-
-  if (String(a.ini_role).toLowerCase() === 'borrow') {
-    return Math.round(L * (1 + 2 * r + FEE_PCT * (1 + r) / ltv))
-  }
-  return L
-}
-
 function fmtDate(ts) {
   if (!ts) return '—'
   const ms = Number(ts) < 1e12 ? Number(ts) * 1000 : Number(ts)
@@ -148,7 +135,7 @@ function fmtDollar(sats) {
 }
 
 function toRow(a) {
-  const collateralSats = computeCollateralSats(a)
+  const collateralSats = Number(a.liquidity_sat) || 0
   return {
     uuid: a.uuid,
     role: capitalize(a.ini_role),
@@ -198,13 +185,12 @@ async function cancelAllocation(row) {
   next.add(row.uuid)
   cancelling.value = next
   try {
-    const idempotencyKey = await generateIdempotencyKey()
-    await postLiquidityWithdrawalV1({
+    await deleteLiquidityAllocation({
       ini_role: raw.ini_role,
       interest: raw.interest_bp / 100,
-      liquidity_sat: raw.liquidity_sat,
-    }, idempotencyKey)
+    })
     await load(true)
+    await setUserFromApi()
   } catch (e) {
     alert(e?.message || 'Failed to cancel allocation.')
   } finally {

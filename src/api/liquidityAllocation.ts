@@ -6,6 +6,7 @@ import {
   LiquidityAllocationResponse,
   LiquidityAllocationV1Request,
   LiquidityAllocationV1Response,
+  LiquidityAllocationDeleteRequest,
   LiquidityMarketResponse,
   LiquidityWithdrawalV1Response,
 } from '../types/allocationFace';
@@ -151,6 +152,48 @@ export const postLiquidityWithdrawalV1 = async (
         );
       } else if (error.response?.status === 400) {
         const errorDetail = error.response.data.detail;
+        if (Array.isArray(errorDetail)) {
+          throw new Error(errorDetail[0].msg);
+        } else {
+          throw new Error(`Bad Request: ${errorDetail}`);
+        }
+      } else if (error.response?.status === 422) {
+        const errorDetail = error.response.data?.detail;
+        if (Array.isArray(errorDetail)) {
+          throw new Error(errorDetail[0].msg);
+        } else {
+          throw new Error(`Validation Error: ${errorDetail}`);
+        }
+      } else if (error.response?.status === 500) {
+        const detail = error.response.data?.detail;
+        throw new Error(detail || 'Internal Server Error');
+      }
+    }
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+export const deleteLiquidityAllocation = async (
+  params: LiquidityAllocationDeleteRequest
+): Promise<void> => {
+  const token = getToken();
+  if (!token) throw new Error('Authentication required for allocation cancellation.');
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
+
+  try {
+    await axios.delete(`${API_URL}/app/dlcp/v1/liqu-allocation`, {
+      headers,
+      data: params,
+    });
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 400) {
+        const errorDetail = error.response.data?.detail;
         if (Array.isArray(errorDetail)) {
           throw new Error(errorDetail[0].msg);
         } else {

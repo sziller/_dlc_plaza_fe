@@ -413,9 +413,10 @@ onUnmounted(() => {
 })
 
 // delete callback
-function onDeleted() {
+async function onDeleted() {
   selectedDlc.value = null
   load(false)
+  await auth.setUserFromApi()
 }
 </script>
 
