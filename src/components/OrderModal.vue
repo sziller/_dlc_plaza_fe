@@ -955,8 +955,8 @@ const computedCollateralBtc = computed(() => {
   if (!Number.isFinite(L) || !Number.isFinite(r) || !Number.isFinite(ltv) || ltv <= 0) return NaN
 
   if (isBorrower.value) {
-    // LOAN * (1 + 2*interest + feerate*(1+interest)/LTV)
-    return roundBtc(L * (1 + 2 * r + FEE_PCT * (1 + r) / ltv))
+    // LOAN * ((1 + interest) / LTV - 1 + feerate)
+    return roundBtc(L * ((1 + r) / ltv - 1 + FEE_PCT))
   }
 
   // Lender: collateral = loan amount
