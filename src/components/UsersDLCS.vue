@@ -263,7 +263,7 @@ const toRow = (d) => {
   const uiDays  = rawDays ? displayDays(rawDays) : null
   const ltv = parseLtv(d.product_id)
   const rateNum = Number(d.interest)
-  const ear = annualize360(rateNum, rawDays)
+  const ear = isYearish(rawDays) ? rateNum : annualize360(rateNum, rawDays)
 
   const fullId = d.dlc_id || d.tmp_cntr_id || ''
   const fullOracle = d.orcl_id || ''
