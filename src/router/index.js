@@ -16,7 +16,6 @@ const TechnicalOverview  = () => import('../views/TechnicalOverview.vue')
 const Article3view       = () => import('../views/Article3view.vue')
 const Article4view       = () => import('../views/Article4view.vue')
 const Article5view       = () => import('../views/Article5view.vue')
-const Article6view       = () => import('../views/Article6view.vue')
 const Article7view       = () => import('../views/Article7view.vue')
 const Article8view       = () => import('../views/Article8view.vue')
 const Article10view      = () => import('../views/Article10view.vue')
@@ -192,11 +191,7 @@ const routes = [
     description: 'Step-by-step breakdown of Cadena Bitcoin loan lifecycle.',
     robots: 'index,follow',
   }},
-  { path: '/article/we-need-to-talk-about-kyc', name: 'Article6', component: Article6view, meta: {
-    title: 'We Need to Talk About KYC — Article',
-    description: 'Why identification is becoming the default to access the internet.',
-    robots: 'index,follow',
-  }},
+  { path: '/article/we-need-to-talk-about-kyc', redirect: '/knowledge-hub' },
   // New Resource Articles (7-16)
   { path: '/article/borrow-against-bitcoin', name: 'Article7', component: Article7view, meta: {
     title: 'Borrow Against Bitcoin: Get Cash Without Selling BTC | Cadena',

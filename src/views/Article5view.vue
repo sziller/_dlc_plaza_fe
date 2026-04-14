@@ -111,10 +111,10 @@
           </router-link>
 
           <router-link
-            to="/article/we-need-to-talk-about-kyc"
+            to="/article/borrow-against-bitcoin"
             class="flex items-center gap-2 text-white/90 hover:text-white transition-all text-base font-medium group"
           >
-            <span>We Need to Talk About KYC</span>
+            <span>Borrow Against Bitcoin</span>
             <span class="text-2xl transform group-hover:translate-x-1 transition-transform">→</span>
           </router-link>
         </div>

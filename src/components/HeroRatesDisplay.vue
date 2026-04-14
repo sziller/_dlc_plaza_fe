@@ -103,8 +103,8 @@ const mounted = ref(false)
 const loading = ref(true)
 const apiError = ref(false)
 
-const borrowRate = ref(10.9)
-const lendRate = ref(9.1)
+const borrowRate = ref(11.5)
+const lendRate = ref(11.4)
 const animatedBorrowRate = ref('*.*')
 const animatedLendRate = ref('*.*')
 const borrowFlash = ref('')
@@ -118,28 +118,23 @@ const deltas = [-0.2, -0.1, 0, 0.1, 0.2]
 
 function tickRates() {
   const bDelta = deltas[Math.floor(Math.random() * deltas.length)]
-  const lDelta = deltas[Math.floor(Math.random() * deltas.length)]
 
   if (bDelta !== 0) {
-    borrowRate.value = Math.round(Math.min(12.5, Math.max(9.5, borrowRate.value + bDelta)) * 10) / 10
+    borrowRate.value = Math.round(Math.min(12.0, Math.max(11.1, borrowRate.value + bDelta)) * 10) / 10
     animatedBorrowRate.value = borrowRate.value.toFixed(1)
     borrowFlash.value = bDelta > 0 ? 'green' : 'red'
     clearTimeout(borrowFlashTimer)
     borrowFlashTimer = setTimeout(() => { borrowFlash.value = '' }, 600)
   }
 
-  if (lDelta !== 0) {
-    lendRate.value = Math.round(Math.min(13.0, Math.max(7.5, lendRate.value + lDelta)) * 10) / 10
+  const newLend = Math.round((borrowRate.value - 0.1) * 10) / 10
+  if (newLend !== lendRate.value) {
+    const dir = newLend > lendRate.value ? 'green' : 'red'
+    lendRate.value = newLend
     animatedLendRate.value = lendRate.value.toFixed(1)
-    lendFlash.value = lDelta > 0 ? 'green' : 'red'
+    lendFlash.value = dir
     clearTimeout(lendFlashTimer)
     lendFlashTimer = setTimeout(() => { lendFlash.value = '' }, 600)
-  }
-
-  // Ensure lend rate is always lower than borrow rate
-  if (lendRate.value >= borrowRate.value - 1.8) {
-    lendRate.value = Math.round((borrowRate.value - 1.8) * 10) / 10
-    animatedLendRate.value = lendRate.value.toFixed(1)
   }
 }
 

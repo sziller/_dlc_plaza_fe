@@ -58,7 +58,7 @@
         <div class="space-y-4">
           <h3 class="text-2xl sm:text-3xl font-bold">Why it’s needed</h3>
           <p class="text-white/80">
-            Cadena is non-c custodial. That means <span class="font-semibold">you</span> hold the keys and control authorization. The Signer separates
+            Cadena is non-custodial. That means <span class="font-semibold">you</span> hold the keys and control authorization. The Signer separates
             identity and UI in the browser from the sensitive key material on your device, reducing attack surface and preserving
             self-custody.
           </p>
@@ -129,30 +129,25 @@
             <img
               src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200"
               alt="Download on the App Store"
-              style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain"
+              style="height: 60px; width: auto; vertical-align: middle; object-fit: contain"
             />
           </a>
 
-          <!-- Android APK badge (same shape as homepage version, now via API) -->
-          <button
-            type="button"
-            class="apk-badge"
-            :disabled="downloading"
-            @click="handleApkDownload"
-            :aria-label="`Download Android APK ${apkVersion || 'Latest'}`"
+          <!-- Google Play badge -->
+          <a
+            href="https://play.google.com/store/apps/details?id=com.cadenabitcoin.mobile.signer&pcampaignid=web_share"
+            style="display: inline-block"
+            aria-label="Get it on Google Play"
+            target="_blank"
+            rel="noopener"
           >
-            <span class="apk-version">
-              {{ downloading ? '...' : (apkVersion || 'Latest') }}
-            </span>
-            <span>
-              {{ downloading ? 'Downloading…' : 'Download APK' }}
-            </span>
-          </button>
+            <img
+              src="/img/google-play-badge.png"
+              alt="Get it on Google Play"
+              style="height: 76px; width: auto; vertical-align: middle; object-fit: contain"
+            />
+          </a>
         </div>
-
-        <p v-if="downloadError" class="text-sm text-red-300 pt-2">
-          {{ downloadError }}
-        </p>
       </section>
 
       <!-- GitHub link (near bottom) -->
@@ -179,41 +174,7 @@
 </template>
 
 <script setup lang="js">
-import { ref, onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
-import { downloadApp, fetchLatestAppInfo } from '../api/downloadApp'
-
-const downloading = ref(false)
-const downloadError = ref('')
-const apkVersion = ref('')
-
-onMounted(async () => {
-  try {
-    const info = await fetchLatestAppInfo()
-    apkVersion.value = info.versionLabel || 'Latest'
-  } catch {
-    apkVersion.value = 'Latest'
-  }
-})
-
-const handleApkDownload = async () => {
-  if (downloading.value) return
-
-  downloading.value = true
-  downloadError.value = ''
-
-  try {
-    const result = await downloadApp()
-    apkVersion.value = result.versionLabel || 'Latest'
-  } catch (e) {
-    const isNotFound = e?.name === 'HttpError' && e?.status === 404
-    downloadError.value = isNotFound
-      ? 'APK not yet available. Please check back soon.'
-      : (e?.message || 'Could not download the APK. Please try again.')
-  } finally {
-    downloading.value = false
-  }
-}
 </script>
 
 <style scoped>
@@ -275,44 +236,6 @@ const handleApkDownload = async () => {
     rgba(103, 56, 228, 0.28) 40%,
     rgba(0, 0, 0, 0) 75%
   );
-}
-
-/* APK badge, same shape */
-.apk-badge {
-  --badge-h: clamp(34px, 5.5vw, 52px);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: calc(var(--badge-h) * 0.14);
-  padding-inline: calc(var(--badge-h) * 0.18);
-  height: var(--badge-h);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: clamp(0.62rem, calc(var(--badge-h) * 0.22), 0.85rem);
-  line-height: 1;
-  border-radius: calc(var(--badge-h) * 0.26);
-  transition: background 0.15s ease-out, border 0.15s ease-out, opacity 0.15s ease-out;
-  cursor: pointer;
-}
-.apk-badge:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.35);
-}
-.apk-badge:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.apk-version {
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 9999px;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.65em;
-  line-height: 1;
-  white-space: nowrap;
 }
 
 /* GitHub badge (simple, matches style) */

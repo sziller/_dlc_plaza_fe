@@ -592,7 +592,7 @@ onBeforeUnmount(() => {
           Ready to Experience Decentralized Bitcoin Finance?
         </h2>
         <p class="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-          Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no KYC, no banks, no middlemen.
+          Whether you want to borrow against your Bitcoin or earn yield by providing liquidity, Cadena Bitcoin gives you the tools to take control — no banks, no middlemen.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
           <router-link to="/btcusd" class="inline-block rounded-full bg-white text-secondary font-semibold px-8 py-4 text-lg transition hover:bg-white/90">Borrow Bitcoin</router-link>

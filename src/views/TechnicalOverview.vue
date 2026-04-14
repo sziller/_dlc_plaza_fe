@@ -1,64 +1,80 @@
-<!-- src/pages/WhitepaperPdf.vue -->
 <template>
-  <main class="min-h-screen bg-primary text-white pt-24 pb-12">
-    <div class="mx-auto max-w-7xl px-6">
-      <h1 class="text-2xl font-bold tracking-tight mb-4">Cadena Whitepaper</h1>
+  <main class="min-h-screen w-full text-white pt-20 md:pt-32 relative">
+    <div class="absolute inset-0 -z-10 bg-page-gradient"></div>
 
-      <p class="text-white/70" aria-live="polite">Opening the whitepaper…</p>
-      <p class="mt-2 text-sm">
-        If it doesn't open, 
-        <a :href="pdfHref" class="underline" target="_blank" rel="noopener">tap here</a>
-        or <a :href="pdfUrl" class="underline" download>download the PDF</a>.
+    <!-- Hero -->
+    <section class="max-w-4xl mx-auto text-center mb-12 px-6">
+      <span class="inline-block text-sm font-semibold tracking-wide uppercase text-secondary mb-4 border border-secondary/40 rounded-full px-4 py-1">
+        Technical Overview
+      </span>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+        The Cadena Paper
+      </h1>
+      <p class="text-tertiary text-lg md:text-xl max-w-2xl mx-auto">
+        A deep dive into Cadena Bitcoin's protocol design, DLC-based lending architecture,
+        and the security model that keeps your keys in your hands.
       </p>
 
-      <noscript>
-        <p class="mt-4 text-sm text-white/80">
-          JavaScript is required to auto-open the PDF.
-          <a href="/whitepaper.pdf" class="underline">Open the whitepaper</a>.
-        </p>
-      </noscript>
-    </div>
+      <!-- Download CTA -->
+      <div class="mt-8">
+        <a
+          :href="pdfUrl"
+          download
+          class="inline-flex items-center gap-2 rounded-full bg-secondary text-dark font-semibold px-8 py-4 text-lg transition hover:bg-secondary/90"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+          Download PDF
+        </a>
+      </div>
+    </section>
+
+    <!-- Embedded PDF viewer -->
+    <section class="max-w-5xl mx-auto px-6 mb-16">
+      <div class="relative rounded-2xl p-[1px] bg-gradient-to-br from-secondary via-secondary/40 to-transparent">
+        <div class="rounded-2xl bg-dark overflow-hidden">
+          <iframe
+            :src="pdfUrl"
+            class="w-full border-0 rounded-2xl"
+            style="height: 80vh; min-height: 600px;"
+            title="Cadena Paper — Technical Overview PDF"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="max-w-4xl mx-auto text-center px-6 mb-20">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6">
+        Ready to get started?
+      </h2>
+      <p class="text-tertiary text-lg max-w-2xl mx-auto mb-8">
+        Put the protocol to work. Borrow against your Bitcoin or earn yield — all with the security described in the paper.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <router-link
+          to="/register"
+          class="inline-block rounded-full bg-white text-dark font-semibold px-8 py-4 text-lg transition hover:bg-white/90"
+        >
+          Get Started
+        </router-link>
+        <router-link
+          to="/security"
+          class="inline-block rounded-full border-2 border-white text-white font-semibold px-8 py-4 text-lg transition hover:bg-white hover:text-dark"
+        >
+          Learn About Security
+        </router-link>
+      </div>
+    </section>
   </main>
-  <TheFooter class="mt-12" />
+
+  <TheFooter />
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 
-/** Static file path (same-origin) */
 const pdfUrl = '/whitepaper.pdf'
-
-/** Reactive state so the fallback link reflects the same target */
-const page = ref(1)
-const zoom = ref('page-fit')
-
-/** Build the fragment-only viewer URL */
-const pdfHref = computed(() => `${pdfUrl}`)
-
-onMounted(() => {
-  try {
-    const params = new URLSearchParams(window.location.search)
-
-    // page: positive integer, default 1
-    const p = parseInt(params.get('page') || '1', 10)
-    page.value = Number.isFinite(p) && p > 0 ? p : 1
-
-    // zoom: keep to a conservative allowlist; default based on viewport
-    const z = params.get('zoom')
-    const isMobile = window.matchMedia('(max-width: 640px)').matches
-    const defaultZoom = isMobile ? 'page-width' : 'page-fit'
-    const allowed = /^(page-(?:width|fit)|\d{1,3})$/i   // e.g. "page-width", "page-fit", or numeric %
-    zoom.value = z && allowed.test(z) ? z : defaultZoom
-
-    // Replace so Back doesn't bounce back to this helper page
-    window.location.replace(pdfHref.value)
-  } catch (e) {
-    // If anything goes wrong, keep the page visible with working links
-    console.error('PDF redirect failed:', e)
-  }
-})
-
-// Exported for template binding if needed elsewhere
-defineExpose({ pdfUrl, pdfHref })
 </script>

@@ -152,14 +152,7 @@ const articles = [
     imageBase: 'article12',
     link: '/article/peer-to-peer-bitcoin-loans'
   },
-  {
-    id: 6,
-    title: 'We Need to Talk About KYC',
-    description: 'Why identification is becoming the default to access the internet.',
-    imageBase: 'article12',
-    link: '/article/we-need-to-talk-about-kyc'
-  },
-  {
+{
     id: 14,
     title: 'DLC Bitcoin Loans: Discreet Log Contracts Explained',
     description: 'Deep dive into Discreet Log Contract loans. Learn how DLCs enable trustless Bitcoin lending with oracle attestations.',

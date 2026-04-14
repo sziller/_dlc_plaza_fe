@@ -31,15 +31,7 @@ export const blogArticles = [
     link: '/article/cadena-loan-lifecycle',
     internal: true,
   },
-  {
-    id: 5,
-    title: 'We need to talk about KYC',
-    description: 'Identification is quietly becoming the default requirement for access to the internet.',
-    imageBase: 'article6',
-    link: '/article/we-need-to-talk-about-kyc',
-    internal: true,
-  },
-  {
+{
     id: 6,
     title: 'How Cadena Bitcoin is Improving Bitcoin Borrowing and Lending',
     description: 'Cadena Bitcoin is redefining BTC lending by eliminating third parties and publishing all loans directly on the blockchain.',
@@ -81,7 +73,7 @@ export const exploreUseCases = [
         <li>✅ Increase your exposure from 0.05 BTC up to 5× stack leverage.</li>
         <li>✅ No taxable event — you never sold your original stack.</li>
         <li>✅ True self-custody throughout.</li>
-        <li>✅ No KYC or banks — pure peer-to-peer Bitcoin finance.</li>
+        <li>✅ No banks — pure peer-to-peer Bitcoin finance.</li>
       </ul>
 
       <p class="mt-4 italic text-white/75">“Just like MicroStrategy’s strategy, but truly decentralized.”</p>

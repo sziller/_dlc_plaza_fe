@@ -35,9 +35,9 @@ Effective Date: October 1, 2025
 At Cadena Bitcoin ("we," "us," or "our"), we are committed to protecting your privacy. This Privacy Policy outlines how we collect, use, store, and protect your personal information when you use our Bitcoin borrowing and lending platform (the "Platform"). By accessing or using the Platform, you agree to the terms of this Privacy Policy.
 
 
-1. Non-KYC Platform and User Responsibility
+1. Minimal Data Collection and User Responsibility
 
-Cadena Bitcoin is a non-KYC platform, meaning we do not require identity verification documents or other personally identifiable information beyond what is outlined in this policy. You are solely responsible for securing and managing your private keys associated with your Bitcoin used on the Platform. We do not store, control, or have access to your private keys. Loss of private keys may result in permanent loss of access to your Bitcoin, and Cadena Bitcoin is not liable for such losses.
+Cadena Bitcoin is committed to minimal data collection, meaning we do not require identity verification documents or other personally identifiable information beyond what is outlined in this policy. You are solely responsible for securing and managing your private keys associated with your Bitcoin used on the Platform. We do not store, control, or have access to your private keys. Loss of private keys may result in permanent loss of access to your Bitcoin, and Cadena Bitcoin is not liable for such losses.
 
 
 2. Information We Collect
