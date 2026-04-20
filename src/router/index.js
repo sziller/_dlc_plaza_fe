@@ -42,6 +42,9 @@ const AdminLoginPage     = () => import('../pages/AdminLoginPage.vue')
 const AdminBlogListPage  = () => import('../pages/AdminBlogListPage.vue')
 const AdminBlogEditPage  = () => import('../pages/AdminBlogEditPage.vue')
 const ForLLMs            = () => import('../views/ForLLMs.vue')
+const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
+const LoanCalculator = () => import('../views/LoanCalculator.vue')
+const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -372,6 +375,36 @@ const routes = [
     title: 'Login — Cadena Bitcoin',
     description: 'Sign in to your Cadena Bitcoin account.',
     robots: 'noindex,follow',
+  }
+},
+{
+  path: '/loan-calculator',
+  name: 'LoanCalculator',
+  component: LoanCalculator,
+  meta: {
+    title: 'Loan Calculator — Cadena Bitcoin',
+    description: 'Calculate how much Bitcoin you need for a Cadena loan.',
+    robots: 'index,follow',
+  }
+},
+{
+  path: '/liquidation-calculator',
+  name: 'LiquidationCalculator',
+  component: LiquidationCalculator,
+  meta: {
+    title: 'Liquidation Risk Calculator — Cadena Bitcoin',
+    description: 'Monte Carlo simulation showing Bitcoin loan liquidation risk vs. no-margin-call loans.',
+    robots: 'index,follow',
+  }
+},
+{
+  path: '/settlement-calculator',
+  name: 'SettlementCalculator',
+  component: SettlementCalculator,
+  meta: {
+    title: 'Settlement Calculator — Cadena Bitcoin',
+    description: 'Calculate your DLC payout at any BTC settlement price.',
+    robots: 'index,follow',
   }
 },
 {

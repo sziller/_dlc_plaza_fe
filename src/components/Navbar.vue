@@ -67,6 +67,23 @@
         <div class="hidden md:flex space-x-6 items-center">
           <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
           <router-link :class="linkClass" to="/btcusd">Create Loan</router-link>
+          <!-- Calculators dropdown -->
+          <div class="relative group">
+            <button :class="['flex items-center space-x-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
+              <span>Calculators</span>
+              <svg class="w-4 h-4 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
+              </svg>
+            </button>
+            <div
+              class="absolute top-full left-0 mt-2 w-52 bg-black text-white border border-secondary/40 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+              role="menu"
+            >
+              <router-link to="/loan-calculator" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Loan Calculator</router-link>
+              <router-link to="/settlement-calculator" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Settlement Calculator</router-link>
+              <router-link to="/liquidation-calculator" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Liquidation Risk</router-link>
+            </div>
+          </div>
 
           <!-- Socials dropdown -->
           <div class="relative group">
@@ -279,6 +296,12 @@
       >
         <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
         <router-link @click="closeMobileMenu" to="/btcusd" class="block text-lg font-semibold hover:text-secondary">Create Loan</router-link>
+        <div>
+          <div class="text-white/50 uppercase text-xs mt-4 mb-2">Calculators</div>
+          <router-link @click="closeMobileMenu" to="/loan-calculator" class="block pl-2 py-2 hover:text-secondary">Loan Calculator</router-link>
+          <router-link @click="closeMobileMenu" to="/settlement-calculator" class="block pl-2 py-2 hover:text-secondary">Settlement Calculator</router-link>
+          <router-link @click="closeMobileMenu" to="/liquidation-calculator" class="block pl-2 py-2 hover:text-secondary">Liquidation Risk</router-link>
+        </div>
 
         <div>
           <div class="text-white/50 uppercase text-xs mt-4 mb-2">Socials</div>
