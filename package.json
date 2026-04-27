@@ -43,6 +43,7 @@
     "autoprefixer": "^10.4.0",
     "baseline-browser-mapping": "^2.10.20",
     "critical": "^7.2.1",
+    "cross-env": "^10.1.0",
     "jsdom": "^27.1.0",
     "pdfjs-dist": "^5.4.149",
     "postcss": "^8.4.0",
