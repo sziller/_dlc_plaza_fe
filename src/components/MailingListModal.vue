@@ -110,6 +110,7 @@ async function handleSubmit() {
     await postContactEmail(email.value)
     successMessage.value = 'Thanks! Check your inbox for Cadena updates.'
     emit('submitted', email.value)
+    try { sessionStorage.setItem('cadena:exit-intent-submitted', '1') } catch {}
     setTimeout(() => {
       handleClose()
       successMessage.value = ''

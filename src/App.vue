@@ -18,6 +18,11 @@
       <router-view />
     </div>
     <CookieBanner />
+    <MailingListModal
+      :open="showExitPopup"
+      @close="dismissExitPopup"
+      @submitted="markExitSubmitted"
+    />
   </div>
 </template>
 
@@ -26,7 +31,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import CookieBanner from './components/CookieBanner.vue'
+import MailingListModal from './components/MailingListModal.vue'
 import { useAuth } from './composables/useAuth'
+import { useExitIntent } from './composables/useExitIntent'
 
 const router = useRouter()
 const route = useRoute()
@@ -42,6 +49,15 @@ const {
   error: authError,
 } = useAuth()
 
+const EXCLUDED_PATHS = new Set(['/login', '/loginpage', '/register', '/admin/login', '/signerapp'])
+
+const exitIntentEnabled = computed(() => {
+  return !isLoggedIn.value && !EXCLUDED_PATHS.has(route.path)
+})
+
+const { showPopup: showExitPopup, dismiss: dismissExitPopup, markSubmitted: markExitSubmitted } =
+  useExitIntent({ enabled: exitIntentEnabled })
+
 // Keep your existing guards
 function ensureOnLogin () {
   if (route.path !== '/login') {
@@ -50,7 +66,7 @@ function ensureOnLogin () {
 }
 function forceLogoutToLogin () {
   if (isLoggedIn.value) logout()
-  ensureOnLogin()
+  if (route.meta?.requiresAuth) ensureOnLogin()
 }
 
 // Heartbeat → logout on invalid
@@ -60,7 +76,7 @@ watch(() => tokenHealth.status, (s) => {
 
 // Any path that flips logged-in false → ensure we’re on /login
 watch(isLoggedIn, (v) => {
-  if (!v) ensureOnLogin()
+  if (!v && route.meta?.requiresAuth) ensureOnLogin()
 })
 
 // ----- Navbar data (from auth) -----
