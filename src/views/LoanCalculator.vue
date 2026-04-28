@@ -92,7 +92,7 @@
         </div>
 
         <div class="hero-note" id="lc-heroNote">
-          <strong>Note:</strong> The Bitcoin is locked as collateral — <strong>there is NO disbursement</strong>. If you need USD, you'd sell Bitcoin from your remaining stack to convert to USD. At maturity, you repay <strong>loan + interest</strong> in Bitcoin. Your locked collateral keeps full BTC upside throughout the term.
+          <strong>Note:</strong> The Bitcoin is locked as collateral — there is NO disbursement. If you need USD, you will need to sell Bitcoin from your remaining stack to convert to USD.  At maturity, you repay loan + interest in Bitcoin automatically from the collateral. The borrower maintains the full upside of the Bitcoin collateral throughout the term.
         </div>
 
         <div id="lc-breakdownSection"></div>
