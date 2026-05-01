@@ -65,7 +65,7 @@
                 />
                 <div class="flex justify-between text-xs text-white/50 mt-1 tabular-nums">
                   <span>$1,000</span>
-                  <span>$100,000</span>
+                  <span>$1,000,000</span>
                 </div>
               </div>
             </div>
@@ -170,7 +170,7 @@ const IS_STAGING = (() => {
 
 // -------- USD Amount Input + Slider ----------
 const AMOUNT_MIN = 1000
-const AMOUNT_MAX = 100000
+const AMOUNT_MAX = 1000000
 const AMOUNT_STEP = 1000
 const AMOUNT_DEFAULT = 5000
 

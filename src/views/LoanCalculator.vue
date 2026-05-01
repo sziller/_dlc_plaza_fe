@@ -40,9 +40,9 @@
             <span class="input-value" id="lc-loanDisplay">$50,000</span>
           </div>
           <div class="slider-wrapper">
-            <input type="range" id="lc-loanSlider" min="1000" max="500000" step="1000" value="50000" />
+            <input type="range" id="lc-loanSlider" min="1000" max="1000000" step="1000" value="50000" />
           </div>
-          <div class="slider-labels"><span>$1K</span><span>$500K</span></div>
+          <div class="slider-labels"><span>$1K</span><span>$1M</span></div>
           <div class="preset-buttons" id="lc-loanPresets">
             <button class="preset-btn" data-val="10000">$10K</button>
             <button class="preset-btn" data-val="25000">$25K</button>
