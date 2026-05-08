@@ -1,19 +1,14 @@
 import { createApp } from 'vue';
 import App from './src/App.vue';
 import router from './src/router/index.js';
-import 'devices.css';
 import './src/index.css';
 import { installSeo } from './src/plugins/seo.js'
 import { installStructuredData } from './src/plugins/structured-data.js'
-import 'lite-youtube-embed';
-import 'lite-youtube-embed/src/lite-yt-embed.css'
 import './src/api/axiosSetup'
 import {
   captureReferralFromURL,
   purgeLegacyReferralCookies,
 } from './src/lib/referral.ts';
-import * as amplitude from '@amplitude/analytics-browser';
-import { sessionReplayPlugin } from '@amplitude/plugin-session-replay-browser';
 import {
   getCookieConsentSnapshot,
   onCookieConsentChange,
@@ -25,11 +20,17 @@ captureReferralFromURL({ keys: ['ref', 'r', 'referral'], cleanURL: true });
 const AMPLITUDE_KEY = '6c7ac9a4cceb973e5068aed421b47352';
 let amplitudeBootstrapped = false;
 let amplitudeAllowed = false;
+let amp = null;
 
-const bootstrapAmplitude = () => {
+const bootstrapAmplitude = async () => {
   if (amplitudeBootstrapped) return;
-  amplitude.add(sessionReplayPlugin({ sampleRate: 1 }));
-  amplitude.init(AMPLITUDE_KEY, undefined, {
+  const [ampModule, { sessionReplayPlugin }] = await Promise.all([
+    import('@amplitude/analytics-browser'),
+    import('@amplitude/plugin-session-replay-browser'),
+  ]);
+  amp = ampModule;
+  amp.add(sessionReplayPlugin({ sampleRate: 0.2 }));
+  amp.init(AMPLITUDE_KEY, undefined, {
     autocapture: {
       elementInteractions: true,
     },
@@ -41,17 +42,17 @@ const hasAmplitudeConsent = (state) =>
   !!(state?.preferences?.analytics || state?.preferences?.marketing);
 
 const trackAmplitudePageView = (to) => {
-  if (!amplitudeAllowed) return;
-  amplitude.track('Page View', {
+  if (!amplitudeAllowed || !amp) return;
+  amp.track('Page View', {
     route: to.path,
     fullPath: to.fullPath,
   });
 };
 
-const syncAmplitudeConsent = (state) => {
+const syncAmplitudeConsent = async (state) => {
   const allowed = hasAmplitudeConsent(state);
   if (allowed) {
-    bootstrapAmplitude();
+    await bootstrapAmplitude();
     amplitudeAllowed = true;
     const currentRoute = router.currentRoute.value;
     if (currentRoute) {
@@ -59,9 +60,10 @@ const syncAmplitudeConsent = (state) => {
     }
   } else {
     amplitudeAllowed = false;
-    if (amplitudeBootstrapped && typeof amplitude.reset === 'function') {
-      amplitude.reset();
+    if (amplitudeBootstrapped && amp && typeof amp.reset === 'function') {
+      amp.reset();
       amplitudeBootstrapped = false;
+      amp = null;
     }
   }
 };

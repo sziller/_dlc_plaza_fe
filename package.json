@@ -9,7 +9,6 @@
     "build:prod": "cross-env VITE_NOINDEX=0 SITE_BASE=https://cadenabitcoin.com vite build",
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "npx critical dist/index.html --inline --base dist/ --width 375 --height 667",
     "preview": "vite preview --port 3000 --strictPort",
     "img:hero": "node scripts/gen-hero-images.mjs",
     "img:logo": "node scripts/gen-logo.mjs",

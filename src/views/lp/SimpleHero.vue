@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import TheFooter from '../../components/TheFooter.vue'
 import HeroRatesDisplay from '../../components/HeroRatesDisplay.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
@@ -7,18 +7,16 @@ import { useAuth } from '../../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../../api/publicContact'
 import { blogArticles } from '../../data/exploreContent'
 
-/* ---------- Media ---------- */
-const videos = ['WfBMCMVsD1Q', 'yNbE83BF8Mk', 'Gr0H0MpUbhU']
+/* ---------- YouTube facade ---------- */
+const showVideo = ref(false)
 
 /* ---------- Articles ---------- */
 const articles = blogArticles
+
 /* ---------- Auth / CTA ---------- */
-const { isLoggedIn, setUserFromApi } = useAuth()
+const { setUserFromApi } = useAuth()
 const heroCtaTo = computed(() => '/btcusd')
-const heroCtaLabel = computed(() => (isLoggedIn.value ? 'Open the Dashboard' : 'Get Started Today'))
-function onHeroCtaClick() {
-  // placeholder for analytics/tracking when CTA is clicked
-}
+function onHeroCtaClick() {}
 
 const showMailingList = ref(false)
 const footerEmail = ref('')
@@ -30,14 +28,6 @@ const footerSubscribeSuccess = ref('')
 const currentIndex = ref(0)
 const isMobile = ref(false)
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1280)
-const heroPhoneScale = computed(() => {
-  const width = viewportWidth.value
-  if (width >= 1800) return 1.45
-  if (width >= 1500) return 1.3
-  if (width >= 1200) return 1.18
-  if (width >= 1000) return 1.05
-  return 1
-})
 const visibleArticles = computed(() => {
   if (isMobile.value) return articles
   const res = []
@@ -58,15 +48,9 @@ function scrollRight() {
   }
 }
 
-/* ---------- Scroll-in animations ---------- */
+/* ---------- Scroll-in animations (IntersectionObserver — no scroll listener) ---------- */
 const sectionInView = ref([false, false, false])
-function handleScroll() {
-  const sections = document.querySelectorAll('.animated-section')
-  sections.forEach((section, idx) => {
-    const rect = section.getBoundingClientRect()
-    if (!sectionInView.value[idx] && rect.top < window.innerHeight - 100) sectionInView.value[idx] = true
-  })
-}
+let io
 
 /* ---------- FAQ ---------- */
 const faqs = [
@@ -96,6 +80,7 @@ const partners = [
   { name: 'Spark Services', href: 'https://getsparkservices.com/', imgSrc: '/img/partners/spark-logo.png', alt: 'Spark Services' },
   { name: 'Asobitcoin', href: 'https://www.asobitcoin.org/', imgSrc: '/img/partners/asobitcoin-logo.webp', alt: 'Asobitcoin' },
 ]
+
 function onEnter(el) {
   el.style.height = '0px'
   el.style.opacity = '0'
@@ -126,78 +111,6 @@ function onAfterLeave(el) {
   el.style.willChange = ''
 }
 
-/* ---------- Left stack instant-fit logic ---------- */
-const leftStackRef = ref(null)
-const stackScale = ref(1)
-const density = ref('normal')
-const NAV_OFFSET = 96
-const GAP_BETWEEN = 24
-
-if (typeof window !== 'undefined') {
-  const availPre = window.innerHeight - NAV_OFFSET - GAP_BETWEEN
-  density.value = availPre < 620 ? 'tiny' : availPre < 780 ? 'compact' : 'normal'
-}
-
-function rafDebounce(fn) {
-  let raf = 0
-  return () => {
-    if (raf) cancelAnimationFrame(raf)
-    raf = requestAnimationFrame(fn)
-  }
-}
-
-let lastMeasuredH = 0
-function fitLeftStack() {
-  if (!leftStackRef.value) return
-  const base = baseScale || 1
-
-  const avail = Math.max((window.innerHeight || 0) - NAV_OFFSET - GAP_BETWEEN, 160)
-
-  const h = leftStackRef.value.offsetHeight
-  lastMeasuredH = h
-
-  const needShrink = (h * base) > avail
-  const s = needShrink
-    ? Math.max(0.78, Math.min(1, avail / (h * base)))
-    : 1
-
-  stackScale.value = s
-}
-const fitDebounced = rafDebounce(() => {
-  if (!leftStackRef.value) return
-  const h = leftStackRef.value.offsetHeight
-  if (Math.abs(h - lastMeasuredH) > 1) fitLeftStack()
-})
-
-/* ---------- Phone preview height = EXACT rendered LEFT STACK HEIGHT ---------- */
-const clampedPhoneH = ref(0)
-function computeClampedPhoneH() {
-  const viewportCap = Math.max((window.innerHeight || 0) - NAV_OFFSET, 360)
-  const generousCap = Math.min(viewportCap * 1, viewportCap)
-  const rawH = leftStackRef.value?.offsetHeight || generousCap
-  const renderedH = rawH * (stackScale.value || 1) * (baseScale || 1)
-  const target = Math.min(Math.max(renderedH, 320), generousCap)
-  clampedPhoneH.value = Math.round(target)
-}
-const clampDebounced = rafDebounce(computeClampedPhoneH)
-const baseScale = 1.2
-
-const heroStackScaleAmount = computed(() => {
-  const width = viewportWidth.value || 0
-  if (width < 768) return 1
-  const scaled = (stackScale.value || 1) * baseScale
-  return Number.isFinite(scaled) ? scaled : 1
-})
-const heroStackOrigin = computed(() => (viewportWidth.value < 768 ? 'top center' : 'top left'))
-
-/* ---------- Mount / Unmount ---------- */
-let ro
-let updateIsMobile
-function handleLayoutChange() {
-  fitDebounced()
-  clampDebounced()
-}
-
 async function handleFooterSubscribe() {
   footerSubscribeError.value = ''
   footerSubscribeSuccess.value = ''
@@ -211,7 +124,6 @@ async function handleFooterSubscribe() {
   try {
     await postContactEmail(footerEmail.value)
 
-    // Also send to Attio CRM (fire-and-forget)
     const attioEmail = footerEmail.value
     fetch('https://hooks.attio.com/w/f2661d8b-9de8-4673-9281-3d3624c2e90b/50d3fdcf-686c-491f-b561-68badcff0cff', {
       method: 'POST',
@@ -221,9 +133,7 @@ async function handleFooterSubscribe() {
 
     footerSubscribeSuccess.value = 'Thanks! Check your inbox for Cadena updates.'
     footerEmail.value = ''
-    setTimeout(() => {
-      footerSubscribeSuccess.value = ''
-    }, 5000)
+    setTimeout(() => { footerSubscribeSuccess.value = '' }, 5000)
   } catch (err) {
     const msg = err && typeof err === 'object' && 'message' in err ? err.message : null
     footerSubscribeError.value = msg || 'Could not add your email. Please try again.'
@@ -231,8 +141,12 @@ async function handleFooterSubscribe() {
     footerSubscribeLoading.value = false
   }
 }
-onMounted(async () => {
+
+let updateIsMobile
+
+onMounted(() => {
   setUserFromApi()
+
   updateIsMobile = () => {
     const width = window.innerWidth
     isMobile.value = width < 640
@@ -241,32 +155,24 @@ onMounted(async () => {
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
 
-  window.addEventListener('scroll', handleScroll)
-  handleScroll()
-
-  await nextTick()
-  fitLeftStack()
-  computeClampedPhoneH()
-
-  ro = new ResizeObserver(() => handleLayoutChange())
-  if (leftStackRef.value) ro.observe(leftStackRef.value)
-
-  window.addEventListener('resize', handleLayoutChange)
-  window.addEventListener('orientationchange', handleLayoutChange)
-  window.addEventListener('focus', handleLayoutChange)
-
-  if (document.fonts?.ready) {
-    document.fonts.ready.then(() => { handleLayoutChange() }).catch(() => {})
-  }
+  const sections = document.querySelectorAll('.animated-section')
+  io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const idx = [...sections].indexOf(entry.target)
+        if (idx !== -1) {
+          sectionInView.value[idx] = true
+          io.unobserve(entry.target)
+        }
+      }
+    })
+  }, { rootMargin: '0px 0px -100px 0px' })
+  sections.forEach(el => io.observe(el))
 })
 
 onBeforeUnmount(() => {
   if (updateIsMobile) window.removeEventListener('resize', updateIsMobile)
-  window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', handleLayoutChange)
-  window.removeEventListener('orientationchange', handleLayoutChange)
-  window.removeEventListener('focus', handleLayoutChange)
-  if (ro) { try { ro.disconnect() } catch {} }
+  if (io) io.disconnect()
 })
 </script>
 
@@ -464,15 +370,26 @@ onBeforeUnmount(() => {
             </div>
           </div>
           <div>
-            <div class="yt">
+            <div class="yt" :class="{ 'yt-ready': !showVideo }" @click="showVideo = true">
               <iframe
-                src="https://www.youtube-nocookie.com/embed/GSwoA__CH5I?rel=0&modestbranding=1&playsinline=1"
+                v-if="showVideo"
+                src="https://www.youtube-nocookie.com/embed/GSwoA__CH5I?rel=0&modestbranding=1&playsinline=1&autoplay=1"
                 title="What is Cadena Bitcoin?"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen
-                loading="lazy"
                 referrerpolicy="strict-origin-when-cross-origin"
               ></iframe>
+              <template v-else>
+                <img
+                  src="/img/cadena-video-thumb.webp"
+                  alt="What is Cadena Bitcoin?"
+                  decoding="async"
+                  class="yt-thumb"
+                />
+                <button class="yt-play" aria-label="Play video">
+                  <svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7A8.5 8.5 0 0 0 60.3 1.5C55 0 34 0 34 0S13 0 7.7 1.5A8.5 8.5 0 0 0 1.5 7.7C0 13 0 24 0 24s0 11 1.5 16.3a8.5 8.5 0 0 0 6.2 6.2C13 48 34 48 34 48s21 0 26.3-1.5a8.5 8.5 0 0 0 6.2-6.2C68 35 68 24 68 24s0-11-1.5-16.3z" fill="#ff0000"/><path d="M27 34l18-10-18-10v20z" fill="#fff"/></svg>
+                </button>
+              </template>
             </div>
           </div>
         </div>
@@ -666,6 +583,10 @@ onBeforeUnmount(() => {
 /* YouTube */
 .yt { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 0.75rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
 .yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.yt-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.yt-ready { cursor: pointer; }
+.yt-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: none; border: none; padding: 0; cursor: pointer; opacity: 0.9; transition: opacity 0.15s, transform 0.15s; }
+.yt-ready:hover .yt-play { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
 
 /* FAQ */
 .faq-panel { overflow: hidden; background: transparent; border: 0; }

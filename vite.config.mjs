@@ -18,6 +18,33 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (
+            id.includes('/node_modules/vue/') ||
+            id.includes('/node_modules/vue-router/') ||
+            id.includes('/node_modules/@vue/')
+          ) {
+            return 'vendor-vue'
+          }
+          if (id.includes('/node_modules/@fullcalendar/')) {
+            return 'vendor-calendar'
+          }
+          if (id.includes('/node_modules/marked/')) {
+            return 'vendor-markdown'
+          }
+          if (id.includes('/node_modules/@vuepic/')) {
+            return 'vendor-datepicker'
+          }
+          if (id.includes('/node_modules/axios/')) {
+            return 'vendor-http'
+          }
+        },
+      },
+    },
+  },
   plugins: [
     vue({
       template: {

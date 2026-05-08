@@ -66,15 +66,19 @@
             p-0 hero-right
             justify-center lg:justify-end
           ">
-            <img
-              src="/img/hero-loan-explained.png"
-              alt="Bitcoin lending illustration"
-              class="w-auto h-auto max-w-xs sm:max-w-sm lg:max-w-md object-contain"
-              width="634"
-              height="471"
-              loading="eager"
-              decoding="async"
-            />
+            <picture>
+              <source type="image/avif" srcset="/img/hero-loan-explained-640.avif 640w, /img/hero-loan-explained-960.avif 960w, /img/hero-loan-explained-1280.avif 1280w" sizes="(max-width: 640px) 320px, (max-width: 1024px) 384px, 448px" />
+              <source type="image/webp" srcset="/img/hero-loan-explained-640.webp 640w, /img/hero-loan-explained-960.webp 960w, /img/hero-loan-explained-1280.webp 1280w" sizes="(max-width: 640px) 320px, (max-width: 1024px) 384px, 448px" />
+              <img
+                src="/img/hero-loan-explained-960.webp"
+                alt="Bitcoin lending illustration"
+                class="w-auto h-auto max-w-xs sm:max-w-sm lg:max-w-md object-contain"
+                width="634"
+                height="471"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
           </div>
         </div>
       </div>
