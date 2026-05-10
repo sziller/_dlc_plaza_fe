@@ -373,7 +373,7 @@ onBeforeUnmount(() => {
             <div class="yt" :class="{ 'yt-ready': !showVideo }" @click="showVideo = true">
               <iframe
                 v-if="showVideo"
-                src="https://www.youtube-nocookie.com/embed/GSwoA__CH5I?rel=0&modestbranding=1&playsinline=1&autoplay=1"
+                src="https://www.youtube-nocookie.com/embed/Sb1_HFkr4T0?rel=0&modestbranding=1&playsinline=1&autoplay=1"
                 title="What is Cadena Bitcoin?"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen
