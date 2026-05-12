@@ -56,5 +56,18 @@
     "unplugin-icons": "^22.2.0",
     "unplugin-vue-components": "^28.8.0",
     "vite": "^5.0.0"
-  }
+  },
+  "description": "",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theschnaz/cadena-website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theschnaz/cadena-website/issues"
+  },
+  "homepage": "https://github.com/theschnaz/cadena-website#readme"
 }

@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ChatBot: typeof import('./components/ChatBot.vue')['default']
     ComparisonTable: typeof import('./components/ComparisonTable.vue')['default']
     CookieBanner: typeof import('./components/CookieBanner.vue')['default']
     DLCDetails: typeof import('./components/DLCDetails.vue')['default']

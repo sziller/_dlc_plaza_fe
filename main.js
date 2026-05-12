@@ -24,18 +24,25 @@ let amp = null;
 
 const bootstrapAmplitude = async () => {
   if (amplitudeBootstrapped) return;
-  const [ampModule, { sessionReplayPlugin }] = await Promise.all([
-    import('@amplitude/analytics-browser'),
-    import('@amplitude/plugin-session-replay-browser'),
-  ]);
+
+  // Load base analytics immediately
+  const ampModule = await import('@amplitude/analytics-browser');
   amp = ampModule;
-  amp.add(sessionReplayPlugin({ sampleRate: 0.2 }));
-  amp.init(AMPLITUDE_KEY, undefined, {
-    autocapture: {
-      elementInteractions: true,
-    },
-  });
+  amp.init(AMPLITUDE_KEY, undefined, { autocapture: { elementInteractions: true } });
   amplitudeBootstrapped = true;
+
+  // Session replay is 297KB of rrweb bundles — skip on mobile (high cost, low value)
+  // and defer on desktop until the browser is idle
+  const isMobile = navigator.maxTouchPoints > 1 || window.innerWidth < 768;
+  if (!isMobile) {
+    const defer = window.requestIdleCallback
+      ? (cb) => window.requestIdleCallback(cb, { timeout: 5000 })
+      : (cb) => setTimeout(cb, 3000);
+    defer(async () => {
+      const { sessionReplayPlugin } = await import('@amplitude/plugin-session-replay-browser');
+      amp.add(sessionReplayPlugin({ sampleRate: 0.2 }));
+    });
+  }
 };
 
 const hasAmplitudeConsent = (state) =>

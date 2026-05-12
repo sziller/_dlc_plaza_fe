@@ -14,10 +14,11 @@
     />
 
     <!-- Page content: pad for navbar base + (optional) info strip -->
-    <div class="px-4" :style="{ paddingTop: contentPad }">
+    <div :style="{ paddingTop: contentPad }">
       <router-view />
     </div>
     <CookieBanner />
+    <ChatBot />
     <MailingListModal
       :open="showExitPopup"
       @close="dismissExitPopup"
@@ -27,11 +28,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import CookieBanner from './components/CookieBanner.vue'
-import MailingListModal from './components/MailingListModal.vue'
+
+const ChatBot = defineAsyncComponent(() => import('./components/ChatBot.vue'))
+const MailingListModal = defineAsyncComponent(() => import('./components/MailingListModal.vue'))
 import { useAuth } from './composables/useAuth'
 import { useExitIntent } from './composables/useExitIntent'
 

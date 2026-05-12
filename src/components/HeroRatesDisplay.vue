@@ -1,9 +1,9 @@
 <template>
   <div
-    class="rounded-xl border border-secondary/60 shadow-lg bg-dark transition-all duration-500 ease-out"
+    class="rounded-xl border border-secondary/60 shadow-lg bg-dark transition-transform duration-500 ease-out"
     :class="[
       compact ? 'p-4' : 'p-5 sm:p-6',
-      mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      mounted ? 'translate-y-0' : 'translate-y-4'
     ]"
   >
     <h3
