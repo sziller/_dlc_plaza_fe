@@ -1,175 +1,224 @@
 <template>
-  <!-- Gradient Wrapper -->
-  <div class="min-h-screen text-white relative overflow-hidden bg-page-gradient">
-  <div class="bg-fixed-gradient" aria-hidden="true"></div>
-  <div class="glow-purple" aria-hidden="true"></div>
-  <div class="glow-cyan" aria-hidden="true"></div>
-    <!-- Onboarding Section -->
-    <section class="w-full pt-0 md:pt-0" aria-labelledby="onboarding-title">
-      <div class="mx-auto max-w-screen-xl px-6 sm:px-8 lg:px-12 space-y-10">
+  <div class="contact-root min-h-screen text-white">
+    <div class="bg-fixed-gradient" aria-hidden="true"></div>
 
-        <!-- Eyebrow + Title + Lead -->
-        <div class="text-center" v-reveal>
-          <h1 id="onboarding-title" class="section-title">
-            Personalized Onboarding
-          </h1>
-
-          <p class="lead max-w-4xl mx-auto">
-            As a Cadena Bitcoin client, expert knowledge is always just a chat, email, or phone call away.
-            We simplify complexity and are available 24/7 for personalized onboarding and strategies to
-            borrow Bitcoin or generate yield from Bitcoin.
+    <!-- ONBOARDING -->
+    <section class="top-section" aria-labelledby="onboarding-title">
+      <div class="max-w-screen-xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div class="text-center">
+          <h1 id="onboarding-title" class="section-title">Personalized Onboarding</h1>
+          <p class="lead max-w-3xl mx-auto mt-4">
+            Expert knowledge is always just a chat, email, or phone call away. We simplify complexity
+            and are available 24/7 for personalized onboarding and strategies to borrow Bitcoin or generate yield from Bitcoin.
           </p>
         </div>
 
-        <!-- Contact Options -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          <!-- Call -->
-          <div class="pro-card group" v-reveal="{ delay: 60 }">
-            <div class="flex flex-col items-start gap-4">
-              <h4 class="text-2xl font-semibold">Book a Demo</h4>
-              <p class="text-sm text-white/70">
-                Schedule a 30-minute meeting with the Cadena team.
-              </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+          <!-- Book Demo -->
+          <div class="c-card">
+            <div class="c-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="w-5 h-5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <div>
+              <h4 class="c-card-title">Book a Demo</h4>
+              <p class="c-card-desc">Schedule a 30-minute meeting with the Cadena team.</p>
               <a
                 href="https://calendly.com/cadenabitcoin-info/30min?month=2026-01"
-                class="btn-primary inline-flex items-center gap-2"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Book a Demo - Schedule a Meeting (opens Calendly in a new tab)"
+                class="btn-primary mt-5 inline-flex items-center gap-2"
+                target="_blank" rel="noopener noreferrer"
               >
-                Book a Demo — Schedule a Meeting
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+                Schedule a Meeting
               </a>
             </div>
           </div>
 
           <!-- Email -->
-          <div class="pro-card group" v-reveal="{ delay: 100 }">
-            <div class="flex items-start gap-4">
-              <div class="icon-wrap">
-                <Mail class="w-5 h-5" aria-hidden="true" />
+          <div class="c-card">
+            <div class="c-card-icon">
+              <Mail class="w-5 h-5" aria-hidden="true" />
+            </div>
+            <div class="flex-1">
+              <h4 class="c-card-title">Email</h4>
+              <p class="c-card-desc">Send us your questions or request onboarding.</p>
+              <div class="mt-5 flex flex-wrap items-center gap-3">
+                <a href="mailto:info@cadenabitcoin.com" class="btn-primary" aria-label="Email info@cadenabitcoin.com">
+                  info@cadenabitcoin.com
+                </a>
+                <button @click="copyEmail" class="btn-ghost" :aria-label="copiedEmail ? 'Copied' : 'Copy email'">
+                  <component :is="copiedEmail ? Check : Copy" class="w-4 h-4" />
+                  <span class="text-sm font-medium">{{ copiedEmail ? 'Copied' : 'Copy' }}</span>
+                </button>
               </div>
-              <div class="flex-1">
-                <h4 class="text-2xl font-semibold">Email</h4>
-                <p class="text-sm text-white/70 mt-1">Send us your questions or request onboarding.</p>
-
-                <div class="mt-5 flex flex-wrap items-center gap-3">
-                  <a
-                    href="mailto:info@cadenabitcoin.com"
-                    class="btn-primary"
-                    aria-label="Email info@cadenabitcoin.com"
-                  >
-                    info@cadenabitcoin.com
-                  </a>
-
-                  <button
-                    @click="copyEmail"
-                    class="btn-ghost"
-                    :aria-label="copiedEmail ? 'Copied email' : 'Copy email'"
-                  >
-                    <component :is="copiedEmail ? Check : Copy" class="w-4 h-4" />
-                    <span class="text-sm font-medium">{{ copiedEmail ? 'Copied' : 'Copy' }}</span>
-                  </button>
-                </div>
-
-
-                <div class="mt-4 flex items-center gap-3 text-xs text-white/60">
-                  <span>Dedicated onboarding specialist</span>
-                  <span aria-hidden="true">•</span>
-                  <span>Secure &amp; private</span>
-                </div>
-              </div>
+              <p class="mt-4 text-xs text-white/60">Dedicated onboarding specialist · Secure &amp; private</p>
             </div>
           </div>
-
         </div>
       </div>
     </section>
 
-    <!-- Who we serve -->
-    <section class="w-full px-6 py-16 md:py-20">
-      <div class="max-w-6xl mx-auto space-y-10">
-        <h2 class="section-title text-center" v-reveal>Who we serve.</h2>
+    <!-- WHO WE SERVE -->
+    <section class="px-6 py-10 md:py-14" aria-labelledby="serve-title">
+      <div class="max-w-screen-xl mx-auto">
+        <div class="text-center mb-3" v-reveal>
+          <p class="eyebrow">Who We Serve</p>
+          <h2 id="serve-title" class="section-title mt-2">Built for every<br class="hidden sm:block"/> Bitcoin investor</h2>
+          <p class="lead max-w-2xl mx-auto mt-4">Get expert support and competitive rates for Bitcoin borrowing and lending — regardless of portfolio size.</p>
+        </div>
 
-        <div class="space-y-8">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 40 }">
-              <User class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
-              <p class="text-xl font-semibold">Individual Investors</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-12">
+          <!-- Individual -->
+          <div class="serve-card" v-reveal="{ delay: 60 }">
+            <div class="serve-icon">
+              <User class="w-5 h-5" aria-hidden="true" />
             </div>
-            <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 90 }">
-              <Users class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
-              <p class="text-xl font-semibold">Family Offices</p>
-            </div>
-            <div class="reveal glass-tile card-tight text-center group" v-reveal="{ delay: 140 }">
-              <Building2 class="w-8 h-8 mx-auto mb-3 text-white/80 group-hover:text-white" aria-hidden="true" />
-              <p class="text-xl font-semibold">Institutional Investors</p>
-            </div>
+            <h3 class="serve-title">Individual Investors</h3>
+            <p class="serve-desc">Bitcoin holders looking to access liquidity or earn fixed yield without surrendering self-custody.</p>
+            <ul class="serve-list">
+              <li>Borrow from $1,000 USD — no credit check</li>
+              <li>Up to 50% LTV with no margin calls</li>
+              <li>Earn ~11% APY lending your idle stack</li>
+            </ul>
+            <router-link to="/btcusd" class="serve-cta">Get Started →</router-link>
           </div>
 
-          <div class="reveal glass-card text-center" v-reveal="{ delay: 180 }">
-            <p class="text-2xl text-white/90">
-              Get expert support and competitive rates for Bitcoin borrowing and lending.
-            </p>
+          <!-- Family Offices -->
+          <div class="serve-card serve-card-featured" v-reveal="{ delay: 120 }">
+            <div class="serve-icon">
+              <Users class="w-5 h-5" aria-hidden="true" />
+            </div>
+            <h3 class="serve-title">Family Offices</h3>
+            <p class="serve-desc">Sophisticated investors managing significant Bitcoin holdings across multiple strategies and beneficiaries.</p>
+            <ul class="serve-list">
+              <li>Dedicated relationship manager</li>
+              <li>Multi-strategy borrowing &amp; lending</li>
+              <li>Priority matching &amp; competitive rates</li>
+            </ul>
+            <a href="mailto:info@cadenabitcoin.com" class="serve-cta">Contact Us →</a>
+          </div>
+
+          <!-- Institutional -->
+          <div class="serve-card" v-reveal="{ delay: 180 }">
+            <div class="serve-icon">
+              <Building2 class="w-5 h-5" aria-hidden="true" />
+            </div>
+            <h3 class="serve-title">Institutional Investors</h3>
+            <p class="serve-desc">Funds, treasuries, and regulated entities requiring bespoke terms, scale, and compliance-ready documentation.</p>
+            <ul class="serve-list">
+              <li>Custom loan sizes &amp; terms</li>
+              <li>White-glove onboarding process</li>
+              <li>API access &amp; reporting on request</li>
+            </ul>
+            <a
+              href="https://calendly.com/cadenabitcoin-info/30min?month=2026-01"
+              target="_blank" rel="noopener"
+              class="serve-cta"
+            >Book a Call →</a>
           </div>
         </div>
       </div>
     </section>
-       <UseCasesAccordion :items="useCases" />
 
-    <!-- Reach Out -->
-    <section class="w-full px-6 pb-16 md:pb-24">
-      <div class="max-w-6xl mx-auto space-y-12">
-        <h2 class="section-title text-center" v-reveal>Reach Out</h2>
+    <!-- USE CASES -->
+    <section class="px-6 py-10 md:py-14" aria-labelledby="usecases-title">
+      <div class="max-w-screen-xl mx-auto">
+        <div class="text-center mb-12" v-reveal>
+          <p class="eyebrow">Real Scenarios</p>
+          <h2 id="usecases-title" class="section-title mt-2">Use Cases</h2>
+          <p class="lead max-w-2xl mx-auto mt-4">See how different Bitcoin investors use Cadena to achieve their financial goals.</p>
+        </div>
 
-        <!-- Helpful prompt / CTA copy -->
-       
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Mini Saylor -->
+          <div class="uc-card" v-reveal="{ delay: 60 }">
+            <div class="uc-tag uc-tag-borrow">Borrower</div>
+            <h3 class="uc-title">Leverage Your Conviction</h3>
+            <p class="uc-persona">The "Mini Saylor" — Corporate Bitcoin Strategy</p>
+            <p class="uc-desc">Amplify your BTC exposure without selling your stack or depleting business capital. Just like MicroStrategy's strategy, but truly decentralized.</p>
+            <ul class="uc-list">
+              <li>Increase exposure up to 5× your current stack</li>
+              <li>No taxable event — your original stack stays intact</li>
+              <li>True self-custody throughout the loan term</li>
+            </ul>
+            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Get Started →</router-link>
+          </div>
+
+          <!-- Dividend Debbie -->
+          <div class="uc-card" v-reveal="{ delay: 100 }">
+            <div class="uc-tag uc-tag-lend">Lender</div>
+            <h3 class="uc-title">Earn Fixed Bitcoin Yield</h3>
+            <p class="uc-persona">"Dividend Debbie" — Stable Bitcoin Yield</p>
+            <p class="uc-desc">Put your idle Bitcoin to work earning ~11% APY with mathematical security. Predictable, Bitcoin-denominated returns — no bank counterparty risk.</p>
+            <ul class="uc-list">
+              <li>~10–11% APY denominated in Bitcoin</li>
+              <li>Your keys, your coins — maintain full custody</li>
+              <li>Secured by on-chain DLC collateral</li>
+            </ul>
+            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Start Lending →</router-link>
+          </div>
+
+          <!-- Boat Liquidity -->
+          <div class="uc-card" v-reveal="{ delay: 140 }">
+            <div class="uc-tag uc-tag-borrow">Borrower</div>
+            <h3 class="uc-title">Access Liquidity Without Selling</h3>
+            <p class="uc-persona">"Borrowing for the Boat" — Liquidity Without Selling</p>
+            <p class="uc-desc">Need $50K for a big purchase? Borrow against your Bitcoin and keep every sat. No capital gains, no missed upside.</p>
+            <ul class="uc-list">
+              <li>Access up to 50% of your BTC value as liquidity</li>
+              <li>No margin calls — collateral only matters at settlement</li>
+              <li>Keep full BTC price upside throughout the term</li>
+            </ul>
+            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Borrow Now →</router-link>
+          </div>
+
+          <!-- Yield Arber -->
+          <div class="uc-card" v-reveal="{ delay: 180 }">
+            <div class="uc-tag uc-tag-both">Borrower &amp; Lender</div>
+            <h3 class="uc-title">Advanced Yield Strategies</h3>
+            <p class="uc-persona">"Yield Arber" — Advanced Bitcoin Strategies</p>
+            <p class="uc-desc">Sophisticated investors can capture spread between Cadena lending rates and cheaper fiat borrowing — all while maintaining maximum Bitcoin exposure.</p>
+            <ul class="uc-list">
+              <li>Capture rate spreads while staying long BTC</li>
+              <li>Maximize capital efficiency across positions</li>
+              <li>Minimize counterparty risk with full on-chain custody</li>
+            </ul>
+            <a
+              href="https://calendly.com/cadenabitcoin-info/30min?month=2026-01"
+              target="_blank" rel="noopener"
+              class="btn-primary mt-auto inline-flex"
+            >Explore Opportunities →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REACH OUT -->
+    <section class="w-full px-6 pb-16 md:pb-20" aria-labelledby="reach-title">
+      <div class="max-w-6xl mx-auto space-y-8">
+        <h2 id="reach-title" class="section-title text-center" v-reveal>Reach Out</h2>
 
         <!-- Socials -->
-        <div class="reveal glass-card" v-reveal="{ delay: 60 }">
-  <p class="text-2xl font-semibold mb-8 text-center">Find Us On Social Media</p>
-  <div class="flex flex-wrap items-center justify-center gap-10 md:gap-12">
-    <a
-      href="https://x.com/cadenabitcoin"
-      target="_blank"
-      rel="noopener noreferrer nofollow"
-      referrerpolicy="no-referrer"
-      aria-label="Visit us on X (Twitter)"
-      class="social-tile"
-    >
-      <i-simple-icons-x class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-x>
-      <span class="text-base font-medium">X</span>
-    </a>
+        <div class="glass-card" v-reveal="{ delay: 60 }">
+          <p class="text-2xl font-semibold mb-8 text-center">Find Us On Social Media</p>
+          <div class="flex flex-wrap items-center justify-center gap-10 md:gap-12">
+            <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener noreferrer nofollow" referrerpolicy="no-referrer" aria-label="Visit us on X (Twitter)" class="social-tile">
+              <i-simple-icons-x class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-x>
+              <span class="text-base font-medium">X</span>
+            </a>
+            <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener noreferrer nofollow" referrerpolicy="no-referrer" aria-label="Visit our GitHub repository" class="social-tile">
+              <i-simple-icons-github class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-github>
+              <span class="text-base font-medium">GitHub</span>
+            </a>
+            <a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" target="_blank" rel="noopener noreferrer nofollow" referrerpolicy="no-referrer" aria-label="Visit our YouTube" class="social-tile">
+              <i-simple-icons-youtube class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-youtube>
+              <span class="text-base font-medium">YouTube</span>
+            </a>
+          </div>
+        </div>
 
-    <a
-      href="https://github.com/CadenaWizard/cryptlib"
-      target="_blank"
-      rel="noopener noreferrer nofollow"
-      referrerpolicy="no-referrer"
-      aria-label="Visit our GitHub repository"
-      class="social-tile"
-    >
-      <i-simple-icons-github class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-github>
-      <span class="text-base font-medium">GitHub</span>
-    </a>
-
-    <a
-      href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt"
-      target="_blank"
-      rel="noopener noreferrer nofollow"
-      referrerpolicy="no-referrer"
-      aria-label="Visit our YouTube"
-      class="social-tile"
-    >
-      <i-simple-icons-youtube class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-youtube>
-      <span class="text-base font-medium">YouTube</span>
-    </a>
-  </div>
-</div>
-
-        <!-- Contacts -->
+        <!-- Team -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div class="reveal glass-card" v-reveal="{ delay: 80 }">
+          <div class="glass-card" v-reveal="{ delay: 80 }">
             <div class="avatar-wrap mb-3">
               <img
                 src="/img/kevinb-640.avif"
@@ -182,22 +231,18 @@
               />
             </div>
             <p class="text-xl font-semibold mb-1">Kevin Bell</p>
-            <p class="text-sm text-white/70">President • CFA</p>
-            <p class="mt-3 text-white/80 text-sm leading-relaxed">
+            <p class="text-sm" style="color:rgba(255,255,255,0.7)">President · CFA</p>
+            <p class="mt-3 text-sm leading-relaxed" style="color:rgba(255,255,255,0.8)">
               Kevin Bell, CFA — tradfi graduate, capital markets veteran, debt and currency dealer, and numbers ninja.
               Passionate about building efficient financial solutions that promote Bitcoin, freedom, decentralization,
               and individual empowerment.
             </p>
-            <div class="mt-4 space-y-1">
-              <p>
-                <span class="font-medium">Email:</span>
-                <a href="mailto:kevin@cadenabitcoin.com" class="underline hover:opacity-80">kevin@cadenabitcoin.com</a>
-              </p>
-              
+            <div class="mt-4">
+              <p><span class="font-medium">Email:</span> <a href="mailto:kevin@cadenabitcoin.com" class="underline hover:opacity-80">kevin@cadenabitcoin.com</a></p>
             </div>
           </div>
 
-          <div class="reveal glass-card" v-reveal="{ delay: 120 }">
+          <div class="glass-card" v-reveal="{ delay: 120 }">
             <div class="avatar-wrap mb-3">
               <img
                 src="/img/Sz-640.avif"
@@ -210,18 +255,15 @@
               />
             </div>
             <p class="text-xl font-semibold mb-1">Sziller</p>
-            <p class="text-sm text-white/70">Chief Technology Officer</p>
-            <p class="mt-3 text-white/80 text-sm leading-relaxed">
+            <p class="text-sm" style="color:rgba(255,255,255,0.7)">Chief Technology Officer</p>
+            <p class="mt-3 text-sm leading-relaxed" style="color:rgba(255,255,255,0.8)">
               Sziller, an Engineer and M.Sc. Architect with decentralization and self-sufficiency on my mind.
-              I’m interested in Engineering solutions for real-life problems accessible to anyone, with skunkswork
+              I'm interested in Engineering solutions for real-life problems accessible to anyone, with skunkswork
               philosophy. I strive to achieve optimal redundancy by cutting out as many middle-men as possible.
               I love solutions that work, even if rough on the edges.
             </p>
-            <div class="mt-4 space-y-1">
-              <p>
-                <span class="font-medium">Email:</span>
-                <a href="mailto:sziller@cadenabitcoin.com" class="underline hover:opacity-80">sziller@cadenabitcoin.com</a>
-              </p>
+            <div class="mt-4">
+              <p><span class="font-medium">Email:</span> <a href="mailto:sziller@cadenabitcoin.com" class="underline hover:opacity-80">sziller@cadenabitcoin.com</a></p>
             </div>
           </div>
         </div>
@@ -235,27 +277,16 @@
 <script setup>
 import TheFooter from '../components/TheFooter.vue'
 import { onMounted, ref } from 'vue'
-import { User, Users, Building2, Copy, Check, Phone, Mail } from 'lucide-vue-next'
-import UseCasesAccordion from '../components/UseCasesAccordion.vue'
-import { exploreUseCases } from '../data/exploreContent'
-/** Copy states */
+import { User, Users, Building2, Copy, Check, Mail } from 'lucide-vue-next'
+
 const copiedEmail = ref(false)
-const copiedPhone = ref(false)
-/** Legacy single-flag (kept for backward compatibility if another part of the page uses it) */
 const copied = ref(false)
 
-/** Copy helpers (no eval/innerHTML, clipboard feature-detected) */
-function copyEmail() {
-  copyToClipboard('info@cadenabitcoin.com', copiedEmail)
-}
-function copyPhone() {
-  copyToClipboard('+13058311410', copiedPhone)
-}
+function copyEmail() { copyToClipboard('info@cadenabitcoin.com', copiedEmail) }
+
 function copyToClipboard(text, flagRef) {
   if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => flash(flagRef))
-      .catch(() => fallbackCopy(text, flagRef))
+    navigator.clipboard.writeText(text).then(() => flash(flagRef)).catch(() => fallbackCopy(text, flagRef))
   } else {
     fallbackCopy(text, flagRef)
   }
@@ -268,457 +299,284 @@ function fallbackCopy(text, flagRef) {
   ta.style.left = '-9999px'
   document.body.appendChild(ta)
   ta.select()
-  try {
-    document.execCommand('copy')
-    flash(flagRef)
-  } finally {
-    document.body.removeChild(ta)
-  }
+  try { document.execCommand('copy'); flash(flagRef) } finally { document.body.removeChild(ta) }
 }
 function flash(flagRef) {
   flagRef.value = true
   copied.value = true
-  setTimeout(() => {
-    flagRef.value = false
-    copied.value = false
-  }, 1500)
+  setTimeout(() => { flagRef.value = false; copied.value = false }, 1500)
 }
 
-onMounted(() => {
-  window.scrollTo(0, 0)
-})
+onMounted(() => { window.scrollTo(0, 0) })
 
-/** Intersection-based reveal directive (static delays only) */
 const vReveal = {
   mounted(el, binding) {
     el.classList.add('reveal')
     const d = Number(binding?.value?.delay ?? 0)
-    // clamp & sanitize delay (defense-in-depth)
     const delay = Number.isFinite(d) && d >= 0 && d <= 2000 ? d : 0
     el.style.transitionDelay = `${delay}ms`
     const io = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        el.classList.add('in')
-        io.unobserve(el)
-      }
-    }, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 })
+      if (entry.isIntersecting) { el.classList.add('in'); io.unobserve(el) }
+    }, { rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
     io.observe(el)
   }
 }
-const useCases = exploreUseCases
 </script>
 
 <style scoped>
-/* ===== Page background (kept) ===== */
-.bg-page-gradient{
-  background-color: #000;
-  background-image:
-    radial-gradient(
-      125% 75% at 50% 100%,
-      rgba(103,56,228,0.58) 0%,
-      rgba(103,56,228,0.36) 26%,
-      rgba(103,56,228,0.16) 52%,
-      rgba(0,0,0,0) 76%
-    );
-}
-@supports (background: radial-gradient(in oklch, black, white)) {
-  .bg-page-gradient{
-    background-color: oklch(0 0 0);
-    background-image:
-      radial-gradient(
-        in oklch 125% 75% at 50% 100%,
-        oklch(from #6738e4 l c h / 0.60) 0%,
-        oklch(from #6738e4 l c h / 0.36) 26%,
-        oklch(from #6738e4 l c h / 0.16) 52%,
-        oklch(0 0 0 / 0) 76%
-      );
-  }
-}
-@media (max-height: 800px){
-  .bg-page-gradient{
-    background-image:
-      radial-gradient(
-        120% 60% at 50% 100%,
-        rgba(103,56,228,0.52) 0%,
-        rgba(103,56,228,0.30) 24%,
-        rgba(103,56,228,0.12) 48%,
-        rgba(0,0,0,0) 70%
-      );
-  }
-}
-
-/* Soft glows (unchanged) */
-.glow-purple,
-.glow-cyan{
-  position: absolute;
-  pointer-events: none;
-  z-index: -1;
-  filter: blur(48px);
-}
-.glow-purple{
-  left: -10%;
-  bottom: 10%;
-  width: 50rem;
-  height: 20rem;
-  opacity: .5;
-  background: radial-gradient(40% 60% at 50% 50%, rgba(124,92,255,0.33), transparent 70%);
-}
-.glow-cyan{
-  right: -10%;
-  top: 10%;
-  width: 40rem;
-  height: 18rem;
-  opacity: .4;
-  background: radial-gradient(40% 60% at 50% 50%, rgba(22,177,255,0.27), transparent 70%);
-}
-
-/* ===== Type ===== */
-.section-title{
-  margin-top: 1rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  font-size: clamp(2rem, 4vw + 1rem, 3.5rem);
-}
-.lead{
-  margin-top: 1rem;
-  font-size: clamp(1rem, 0.5vw + 0.9rem, 1.25rem);
-  color: rgba(255,255,255,0.8);
-}
-
-/* ===== Cards: solid #0A1123 with #8387C4 accents ===== */
-.pro-card,
-.glass-card,
-.glass-tile {
-  position: relative;
-  border-radius: 1.25rem;
-  padding: 1.25rem;
-  background: #0A1123;             /* ← solid */
-  border: 1px solid #8387C4;       /* ← accent */
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  /* remove glass */
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-/* remove gradient border layer entirely */
-.pro-card::before,
-.glass-card::before,
-.glass-tile::before {
-  content: none !important;
-}
-.pro-card:hover,
-.glass-card:hover,
-.glass-tile:hover {
-  transform: translateY(-2px);
-  border-color: #A4A8D6;           /* lighter accent on hover */
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
-}
-
-/* Social tiles: keep as plain icons (no card look) */
-.social-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .75rem;
-  text-align: center;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  padding: 0 !important;
-}
-.social-tile::before { content: none !important; }
-.social-tile:hover {
-  transform: none !important;
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-/* Icon puck: match card background, accent border */
-.icon-wrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px; height: 44px;
-  border-radius: 0.875rem;
-  background: #0A1123;
-  border: 1px solid #8387C4;
-  transition: transform .18s ease, border-color .18s ease;
-}
-.pro-card:hover .icon-wrap,
-.glass-card:hover .icon-wrap,
-.glass-tile:hover .icon-wrap {
-  transform: translateY(-1px);
-  border-color: #A4A8D6;
-}
-
-/* Buttons */
-.btn-primary {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: .625rem 1rem; border-radius: .75rem;
-  background: #6738e4; color: white; font-weight: 600;
-  box-shadow: 0 6px 14px rgba(103,56,228,.35);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-}
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(103,56,228,.45); }
-.btn-primary:focus-visible { outline: 2px solid rgba(255,255,255,.9); outline-offset: 2px; }
-
-.btn-ghost {
-  display: inline-flex; align-items: center; gap: .5rem;
-  padding: .6rem .9rem; border-radius: .75rem;
-  background: #0A1123;             /* solid */
-  color: white;
-  border: 1px solid #8387C4;       /* accent */
-  transition: transform .15s ease, border-color .15s ease;
-}
-.btn-ghost:hover { transform: translateY(-1px); border-color: #A4A8D6; }
-.btn-ghost:focus-visible { outline: 2px solid rgba(255,255,255,.85); outline-offset: 2px; }
-
-/* Tighter padding option */
-.card-tight { padding: 1rem; }
-
-/* ===== Scroll reveal ===== */
-.reveal {
-  opacity: 0;
-  transform: translateY(14px) scale(0.995);
-  filter: blur(6px);
-  transition:
-    opacity .7s cubic-bezier(.2,.65,.2,1),
-    transform .7s cubic-bezier(.2,.65,.2,1),
-    filter .6s ease;
-  will-change: opacity, transform, filter;
-}
-.reveal.in { opacity: 1; transform: none; filter: none; }
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .reveal { transition: none; opacity: 1; transform: none; filter: none; }
-  .pro-card, .btn-primary, .btn-ghost, .icon-wrap { transition: none; }
-}
-
-/* Neutralize text glow */
-:deep(h1), :deep(h2), :deep(p), :deep(a), :deep(span) { text-shadow: 0 0 0 transparent; }
-
-/* ===== Headshots ===== */
-.avatar-wrap{ display:flex; justify-content:center; }
-.headshot{
-  width:160px; height:160px; border-radius:9999px; object-fit:cover; display:block;
-  box-shadow:0 12px 28px rgba(0,0,0,.45);
-  border: 1px solid #8387C4;       /* accent ring */
-  background: #0A1123;             /* solid chip behind image */
-}
-@media (min-width: 768px){
-  .headshot{ width:192px; height:192px; }
-}
-/* ============ Global spacing tokens (scoped to this page) ============ */
-.bg-page-gradient{
-  --space-1: .25rem;
-  --space-2: .5rem;
-  --space-3: .75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-
-  --section-pad-y-sm: var(--space-12);
-  --section-pad-y-md: var(--space-16);
-  --stack-gap:        var(--space-8);   /* default vertical rhythm */
-  --grid-gap:         var(--space-6);   /* default grid gap */
-  --card-pad:         var(--space-5);   /* card internal padding */
-}
-
-/* ============ Sections: unify vertical padding ============ */
-.bg-page-gradient section{
-  padding-block: var(--section-pad-y-sm) !important;
-}
-@media (min-width: 768px){
-  .bg-page-gradient section{
-    padding-block: var(--section-pad-y-md) !important;
-  }
-}
-
-/* ============ Wrappers: consistent vertical rhythm inside ============ */
-/* Applies to both max-width wrappers you use */
-.bg-page-gradient .max-w-screen-xl > * + *,
-.bg-page-gradient .max-w-6xl > * + *{
-  margin-top: var(--stack-gap) !important;
-}
-
-/* ============ Grids: consistent gaps ============ */
-.bg-page-gradient .grid{
-  row-gap: var(--grid-gap) !important;
-  column-gap: var(--grid-gap) !important;
-}
-
-/* ============ Cards: consistent internal padding ============ */
-.bg-page-gradient .pro-card,
-.bg-page-gradient .glass-card,
-.bg-page-gradient .glass-tile{
-  padding: var(--card-pad) !important;
-}
-
-/* ============ Headings & lead: predictable spacing ============ */
-.bg-page-gradient .section-title{
-  margin-bottom: var(--space-4) !important;
-}
-.bg-page-gradient .lead{
-  margin-top: var(--space-3) !important;
-  margin-bottom: 0 !important;
-}
-
-/* Subtitles in contact cards */
-.bg-page-gradient h4{
-  margin: 0 0 var(--space-2) 0 !important;
-}
-
-/* ============ Stacks inside cards/panels ============ */
-.bg-page-gradient .pro-card > * + *,
-.bg-page-gradient .glass-card > * + *,
-.bg-page-gradient .glass-tile > * + *{
-  margin-top: var(--space-4) !important;
-}
-
-/* ============ Lists & paragraphs ============ */
-.bg-page-gradient p{ margin: 0; }
-.bg-page-gradient p + p,
-.bg-page-gradient p + ul,
-.bg-page-gradient p + ol,
-.bg-page-gradient ul + p,
-.bg-page-gradient ol + p{
-  margin-top: var(--space-3) !important;
-}
-.bg-page-gradient ul,
-.bg-page-gradient ol{
-  margin: 0;
-  padding-left: 1.25rem;
-}
-.bg-page-gradient li + li{
-  margin-top: .35em;
-}
-
-/* ============ Button rows ============ */
-.bg-page-gradient .pro-card .flex.flex-wrap.items-center.gap-3{
-  gap: var(--space-3) !important;
-  margin-top: var(--space-4) !important;
-}
-
-/* ============ “Who we serve” tiles spacing ============ */
-.bg-page-gradient .card-tight{
-  padding: var(--space-4) !important;
-}
-.bg-page-gradient .glass-card.text-center p.text-2xl{
-  margin: 0 !important;
-}
-
-/* ============ Social block ============ */
-.bg-page-gradient .social-tile{
-  margin: 0 !important;
-}
-.bg-page-gradient .glass-card .flex.flex-wrap.items-center.justify-center{
-  gap: var(--space-10) !important;
-}
-
-/* ============ Avatar blocks ============ */
-.bg-page-gradient .avatar-wrap{ margin-bottom: var(--space-3) !important; }
-.bg-page-gradient .headshot{ margin: 0; }
-.bg-page-gradient .reveal.glass-card p.text-xl{ margin-bottom: var(--space-1) !important; }
-.bg-page-gradient .reveal.glass-card p.text-sm.text-white\/70{ margin: 0 0 var(--space-3) 0 !important; }
-
-/* ============ UseCasesAccordion spacing ============ */
-/* The component already normalizes itself; just ensure outer margin matches */
-.bg-page-gradient :is(UseCasesAccordion, .usecases-accordion){
-  display: block;
-  margin-block: var(--stack-gap) !important;
-}
-
-/* ============ Footer top spacing ============ */
-.bg-page-gradient + TheFooter,
-TheFooter{
-  margin-top: var(--space-12) !important;
-}
-.text-center .lead,
-.bg-page-gradient .lead {
-  text-align: center;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  max-width: 60ch; /* ~perfect line length */
-}
-/* Wrapper is now transparent; content sits above a fixed layer */
-.bg-page-gradient{
-  background: transparent;
-}
-
-/* Fixed, full-viewport gradient (like the home page) */
-.bg-fixed-gradient{
-  position: fixed;
-  inset: 0;
-  z-index: -10;            /* behind everything */
-  pointer-events: none;    /* clicks go through */
-  background-color: #000;  /* solid base */
-  background-image:
-    radial-gradient(
-      125% 75% at 50% 100%,
-      rgba(103,56,228,0.58) 0%,
-      rgba(103,56,228,0.36) 26%,
-      rgba(103,56,228,0.16) 52%,
-      rgba(0,0,0,0) 76%
-    );
-}
-
-@supports (background: radial-gradient(in oklch, black, white)) {
-  .bg-fixed-gradient{
-    background-color: oklch(0 0 0);
-    background-image:
-      radial-gradient(
-        in oklch 125% 75% at 50% 100%,
-        oklch(from #6738e4 l c h / 0.60) 0%,
-        oklch(from #6738e4 l c h / 0.36) 26%,
-        oklch(from #6738e4 l c h / 0.16) 52%,
-        oklch(0 0 0 / 0) 76%
-      );
-  }
-}
-
-/* Slightly lower glow on short screens (same behavior as before) */
-@media (max-height: 800px){
-  .bg-fixed-gradient{
-    background-image:
-      radial-gradient(
-        120% 60% at 50% 100%,
-        rgba(103,56,228,0.52) 0%,
-        rgba(103,56,228,0.30) 24%,
-        rgba(103,56,228,0.12) 48%,
-        rgba(0,0,0,0) 70%
-      );
-  }
-}
-.glow-cyan{
-  right: -22%;         /* was -10% — push it farther off-screen */
-  top: 6%;             /* a touch lower */
-  width: 36rem;        /* slightly smaller */
-  height: 16rem;
-  opacity: .22;        /* softer */
-  background: radial-gradient(
-    40% 60% at 50% 50%,
-    rgba(22,177,255,0.18),   /* gentler center */
-    transparent 70%
+/* ── Page background ── */
+.contact-root { background: transparent; position: relative; }
+.bg-fixed-gradient {
+  position: fixed; inset: 0; z-index: -10; pointer-events: none;
+  background-color: #081123;
+  background-image: radial-gradient(
+    110% 60% at 50% 100%,
+    rgba(103,56,228,0.45) 0%,
+    rgba(103,56,228,0.22) 35%,
+    rgba(103,56,228,0.08) 60%,
+    transparent 80%
   );
 }
 
-/* On small screens, hide it entirely if it still peeks */
-@media (max-width: 768px){
-  .glow-cyan{ display: none; }
+/* ── Top section (accounts for fixed nav) ── */
+.top-section {
+  padding-top: calc(var(--nav-h, 80px) + 2.5rem);
+  padding-bottom: 3rem;
 }
 
-/* If you want an even cleaner edge, feather it with a mask */
-.glow-cyan{
-  -webkit-mask-image: radial-gradient(65% 65% at 50% 50%, #000 60%, transparent 100%);
-          mask-image: radial-gradient(65% 65% at 50% 50%, #000 60%, transparent 100%);
+/* ── Typography ── */
+.section-title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-size: clamp(2rem, 4vw + 0.5rem, 3.2rem);
+  color: #fff;
 }
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6738e3;
+}
+.lead {
+  font-size: clamp(1rem, 0.5vw + 0.9rem, 1.2rem);
+  color: rgba(255,255,255,0.8);
+  line-height: 1.65;
+}
+
+/* ── Base card ── */
+.c-card {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(131,135,196,0.35);
+  border-radius: 1.25rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.c-card:hover {
+  border-color: rgba(131,135,196,0.65);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+.c-card-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; flex-shrink: 0;
+  background: rgba(103,56,228,0.12);
+  border: 1px solid rgba(103,56,228,0.35);
+  border-radius: 0.75rem;
+  color: #8387c3;
+}
+.c-card-title { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem; }
+.c-card-desc { font-size: 0.9rem; color: rgba(255,255,255,0.65); }
+
+/* ── Who We Serve cards ── */
+.serve-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 2rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(131,135,196,0.3);
+  border-radius: 1.25rem;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.serve-card:hover {
+  border-color: rgba(131,135,196,0.6);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+.serve-card-featured {
+  border-color: rgba(103,56,228,0.5);
+  background: rgba(103,56,228,0.06);
+}
+.serve-card-featured:hover { border-color: rgba(103,56,228,0.8); }
+.serve-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; margin-bottom: 1.25rem; flex-shrink: 0;
+  background: rgba(103,56,228,0.15);
+  border: 1px solid rgba(103,56,228,0.4);
+  border-radius: 0.75rem;
+  color: #8387c3;
+}
+.serve-title { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.6rem; }
+.serve-desc { font-size: 0.875rem; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 1.25rem; }
+.serve-list {
+  list-style: none; padding: 0; margin: 0 0 1.5rem 0;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.serve-list li {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.8);
+  padding-left: 1.1rem;
+  position: relative;
+}
+.serve-list li::before {
+  content: '→';
+  position: absolute; left: 0;
+  color: #6738e3;
+  font-size: 0.75rem;
+}
+.serve-cta {
+  margin-top: auto;
+  display: inline-flex;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8387c3;
+  transition: color 0.15s;
+  text-decoration: none;
+}
+.serve-cta:hover { color: #fff; }
+
+/* ── Use Case cards ── */
+.uc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 2rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(131,135,196,0.3);
+  border-left: 3px solid #6738e3;
+  border-radius: 1.25rem;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.uc-card:hover {
+  border-color: rgba(131,135,196,0.6);
+  border-left-color: #8b5cf6;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+.uc-tag {
+  display: inline-flex;
+  align-self: flex-start;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.35rem;
+  margin-bottom: 1rem;
+}
+.uc-tag-borrow { background: rgba(103,56,228,0.2); color: #a78bfa; border: 1px solid rgba(103,56,228,0.4); }
+.uc-tag-lend   { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+.uc-tag-both   { background: rgba(251,191,36,0.12); color: #fde68a; border: 1px solid rgba(251,191,36,0.25); }
+.uc-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+.uc-persona { font-size: 0.75rem; font-weight: 600; color: #6738e3; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.85rem; }
+.uc-desc { font-size: 0.875rem; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 1.25rem; }
+.uc-list {
+  list-style: none; padding: 0; margin: 0 0 1.75rem 0;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  flex: 1;
+}
+.uc-list li {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.8);
+  padding-left: 1.1rem;
+  position: relative;
+}
+.uc-list li::before {
+  content: '✓';
+  position: absolute; left: 0;
+  color: #6738e3;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  padding: 0.625rem 1.1rem; border-radius: 0.75rem;
+  background: #6738e4; color: #fff; font-weight: 600; font-size: 0.9rem;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+  text-decoration: none;
+}
+.btn-primary:hover { background: #7a4af0; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(103,56,228,0.4); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 0.9rem; border-radius: 0.75rem;
+  background: rgba(255,255,255,0.04);
+  color: #fff; font-size: 0.9rem;
+  border: 1px solid rgba(131,135,196,0.4);
+  transition: border-color 0.15s, transform 0.15s;
+  text-decoration: none;
+}
+.btn-ghost:hover { border-color: rgba(131,135,196,0.75); transform: translateY(-1px); }
+
+/* ── Social tiles ── */
+.social-tile {
+  display: flex; flex-direction: column; align-items: center;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: color 0.2s, transform 0.2s;
+}
+.social-tile:hover { color: #fff; transform: translateY(-2px); }
+
+/* ── Headshots ── */
+.headshot {
+  width: 160px; height: 160px; border-radius: 9999px; object-fit: cover;
+  border: 1px solid rgba(131,135,196,0.4);
+  background: #0A1123;
+}
+
+/* ── Reveal animation ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.65s cubic-bezier(.2,.65,.2,1), transform 0.65s cubic-bezier(.2,.65,.2,1);
+  will-change: opacity, transform;
+}
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; opacity: 1; transform: none; }
+}
+
+/* ── Glass card (original Reach Out style) ── */
+.glass-card {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  background: #0A1123;
+  border: 1px solid #8387C4;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.glass-card:hover {
+  transform: translateY(-2px);
+  border-color: #A4A8D6;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.28);
+}
+
+/* ── Headshots ── */
+.avatar-wrap { display: flex; justify-content: center; }
+.headshot {
+  width: 160px; height: 160px; border-radius: 9999px; object-fit: cover; display: block;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+  border: 1px solid #8387C4;
+  background: #0A1123;
+}
+@media (min-width: 768px) { .headshot { width: 192px; height: 192px; } }
+
+/* ── Misc ── */
+:deep(h1), :deep(h2), :deep(p), :deep(a), :deep(span) { text-shadow: none; }
 </style>

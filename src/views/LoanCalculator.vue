@@ -337,7 +337,7 @@ onMounted(() => {
 
 .lc-page {
   font-family: 'Inter', sans-serif;
-  background: #000000;
+  background: #081123;
   color: #e0e0e0;
   min-height: 100vh;
   display: flex;
@@ -413,7 +413,7 @@ onMounted(() => {
 }
 
 .lc-page .panel {
-  background: rgba(20, 20, 30, 0.8);
+  background: rgba(8, 17, 35, 0.9);
   border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: 16px;
   padding: 28px;
@@ -464,13 +464,13 @@ onMounted(() => {
 
 .lc-page input[type="range"] {
   -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px;
-  background: linear-gradient(to right, #7c3aed var(--fill, 50%), #1f1f2e var(--fill, 50%));
+  background: linear-gradient(to right, #7c3aed var(--fill, 50%), #0d1a30 var(--fill, 50%));
   outline: none; cursor: pointer;
 }
 
 .lc-page input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
-  background: #a78bfa; border: 3px solid #000000;
+  background: #a78bfa; border: 3px solid #081123;
   box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
   cursor: pointer; transition: transform 0.15s;
 }
@@ -502,7 +502,7 @@ onMounted(() => {
   grid-template-columns: 1fr 1fr;
   gap: 4px;
   padding: 4px;
-  background: rgba(10, 10, 15, 0.6);
+  background: rgba(8, 17, 35, 0.6);
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
   margin-bottom: 20px;
@@ -631,7 +631,7 @@ onMounted(() => {
 }
 
 .lc-page .scenario-card {
-  background: rgba(10, 10, 15, 0.6);
+  background: rgba(8, 17, 35, 0.6);
   border: 1px solid rgba(139, 92, 246, 0.1);
   border-radius: 8px;
   padding: 14px 10px;

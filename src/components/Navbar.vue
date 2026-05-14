@@ -4,8 +4,7 @@
     <nav
       ref="navRef"
       :class="[
-        'w-full fixed top-0 left-0 right-0 z-50 transition-colors duration-200',
-        'bg-black text-white supports-[backdrop-filter]:backdrop-blur'
+        'w-full fixed top-0 left-0 right-0 z-50 nav-bg text-white'
       ]"
       role="navigation"
       aria-label="Main"
@@ -76,7 +75,7 @@
               </svg>
             </button>
             <div
-              class="absolute top-full left-0 mt-2 w-52 bg-black text-white border border-secondary/40 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+              class="absolute top-full left-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
               role="menu"
             >
               <router-link to="/loan-calculator" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Loan Calculator</router-link>
@@ -94,7 +93,7 @@
               </svg>
             </button>
             <div
-              class="absolute top-full left-0 mt-2 w-48 bg-black text-white border border-secondary/40 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+              class="absolute top-full left-0 mt-2 w-48 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
               role="menu"
             >
               <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">X (Twitter)</a>
@@ -128,14 +127,14 @@
           <router-link
             v-if="!isLoggedIn"
             to="/register"
-            class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
+            class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:shadow-[0_0_20px_rgba(103,56,228,0.5)]"
           >
             Get Started
           </router-link>
           <router-link
             v-else
             to="/my-profile"
-            class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition"
+            class="bg-secondary hover:bg-white text-white hover:text-secondary px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:shadow-[0_0_20px_rgba(103,56,228,0.5)]"
           >
             My Profile
           </router-link>
@@ -147,7 +146,7 @@
     <div
       v-if="isLoggedIn"
       ref="infoRef"
-      class="w-full fixed left-0 right-0 z-40 border-b border-secondary bg-secondary text-white supports-[backdrop-filter]:bg-secondary backdrop-blur"
+      class="w-full fixed left-0 right-0 z-40 bg-secondary text-white supports-[backdrop-filter]:bg-secondary backdrop-blur"
       :style="{ top: `var(--nav-h)` }"
       role="region"
       aria-label="User info"
@@ -291,7 +290,7 @@
       <div
         v-if="isMobileMenuOpen"
         id="mobile-menu"
-        class="fixed inset-0 bg-black text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-lg pt-[var(--nav-h)]"
+        class="fixed inset-0 text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-xl pt-[var(--nav-h)] mobile-menu-bg"
         @keyup.esc="closeMobileMenu"
       >
         <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
@@ -656,7 +655,16 @@ defineExpose({
 
 
 <style scoped>
-:where(.tabular-nums){
+:where(.tabular-nums) {
   font-variant-numeric: tabular-nums;
+}
+
+.nav-bg {
+  background: #081123;
+  transition: background 0.3s ease;
+}
+
+.mobile-menu-bg {
+  background: #081123;
 }
 </style>

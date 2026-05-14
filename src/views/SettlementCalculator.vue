@@ -236,7 +236,7 @@ onMounted(() => {
       <path d="${pathD} L ${xOf(pMax)} ${PAD_T + plotH} L ${xOf(pMin)} ${PAD_T + plotH} Z" fill="url(#areaGrad)"/>
       <path d="${pathD}" stroke="#a78bfa" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
       <line x1="${cx}" y1="${PAD_T}" x2="${cx}" y2="${PAD_T + plotH}" stroke="${dotColor}" stroke-width="1" stroke-dasharray="2,3" opacity="0.6"/>
-      <circle cx="${cx}" cy="${cy}" r="6" fill="${dotColor}" stroke="#0a0a0f" stroke-width="2.5"/>
+      <circle cx="${cx}" cy="${cy}" r="6" fill="${dotColor}" stroke="#081123" stroke-width="2.5"/>
       ${yTicks.map(b => `<text x="${PAD_L - 5}" y="${yOf(b) + 3}" fill="#6b7280" font-size="9" text-anchor="end" font-family="Inter">${fmtBtc(b)}</text>`).join('')}
       <text x="${xOf(pMin)}" y="${H - 8}" fill="#6b7280" font-size="9" text-anchor="start" font-family="Inter">$${fmt(pMin / 1000)}K</text>
       <text x="${xOf((pMin + pMax) / 2)}" y="${H - 8}" fill="#6b7280" font-size="9" text-anchor="middle" font-family="Inter">$${fmt((pMin + pMax) / 2 / 1000)}K</text>
@@ -374,7 +374,7 @@ onMounted(() => {
 
 .sc-page {
   font-family: 'Inter', sans-serif;
-  background: #0a0a0f;
+  background: #081123;
   color: #e0e0e0;
   min-height: 100vh;
   display: flex;
@@ -413,7 +413,7 @@ onMounted(() => {
 }
 
 .sc-page .panel {
-  background: rgba(20, 20, 30, 0.8);
+  background: rgba(8, 17, 35, 0.9);
   border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: 16px;
   padding: 28px;
@@ -446,7 +446,7 @@ onMounted(() => {
 
 .sc-page input[type="range"] {
   -webkit-appearance: none; width: 100%; height: 6px; border-radius: 3px;
-  background: linear-gradient(to right, #7c3aed var(--fill, 50%), #1f1f2e var(--fill, 50%));
+  background: linear-gradient(to right, #7c3aed var(--fill, 50%), #0d1a30 var(--fill, 50%));
   outline: none; cursor: pointer;
 }
 
@@ -462,7 +462,7 @@ onMounted(() => {
 
 .sc-page input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
-  background: #a78bfa; border: 3px solid #0a0a0f;
+  background: #a78bfa; border: 3px solid #081123;
   box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
   cursor: pointer; transition: transform 0.15s;
 }
@@ -511,7 +511,7 @@ onMounted(() => {
   grid-template-columns: 1fr 1fr;
   gap: 4px;
   padding: 4px;
-  background: rgba(10, 10, 15, 0.6);
+  background: rgba(8, 17, 35, 0.6);
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 12px;
   margin-bottom: 20px;
@@ -579,7 +579,7 @@ onMounted(() => {
 .sc-page .pnl-box {
   text-align: center;
   padding: 8px;
-  background: rgba(10, 10, 15, 0.4);
+  background: rgba(8, 17, 35, 0.4);
   border-radius: 8px;
 }
 
@@ -599,7 +599,7 @@ onMounted(() => {
 .sc-page .pnl-neutral { color: #9ca3af; }
 
 .sc-page .chart-container {
-  background: rgba(10, 10, 15, 0.6);
+  background: rgba(8, 17, 35, 0.6);
   border: 1px solid rgba(139, 92, 246, 0.15);
   border-radius: 12px;
   padding: 16px;
@@ -632,7 +632,7 @@ onMounted(() => {
 
 .sc-page .ref-table {
   margin-top: 16px;
-  background: rgba(10, 10, 15, 0.4);
+  background: rgba(8, 17, 35, 0.4);
   border: 1px solid rgba(139, 92, 246, 0.1);
   border-radius: 10px;
   overflow: hidden;
