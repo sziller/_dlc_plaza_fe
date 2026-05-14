@@ -465,41 +465,7 @@ onBeforeUnmount(() => {
 
 
 <style scoped>
-/* Bottom-centered purple glow on black (local-only) */
 .bg-page-gradient{
-  background-color: #000;
-  background-image:
-    radial-gradient(
-      125% 75% at 50% 100%,
-      rgba(103,56,228,0.58) 0%,
-      rgba(103,56,228,0.36) 26%,
-      rgba(103,56,228,0.16) 52%,
-      rgba(0,0,0,0) 76%
-    );
-}
-@supports (background: radial-gradient(in oklch, black, white)) {
-  .bg-page-gradient{
-    background-color: oklch(0 0 0);
-    background-image:
-      radial-gradient(
-        in oklch 125% 75% at 50% 100%,
-        oklch(from #6738e4 l c h / 0.60) 0%,
-        oklch(from #6738e4 l c h / 0.36) 26%,
-        oklch(from #6738e4 l c h / 0.16) 52%,
-        oklch(0 0 0 / 0) 76%
-      );
-  }
-}
-@media (max-height: 800px){
-  .bg-page-gradient{
-    background-image:
-      radial-gradient(
-        120% 60% at 50% 100%,
-        rgba(103,56,228,0.52) 0%,
-        rgba(103,56,228,0.30) 24%,
-        rgba(103,56,228,0.12) 48%,
-        rgba(0,0,0,0) 70%
-      );
-  }
+  background-color: #081123;
 }
 </style>

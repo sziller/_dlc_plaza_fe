@@ -222,21 +222,6 @@ import TheFooter from '../components/TheFooter.vue'
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-.title-glow::before {
-  content: "";
-  position: absolute;
-  inset: -10% -10% -20% -10%;
-  border-radius: 2rem;
-  pointer-events: none;
-  filter: blur(80px);
-  opacity: 0.6;
-  background: radial-gradient(
-    55% 55% at 50% 80%,
-    rgba(103, 56, 228, 0.55) 0%,
-    rgba(103, 56, 228, 0.28) 40%,
-    rgba(0, 0, 0, 0) 75%
-  );
-}
 
 /* GitHub badge (simple, matches style) */
 .github-badge {

@@ -560,9 +560,9 @@ onMounted(() => {
 
 <style>
 .liq-page {
-  --liq-bg:     #0b0e13;
-  --liq-bg-2:   #121722;
-  --liq-bg-3:   #1a2131;
+  --liq-bg:     #081123;
+  --liq-bg-2:   #0d1a30;
+  --liq-bg-3:   #122040;
   --liq-fg:     #e8ecf3;
   --liq-dim:    #9aa4b8;
   --liq-muted:  #6b7587;
