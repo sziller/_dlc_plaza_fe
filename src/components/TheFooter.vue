@@ -34,10 +34,10 @@
         <div>
           <p class="text-sm font-semibold text-secondary mb-4 uppercase tracking-wide">Product</p>
           <ul class="space-y-2 text-sm text-white/70">
-            <li><router-link to="/btcusd" class="hover:text-white transition-colors">Get a loan</router-link></li>
+            <li><router-link to="/btcusd" class="hover:text-white transition-colors">Get a loan (BTC/USD)</router-link></li>
             <li><router-link to="/btcusd" class="hover:text-white transition-colors">Earn 12% lending</router-link></li>
             <li><router-link to="/loan-calculator" class="hover:text-white transition-colors">Calculators</router-link></li>
-            <li><router-link to="/signerapp" class="hover:text-white transition-colors">Signer App</router-link></li>
+            <li><router-link to="/signerapp" class="hover:text-white transition-colors">Signer App (open-source)</router-link></li>
           </ul>
         </div>
 
@@ -48,6 +48,8 @@
             <li><router-link to="/knowledge-hub" class="hover:text-white transition-colors">Knowledge Hub</router-link></li>
             <li><router-link to="/cadena-paper" class="hover:text-white transition-colors">Cadena Paper</router-link></li>
             <li><router-link to="/endgame" class="hover:text-white transition-colors">Endgame book</router-link></li>
+            <li><a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Freedom Money Podcast</a></li>
+            <li><a href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">On-chain proof (mempool.space)</a></li>
           </ul>
         </div>
 
