@@ -155,7 +155,7 @@ const articles = [
 {
     id: 14,
     title: 'DLC Bitcoin Loans: Discreet Log Contracts Explained',
-    description: 'Deep dive into Discreet Log Contract loans. Learn how DLCs enable trustless Bitcoin lending with oracle attestations.',
+    description: 'Deep dive into Discreet Log Contract loans. Learn how DLCs enable self-enforcing Bitcoin lending with oracle attestations.',
     imageBase: 'article14',
     link: '/article/dlc-bitcoin-loans'
   },
@@ -176,7 +176,7 @@ const articles = [
   {
     id: 17,
     title: 'Cadena Bitcoin Presentation',
-    description: 'Slide deck overview of Cadena Bitcoin’s decentralized lending model and DLC security.',
+    description: ‘Slide deck overview of Cadena Bitcoin’s non-custodial lending model and DLC security.’,
     imageBase: 'article10',
     link: '/article/cadena-bitcoin-presentation'
   },

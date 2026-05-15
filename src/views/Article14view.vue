@@ -17,7 +17,7 @@
     </section>
 
     <section class="px-10 py-5 lg:py-14 max-w-[1100px] mx-auto space-y-6 text-lg leading-relaxed text-white/90">
-      <p>Discreet Log Contracts (DLCs) represent the most significant advancement in Bitcoin-native smart contracts since the blockchain's inception. By enabling trustless, oracle-attested agreements settled directly on Bitcoin's base layer, DLCs make truly decentralized Bitcoin lending possible. This technical deep dive explains how DLCs work and why they're revolutionizing Bitcoin finance.</p>
+      <p>Discreet Log Contracts (DLCs) represent the most significant advancement in Bitcoin-native smart contracts since the blockchain's inception. By enabling self-enforcing, oracle-attested agreements settled directly on Bitcoin's base layer, DLCs make truly non-custodial Bitcoin lending possible. This technical deep dive explains how DLCs work and why they're revolutionizing Bitcoin finance.</p>
 
       <div class="space-y-8">
         <div>
@@ -27,7 +27,7 @@
         </div>
 
         <div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-secondary mb-4">How DLCs Enable Trustless Bitcoin Lending</h2>
+          <h2 class="text-2xl sm:text-3xl font-bold text-secondary mb-4">How DLCs Enable Self-Enforcing Bitcoin Lending</h2>
           <p>In a DLC-based Bitcoin loan on Cadena:</p>
           <ol class="list-decimal list-inside space-y-3 mt-4 ml-4">
             <li><strong>Contract creation:</strong> Borrower and lender agree on terms (loan amount, interest rate, collateral, liquidation price)</li>
@@ -60,7 +60,7 @@
           { feature: 'No wrapped tokens', cadena: true, traditional: true, defi: false },
           { feature: 'Private contract details', cadena: true, traditional: true, defi: false },
           { feature: 'No smart contract bugs', cadena: true, traditional: true, defi: false },
-          { feature: 'Trustless execution', cadena: true, traditional: false, defi: true },
+          { feature: 'Self-Enforcing execution', cadena: true, traditional: false, defi: true },
           { feature: 'Oracle-attested settlement', cadena: true, traditional: false, defi: 'Sometimes' }
         ]"
         cta-text="Try DLC Lending"
@@ -106,7 +106,7 @@
             Experience DLC-Powered Lending
           </h2>
           <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-8">
-            The most secure way to borrow against Bitcoin. Trustless, transparent, settled on-chain.
+            The most secure way to borrow against Bitcoin. Self-Enforcing, transparent, settled on-chain.
           </p>
 
           <router-link

@@ -10,11 +10,11 @@
       aria-label="Main"
     >
       <!-- Main navbar row -->
-      <div class="px-6 py-4 flex justify-between items-center">
-        <!-- Logo & BTC Price (clickable; when logged in -> BTCUSD) -->
+      <div class="px-6 py-4 grid grid-cols-3 items-center">
+        <!-- Left: Logo -->
         <router-link
           to="/"
-          class="flex items-center space-x-4 group focus:outline-none focus:ring-2 focus:ring-secondary/60 rounded-md"
+          class="flex items-center space-x-3 group focus:outline-none focus:ring-2 focus:ring-secondary/60 rounded-md w-fit"
           aria-label="Go to Home"
         >
           <img
@@ -26,87 +26,72 @@
             draggable="false"
             referrerpolicy="no-referrer"
           />
-          <div class="flex flex-col items-start space-y-1">
-            <div class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
-              Cadena Bitcoin
-            </div>
-            <div class="text-sm font-medium flex items-center gap-1">
-              <img
-                src="https://flagcdn.com/us.svg"
-                alt="US Flag"
-                class="w-4 h-4 inline-block"
-                width="16" height="12"
-                decoding="async"
-                loading="lazy"
-                draggable="false"
-                referrerpolicy="no-referrer"
-              />
-              <span class="text-white">BTCUSD:</span>
-              <span class="text-secondary font-semibold text-lg">${{ btcPrice }}</span>
-            </div>
-          </div>
+          <span class="text-xl font-bold tracking-wide leading-tight text-secondary group-hover:text-white transition-colors">
+            Cadena Bitcoin
+          </span>
         </router-link>
 
-        <!-- Burger -->
-        <button
-          @click="toggleMobileMenu"
-          @keyup.esc="closeMobileMenu"
-          class="md:hidden focus:outline-none text-white"
-          :aria-expanded="isMobileMenuOpen ? 'true' : 'false'"
-          aria-controls="mobile-menu"
-          aria-label="Toggle menu"
-        >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
-               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-
-        <!-- Desktop Nav -->
-        <div class="hidden md:flex space-x-6 items-center">
-          <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
-          <router-link :class="linkClass" to="/btcusd">Create Loan</router-link>
-          <!-- Calculators dropdown -->
-          <div class="relative group">
-            <button :class="['flex items-center space-x-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
-              <span>Calculators</span>
-              <svg class="w-4 h-4 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
-              </svg>
-            </button>
-            <div
-              class="absolute top-full left-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
-              role="menu"
-            >
-              <router-link to="/loan-calculator" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Loan Calculator</router-link>
-              <router-link to="/settlement-calculator" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Settlement Calculator</router-link>
-              <router-link to="/liquidation-calculator" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Liquidation Risk</router-link>
-            </div>
-          </div>
-
-          <!-- Socials dropdown -->
-          <div class="relative group">
-            <button :class="['flex items-center space-x-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
-              <span>Socials</span>
-              <svg class="w-4 h-4 transition" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
-              </svg>
-            </button>
-            <div
-              class="absolute top-full left-0 mt-2 w-48 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
-              role="menu"
-            >
-              <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">X (Twitter)</a>
-              <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">YouTube</a>
-              <a href="https://www.instagram.com/cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Instagram</a>
-              <a href="https://www.facebook.com/people/CadenaBitcoin/61568348506268" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">Facebook</a>
-              <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block px-4 py-2 hover:bg-white/10 hover:text-white transition" role="menuitem">GitHub</a>
-            </div>
-          </div>
+        <!-- Center: BTCUSD ticker -->
+        <div class="hidden md:flex justify-center items-center gap-1.5 text-sm font-medium">
+          <img
+            src="https://flagcdn.com/us.svg"
+            alt="US Flag"
+            class="w-4 h-4 inline-block"
+            width="16" height="12"
+            decoding="async"
+            loading="lazy"
+            draggable="false"
+            referrerpolicy="no-referrer"
+          />
+          <span class="text-white/70">BTCUSD</span>
+          <span class="text-secondary font-semibold text-base">${{ btcPrice }}</span>
         </div>
 
-        <!-- CTA Buttons Desktop -->
-        <div class="hidden md:flex items-center space-x-4 text-white">
+        <!-- Right: Desktop Nav + CTA -->
+        <div class="hidden md:flex items-center justify-end gap-4 flex-nowrap whitespace-nowrap">
+          <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
+          <router-link :class="linkClass" to="/btcusd">Create Loan</router-link>
+
+          <!-- Calculators dropdown -->
+          <div class="relative group">
+            <button :class="['flex items-center gap-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
+              <span>Calculators</span>
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
+              </svg>
+            </button>
+            <div
+              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
+              role="menu"
+            >
+              <router-link to="/loan-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Loan Calculator</router-link>
+              <router-link to="/settlement-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Settlement Calculator</router-link>
+              <router-link to="/liquidation-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Liquidation Risk</router-link>
+            </div>
+          </div>
+
+          <!-- Resources dropdown -->
+          <div class="relative group">
+            <button :class="['flex items-center gap-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
+              <span>Resources</span>
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
+              </svg>
+            </button>
+            <div
+              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
+              role="menu"
+            >
+              <router-link to="/knowledge-hub" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Knowledge Hub</router-link>
+              <router-link to="/cadena-paper" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
+              <router-link to="/endgame" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Endgame Book</router-link>
+              <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Podcast</a>
+              <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">GitHub</a>
+            </div>
+          </div>
+
+          <!-- Auth + CTA -->
+          <div class="flex items-center gap-4 text-white">
           <router-link
             v-if="!isLoggedIn"
             to="/login"
@@ -138,6 +123,24 @@
           >
             My Profile
           </router-link>
+          </div><!-- /auth+cta -->
+        </div><!-- /right col -->
+
+        <!-- Burger (mobile) -->
+        <div class="md:hidden flex justify-end col-span-2">
+          <button
+            @click="toggleMobileMenu"
+            @keyup.esc="closeMobileMenu"
+            class="focus:outline-none text-white"
+            :aria-expanded="isMobileMenuOpen ? 'true' : 'false'"
+            aria-controls="mobile-menu"
+            aria-label="Toggle menu"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </div>
     </nav>
@@ -303,11 +306,11 @@
         </div>
 
         <div>
-          <div class="text-white/50 uppercase text-xs mt-4 mb-2">Socials</div>
-          <a href="https://x.com/cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">X (Twitter)</a>
-          <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">YouTube</a>
-          <a href="https://www.instagram.com/cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Instagram</a>
-          <a href="https://www.facebook.com/people/CadenaBitcoin/61568348506268" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Facebook</a>
+          <div class="text-white/50 uppercase text-xs mt-4 mb-2">Resources</div>
+          <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block pl-2 py-2 hover:text-secondary">Knowledge Hub</router-link>
+          <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
+          <router-link @click="closeMobileMenu" to="/endgame" class="block pl-2 py-2 hover:text-secondary">Endgame Book</router-link>
+          <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Podcast</a>
           <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">GitHub</a>
         </div>
 

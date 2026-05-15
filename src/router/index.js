@@ -42,6 +42,7 @@ const AdminLoginPage     = () => import('../pages/AdminLoginPage.vue')
 const AdminBlogListPage  = () => import('../pages/AdminBlogListPage.vue')
 const AdminBlogEditPage  = () => import('../pages/AdminBlogEditPage.vue')
 const ForLLMs            = () => import('../views/ForLLMs.vue')
+const Endgame            = () => import('../views/Endgame.vue')
 const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
 const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
@@ -59,6 +60,11 @@ const hasBlogToken = () => {
 }
 
 const routes = [
+  { path: '/endgame', name: 'Endgame', component: Endgame, meta: {
+    title: 'Endgame — Bitcoin, Sovereign Debt, and the Return of Sound Capital',
+    description: 'A serious framework for allocating in a Bitcoin-anchored monetary order. By Kevin Bell, Founder of Cadena Bitcoin.',
+    robots: 'index,follow',
+  }},
   { path: '/', name: 'Home', component: Home, meta: {
     title: 'Cadena Bitcoin — Decentralized BTC Lending & Borrowing',
     description: 'Borrow against Bitcoin or earn yield with BTC-secured lending. Your keys, your coins. No banks, no sidechains.',
@@ -165,7 +171,7 @@ const routes = [
   // Lender Explained Landing Page (retargeting)
   { path: '/loan-explained-lender', name: 'LoanExplainedLender', component: LoanExplainedLender, meta: {
     title: 'Earn Fixed Returns Lending Bitcoin — Cadena',
-    description: 'Generate 10% APR fixed returns with Bitcoin-backed lending. Guaranteed USD claims, no volatility exposure, trustless DLC enforcement.',
+    description: 'Generate 10% APR fixed returns with Bitcoin-backed lending. Guaranteed USD claims, no volatility exposure, self-enforcing DLC enforcement.',
     robots: 'index,follow',
   }},
   // Sazmining Partnership Landing Page
@@ -245,24 +251,24 @@ const routes = [
     tags: ['Bitcoin', 'Non-Custodial', 'Self-Custody', 'DLC', 'Security'],
   }},
   { path: '/article/peer-to-peer-bitcoin-loans', name: 'Article12', component: Article12view, meta: {
-    title: 'Peer-to-Peer Bitcoin Loans: Direct, Trustless, DLC-Secured | Cadena',
+    title: 'Peer-to-Peer Bitcoin Loans: Direct, Self-Enforcing, DLC-Secured | Cadena',
     description: 'True P2P Bitcoin loans – no middleman, no custodian. Set your own rates, get matched instantly, fully secured by Discreet Log Contracts. The purest form of Bitcoin lending.',
     robots: 'index,follow',
     type: 'article',
     image: '/img/og-article12.webp',
     imageWidth: '1200',
     imageHeight: '630',
-    imageAlt: 'Peer-to-peer Bitcoin loans - Direct, trustless, DLC-secured lending',
+    imageAlt: 'Peer-to-peer Bitcoin loans - Direct, self-enforcing, DLC-secured lending',
     imageType: 'image/webp',
     author: 'Cadena Bitcoin Team',
     publishedTime: '2024-12-01T08:00:00+00:00',
     modifiedTime: '2024-12-01T08:00:00+00:00',
     section: 'DeFi',
-    tags: ['Bitcoin', 'P2P', 'Peer-to-Peer', 'DLC', 'Trustless'],
+    tags: ['Bitcoin', 'P2P', 'Peer-to-Peer', 'DLC', 'Self-Enforcing'],
   }},
   { path: '/article/dlc-bitcoin-loans', name: 'Article14', component: Article14view, meta: {
     title: 'DLC Bitcoin Loans: The Most Secure Way to Borrow BTC | Cadena',
-    description: 'DLC Bitcoin loans on Cadena – trustless, oracle-free, fully on-chain enforcement. No custodians, no liquidation bots, just Bitcoin script. The gold standard in Bitcoin lending.',
+    description: 'DLC Bitcoin loans on Cadena – self-enforcing, oracle-free, fully on-chain enforcement. No custodians, no liquidation bots, just Bitcoin script. The gold standard in Bitcoin lending.',
     robots: 'index,follow',
     type: 'article',
     image: '/img/og-article14.webp',

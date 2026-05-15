@@ -42,7 +42,7 @@
                   <svg class="w-6 h-6 text-green-400 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                   </svg>
-                  <span class="text-white">Trustless DLC enforcement.</span>
+                  <span class="text-white">Self-Enforcing DLC enforcement.</span>
                 </li>
               </ul>
 
@@ -243,7 +243,7 @@
           </div>
           <div class="bg-white/5 border border-white/10 rounded-xl p-6">
             <div class="text-secondary text-3xl mb-4">&#x1F512;</div>
-            <h3 class="text-lg font-bold mb-2">Trustless Enforcement</h3>
+            <h3 class="text-lg font-bold mb-2">Self-Enforcing Enforcement</h3>
             <p class="text-white/70 text-sm">
               DLC smart contracts enforce settlement automatically. No company custody, no trust needed. Code is law.
             </p>
@@ -455,7 +455,7 @@
           Ready to Earn Bitcoin-Backed Yield?
         </h2>
         <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto mb-10">
-          Lock in 10% APR returns with DLC-secured lending. Fixed, predictable, trustless.
+          Lock in 10% APR returns with DLC-secured lending. Fixed, predictable, self-enforcing.
         </p>
         <router-link
           :to="ctaLink"
