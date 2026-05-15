@@ -2,12 +2,12 @@
   <div
     class="rounded-xl border border-secondary/60 shadow-lg bg-dark transition-transform duration-500 ease-out"
     :class="[
-      compact ? 'p-4' : 'p-5 sm:p-6',
+      compact ? 'p-4' : 'p-6 sm:p-8',
       mounted ? 'translate-y-0' : 'translate-y-4'
     ]"
   >
     <!-- Header row -->
-    <div class="flex items-center justify-between mb-1">
+    <div class="flex items-center justify-between" :class="compact ? 'mb-1' : 'mb-7'">
       <h3 class="font-bold text-white" :class="compact ? 'text-lg' : 'text-xl sm:text-2xl'">
         Live Market Rates
       </h3>
@@ -15,15 +15,13 @@
         1 Year <span class="text-white/50 ml-0.5">▾</span>
       </div>
     </div>
-    <p class="text-white/50 text-xs mb-4 font-mono">(90-day available subject to lender match)</p>
-
     <!-- Rate rows -->
-    <div class="space-y-2" :class="compact ? 'mb-3' : 'mb-4'">
+    <div class="space-y-2" :class="compact ? 'mb-3' : 'mb-10'">
       <!-- Earn row -->
       <router-link
         :to="linkTo"
         class="flex items-center justify-between rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-secondary/40 transition-all duration-200 cursor-pointer"
-        :class="compact ? 'px-3 py-2.5' : 'px-4 py-3'"
+        :class="compact ? 'px-3 py-2.5' : 'px-4 py-5'"
       >
         <div>
           <div class="text-xs text-white/60 font-mono mb-0.5 uppercase tracking-wide">Earn as a lender</div>
@@ -45,7 +43,7 @@
       <router-link
         :to="linkTo"
         class="flex items-center justify-between rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-secondary/40 transition-all duration-200 cursor-pointer"
-        :class="compact ? 'px-3 py-2.5' : 'px-4 py-3'"
+        :class="compact ? 'px-3 py-2.5' : 'px-4 py-5'"
       >
         <div>
           <div class="text-xs text-white/60 font-mono mb-0.5 uppercase tracking-wide">Borrow all-in</div>
@@ -60,11 +58,6 @@
         </div>
       </router-link>
     </div>
-
-    <!-- Footnote -->
-    <p v-if="!compact" class="text-white/40 text-xs font-mono leading-relaxed mb-4">
-      Single contract up to $1M. Larger sizes syndicated. 50% LTV · DLCP Oracle · Actual/360 sub-year terms.
-    </p>
 
     <!-- Marketplace CTA -->
     <router-link

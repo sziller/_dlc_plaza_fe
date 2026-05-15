@@ -176,7 +176,7 @@ const articles = [
   {
     id: 17,
     title: 'Cadena Bitcoin Presentation',
-    description: ‘Slide deck overview of Cadena Bitcoin’s non-custodial lending model and DLC security.’,
+    description: 'Slide deck overview of Cadena Bitcoin\'s non-custodial lending model and DLC security.',
     imageBase: 'article10',
     link: '/article/cadena-bitcoin-presentation'
   },

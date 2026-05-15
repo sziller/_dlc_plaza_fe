@@ -33,12 +33,13 @@ const borrowSteps = [
   },
   {
     title: 'You sell your own Bitcoin separately for the cash you need.',
-    desc: 'The contract gives you synthetic exposure to your locked collateral — a pre-signed on-chain claim against the pool, payable at maturity. With that synthetic in hand, you sell Bitcoin from outside the contract to access dollars on your own exchange or OTC desk.',
-    note: 'Cash in hand. Original Bitcoin position preserved through the locked collateral.',
+    desc: 'The contract gives you synthetic exposure to your locked collateral. You sell Bitcoin separately on your own exchange or OTC desk for the cash.',
+    note: 'Cash in hand. Bitcoin position preserved through the locked collateral.',
   },
   {
     title: 'The contract settles itself at term-end.',
-    desc: 'At maturity, the DLCP Oracle attests to BTCUSD. The pre-signed Contract Execution Transaction broadcasts on-chain automatically. The lender\'s USD-denominated target is paid in Bitcoin at the maturity price. You receive the residual back to self-custody. No margin calls during the term. No active repayment.',
+    desc: 'At maturity, the pre-signed Contract Execution Transaction broadcasts on-chain. The lender\'s USD target is paid in Bitcoin at maturity price. You receive the residual back to self-custody.',
+    note: 'No margin calls. No active repayment.',
   },
 ]
 
@@ -67,7 +68,7 @@ const features = [
   {
 
     title: 'No margin calls',
-    desc: 'Every settlement outcome is pre-signed at funding via Contract Execution Transactions. The contract\'s full lifecycle is mathematically determined before it begins. No liquidation bots. No forced selling. No in-term recalls. Settlement is a single event at maturity.',
+    desc: 'Every settlement outcome is pre-signed at funding. No liquidation bots. No forced selling. No in-term recalls. Settlement is a single event at maturity.',
   },
   {
 
@@ -82,7 +83,7 @@ const features = [
   {
 
     title: 'Regulated · verifiable · live',
-    desc: 'Cadena Bitcoin S.A. de C.V. is a registered Bitcoin Service Provider in El Salvador. KYC is on-device through the open-sourced Signer App — identity flows to Sumsub directly, never through Cadena. An early contract settled on mainnet on May 9, 2026 — verify on-chain.',
+    desc: 'Registered Bitcoin Service Provider in El Salvador. KYC on-device via the open-sourced Signer App. An early contract settled on Bitcoin\'s mainnet May 9, 2026 — verify on-chain.',
   },
 ]
 
@@ -182,10 +183,6 @@ const faqs = [
     q: 'Where does the off-ramp happen?',
     a: 'On your own exchange or OTC desk. Cadena is not in the off-ramp path and does not custody or process any fiat at any point.',
   },
-  {
-    q: 'Where do I find the contracts on-chain?',
-    a: 'Every Cadena contract is verifiable on Bitcoin\'s base layer via mempool.space. The early settled contract from May 9, 2026: 95bf1377…9e5aab7d.',
-  },
 ]
 const openSet = ref(new Set([0]))
 const isOpen = (i) => openSet.value.has(i)
@@ -197,12 +194,12 @@ function toggle(i) {
 
 /* ---------- Partners ---------- */
 const partners = [
-  { name: '21Rates', href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp', alt: '21Rates' },
-  { name: 'Adopting Bitcoin', href: 'https://sv25.adoptingbitcoin.org/', imgSrc: '/img/adopting-640.webp', alt: 'Adopting Bitcoin' },
-  { name: 'Surfdojo', href: 'https://surfdojo.org/', imgSrc: '/img/surfdojo-640.webp', alt: 'Surfdojo' },
-  { name: 'Bitcoin Treasuries', href: 'https://bitcointreasuries.net/directory#C', imgSrc: '/img/treasuries-640.webp', alt: 'Bitcoin Treasuries' },
-  { name: 'Spark Services', href: 'https://getsparkservices.com/', imgSrc: '/img/partners/spark-logo.png', alt: 'Spark Services' },
-  { name: 'Asobitcoin', href: 'https://www.asobitcoin.org/', imgSrc: '/img/partners/asobitcoin-logo.webp', alt: 'Asobitcoin' },
+  { name: '21Rates',           href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp',               alt: '21Rates' },
+  { name: 'Bitcoin Treasuries',href: 'https://bitcointreasuries.net/directory#C',         imgSrc: '/img/treasuries-640.webp',            alt: 'BitcoinTreasuries.net' },
+  { name: 'Adopting Bitcoin',  href: 'https://sv25.adoptingbitcoin.org/',                 imgSrc: '/img/adopting-640.webp',              alt: 'Adopting Bitcoin SV25' },
+  { name: 'Surfdojo',          href: 'https://surfdojo.org/',                             imgSrc: '/img/surfdojo-640.webp',              alt: 'Surfdojo' },
+  { name: 'Spark Services',    href: 'https://getsparkservices.com/',                     imgSrc: '/img/partners/spark-logo.png',        alt: 'Spark Services' },
+  { name: 'Asobitcoin',        href: 'https://www.asobitcoin.org/',                       imgSrc: '/img/partners/asobitcoin-logo.webp',  alt: 'Asobitcoin' },
 ]
 
 function onEnter(el) {
@@ -332,20 +329,8 @@ onBeforeUnmount(() => {
               Borrow against your Bitcoin or earn 12% on it — without surrendering custody. Non-custodial. No margin calls. No counterparty risk.
             </p>
 
-            <!-- Verified on mainnet trust badge -->
-            <div class="inline-flex items-center gap-2 mt-5 text-sm text-white/80 font-mono">
-              <span class="text-secondary font-bold">✓</span>
-              Verified on mainnet. Early contract funded Nov 2025, settled May 2026.
-              <a
-                href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-secondary underline underline-offset-2 hover:text-secondary/80 transition whitespace-nowrap"
-              >See the transaction →</a>
-            </div>
-
             <!-- Feature checks — 4 across -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 mt-6 text-sm text-white/90 text-left">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 mt-6 text-sm text-white text-left">
               <!-- Self-custody: lock -->
               <div class="flex items-start gap-2">
                 <svg class="w-3.5 h-3.5 text-secondary flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -423,39 +408,36 @@ onBeforeUnmount(() => {
     ═══════════════════════════════════════════════════ -->
     <section class="w-full bg-transparent text-white pt-6 pb-4 px-4">
       <div class="max-w-screen-xl mx-auto text-center mb-4">
-        <p class="text-xs font-semibold text-white uppercase tracking-widest">Trusted &amp; Featured By</p>
+        <p class="text-xs font-semibold text-white uppercase tracking-widest">Listed &amp; verified</p>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-12 max-w-screen-xl mx-auto px-4">
+        <a
+          v-for="p in partners"
+          :key="p.name"
+          :href="p.href"
+          target="_blank"
+          rel="noopener"
+          :aria-label="p.name"
+        >
+          <img
+            :src="p.imgSrc"
+            :alt="p.alt"
+            class="h-7 sm:h-8 w-auto object-contain grayscale brightness-110 opacity-70 hover:grayscale-0 hover:brightness-100 hover:opacity-100 transition-all duration-200"
+            loading="lazy"
+            decoding="async"
+          />
+        </a>
+      </div>
+      <div class="max-w-screen-xl mx-auto text-center mt-4">
         <a
           href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 mt-2 text-xs font-mono text-white/50 hover:text-white/80 transition-colors"
+          class="inline-flex items-center gap-1.5 text-xs font-mono text-white hover:text-white transition-colors"
         >
           <span class="text-secondary">✓</span>
           Mainnet-settled contract — verify on mempool.space →
         </a>
-      </div>
-      <div class="marquee-container max-w-screen-xl mx-auto overflow-hidden">
-        <div class="marquee-track flex items-center gap-10 sm:gap-12">
-          <template v-for="copy in 2" :key="copy">
-            <a
-              v-for="p in partners"
-              :key="`${copy}-${p.name}`"
-              :href="p.href"
-              target="_blank"
-              rel="noopener"
-              class="flex-shrink-0 marquee-logo"
-              :aria-label="p.name"
-            >
-              <img
-                :src="p.imgSrc"
-                :alt="p.alt"
-                class="h-7 sm:h-8 w-auto object-contain grayscale brightness-110 opacity-70 hover:grayscale-0 hover:brightness-100 hover:opacity-100 transition-all duration-200"
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-          </template>
-        </div>
       </div>
     </section>
 
@@ -466,7 +448,7 @@ onBeforeUnmount(() => {
       <div class="max-w-screen-xl mx-auto">
         <div class="text-center mb-8">
           <h2 class="text-3xl md:text-4xl font-extrabold">How it works</h2>
-          <p class="mt-3 text-white/70 text-base max-w-2xl mx-auto leading-relaxed">
+          <p class="mt-3 text-white text-base max-w-2xl mx-auto leading-relaxed">
             Both parties commit Bitcoin. Both parties pre-sign every possible outcome. Bitcoin's base layer enforces the result.
           </p>
         </div>
@@ -492,7 +474,7 @@ onBeforeUnmount(() => {
           >
             <div class="step-number font-mono">{{ String(i + 1).padStart(2, '0') }}</div>
             <h3 class="text-base font-bold mt-4 mb-2 text-white">{{ step.title }}</h3>
-            <p class="text-white/80 text-sm leading-relaxed">{{ step.desc }}</p>
+            <p class="text-white text-sm leading-relaxed">{{ step.desc }}</p>
             <p v-if="step.note" class="mt-3 text-xs font-mono text-secondary/80 leading-relaxed">{{ step.note }}</p>
           </div>
         </div>
@@ -512,7 +494,7 @@ onBeforeUnmount(() => {
       <div class="max-w-screen-xl mx-auto">
         <div class="text-center mb-10">
           <h2 class="text-3xl md:text-4xl font-extrabold">Why Cadena</h2>
-          <p class="mt-3 text-white/70 text-lg">Most Bitcoin lenders take your coins. We never touch them.</p>
+          <p class="mt-3 text-white text-lg">Most Bitcoin lenders take your coins. We never touch them.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px feature-grid">
@@ -530,7 +512,7 @@ onBeforeUnmount(() => {
               <svg v-if="fi === 4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <h3 class="text-base font-bold mb-2 text-white">{{ feat.title }}</h3>
-            <p class="text-sm text-white/80 leading-relaxed">{{ feat.desc }}</p>
+            <p class="text-sm text-white leading-relaxed">{{ feat.desc }}</p>
           </div>
         </div>
       </div>
@@ -543,25 +525,25 @@ onBeforeUnmount(() => {
       <div class="max-w-4xl mx-auto">
         <div class="text-center mb-8">
           <h2 class="text-3xl md:text-4xl font-extrabold">How Cadena compares</h2>
-          <p class="mt-3 text-white/70 text-base max-w-2xl mx-auto">Why non-custodial Bitcoin credit is structurally different from every other option.</p>
+          <p class="mt-3 text-white text-base max-w-2xl mx-auto">Why non-custodial Bitcoin credit is structurally different from every other option.</p>
         </div>
 
         <div class="overflow-x-auto rounded-xl border border-white/10">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-white/5">
-                <th class="text-left px-5 py-4 text-white/50 font-medium text-xs uppercase tracking-wide">Feature</th>
+                <th class="text-left px-5 py-4 text-white font-medium text-xs uppercase tracking-wide">Feature</th>
                 <th class="px-4 py-4 text-center min-w-[90px]">
                   <div class="text-secondary font-extrabold text-base">Cadena</div>
                 </th>
                 <th class="px-4 py-4 text-center min-w-[110px]">
-                  <div class="text-white/70 font-medium text-xs">Custodial<br/>Lenders</div>
+                  <div class="text-white font-medium text-xs">Custodial<br/>Lenders</div>
                 </th>
                 <th class="px-4 py-4 text-center min-w-[110px]">
-                  <div class="text-white/70 font-medium text-xs">DeFi Pools<br/>(wBTC)</div>
+                  <div class="text-white font-medium text-xs">DeFi Pools<br/>(wBTC)</div>
                 </th>
                 <th class="px-4 py-4 text-center min-w-[90px]">
-                  <div class="text-white/70 font-medium text-xs">Selling<br/>Bitcoin</div>
+                  <div class="text-white font-medium text-xs">Selling<br/>Bitcoin</div>
                 </th>
               </tr>
             </thead>
@@ -571,26 +553,26 @@ onBeforeUnmount(() => {
                 :key="i"
                 :class="i % 2 === 0 ? 'bg-white/[0.02]' : ''"
               >
-                <td class="px-5 py-3 text-white/90 font-medium text-sm">{{ row.feature }}</td>
+                <td class="px-5 py-3 text-white font-medium text-sm">{{ row.feature }}</td>
                 <td class="px-4 py-3 text-center">
                   <span v-if="row.cadena === true" class="text-green-400 font-bold text-base">✓</span>
                   <span v-else-if="row.cadena === false" class="text-red-400 text-base">✗</span>
-                  <span v-else class="text-white/40 text-xs font-mono">{{ row.cadena }}</span>
+                  <span v-else class="text-white text-xs font-mono">{{ row.cadena }}</span>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <span v-if="row.custodial === true" class="text-green-400 font-bold text-base">✓</span>
                   <span v-else-if="row.custodial === false" class="text-red-400 text-base">✗</span>
-                  <span v-else class="text-white/40 text-xs font-mono">{{ row.custodial }}</span>
+                  <span v-else class="text-white text-xs font-mono">{{ row.custodial }}</span>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <span v-if="row.defi === true" class="text-green-400 font-bold text-base">✓</span>
                   <span v-else-if="row.defi === false" class="text-red-400 text-base">✗</span>
-                  <span v-else class="text-white/40 text-xs font-mono">{{ row.defi }}</span>
+                  <span v-else class="text-white text-xs font-mono">{{ row.defi }}</span>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <span v-if="row.selling === true" class="text-green-400 font-bold text-base">✓</span>
                   <span v-else-if="row.selling === false" class="text-red-400 text-base">✗</span>
-                  <span v-else class="text-white/40 text-xs font-mono">{{ row.selling }}</span>
+                  <span v-else class="text-white text-xs font-mono">{{ row.selling }}</span>
                 </td>
               </tr>
             </tbody>
@@ -605,6 +587,10 @@ onBeforeUnmount(() => {
     <section class="px-4 py-20 sm:px-6 lg:px-8" style="background:#081123">
       <div class="max-w-2xl mx-auto">
 
+        <div class="text-center mb-8">
+          <h2 class="text-3xl md:text-4xl font-extrabold">Verified on mainnet</h2>
+        </div>
+
         <!-- Explorer card -->
         <div class="voc-card">
 
@@ -617,7 +603,6 @@ onBeforeUnmount(() => {
 
           <!-- Main content -->
           <div class="voc-body">
-            <h2 class="voc-body-heading">Verified on mainnet</h2>
             <p class="voc-body-sub">Early contract — funded Nov 2025, settled May 2026</p>
             <p class="voc-body-stats">6-month term · $80k BTC · 12% annualized yield</p>
             <p class="voc-body-desc">Bitcoin's price fell over the term — the lender received more sats than the opening BTC contribution implied, exactly as the pre-signed CETs were structured to deliver.</p>
@@ -662,7 +647,7 @@ onBeforeUnmount(() => {
       <div class="max-w-3xl mx-auto">
         <div class="text-center mb-8">
           <h2 class="text-3xl md:text-4xl font-extrabold">Frequently asked questions</h2>
-          <p class="mt-3 text-white/60 text-base">The questions every prospect asks before their first contract.</p>
+          <p class="mt-3 text-white text-base">The questions every prospect asks before their first contract.</p>
         </div>
 
         <div class="space-y-2">
@@ -705,8 +690,7 @@ onBeforeUnmount(() => {
       <div class="max-w-2xl mx-auto text-center">
 
         <!-- Label + heading -->
-        <p class="inst-label">For institutions</p>
-        <h2 class="inst-heading">Built for institutional collateral logic.</h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-3">For institutions</h2>
         <p class="inst-sub">If you're managing a Bitcoin treasury, running a fund, operating a mining business, or sitting on a sec-lending desk — Cadena's architecture maps onto your existing collateral and settlement mental model.</p>
 
         <!-- Cards -->
@@ -716,13 +700,19 @@ onBeforeUnmount(() => {
             <div class="inst-card-badge inst-card-badge-lend">Lend</div>
             <div class="inst-card-amount">$1M</div>
             <p class="inst-card-desc">12% annualized USD yield on Bitcoin</p>
-            <span class="inst-card-link">View example →</span>
+            <span class="inst-card-link">View →</span>
           </router-link>
           <router-link to="/btcusd" class="inst-card">
             <div class="inst-card-badge inst-card-badge-borrow">Borrow</div>
-            <div class="inst-card-amount">$1M</div>
-            <p class="inst-card-desc">USD liquidity, BTC collateral, no custody transfer</p>
-            <span class="inst-card-link">View example →</span>
+            <div class="inst-card-amount">$3M</div>
+            <p class="inst-card-desc">Non-custodial liquidity without selling</p>
+            <span class="inst-card-link">View →</span>
+          </router-link>
+          <router-link to="/sazmining" class="inst-card">
+            <div class="inst-card-badge inst-card-badge-lend">Mine</div>
+            <div class="inst-card-amount">130 rigs</div>
+            <p class="inst-card-desc">Mining flywheel via Sazmining + Cadena</p>
+            <span class="inst-card-link">View →</span>
           </router-link>
         </div>
 
@@ -731,7 +721,7 @@ onBeforeUnmount(() => {
           <div class="inst-kevin-avatar">KB</div>
           <div>
             <p class="inst-kevin-name">Kevin Bell, CFA</p>
-            <p class="inst-kevin-title">Founder — talk directly, no sales team</p>
+            <p class="inst-kevin-title">Founder — term sheets available</p>
           </div>
         </div>
 
@@ -750,7 +740,7 @@ onBeforeUnmount(() => {
     <section class="bg-transparent px-4 py-10 sm:px-6 lg:px-8">
       <div class="max-w-lg mx-auto text-center">
         <h3 class="text-2xl font-bold text-white mb-2">Stay in the loop</h3>
-        <p class="text-white/60 text-sm mb-5">Rate updates, on-chain settlements, and chapter excerpts from Endgame — Kevin's book on the credit function on Bitcoin.</p>
+        <p class="text-white text-sm mb-5">Rate updates, on-chain settlements, and chapter excerpts from Endgame — Kevin's book on the credit function on Bitcoin.</p>
         <form class="flex flex-col sm:flex-row gap-3 sm:justify-center" @submit.prevent="handleFooterSubscribe">
           <input
             v-model.trim="footerEmail"
@@ -772,7 +762,7 @@ onBeforeUnmount(() => {
         </form>
         <div v-if="footerSubscribeError" class="mt-2 text-sm text-red-300" aria-live="polite">{{ footerSubscribeError }}</div>
         <div v-else-if="footerSubscribeSuccess" class="mt-2 text-sm text-green-300" aria-live="polite">{{ footerSubscribeSuccess }}</div>
-        <p class="mt-3 text-white/30 text-xs">One email per week. Unsubscribe anytime.</p>
+        <p class="mt-3 text-white text-xs">One email per week. Unsubscribe anytime.</p>
       </div>
     </section>
 
@@ -784,7 +774,7 @@ onBeforeUnmount(() => {
         <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
           Ready to put your Bitcoin to work?
         </h2>
-        <p class="mt-4 text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+        <p class="mt-4 text-lg text-white leading-relaxed max-w-2xl mx-auto">
           Borrow against your Bitcoin or earn 12% USD-denominated yield on it — without surrendering custody. Onboard once. Reuse across every contract.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
@@ -807,7 +797,7 @@ onBeforeUnmount(() => {
             Talk to Kevin →
           </router-link>
         </div>
-        <p class="mt-5 text-sm text-white/60">No credit check · No custody transfer · No margin calls · Mainnet-verified</p>
+        <p class="mt-5 text-sm text-white">No credit check · No custody transfer · No margin calls · Mainnet-verified</p>
       </div>
     </section>
 
@@ -1100,7 +1090,7 @@ onBeforeUnmount(() => {
 }
 .voc-card-header-label {
   font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(255,255,255,0.45); font-family: monospace; flex: 1;
+  color: #fff; font-family: monospace; flex: 1;
 }
 .voc-verified-badge {
   font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
@@ -1115,14 +1105,14 @@ onBeforeUnmount(() => {
   font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -0.02em; margin-bottom: 0.35rem;
 }
 .voc-body-sub {
-  font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.55); margin-bottom: 0.6rem;
+  font-size: 0.78rem; font-family: monospace; color: #fff; margin-bottom: 0.6rem;
 }
 .voc-body-stats {
   font-size: 0.72rem; font-family: monospace; font-weight: 700; color: #6738e3;
   letter-spacing: 0.04em; margin-bottom: 1rem;
 }
 .voc-body-desc {
-  font-size: 0.88rem; color: rgba(255,255,255,0.75); line-height: 1.65;
+  font-size: 0.88rem; color: #fff; line-height: 1.65;
 }
 
 .voc-tx-block {
@@ -1132,7 +1122,7 @@ onBeforeUnmount(() => {
 }
 .voc-tx-label {
   font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255,255,255,0.3); font-family: monospace; margin-bottom: 0.35rem;
+  color: #fff; font-family: monospace; margin-bottom: 0.35rem;
 }
 .voc-tx-hash {
   font-family: monospace; font-size: 0.75rem; color: #6738e3;
@@ -1147,7 +1137,7 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
 }
 .voc-footer-note {
-  font-size: 0.72rem; color: rgba(255,255,255,0.35); font-family: monospace; line-height: 1.5; flex: 1;
+  font-size: 0.72rem; color: #fff; font-family: monospace; line-height: 1.5; flex: 1;
 }
 .voc-tx-link {
   display: inline-flex; align-items: center; gap: 0.35rem;
@@ -1170,13 +1160,13 @@ onBeforeUnmount(() => {
   line-height: 1.1; letter-spacing: -0.025em; margin-bottom: 1.25rem;
 }
 .inst-sub {
-  font-size: 0.92rem; color: rgba(255,255,255,0.75); line-height: 1.75;
+  font-size: 0.92rem; color: #fff; line-height: 1.75;
   margin-bottom: 2.5rem;
 }
 
 .inst-examples-label {
   font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
-  color: rgba(255,255,255,0.4); font-family: monospace; margin-bottom: 1.25rem;
+  color: #fff; font-family: monospace; margin-bottom: 1.25rem;
 }
 
 .inst-cards {
@@ -1206,7 +1196,7 @@ onBeforeUnmount(() => {
   font-family: monospace; margin-bottom: 0.75rem;
 }
 .inst-card-desc {
-  font-size: 0.75rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 1rem; flex: 1;
+  font-size: 0.75rem; color: #fff; line-height: 1.5; margin-bottom: 1rem; flex: 1;
 }
 .inst-card-link { font-size: 0.73rem; font-weight: 600; color: #6738e3; transition: color 0.15s; }
 .inst-card:hover .inst-card-link { color: #8b63f0; }
@@ -1222,7 +1212,7 @@ onBeforeUnmount(() => {
   font-size: 0.65rem; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: 0.05em;
 }
 .inst-kevin-name { font-size: 0.85rem; font-weight: 700; color: #fff; text-align: left; }
-.inst-kevin-title { font-size: 0.7rem; color: rgba(255,255,255,0.6); text-align: left; margin-top: 0.1rem; }
+.inst-kevin-title { font-size: 0.7rem; color: #fff; text-align: left; margin-top: 0.1rem; }
 
 .inst-ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
 
@@ -1239,6 +1229,6 @@ onBeforeUnmount(() => {
   font-weight: 600; font-size: 0.82rem; padding: 0.7rem 1.6rem; text-decoration: none;
   transition: border-color 0.2s;
 }
-.inst-cta-secondary:hover { border-color: rgba(255,255,255,0.5); }
+.inst-cta-secondary:hover { border-color: #fff; }
 
 </style>
