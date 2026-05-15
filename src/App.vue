@@ -2,6 +2,7 @@
   <div class="text-white min-h-screen">
     <!-- Fixed navbar includes the top info strip when logged in -->
     <Navbar
+      v-if="!hideChrome"
       :is-logged-in="isLoggedIn"
       :email="profile?.payload?.email || ''"
       :balance-derived-sats="profile?.payload?.balance_derived"
@@ -14,11 +15,11 @@
     />
 
     <!-- Page content: pad for navbar base + (optional) info strip -->
-    <div :style="{ paddingTop: contentPad }">
+    <div :style="{ paddingTop: hideChrome ? '0' : contentPad }">
       <router-view />
     </div>
     <CookieBanner />
-    <ChatBot />
+    <ChatBot v-if="!hideChrome" />
     <MailingListModal
       :open="showExitPopup"
       @close="dismissExitPopup"
@@ -53,6 +54,8 @@ const {
 } = useAuth()
 
 const EXCLUDED_PATHS = new Set(['/login', '/loginpage', '/register', '/admin/login', '/signerapp'])
+
+const hideChrome = computed(() => route.path === '/sazmining')
 
 const exitIntentEnabled = computed(() => {
   return !isLoggedIn.value && !EXCLUDED_PATHS.has(route.path)

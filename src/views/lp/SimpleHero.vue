@@ -6,10 +6,8 @@ import MailingListModal from '../../components/MailingListModal.vue'
 import { useAuth } from '../../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../../api/publicContact'
 import { blogArticles } from '../../data/exploreContent'
-import HubStyleMosaic from '../../components/HubStyleMosaic.vue'
 
 /* ---------- YouTube facade ---------- */
-const showVideo = ref(false)
 
 /* ---------- Articles ---------- */
 const articles = blogArticles
@@ -417,28 +415,6 @@ onBeforeUnmount(() => {
           </span>
         </div>
 
-        <!-- Testimonials -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10 sm:mt-12">
-          <div class="testimonial-card">
-            <div class="flex gap-0.5 mb-3">
-              <span v-for="n in 5" :key="n" class="text-secondary text-sm">★</span>
-            </div>
-            <p class="text-white text-sm leading-relaxed">
-              "A Bitcoin lending platform where you do not give up custody of your BTC. What a unique concept."
-            </p>
-            <p class="mt-3 text-xs text-white font-mono">— Antonio, Canada</p>
-          </div>
-          <div class="testimonial-card">
-            <div class="flex gap-0.5 mb-3">
-              <span v-for="n in 5" :key="n" class="text-secondary text-sm">★</span>
-            </div>
-            <p class="text-white text-sm leading-relaxed">
-              "I think this product is going very far."
-            </p>
-            <p class="mt-3 text-xs text-white font-mono">— Frederick, Denmark</p>
-          </div>
-        </div>
-
       </div>
     </section>
 
@@ -678,72 +654,6 @@ onBeforeUnmount(() => {
 
       </div>
     </section>
-
-    <!-- ═══════════════════════════════════════════════════
-         WHAT IS CADENA (video)
-    ═══════════════════════════════════════════════════ -->
-    <section class="px-4 sm:px-6 lg:px-8">
-      <div class="rounded-2xl bg-secondary mx-auto max-w-screen-xl px-4 py-12 sm:px-8 lg:px-12">
-        <div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
-          <div>
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-              What is Cadena Bitcoin?
-            </h2>
-            <p class="mt-5 text-white/90 text-lg leading-relaxed">
-              Cadena is a non-custodial Bitcoin credit market built on Bitcoin's base layer. Lenders earn USD-denominated yield on their Bitcoin; borrowers access dollars without selling theirs. Every contract sits in a Discreet Log Contract on-chain — Cadena holds no key, runs no pool, and operates no liquidation engine.
-            </p>
-            <p class="mt-4 text-white/80 text-base leading-relaxed">
-              The credit function on Bitcoin has been the missing piece of the monetary system since 2009. The previous cycle's lenders failed structurally — custodial, pooled, trust-dependent. Cadena is the architecture that wasn't possible until Discreet Log Contracts matured.
-            </p>
-            <p class="mt-4 text-white font-semibold text-base leading-relaxed">
-              Sound money without credit is hoarding. We're building the rest of the system.
-            </p>
-            <div class="flex flex-col sm:flex-row flex-wrap gap-3 mt-7">
-              <router-link
-                :to="heroCtaTo"
-                class="inline-flex items-center justify-center rounded-full bg-white text-secondary font-bold px-6 py-3 text-sm hover:bg-white/90 transition"
-              >
-                Explore the marketplace →
-              </router-link>
-              <router-link
-                to="/cadena-paper"
-                class="inline-flex items-center justify-center rounded-full border-2 border-white/40 text-white font-semibold px-6 py-3 text-sm hover:border-white hover:bg-white/10 transition"
-              >
-                Read the paper →
-              </router-link>
-            </div>
-          </div>
-          <div>
-            <div class="yt" :class="{ 'yt-ready': !showVideo }" @click="showVideo = true">
-              <iframe
-                v-if="showVideo"
-                src="https://www.youtube-nocookie.com/embed/Sb1_HFkr4T0?rel=0&modestbranding=1&playsinline=1&autoplay=1"
-                title="What is Cadena Bitcoin?"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
-                referrerpolicy="strict-origin-when-cross-origin"
-              ></iframe>
-              <template v-else>
-                <img
-                  src="/img/cadena-video-thumb.webp"
-                  alt="What is Cadena Bitcoin?"
-                  decoding="async"
-                  class="yt-thumb"
-                />
-                <button class="yt-play" aria-label="Play video">
-                  <svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7A8.5 8.5 0 0 0 60.3 1.5C55 0 34 0 34 0S13 0 7.7 1.5A8.5 8.5 0 0 0 1.5 7.7C0 13 0 24 0 24s0 11 1.5 16.3a8.5 8.5 0 0 0 6.2 6.2C13 48 34 48 34 48s21 0 26.3-1.5a8.5 8.5 0 0 0 6.2-6.2C68 35 68 24 68 24s0-11-1.5-16.3z" fill="#ff0000"/><path d="M27 34l18-10-18-10v20z" fill="#fff"/></svg>
-                </button>
-              </template>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════════════════════════════
-         KNOWLEDGE HUB
-    ═══════════════════════════════════════════════════ -->
-    <HubStyleMosaic />
 
     <!-- ═══════════════════════════════════════════════════
          FAQ
