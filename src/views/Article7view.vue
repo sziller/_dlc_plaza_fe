@@ -38,7 +38,7 @@
           <h2 class="text-2xl sm:text-3xl font-bold text-secondary mb-4">What Does It Mean to Borrow Against Bitcoin?</h2>
           <p>
             Borrowing against Bitcoin means using your BTC as collateral to secure a loan, typically in USD or stablecoins, without selling your Bitcoin.
-            The lender locks your Bitcoin in a secure contract, provides you with liquidity, and returns your Bitcoin when you repay the loan plus interest.
+            The lender locks your Bitcoin in a secure contract, provides you with liquidity, and returns your Bitcoin when the contract settles via pre-signed CET.
             This mechanism allows you to access cash for immediate needs while maintaining exposure to Bitcoin's price appreciation.
           </p>
           <p class="mt-4">
@@ -58,7 +58,7 @@
             <li><strong>Lock your collateral:</strong> Your Bitcoin is secured in a smart contract or DLC (Discreet Log Contract) that neither party can access unilaterally.</li>
             <li><strong>Receive funds:</strong> USD or stablecoins are transferred to your account, usually within minutes to hours.</li>
             <li><strong>Monitor your position:</strong> Track Bitcoin's price and your collateral ratio to avoid liquidation if BTC price drops significantly.</li>
-            <li><strong>Repay and unlock:</strong> When you repay the principal plus interest, your Bitcoin is automatically released back to your control.</li>
+            <li><strong>Repay and unlock:</strong> When the contract settles via pre-signed CET, your Bitcoin is automatically released back to your control.</li>
           </ol>
           <p class="mt-4">
             On Cadena Bitcoin, this entire process happens through Discreet Log Contracts on the Bitcoin blockchain itself—no wrapped tokens,
@@ -190,7 +190,7 @@
             Ready to Borrow Against Your Bitcoin?
           </h2>
           <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-8">
-            Get instant liquidity with rates starting at 4.9%. Non-custodial, DLC-secured, and fully decentralized.
+            Get instant liquidity with rates starting at 4.9%. Non-custodial, DLC-secured, and self-enforcing.
             Your Bitcoin, your keys, your control.
           </p>
 

@@ -8,12 +8,12 @@ const articles = blogArticles
     <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
 
       <!-- Header -->
-      <div class="flex items-center justify-between mb-8">
-        <div class="flex-1"></div>
-        <h2 class="hub-m-heading flex-1 text-center whitespace-nowrap">Knowledge Hub</h2>
-        <div class="flex-1 flex justify-end">
-          <router-link to="/knowledge-hub" class="hub-m-viewall">View all &rarr;</router-link>
-        </div>
+      <div class="text-center mb-6">
+        <h2 class="hub-m-heading">Knowledge Hub</h2>
+        <p class="mt-2 text-white/50 text-sm">Architecture, mechanics, and the worldview behind Cadena.</p>
+      </div>
+      <div class="flex justify-end mb-3">
+        <router-link to="/knowledge-hub" class="hub-m-viewall">View all &rarr;</router-link>
       </div>
 
       <!-- Mosaic grid -->

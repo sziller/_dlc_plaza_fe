@@ -4,7 +4,7 @@
     <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
       <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
-          Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance
+          Cadena Bitcoin – Non-Custodial Peer-to-Peer Bitcoin Finance
         </h1>
         <p class="text-white/80 text-base sm:text-lg font-medium mb-1">Kevin Bell, CFA</p>
         <p class="text-white/80 text-base sm:text-lg font-medium">President, Cadena Bitcoin</p>
@@ -45,8 +45,8 @@
       </p>
 
       <p>
-        What Cadena does differently is that we're a 
-        <span class="text-secondary font-semibold">decentralized peer-to-peer platform</span>. 
+        What Cadena does differently is that we're a
+        <span class="text-secondary font-semibold">non-custodial peer-to-peer platform</span>. 
         We match borrowers and investors and create smart contracts that are funded and settled on the Bitcoin blockchain.
       </p>
 
@@ -56,7 +56,7 @@
       </p>
 
       <p>
-        We want borrowers and investors to benefit from using decentralized financial services in a free market to achieve their goals.
+        We want borrowers and investors to benefit from using non-custodial financial services in a free market to achieve their goals.
       </p>
     </section>
 
@@ -69,7 +69,7 @@
             Experience True Peer-to-Peer Bitcoin Finance
           </h2>
           <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-8">
-            No sidechains, no wrapping, no margin calls. Just decentralized, verifiable, on-chain lending and borrowing. The way Bitcoin was meant to work.
+            No sidechains, no wrapping, no margin calls. Just non-custodial, verifiable, on-chain lending and borrowing. The way Bitcoin was meant to work.
           </p>
 
           <router-link

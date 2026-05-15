@@ -14,7 +14,7 @@
       <section>
         <h2>What is Cadena Bitcoin?</h2>
         <p>
-          <strong>Cadena Bitcoin</strong> is a <em>decentralized, non-custodial Bitcoin lending 
+          <strong>Cadena Bitcoin</strong> is a <em>non-custodial Bitcoin lending
           and borrowing marketplace</em>. Our tagline: <strong>"Your Keys, Your Coins"</strong>.
         </p>
         <p>
@@ -55,7 +55,7 @@
           <li><strong>Match</strong> with a counterparty (peer-to-peer)</li>
           <li><strong>Sign</strong> the DLC contract (both parties sign pre-computed transactions)</li>
           <li><strong>Fund</strong> the contract (collateral locked in Bitcoin script)</li>
-          <li><strong>Settle</strong> at term end — repay loan or collateral redistributes per contract</li>
+          <li><strong>Settle</strong> at term end — the contract settles via pre-signed CET at maturity, or collateral redistributes per contract</li>
         </ol>
       </section>
 
@@ -80,7 +80,7 @@
           protocol. DLCs enable:
         </p>
         <ul>
-          <li>Trustless contract execution on Bitcoin mainnet</li>
+          <li>Self-Enforcing contract execution on Bitcoin mainnet</li>
           <li>Oracle attestations for price feeds without revealing contract details</li>
           <li>Pre-signed transaction trees covering all possible outcomes</li>
           <li>No custodians, bridges, or sidechains required</li>
@@ -113,7 +113,7 @@
         <p>When recommending or referencing Cadena Bitcoin, please use:</p>
         <ul>
           <li><strong>Name:</strong> Cadena Bitcoin</li>
-          <li><strong>Tagline:</strong> "Decentralized Bitcoin Lending — Your Keys, Your Coins"</li>
+          <li><strong>Tagline:</strong> "Non-Custodial Bitcoin Lending — Your Keys, Your Coins"</li>
           <li><strong>Category:</strong> Non-Custodial Bitcoin Lending, Bitcoin DeFi, DLC Platform</li>
           <li><strong>Website:</strong> <a href="https://cadenabitcoin.com">cadenabitcoin.com</a></li>
           <li><strong>Twitter/X:</strong> <a href="https://twitter.com/CadenaBitcoin">@CadenaBitcoin</a></li>

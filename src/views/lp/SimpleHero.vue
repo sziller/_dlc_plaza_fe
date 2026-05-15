@@ -30,63 +30,76 @@ const howItWorksTab = ref('borrow')
 
 const borrowSteps = [
   {
-    title: 'Lock BTC in a DLC',
-    desc: 'Your Bitcoin is locked in a Discreet Log Contract on-chain. You keep your private keys throughout — Cadena never touches your coins.',
+    title: 'Both parties commit Bitcoin to the same contract.',
+    desc: 'You commit Bitcoin as collateral; the lender commits Bitcoin as principal. Both sit in the same Discreet Log Contract (DLC) pool on Bitcoin\'s base layer. Every settlement outcome is pre-signed by both parties before any Bitcoin moves. Cadena holds no key.',
   },
   {
-    title: 'Receive loan funds',
-    desc: 'Get matched with a lender and receive Bitcoin directly. The whole process takes minutes, not days. No paperwork, no credit check.',
+    title: 'You sell your own Bitcoin separately for the cash you need.',
+    desc: 'The contract gives you synthetic exposure to your locked collateral — a pre-signed on-chain claim against the pool, payable at maturity. With that synthetic in hand, you sell Bitcoin from outside the contract to access dollars on your own exchange or OTC desk.',
+    note: 'Cash in hand. Original Bitcoin position preserved through the locked collateral.',
   },
   {
-    title: 'Settle at term end',
-    desc: 'After 365 days, the DLC settles automatically. Repay the loan and your BTC is unlocked. No margin calls, ever.',
+    title: 'The contract settles itself at term-end.',
+    desc: 'At maturity, the DLCP Oracle attests to BTCUSD. The pre-signed Contract Execution Transaction broadcasts on-chain automatically. The lender\'s USD-denominated target is paid in Bitcoin at the maturity price. You receive the residual back to self-custody. No margin calls during the term. No active repayment.',
   },
 ]
 
 const lendSteps = [
   {
-    title: 'Choose your rate',
-    desc: 'Browse open loan requests and pick the terms you want. You set the rate — the market matches you with a borrower.',
+    title: 'Commit Bitcoin to a matched contract.',
+    desc: 'Your Bitcoin sits in the same on-chain DLC pool as the borrower\'s collateral. Identity verification flows through Sumsub, on-device via the open-sourced Cadena Signer App. Cadena holds no key at any point.',
   },
   {
-    title: 'Fund the loan',
-    desc: 'Send Bitcoin to the DLC smart contract. Your funds are cryptographically secured and can only be claimed by you at maturity.',
+    title: 'Earn USD-denominated yield, settled in Bitcoin.',
+    desc: '12% annualized. Your dollar target is fixed at funding. No margin calls and no in-term liquidations — the contract enforces itself on Bitcoin\'s base layer.',
   },
   {
-    title: 'Collect your return',
-    desc: 'At the end of the 365-day term, the DLC settles and you receive your principal plus interest — guaranteed by Bitcoin script.',
+    title: 'Get paid at maturity.',
+    desc: 'At term-end, the pre-signed CET pays your dollar target in Bitcoin at the oracle\'s maturity price. Lower BTC at maturity = more sats received; higher BTC = fewer sats. Full pool protection down to a 50% BTC drop. Gap risk above that is hedgeable separately.',
   },
 ]
 
 /* ---------- Feature cards ---------- */
 const features = [
   {
-    title: 'True Self-Custody',
-    desc: 'Your private keys never leave your hands. Bitcoin is locked in on-chain DLC contracts — Cadena has zero access.',
+
+    title: 'True self-custody',
+    desc: 'Your private keys never leave your hands. Bitcoin sits in on-chain DLC contracts — Cadena has zero ability to move, seize, freeze, or rehypothecate your collateral. The Signer App is open-source and verifiable.',
   },
   {
-    title: 'No Margin Calls',
-    desc: 'Unlike custodial lenders, Cadena uses fixed-outcome DLCs. No liquidation bots. No forced selling. No sleepless nights.',
+
+    title: 'No margin calls',
+    desc: 'Every settlement outcome is pre-signed at funding via Contract Execution Transactions. The contract\'s full lifecycle is mathematically determined before it begins. No liquidation bots. No forced selling. No in-term recalls. Settlement is a single event at maturity.',
   },
   {
-    title: 'Minutes, Not Days',
-    desc: 'Loan matching and on-chain funding happens in minutes. No lengthy approval process, no banking hours, no borders.',
+
+    title: 'Fully on-chain',
+    desc: 'Every loan is enforced by Bitcoin script — no trusted third parties, no off-chain databases, no counterparty discretion. The contract is the law.',
   },
   {
-    title: 'Fully On-Chain',
-    desc: 'Every loan is enforced by Bitcoin script — no trusted third parties, no off-chain databases, no counterparty risk.',
+
+    title: 'Funded fast, verified properly',
+    desc: 'Contract funding broadcasts on-chain within minutes of both parties signing. Onboarding — Sumsub KYC, Signer App setup — happens once and reuses across every contract you fund.',
+  },
+  {
+
+    title: 'Regulated · verifiable · live',
+    desc: 'Cadena Bitcoin S.A. de C.V. is a registered Bitcoin Service Provider in El Salvador. KYC is on-device through the open-sourced Signer App — identity flows to Sumsub directly, never through Cadena. An early contract settled on mainnet on May 9, 2026 — verify on-chain.',
   },
 ]
 
 /* ---------- Comparison table ---------- */
 const comparisonRows = [
-  { feature: 'Keep BTC in self-custody', cadena: true, custodial: false, selling: false },
-  { feature: 'No margin calls', cadena: true, custodial: false, selling: 'N/A' },
-  { feature: 'No credit check', cadena: true, custodial: true, selling: 'N/A' },
-  { feature: 'No taxable event', cadena: true, custodial: true, selling: false },
-  { feature: 'Fully on-chain enforcement', cadena: true, custodial: false, selling: 'N/A' },
-  { feature: 'Keep BTC price upside', cadena: true, custodial: false, selling: false },
-  { feature: 'Lender gets guaranteed return', cadena: true, custodial: false, selling: 'N/A' },
+  { feature: 'Keep BTC in self-custody',    cadena: true,      custodial: false,       defi: '✗ wrapped',            selling: false },
+  { feature: 'No margin calls',             cadena: true,      custodial: false,       defi: '✗ liquidation engine', selling: '—' },
+  { feature: 'No rehypothecation',          cadena: true,      custodial: false,       defi: '✗ pooled',             selling: '—' },
+  { feature: 'No credit check',             cadena: true,      custodial: false,       defi: true,                   selling: '—' },
+  { feature: 'No taxable event',            cadena: true,      custodial: true,        defi: 'depends',              selling: false },
+  { feature: 'Fully on-chain enforcement',  cadena: true,      custodial: false,       defi: true,                   selling: '—' },
+  { feature: 'Bitcoin-native (no wrapping)',cadena: true,      custodial: 'depends',   defi: false,                  selling: '—' },
+  { feature: 'Keep BTC price upside',       cadena: true,      custodial: true,        defi: true,                   selling: false },
+  { feature: 'Lender gets fixed yield',     cadena: true,      custodial: true,        defi: '✗ variable',           selling: '—' },
+  { feature: 'Pre-signed settlement',       cadena: true,      custodial: '—',         defi: false,                  selling: '—' },
 ]
 
 /* ---------- Carousel ---------- */
@@ -121,35 +134,59 @@ let io
 const faqs = [
   {
     q: 'What is the loan amount?',
-    a: 'Loans are in any $1,000 USD denomination.',
-  },
-  {
-    q: 'Can I repay my loan early?',
-    a: 'All loans settle at the end of the 365 day term.',
-  },
-  {
-    q: 'Are there monthly payments?',
-    a: 'There are no payments. All loans settle at the end of the term.',
-  },
-  {
-    q: 'What is the Loan To Value?',
-    a: 'Loans are 50% value loans.',
-  },
-  {
-    q: 'How is collateral managed?',
-    a: 'You control your private keys and funds. Cadena Bitcoin does not hold or access your private keys or seed phrase. Bitcoin is locked in smart contracts onchain.',
-  },
-  {
-    q: 'What currency can I get my loan in?',
-    a: 'Loans are funded in Bitcoin and settled in Bitcoin.',
-  },
-  {
-    q: 'How long does it take to get a loan?',
-    a: 'Minutes. Funding transactions are broadcast as soon as the contracts are signed.',
+    a: 'Loan size ranges from $1,000 minimum to $1M per single contract. Loans above $1M are syndicated across multiple parallel contracts funded the same day. We\'ve structured $3M+ facilities this way.',
   },
   {
     q: 'Is there a credit check?',
-    a: 'No. Your bitcoin is your credit.',
+    a: 'No. Your Bitcoin is your credit.',
+  },
+  {
+    q: 'What is the Loan-to-Value?',
+    a: '50% LTV. This means the lender\'s USD principal is protected against up to a 50% BTC price decline between funding and maturity. The collateral pool is sized to cover the lender\'s full dollar-denominated target in any flat-or-down BTC scenario down to that threshold.',
+  },
+  {
+    q: 'What currency is the loan in?',
+    a: 'The contract is denominated in USD but funded and settled in Bitcoin. You commit Bitcoin as collateral; you sell additional Bitcoin separately on your own exchange or OTC desk to access cash. The contract preserves your original Bitcoin position through the term via the locked collateral.',
+  },
+  {
+    q: 'Are there monthly payments?',
+    a: 'No. All Cadena contracts settle in a single event at maturity via a pre-signed Contract Execution Transaction. The borrower\'s all-in cost is paid in BTC at maturity, denominated in USD.',
+  },
+  {
+    q: 'Can I repay early?',
+    a: 'Cadena contracts don\'t have an active repayment step. Settlement is automatic at term-end via the pre-signed CET. 1-year terms are standard; 90-day terms are available subject to lender match.',
+  },
+  {
+    q: 'How is collateral managed?',
+    a: 'You control your private keys and Bitcoin throughout. Cadena does not hold, custody, or access your private keys at any point. The Signer App is open-source.',
+  },
+  {
+    q: 'How long does funding take?',
+    a: 'Funding broadcasts within minutes of both parties signing. Initial onboarding (Sumsub KYC and Signer App setup) is a one-time step that reuses across every future contract.',
+  },
+  {
+    q: 'Is Cadena regulated?',
+    a: 'Yes. Cadena Bitcoin S.A. de C.V. is a registered Bitcoin Service Provider in El Salvador. All identity verification flows through Sumsub on-device via the open-sourced Cadena Signer App — identity goes to Sumsub directly, never through Cadena.',
+  },
+  {
+    q: 'What happens if Bitcoin falls more than 50% during the term?',
+    a: 'The collateral pool is sized for a 50% BTC drop. Below that threshold, the lender absorbs any shortfall against their dollar-denominated target. The gap risk above that threshold is hedgeable separately with a put position struck near the 50% LTV mark.',
+  },
+  {
+    q: 'What\'s the fee structure?',
+    a: '1% Cadena platform fee on the borrower side, paid in BTC from the borrower\'s collateral contribution at funding and settlement. 0% on the lender side.',
+  },
+  {
+    q: 'Can I lend or borrow above $1M?',
+    a: 'Yes. Above $1M, contracts are syndicated — multiple parallel $1M contracts funded the same day with matched counterparties.',
+  },
+  {
+    q: 'Where does the off-ramp happen?',
+    a: 'On your own exchange or OTC desk. Cadena is not in the off-ramp path and does not custody or process any fiat at any point.',
+  },
+  {
+    q: 'Where do I find the contracts on-chain?',
+    a: 'Every Cadena contract is verifiable on Bitcoin\'s base layer via mempool.space. The early settled contract from May 9, 2026: 95bf1377…9e5aab7d.',
   },
 ]
 const openSet = ref(new Set([0]))
@@ -290,32 +327,55 @@ onBeforeUnmount(() => {
             </div>
 
             <h1 class="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold leading-tight tracking-tight">
-              Borrow Against Bitcoin.<br class="hidden sm:block" />
-              <span class="text-secondary">Keep Every Sat.</span>
+              Bitcoin credit, on Bitcoin's base layer.
             </h1>
 
             <p class="mt-5 text-lg sm:text-xl text-white max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Non-custodial Bitcoin loans secured by Discreet Log Contracts. No margin calls, no credit check, no surrendering your keys.
+              Borrow against your Bitcoin or earn 12% on it — without surrendering custody. Non-custodial. No margin calls. No counterparty risk.
             </p>
 
-            <!-- Trust pills — SVG icons, no emoji -->
-            <div class="flex flex-wrap gap-2 mt-5 justify-center lg:justify-start">
-              <span class="trust-pill">
-                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Self-custody
-              </span>
-              <span class="trust-pill">
-                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M4.93 4.93l14.14 14.14"/></svg>
-                No margin calls
-              </span>
-              <span class="trust-pill">
-                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                No credit check
-              </span>
-              <span class="trust-pill">
-                <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3c4 4 4 14 0 18M12 3c-4 4-4 14 0 18M3 12h18"/></svg>
-                Global access
-              </span>
+            <!-- Verified on mainnet trust badge -->
+            <div class="inline-flex items-center gap-2 mt-5 text-sm text-white/80 font-mono">
+              <span class="text-secondary font-bold">✓</span>
+              Verified on mainnet. Early contract funded Nov 2025, settled May 2026.
+              <a
+                href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-secondary underline underline-offset-2 hover:text-secondary/80 transition whitespace-nowrap"
+              >See the transaction →</a>
+            </div>
+
+            <!-- Feature checks — 4 across -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 mt-6 text-sm text-white/90 text-left">
+              <!-- Self-custody: lock -->
+              <div class="flex items-start gap-2">
+                <svg class="w-3.5 h-3.5 text-secondary flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <span>Self-custody throughout</span>
+              </div>
+              <!-- Pre-signed settlement: document with checkmark -->
+              <div class="flex items-start gap-2">
+                <svg class="w-3.5 h-3.5 text-secondary flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="9 15 11 17 15 13"/>
+                </svg>
+                <span>Pre-signed settlement — no margin calls</span>
+              </div>
+              <!-- No rehypothecation / on-chain: chain link -->
+              <div class="flex items-start gap-2">
+                <svg class="w-3.5 h-3.5 text-secondary flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span>No rehypothecation — every contract on-chain</span>
+              </div>
+              <!-- Regulated / KYC: shield -->
+              <div class="flex items-start gap-2">
+                <svg class="w-3.5 h-3.5 text-secondary flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span>El Salvador BSP regulated · KYC on-device</span>
+              </div>
             </div>
 
             <!-- Desktop CTAs -->
@@ -325,13 +385,13 @@ onBeforeUnmount(() => {
               </router-link>
               <span class="cta-outline-wrap">
                 <router-link :to="heroCtaTo" class="cta-outline" @click="onHeroCtaClick">
-                  Earn ~11% APY Lending
+                  Earn 12% Lending
                 </router-link>
               </span>
             </div>
 
             <p class="mt-4 text-xs text-white font-mono hidden lg:block">
-              // No registration required to browse rates
+              // Browse live rates — no registration required.
             </p>
           </div>
 
@@ -352,7 +412,7 @@ onBeforeUnmount(() => {
           </router-link>
           <span class="cta-outline-wrap w-full sm:w-auto">
             <router-link :to="heroCtaTo" class="cta-outline w-full text-center" @click="onHeroCtaClick">
-              Earn ~11% APY Lending
+              Earn 12% Lending
             </router-link>
           </span>
         </div>
@@ -388,6 +448,15 @@ onBeforeUnmount(() => {
     <section class="w-full bg-transparent text-white pt-6 pb-4 px-4">
       <div class="max-w-screen-xl mx-auto text-center mb-4">
         <p class="text-xs font-semibold text-white uppercase tracking-widest">Trusted &amp; Featured By</p>
+        <a
+          href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 mt-2 text-xs font-mono text-white/50 hover:text-white/80 transition-colors"
+        >
+          <span class="text-secondary">✓</span>
+          Mainnet-settled contract — verify on mempool.space →
+        </a>
       </div>
       <div class="marquee-container max-w-screen-xl mx-auto overflow-hidden">
         <div class="marquee-track flex items-center gap-10 sm:gap-12">
@@ -420,8 +489,10 @@ onBeforeUnmount(() => {
     <section class="px-4 pt-16 pb-10 sm:px-6 lg:px-8">
       <div class="max-w-screen-xl mx-auto">
         <div class="text-center mb-8">
-          <h2 class="text-3xl md:text-4xl font-extrabold">How It Works</h2>
-          <p class="mt-3 text-white text-lg">Two ways to use Cadena — both fully non-custodial.</p>
+          <h2 class="text-3xl md:text-4xl font-extrabold">How it works</h2>
+          <p class="mt-3 text-white/70 text-base max-w-2xl mx-auto leading-relaxed">
+            Both parties commit Bitcoin. Both parties pre-sign every possible outcome. Bitcoin's base layer enforces the result.
+          </p>
         </div>
 
         <!-- Tab switcher -->
@@ -445,13 +516,14 @@ onBeforeUnmount(() => {
           >
             <div class="step-number font-mono">{{ String(i + 1).padStart(2, '0') }}</div>
             <h3 class="text-base font-bold mt-4 mb-2 text-white">{{ step.title }}</h3>
-            <p class="text-white text-sm leading-relaxed">{{ step.desc }}</p>
+            <p class="text-white/80 text-sm leading-relaxed">{{ step.desc }}</p>
+            <p v-if="step.note" class="mt-3 text-xs font-mono text-secondary/80 leading-relaxed">{{ step.note }}</p>
           </div>
         </div>
 
         <div class="text-center mt-8">
           <router-link :to="heroCtaTo" class="cta-primary inline-flex">
-            {{ howItWorksTab === 'borrow' ? 'Get Your Loan' : 'Start Earning' }}
+            {{ howItWorksTab === 'borrow' ? 'Build your borrower scenario →' : 'Build your lender scenario →' }}
           </router-link>
         </div>
       </div>
@@ -463,25 +535,26 @@ onBeforeUnmount(() => {
     <section class="px-4 pt-8 pb-12 sm:px-6 lg:px-8">
       <div class="max-w-screen-xl mx-auto">
         <div class="text-center mb-10">
-          <h2 class="text-3xl md:text-4xl font-extrabold">Why Cadena?</h2>
-          <p class="mt-3 text-white text-lg">Most Bitcoin lenders take your coins. We don't.</p>
+          <h2 class="text-3xl md:text-4xl font-extrabold">Why Cadena</h2>
+          <p class="mt-3 text-white/70 text-lg">Most Bitcoin lenders take your coins. We never touch them.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px feature-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px feature-grid">
           <div v-for="(feat, fi) in features" :key="feat.title" class="feature-card">
-            <!-- SVG icon per card -->
             <div class="feature-icon">
-              <!-- Self-custody: lock -->
+              <!-- 🔐 Self-custody: lock -->
               <svg v-if="fi === 0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <!-- No margin calls: slash circle -->
-              <svg v-if="fi === 1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M4.93 4.93l14.14 14.14"/></svg>
-              <!-- Minutes not days: bolt -->
-              <svg v-if="fi === 2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              <!-- Fully on-chain: chain link -->
-              <svg v-if="fi === 3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <!-- ⚖️ No margin calls: scales -->
+              <svg v-if="fi === 1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 4-1 6-2 2 1 4 2 6 2h2"/></svg>
+              <!-- 🔗 Fully on-chain: chain link -->
+              <svg v-if="fi === 2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <!-- ⚡ Fast + verified: bolt -->
+              <svg v-if="fi === 3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <!-- 🛡️ Regulated: shield -->
+              <svg v-if="fi === 4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <h3 class="text-base font-bold mb-2 text-white">{{ feat.title }}</h3>
-            <p class="text-sm text-white leading-relaxed">{{ feat.desc }}</p>
+            <p class="text-sm text-white/80 leading-relaxed">{{ feat.desc }}</p>
           </div>
         </div>
       </div>
@@ -493,23 +566,26 @@ onBeforeUnmount(() => {
     <section class="bg-transparent px-4 pt-4 pb-14 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
         <div class="text-center mb-8">
-          <h2 class="text-3xl md:text-4xl font-extrabold">How We Compare</h2>
-          <p class="mt-3 text-white text-base">See why Cadena is the only way to borrow Bitcoin without the trade-offs.</p>
+          <h2 class="text-3xl md:text-4xl font-extrabold">How Cadena compares</h2>
+          <p class="mt-3 text-white/70 text-base max-w-2xl mx-auto">Why non-custodial Bitcoin credit is structurally different from every other option.</p>
         </div>
 
         <div class="overflow-x-auto rounded-xl border border-white/10">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-white/5">
-                <th class="text-left px-5 py-4 text-white font-medium text-xs uppercase tracking-wide">Feature</th>
-                <th class="px-4 py-4 text-center min-w-[100px]">
+                <th class="text-left px-5 py-4 text-white/50 font-medium text-xs uppercase tracking-wide">Feature</th>
+                <th class="px-4 py-4 text-center min-w-[90px]">
                   <div class="text-secondary font-extrabold text-base">Cadena</div>
                 </th>
-                <th class="px-4 py-4 text-center min-w-[120px]">
-                  <div class="text-white font-medium text-sm">Custodial<br/>Lenders</div>
+                <th class="px-4 py-4 text-center min-w-[110px]">
+                  <div class="text-white/70 font-medium text-xs">Custodial<br/>Lenders</div>
                 </th>
-                <th class="px-4 py-4 text-center min-w-[100px]">
-                  <div class="text-white font-medium text-sm">Selling<br/>BTC</div>
+                <th class="px-4 py-4 text-center min-w-[110px]">
+                  <div class="text-white/70 font-medium text-xs">DeFi Pools<br/>(wBTC)</div>
+                </th>
+                <th class="px-4 py-4 text-center min-w-[90px]">
+                  <div class="text-white/70 font-medium text-xs">Selling<br/>Bitcoin</div>
                 </th>
               </tr>
             </thead>
@@ -517,29 +593,89 @@ onBeforeUnmount(() => {
               <tr
                 v-for="(row, i) in comparisonRows"
                 :key="i"
-                class=""
                 :class="i % 2 === 0 ? 'bg-white/[0.02]' : ''"
               >
-                <td class="px-5 py-3.5 text-white font-medium">{{ row.feature }}</td>
-                <td class="px-4 py-3.5 text-center">
-                  <span v-if="row.cadena === true" class="text-green-400 font-bold text-lg">✓</span>
-                  <span v-else-if="row.cadena === false" class="text-red-400 text-lg">✗</span>
-                  <span v-else class="text-white text-xs">{{ row.cadena }}</span>
+                <td class="px-5 py-3 text-white/90 font-medium text-sm">{{ row.feature }}</td>
+                <td class="px-4 py-3 text-center">
+                  <span v-if="row.cadena === true" class="text-green-400 font-bold text-base">✓</span>
+                  <span v-else-if="row.cadena === false" class="text-red-400 text-base">✗</span>
+                  <span v-else class="text-white/40 text-xs font-mono">{{ row.cadena }}</span>
                 </td>
-                <td class="px-4 py-3.5 text-center">
-                  <span v-if="row.custodial === true" class="text-green-400 font-bold text-lg">✓</span>
-                  <span v-else-if="row.custodial === false" class="text-red-400 text-lg">✗</span>
-                  <span v-else class="text-white text-xs">{{ row.custodial }}</span>
+                <td class="px-4 py-3 text-center">
+                  <span v-if="row.custodial === true" class="text-green-400 font-bold text-base">✓</span>
+                  <span v-else-if="row.custodial === false" class="text-red-400 text-base">✗</span>
+                  <span v-else class="text-white/40 text-xs font-mono">{{ row.custodial }}</span>
                 </td>
-                <td class="px-4 py-3.5 text-center">
-                  <span v-if="row.selling === true" class="text-green-400 font-bold text-lg">✓</span>
-                  <span v-else-if="row.selling === false" class="text-red-400 text-lg">✗</span>
-                  <span v-else class="text-white text-xs">{{ row.selling }}</span>
+                <td class="px-4 py-3 text-center">
+                  <span v-if="row.defi === true" class="text-green-400 font-bold text-base">✓</span>
+                  <span v-else-if="row.defi === false" class="text-red-400 text-base">✗</span>
+                  <span v-else class="text-white/40 text-xs font-mono">{{ row.defi }}</span>
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <span v-if="row.selling === true" class="text-green-400 font-bold text-base">✓</span>
+                  <span v-else-if="row.selling === false" class="text-red-400 text-base">✗</span>
+                  <span v-else class="text-white/40 text-xs font-mono">{{ row.selling }}</span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         VERIFIED ON-CHAIN
+    ═══════════════════════════════════════════════════ -->
+    <section class="px-4 py-20 sm:px-6 lg:px-8" style="background:#081123">
+      <div class="max-w-2xl mx-auto">
+
+        <!-- Explorer card -->
+        <div class="voc-card">
+
+          <!-- Card header -->
+          <div class="voc-card-header">
+            <div class="voc-status-dot"></div>
+            <span class="voc-card-header-label">Bitcoin Mainnet · DLC Contract · Settled</span>
+            <span class="voc-verified-badge">✓ Verified</span>
+          </div>
+
+          <!-- Main content -->
+          <div class="voc-body">
+            <h2 class="voc-body-heading">Verified on mainnet</h2>
+            <p class="voc-body-sub">Early contract — funded Nov 2025, settled May 2026</p>
+            <p class="voc-body-stats">6-month term · $80k BTC · 12% annualized yield</p>
+            <p class="voc-body-desc">Bitcoin's price fell over the term — the lender received more sats than the opening BTC contribution implied, exactly as the pre-signed CETs were structured to deliver.</p>
+          </div>
+
+          <!-- TX block -->
+          <div class="voc-tx-block">
+            <p class="voc-tx-label">Transaction ID</p>
+            <a
+              href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="voc-tx-hash"
+            >
+              95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d
+            </a>
+          </div>
+
+          <!-- Card footer -->
+          <div class="voc-card-footer">
+            <span class="voc-footer-note">Every Cadena contract leaves a verifiable on-chain trail. The contract is the proof.</span>
+            <a
+              href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="voc-tx-link"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Verify on mempool.space →
+            </a>
+          </div>
+
+        </div>
+
       </div>
     </section>
 
@@ -553,22 +689,27 @@ onBeforeUnmount(() => {
             <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
               What is Cadena Bitcoin?
             </h2>
-            <p class="mt-5 text-white text-lg leading-relaxed">
-              Cadena is a decentralized Bitcoin lending marketplace. Borrowers get liquidity without selling. Lenders earn guaranteed yields secured by Bitcoin. And
-              <span class="font-semibold underline underline-offset-4 decoration-2 decoration-white/70">every participant keeps custody of their Bitcoin throughout.</span>
+            <p class="mt-5 text-white/90 text-lg leading-relaxed">
+              Cadena is a non-custodial Bitcoin credit market built on Bitcoin's base layer. Lenders earn USD-denominated yield on their Bitcoin; borrowers access dollars without selling theirs. Every contract sits in a Discreet Log Contract on-chain — Cadena holds no key, runs no pool, and operates no liquidation engine.
             </p>
-            <div class="flex flex-col sm:flex-row gap-3 mt-7">
+            <p class="mt-4 text-white/80 text-base leading-relaxed">
+              The credit function on Bitcoin has been the missing piece of the monetary system since 2009. The previous cycle's lenders failed structurally — custodial, pooled, trust-dependent. Cadena is the architecture that wasn't possible until Discreet Log Contracts matured.
+            </p>
+            <p class="mt-4 text-white font-semibold text-base leading-relaxed">
+              Sound money without credit is hoarding. We're building the rest of the system.
+            </p>
+            <div class="flex flex-col sm:flex-row flex-wrap gap-3 mt-7">
               <router-link
                 :to="heroCtaTo"
-                class="inline-flex items-center justify-center rounded-full bg-white text-secondary font-bold px-7 py-3.5 text-base hover:bg-white/90 transition"
+                class="inline-flex items-center justify-center rounded-full bg-white text-secondary font-bold px-6 py-3 text-sm hover:bg-white/90 transition"
               >
                 Explore the marketplace →
               </router-link>
               <router-link
                 to="/cadena-paper"
-                class="inline-flex items-center justify-center rounded-full border-2 border-white/40 text-white font-semibold px-7 py-3.5 text-base hover:border-white hover:bg-white/10 transition"
+                class="inline-flex items-center justify-center rounded-full border-2 border-white/40 text-white font-semibold px-6 py-3 text-sm hover:border-white hover:bg-white/10 transition"
               >
-                Read the paper
+                Read the paper →
               </router-link>
             </div>
           </div>
@@ -610,8 +751,8 @@ onBeforeUnmount(() => {
     <section id="faq" class="bg-transparent text-white px-4 pt-12 pb-16 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto">
         <div class="text-center mb-8">
-          <h2 class="text-3xl md:text-4xl font-extrabold">Frequently Asked Questions</h2>
-          <p class="mt-3 text-white text-lg">Every question you have before taking the first step.</p>
+          <h2 class="text-3xl md:text-4xl font-extrabold">Frequently asked questions</h2>
+          <p class="mt-3 text-white/60 text-base">The questions every prospect asks before their first contract.</p>
         </div>
 
         <div class="space-y-2">
@@ -648,12 +789,58 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- ═══════════════════════════════════════════════════
+         FOR INSTITUTIONS
+    ═══════════════════════════════════════════════════ -->
+    <section class="inst-root px-4 py-20 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto text-center">
+
+        <!-- Label + heading -->
+        <p class="inst-label">For institutions</p>
+        <h2 class="inst-heading">Built for institutional collateral logic.</h2>
+        <p class="inst-sub">If you're managing a Bitcoin treasury, running a fund, operating a mining business, or sitting on a sec-lending desk — Cadena's architecture maps onto your existing collateral and settlement mental model.</p>
+
+        <!-- Cards -->
+        <p class="inst-examples-label">Worked examples by use case</p>
+        <div class="inst-cards">
+          <router-link to="/btcusd" class="inst-card">
+            <div class="inst-card-badge inst-card-badge-lend">Lend</div>
+            <div class="inst-card-amount">$1M</div>
+            <p class="inst-card-desc">12% annualized USD yield on Bitcoin</p>
+            <span class="inst-card-link">View example →</span>
+          </router-link>
+          <router-link to="/btcusd" class="inst-card">
+            <div class="inst-card-badge inst-card-badge-borrow">Borrow</div>
+            <div class="inst-card-amount">$1M</div>
+            <p class="inst-card-desc">USD liquidity, BTC collateral, no custody transfer</p>
+            <span class="inst-card-link">View example →</span>
+          </router-link>
+        </div>
+
+        <!-- Kevin -->
+        <div class="inst-kevin">
+          <div class="inst-kevin-avatar">KB</div>
+          <div>
+            <p class="inst-kevin-name">Kevin Bell, CFA</p>
+            <p class="inst-kevin-title">Founder — talk directly, no sales team</p>
+          </div>
+        </div>
+
+        <!-- CTAs -->
+        <div class="inst-ctas">
+          <router-link to="/contact" class="inst-cta-primary">Schedule a call →</router-link>
+          <router-link to="/contact" class="inst-cta-secondary">Request a term sheet →</router-link>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
          NEWSLETTER
     ═══════════════════════════════════════════════════ -->
     <section class="bg-transparent px-4 py-10 sm:px-6 lg:px-8">
       <div class="max-w-lg mx-auto text-center">
-        <h3 class="text-xl font-bold text-white mb-1">Stay in the Loop</h3>
-        <p class="text-white text-sm mb-5">Rate alerts, product updates, and Bitcoin finance insights.</p>
+        <h3 class="text-2xl font-bold text-white mb-2">Stay in the loop</h3>
+        <p class="text-white/60 text-sm mb-5">Rate updates, on-chain settlements, and chapter excerpts from Endgame — Kevin's book on the credit function on Bitcoin.</p>
         <form class="flex flex-col sm:flex-row gap-3 sm:justify-center" @submit.prevent="handleFooterSubscribe">
           <input
             v-model.trim="footerEmail"
@@ -675,6 +862,7 @@ onBeforeUnmount(() => {
         </form>
         <div v-if="footerSubscribeError" class="mt-2 text-sm text-red-300" aria-live="polite">{{ footerSubscribeError }}</div>
         <div v-else-if="footerSubscribeSuccess" class="mt-2 text-sm text-green-300" aria-live="polite">{{ footerSubscribeSuccess }}</div>
+        <p class="mt-3 text-white/30 text-xs">One email per week. Unsubscribe anytime.</p>
       </div>
     </section>
 
@@ -684,26 +872,32 @@ onBeforeUnmount(() => {
     <section class="bg-secondary text-white py-16 px-6">
       <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
-          Ready to Put Your Bitcoin to Work?
+          Ready to put your Bitcoin to work?
         </h2>
-        <p class="mt-4 text-lg text-white leading-relaxed max-w-2xl mx-auto">
-          Borrow against your Bitcoin or earn guaranteed returns — all without surrendering custody. Set up in minutes.
+        <p class="mt-4 text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+          Borrow against your Bitcoin or earn 12% USD-denominated yield on it — without surrendering custody. Onboard once. Reuse across every contract.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
           <router-link
             to="/btcusd"
-            class="inline-flex items-center justify-center rounded-full bg-white text-secondary font-extrabold px-9 py-4 text-lg transition hover:bg-white/90 shadow-xl"
+            class="inline-flex items-center justify-center rounded-full bg-white text-secondary font-extrabold px-8 py-4 text-base transition hover:bg-white/90 shadow-xl"
           >
-            Get a Loan Now
+            Get a Loan
           </router-link>
           <router-link
             to="/btcusd"
-            class="inline-flex items-center justify-center rounded-full border-2 border-white/70 text-white font-bold px-9 py-4 text-lg transition hover:border-white hover:bg-white/10"
+            class="inline-flex items-center justify-center rounded-full border-2 border-white/70 text-white font-bold px-8 py-4 text-base transition hover:border-white hover:bg-white/10"
           >
-            Start Lending →
+            Start Lending
+          </router-link>
+          <router-link
+            to="/contact"
+            class="inline-flex items-center justify-center rounded-full border-2 border-white/30 text-white font-bold px-8 py-4 text-base transition hover:border-white hover:bg-white/10"
+          >
+            Talk to Kevin →
           </router-link>
         </div>
-        <p class="mt-5 text-sm text-white">No credit check · No custody transfer · No margin calls</p>
+        <p class="mt-5 text-sm text-white/60">No credit check · No custody transfer · No margin calls · Mainnet-verified</p>
       </div>
     </section>
 
@@ -974,5 +1168,167 @@ onBeforeUnmount(() => {
 }
 
 :deep(.rate) { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+
+/* ── Verified on-chain ── */
+.voc-card {
+  border: 1px solid rgba(103,56,228,0.35);
+  background: #080e1d;
+  overflow: hidden;
+}
+
+.voc-card-header {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: rgba(103,56,228,0.08);
+  border-bottom: 1px solid rgba(103,56,228,0.2);
+  padding: 0.65rem 1.25rem;
+}
+.voc-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34,197,94,0.8);
+  flex-shrink: 0;
+}
+.voc-card-header-label {
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); font-family: monospace; flex: 1;
+}
+.voc-verified-badge {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #22c55e; border: 1px solid rgba(34,197,94,0.35); padding: 0.15rem 0.5rem;
+}
+
+.voc-body {
+  padding: 1.75rem 1.5rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.voc-body-heading {
+  font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -0.02em; margin-bottom: 0.35rem;
+}
+.voc-body-sub {
+  font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.55); margin-bottom: 0.6rem;
+}
+.voc-body-stats {
+  font-size: 0.72rem; font-family: monospace; font-weight: 700; color: #6738e3;
+  letter-spacing: 0.04em; margin-bottom: 1rem;
+}
+.voc-body-desc {
+  font-size: 0.88rem; color: rgba(255,255,255,0.75); line-height: 1.65;
+}
+
+.voc-tx-block {
+  padding: 1rem 1.5rem;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.voc-tx-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); font-family: monospace; margin-bottom: 0.35rem;
+}
+.voc-tx-hash {
+  font-family: monospace; font-size: 0.75rem; color: #6738e3;
+  text-decoration: none; word-break: break-all; line-height: 1.5; display: block;
+  transition: color 0.15s;
+}
+.voc-tx-hash:hover { color: #8b63f0; }
+
+.voc-card-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.875rem 1.5rem;
+  flex-wrap: wrap;
+}
+.voc-footer-note {
+  font-size: 0.72rem; color: rgba(255,255,255,0.35); font-family: monospace; line-height: 1.5; flex: 1;
+}
+.voc-tx-link {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  font-size: 0.72rem; font-weight: 600; color: #6738e3;
+  text-decoration: none; border: 1px solid rgba(103,56,228,0.4);
+  padding: 0.35rem 0.75rem; white-space: nowrap; flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.voc-tx-link:hover { color: #fff; border-color: rgba(103,56,228,0.8); background: rgba(103,56,228,0.1); }
+
+/* ── For Institutions ── */
+.inst-root { background: #081123; }
+
+.inst-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #6738e3; display: block; margin-bottom: 1rem;
+}
+.inst-heading {
+  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; color: #fff;
+  line-height: 1.1; letter-spacing: -0.025em; margin-bottom: 1.25rem;
+}
+.inst-sub {
+  font-size: 0.92rem; color: rgba(255,255,255,0.75); line-height: 1.75;
+  margin-bottom: 2.5rem;
+}
+
+.inst-examples-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); font-family: monospace; margin-bottom: 1.25rem;
+}
+
+.inst-cards {
+  display: flex; gap: 1rem; justify-content: center; margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.inst-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 1.75rem 2rem;
+  border: 1px solid rgba(103,56,228,0.25);
+  background: rgba(103,56,228,0.04);
+  text-decoration: none; width: 200px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.inst-card:hover { border-color: rgba(103,56,228,0.6); background: rgba(103,56,228,0.08); }
+
+.inst-card-badge {
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; margin-bottom: 1rem; display: inline-block;
+}
+.inst-card-badge-lend { color: #22c55e; border: 1px solid rgba(34,197,94,0.35); }
+.inst-card-badge-borrow { color: #6738e3; border: 1px solid rgba(103,56,228,0.4); }
+
+.inst-card-amount {
+  font-size: 2.25rem; font-weight: 900; color: #fff; line-height: 1;
+  font-family: monospace; margin-bottom: 0.75rem;
+}
+.inst-card-desc {
+  font-size: 0.75rem; color: rgba(255,255,255,0.7); line-height: 1.5; margin-bottom: 1rem; flex: 1;
+}
+.inst-card-link { font-size: 0.73rem; font-weight: 600; color: #6738e3; transition: color 0.15s; }
+.inst-card:hover .inst-card-link { color: #8b63f0; }
+
+.inst-kevin {
+  display: inline-flex; align-items: center; gap: 0.875rem;
+  margin-bottom: 1.75rem;
+}
+.inst-kevin-avatar {
+  width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: linear-gradient(135deg, #6738e3, #3b1fa3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 800; color: #fff; flex-shrink: 0; letter-spacing: 0.05em;
+}
+.inst-kevin-name { font-size: 0.85rem; font-weight: 700; color: #fff; text-align: left; }
+.inst-kevin-title { font-size: 0.7rem; color: rgba(255,255,255,0.6); text-align: left; margin-top: 0.1rem; }
+
+.inst-ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+
+.inst-cta-primary {
+  display: inline-flex; align-items: center;
+  background: #6738e3; color: #fff; font-weight: 700; font-size: 0.82rem;
+  padding: 0.7rem 1.6rem; text-decoration: none; transition: background 0.2s;
+}
+.inst-cta-primary:hover { background: #7b4df5; }
+
+.inst-cta-secondary {
+  display: inline-flex; align-items: center;
+  border: 1px solid rgba(255,255,255,0.25); color: #fff;
+  font-weight: 600; font-size: 0.82rem; padding: 0.7rem 1.6rem; text-decoration: none;
+  transition: border-color 0.2s;
+}
+.inst-cta-secondary:hover { border-color: rgba(255,255,255,0.5); }
 
 </style>

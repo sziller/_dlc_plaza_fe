@@ -1,10 +1,10 @@
 export const blogArticles = [
   {
     id: 1,
-    title: 'Cadena Bitcoin – Decentralized Peer-to-Peer Bitcoin Finance',
+    title: 'Cadena Bitcoin – Non-Custodial Peer-to-Peer Bitcoin Finance',
     description: 'Understand what sets Cadena Bitcoin apart from other platforms.',
     imageBase: 'article1',
-    link: '/article/cadena-decentralized-finance',
+    link: '/article/cadena-bitcoin-finance',
     internal: true,
   },
   {
@@ -18,7 +18,7 @@ export const blogArticles = [
   {
     id: 3,
     title: 'Cadena Bitcoin: Security',
-    description: "Cadena Bitcoin prioritizes self-sovereignty, decentralization, and Bitcoin's core security principles.",
+    description: "Cadena Bitcoin prioritizes self-sovereignty, peer-to-peer operations, and Bitcoin's core security principles.",
     imageBase: 'article3',
     link: '/article/cadena-bitcoin-security',
     internal: true,
@@ -26,7 +26,7 @@ export const blogArticles = [
   {
     id: 4,
     title: 'How Does it Work?',
-    description: 'Cadena Bitcoin is a decentralized lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.',
+    description: "Cadena Bitcoin is a non-custodial lending and borrowing product where users lock Bitcoin collateral in a DLC to facilitate loans. Here’s a breakdown of the key actions.",
     imageBase: 'article4',
     link: '/article/cadena-loan-lifecycle',
     internal: true,

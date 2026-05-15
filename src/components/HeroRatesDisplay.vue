@@ -6,86 +6,79 @@
       mounted ? 'translate-y-0' : 'translate-y-4'
     ]"
   >
-    <h3
-      class="font-bold text-white text-center"
-      :class="compact ? 'text-xl mb-1' : 'text-2xl sm:text-3xl mb-2'"
-    >
-      Market Rates
-    </h3>
-    <div
-      class="text-white/70 text-center"
-      :class="compact ? 'text-xs mb-3' : 'text-sm mb-4'"
-    >
-      1 Year Term
+    <!-- Header row -->
+    <div class="flex items-center justify-between mb-1">
+      <h3 class="font-bold text-white" :class="compact ? 'text-lg' : 'text-xl sm:text-2xl'">
+        Live Market Rates
+      </h3>
+      <div class="flex items-center gap-1 border border-white/20 rounded px-2 py-1 text-xs text-white/70 font-mono cursor-default select-none">
+        1 Year <span class="text-white/50 ml-0.5">▾</span>
+      </div>
     </div>
+    <p class="text-white/50 text-xs mb-4 font-mono">(90-day available subject to lender match)</p>
 
-    <!-- Side-by-side rate cards -->
-    <div :class="compact ? 'flex gap-2' : 'flex gap-3 sm:gap-4'">
-      <!-- Lend Card -->
+    <!-- Rate rows -->
+    <div class="space-y-2" :class="compact ? 'mb-3' : 'mb-4'">
+      <!-- Earn row -->
       <router-link
         :to="linkTo"
-        class="flex-1 rounded-lg bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-secondary/40 cursor-pointer block"
-        :class="compact ? 'p-2.5' : 'p-3 sm:p-4'"
+        class="flex items-center justify-between rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-secondary/40 transition-all duration-200 cursor-pointer"
+        :class="compact ? 'px-3 py-2.5' : 'px-4 py-3'"
       >
-        <div
-          class="bg-secondary text-white font-semibold rounded-md text-center"
-          :class="compact ? 'text-xs py-1.5 px-2 mb-2' : 'text-sm py-2 px-3 mb-3'"
-        >
-          Lend
+        <div>
+          <div class="text-xs text-white/60 font-mono mb-0.5 uppercase tracking-wide">Earn as a lender</div>
+          <div class="text-xs text-white/50 font-mono">USD-denominated · paid in BTC at maturity</div>
         </div>
-        <div class="flex items-baseline justify-center gap-0.5">
-          <span
-            class="font-bold transition-colors duration-500"
-            style="font-variant-numeric: tabular-nums"
-            :class="[
-              compact ? 'text-2xl' : 'text-3xl sm:text-4xl',
-              lendFlash === 'green' ? 'text-green-400' : lendFlash === 'red' ? 'text-red-400' : 'text-secondary'
-            ]"
-          >
-            {{ animatedLendRate }}
-          </span>
-          <span
-            class="text-white/80"
-            :class="compact ? 'text-sm' : 'text-lg'"
-          >%</span>
+        <div class="text-right flex-shrink-0 ml-4">
+          <div class="flex items-baseline gap-0.5">
+            <span
+              class="font-bold tabular-nums transition-colors duration-500"
+              :class="[compact ? 'text-2xl' : 'text-3xl', lendFlash === 'green' ? 'text-green-400' : lendFlash === 'red' ? 'text-red-400' : 'text-secondary']"
+            >{{ animatedLendRate }}</span>
+            <span class="text-white/70 text-sm">%</span>
+          </div>
+          <div class="text-xs text-white/50 font-mono">APY</div>
         </div>
       </router-link>
 
-      <!-- Borrow Card -->
+      <!-- Borrow row -->
       <router-link
         :to="linkTo"
-        class="flex-1 rounded-lg bg-white/5 border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-secondary/40 cursor-pointer block"
-        :class="compact ? 'p-2.5' : 'p-3 sm:p-4'"
+        class="flex items-center justify-between rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-secondary/40 transition-all duration-200 cursor-pointer"
+        :class="compact ? 'px-3 py-2.5' : 'px-4 py-3'"
       >
-        <div
-          class="bg-secondary/70 text-white font-semibold rounded-md text-center"
-          :class="compact ? 'text-xs py-1.5 px-2 mb-2' : 'text-sm py-2 px-3 mb-3'"
-        >
-          Borrow
+        <div>
+          <div class="text-xs text-white/60 font-mono mb-0.5 uppercase tracking-wide">Borrow all-in</div>
+          <div class="text-xs text-white/50 font-mono">12% interest + 1% Cadena fee</div>
         </div>
-        <div class="flex items-baseline justify-center gap-0.5">
-          <span
-            class="font-bold transition-colors duration-500"
-            style="font-variant-numeric: tabular-nums"
-            :class="[
-              compact ? 'text-2xl' : 'text-3xl sm:text-4xl',
-              borrowFlash === 'green' ? 'text-green-400' : borrowFlash === 'red' ? 'text-red-400' : 'text-secondary'
-            ]"
-          >
-            {{ animatedBorrowRate }}
-          </span>
-          <span
-            class="text-white/80"
-            :class="compact ? 'text-sm' : 'text-lg'"
-          >%</span>
+        <div class="text-right flex-shrink-0 ml-4">
+          <div class="flex items-baseline gap-0.5">
+            <span class="font-bold tabular-nums text-secondary" :class="compact ? 'text-2xl' : 'text-3xl'">{{ animatedBorrowRate }}</span>
+            <span class="text-white/70 text-sm">%</span>
+          </div>
+          <div class="text-xs text-white/50 font-mono">APR</div>
         </div>
       </router-link>
     </div>
 
-    <div v-if="loading" class="mt-4 text-center text-white/60 text-sm">
+    <!-- Footnote -->
+    <p v-if="!compact" class="text-white/40 text-xs font-mono leading-relaxed mb-4">
+      Single contract up to $1M. Larger sizes syndicated. 50% LTV · DLCP Oracle · Actual/360 sub-year terms.
+    </p>
+
+    <!-- Marketplace CTA -->
+    <router-link
+      :to="linkTo"
+      class="block w-full text-center rounded-lg border border-secondary/50 text-secondary font-semibold hover:bg-secondary/10 transition-all duration-200"
+      :class="compact ? 'py-2 text-sm' : 'py-2.5 text-sm'"
+    >
+      Open the marketplace →
+    </router-link>
+
+    <div v-if="loading" class="mt-3 text-center text-white/60 text-xs font-mono">
       Loading rates...
     </div>
-    <div v-if="apiError" class="mt-4 text-center text-red-300 text-sm">
+    <div v-if="apiError" class="mt-3 text-center text-red-300 text-xs font-mono">
       Rates temporarily unavailable
     </div>
   </div>
@@ -103,8 +96,8 @@ const mounted = ref(false)
 const loading = ref(true)
 const apiError = ref(false)
 
-const borrowRate = ref(11.5)
-const lendRate = ref(11.4)
+const borrowRate = ref(13.0)
+const lendRate = ref(12.0)
 const animatedBorrowRate = ref('*.*')
 const animatedLendRate = ref('*.*')
 const borrowFlash = ref('')
@@ -114,34 +107,30 @@ let tickInterval = null
 let borrowFlashTimer = null
 let lendFlashTimer = null
 
-const deltas = [-0.2, -0.1, 0, 0.1, 0.2]
+const deltas = [-0.1, 0, 0, 0.1]
 
 function tickRates() {
-  const bDelta = deltas[Math.floor(Math.random() * deltas.length)]
+  const lDelta = deltas[Math.floor(Math.random() * deltas.length)]
 
-  if (bDelta !== 0) {
-    borrowRate.value = Math.round(Math.min(12.0, Math.max(11.1, borrowRate.value + bDelta)) * 10) / 10
-    animatedBorrowRate.value = borrowRate.value.toFixed(1)
-    borrowFlash.value = bDelta > 0 ? 'green' : 'red'
-    clearTimeout(borrowFlashTimer)
-    borrowFlashTimer = setTimeout(() => { borrowFlash.value = '' }, 600)
-  }
-
-  const newLend = Math.round((borrowRate.value - 0.1) * 10) / 10
-  if (newLend !== lendRate.value) {
-    const dir = newLend > lendRate.value ? 'green' : 'red'
-    lendRate.value = newLend
+  if (lDelta !== 0) {
+    lendRate.value = Math.round(Math.min(12.5, Math.max(11.5, lendRate.value + lDelta)) * 10) / 10
     animatedLendRate.value = lendRate.value.toFixed(1)
-    lendFlash.value = dir
+    lendFlash.value = lDelta > 0 ? 'green' : 'red'
     clearTimeout(lendFlashTimer)
     lendFlashTimer = setTimeout(() => { lendFlash.value = '' }, 600)
+  }
+  // Borrow is always lend + 1% fee, shown as fixed
+  const newBorrow = Math.round((lendRate.value + 1.0) * 10) / 10
+  if (newBorrow !== borrowRate.value) {
+    borrowRate.value = newBorrow
+    animatedBorrowRate.value = borrowRate.value.toFixed(1)
   }
 }
 
 async function loadRates() {
   loading.value = false
-  animatedBorrowRate.value = borrowRate.value.toFixed(1)
   animatedLendRate.value = lendRate.value.toFixed(1)
+  animatedBorrowRate.value = borrowRate.value.toFixed(1)
   apiError.value = false
 }
 

@@ -190,7 +190,7 @@
             Ready to Borrow Against Your Bitcoin?
           </h2>
           <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-8">
-            Get instant liquidity with rates starting at 4.9%. Non-custodial, DLC-secured, and fully decentralized.
+            Get instant liquidity with rates starting at 4.9%. Non-custodial, DLC-secured, and self-enforcing.
             Your Bitcoin, your keys, your control.
           </p>
 
