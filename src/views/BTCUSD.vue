@@ -20,11 +20,13 @@ import { onMounted } from 'vue'
 import MarketOverviewTable from '../components/MarketOverviewTable.vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
+import { notifySlackNewBtcusdUser } from '../api/slackNotify'
 
 const { setUserFromApi } = useAuth()
 
 onMounted(() => {
   setUserFromApi()
+  notifySlackNewBtcusdUser()
 
   // Fire X conversion event for dashboard view
   if (typeof window !== 'undefined' && window.twq) {
