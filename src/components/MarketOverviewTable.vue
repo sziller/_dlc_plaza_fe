@@ -145,6 +145,7 @@ import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
 import { DEFAULT_ORACLE, oracleDisplayName } from '../config'
 import { generateIdempotencyKey } from '../lib/idempotencyKey'
+import { notifySlackCollateralShortfall } from '../api/slackNotify'
 
 const router = useRouter()
 
@@ -350,6 +351,8 @@ async function handleOrderSubmit(data) {
     const availableSats = allocationResult.value.available_btc_liquidity ?? 0
 
     if (availableSats < requiredSats) {
+      const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
+      notifySlackCollateralShortfall(userEmail, usdAmount.value, availableSats, requiredSats)
       showFundingScreen.value = true
       await fetchTopupAddress()
       modalLoading.value = false
@@ -358,6 +361,10 @@ async function handleOrderSubmit(data) {
   }
 
   if (!allocationResult.value?.is_covered) {
+    const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
+    const availSats = allocationResult.value?.available_btc_liquidity ?? 0
+    const reqSats = allocationResult.value?.required_collateral_sats ?? 0
+    notifySlackCollateralShortfall(userEmail, usdAmount.value, availSats, reqSats)
     showFundingScreen.value = true
     await fetchTopupAddress()
     modalLoading.value = false
@@ -392,6 +399,8 @@ async function handleOrderSubmit(data) {
       } else {
         const detail = e?.response?.data?.detail || e?.message || ''
         if (/insufficient/i.test(detail)) {
+          const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
+          notifySlackCollateralShortfall(userEmail, usdAmount.value, 0, 0)
           showFundingScreen.value = true
           await fetchTopupAddress()
         } else {
