@@ -304,7 +304,7 @@ onBeforeUnmount(() => {
          HERO
     ═══════════════════════════════════════════════════ -->
     <section class="hero-shell text-white">
-      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 relative z-10">
+      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 pt-1 pb-2 sm:py-3 lg:py-4 relative z-10">
 
         <!-- Desktop: side-by-side | Mobile: stacked -->
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-12">
@@ -428,15 +428,17 @@ onBeforeUnmount(() => {
           />
         </a>
       </div>
-      <div class="max-w-screen-xl mx-auto text-center mt-4">
+      <div class="max-w-screen-xl mx-auto text-center mt-6">
         <a
           href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 text-xs font-mono text-white hover:text-white transition-colors"
+          class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-secondary/50 bg-secondary/10 hover:bg-secondary/20 hover:border-secondary/80 transition-all duration-200 group"
         >
-          <span class="text-secondary">✓</span>
-          Mainnet-settled contract — verify on mempool.space →
+          <span class="flex items-center justify-center w-4 h-4 rounded-full bg-secondary text-white text-[10px] font-bold shrink-0">✓</span>
+          <span class="text-xs font-mono text-white font-semibold group-hover:text-white transition-colors">Mainnet-settled contract</span>
+          <span class="text-white/40">·</span>
+          <span class="text-xs font-mono text-secondary font-semibold group-hover:brightness-125 transition-all">verify on mempool.space →</span>
         </a>
       </div>
     </section>
@@ -826,15 +828,13 @@ onBeforeUnmount(() => {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 60vh;
-  padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px));
+  padding-top: 0;
   padding-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 @media (min-width: 1024px) {
-  .hero-shell {
-    padding-top: calc(var(--nav-h, 80px) + var(--info-h, 0px));
-  }
+  .hero-shell { justify-content: center; }
 }
 @media (max-width: 1023px) {
   .hero-shell { padding-bottom: clamp(1.5rem, 4vw, 2.5rem); }

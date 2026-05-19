@@ -9,8 +9,24 @@
       role="navigation"
       aria-label="Main"
     >
+      <!-- Mobile-only BTCUSD strip -->
+      <div class="md:hidden flex items-center justify-center gap-1.5 px-4 py-1 text-xs font-medium border-b border-white/10">
+        <img
+          src="https://flagcdn.com/us.svg"
+          alt="US Flag"
+          class="w-3.5 h-3.5 inline-block"
+          width="14" height="10"
+          decoding="async"
+          loading="lazy"
+          draggable="false"
+          referrerpolicy="no-referrer"
+        />
+        <span class="text-white/60">BTCUSD</span>
+        <span class="text-secondary font-semibold">${{ btcPrice }}</span>
+      </div>
+
       <!-- Main navbar row -->
-      <div class="px-6 py-4 grid grid-cols-3 items-center">
+      <div class="px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center gap-x-4">
         <!-- Left: Logo -->
         <router-link
           to="/"

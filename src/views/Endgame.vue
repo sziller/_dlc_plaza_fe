@@ -14,12 +14,11 @@
             <a href="https://www.bitcoinbeach.com" target="_blank" rel="noopener noreferrer">Bitcoin Beach</a>
             (El Zonte, El Salvador).
           </strong>
-          Pay in Bitcoin or Lightning at the listed price. Pay in fiat and the price doubles — sound-money discount, in honor of what the book argues for.
+          Pay in Bitcoin.
         </div>
 
         <div class="cta-row">
-          <a href="#download" class="btn btn-primary">Download free PDF</a>
-          <a href="#pricing" class="btn btn-secondary">Order signed copy</a>
+          <a href="/endgame.pdf" class="btn btn-primary">Download free PDF</a>
         </div>
       </div>
     </header>
@@ -51,7 +50,7 @@
       <div class="container">
         <h2 class="section-title">Where the money goes</h2>
         <p>
-          Half of every dollar this book earns is split between two organizations that teach kids to surf — one in Hermosa Beach, California, and one in El Zonte, El Salvador. The flow is automatic. Bitcoin and Lightning payments split on receipt; cash payments are reconciled and transferred quarterly. Quarterly updates are published below.
+          Half of every dollar this book earns is split between two organizations that teach kids to surf — one in Playa Hermosa, Costa Rica, and one in El Zonte, El Salvador. The flow is automatic. Bitcoin payments split on receipt; cash payments are reconciled and transferred quarterly. Quarterly updates are published below.
         </p>
 
         <div class="charity-grid">
@@ -61,10 +60,6 @@
             </div>
             <div class="charity-loc">Playa Hermosa, Costa Rica</div>
             <p class="charity-desc">Through surfing, mentorship, and community, SurfDojo empowers youth in Costa Rica to grow with confidence, resilience, and purpose. The program is built on the philosophy that the ocean is more than a playground — it is a teacher. Donations fund scholarships, transportation, and equipment for kids who would not otherwise have access.</p>
-            <div class="addr-label">Lightning Address</div>
-            <div class="addr-block">surfdojo@cadenabitcoin.com</div>
-            <div class="addr-label" style="margin-top:8px">Bitcoin Address</div>
-            <div class="addr-block">bc1q[REPLACE_WITH_SURFDOJO_ADDRESS]</div>
             <div style="margin-top:14px;font-size:13px"><a href="https://surfdojo.org" target="_blank" rel="noopener noreferrer">surfdojo.org →</a></div>
           </div>
 
@@ -74,11 +69,30 @@
             </div>
             <div class="charity-loc">El Zonte, El Salvador</div>
             <p class="charity-desc">The original Bitcoin community geographic instance, where Bitcoin works as money in daily life. Funds support the kids' surf programs (including <em>Surf Para Todas</em>) that provide instruction, equipment, and water time to local children — built on the same principle: the ocean as teacher, sound money as foundation.</p>
-            <div class="addr-label">Lightning Address</div>
-            <div class="addr-block">bitcoinbeach@cadenabitcoin.com</div>
-            <div class="addr-label" style="margin-top:8px">Bitcoin Address</div>
-            <div class="addr-block">bc1q[REPLACE_WITH_BITCOIN_BEACH_ADDRESS]</div>
             <div style="margin-top:14px;font-size:13px"><a href="https://www.bitcoinbeach.com" target="_blank" rel="noopener noreferrer">bitcoinbeach.com →</a></div>
+          </div>
+        </div>
+
+        <div class="donate-grid">
+          <div class="donate-card">
+            <div class="donate-label">Bitcoin</div>
+            <img class="donate-qr" :src="btcQrUrl" alt="Bitcoin QR code" width="180" height="180" loading="lazy" decoding="async" />
+            <div class="donate-addr-row">
+              <span class="donate-addr-text" :class="{ expanded: btcExpanded }">
+                <template v-if="!btcExpanded">{{ btcAddress.slice(0, 24) }}…</template>
+                <template v-else>{{ btcAddress }}</template>
+              </span>
+              <div class="addr-icons">
+                <button class="addr-icon" @click="btcExpanded = !btcExpanded" :title="btcExpanded ? 'Hide' : 'Show full address'">
+                  <svg v-if="!btcExpanded" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </button>
+                <button class="addr-icon" @click="copy(btcAddress, 'btc')" :title="copied === 'btc' ? 'Copied!' : 'Copy address'">
+                  <svg v-if="copied !== 'btc'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -96,66 +110,10 @@
         </p>
         <div class="cta-row" style="margin-top:8px">
           <a href="/endgame.pdf" class="btn btn-primary">Download PDF</a>
-          <a href="/endgame.epub" class="btn btn-secondary">Download EPUB</a>
         </div>
         <p class="pricing-note" style="margin-top:24px">
-          <strong>Suggested donation:</strong> 21,000 sats via Lightning to <span class="mono-text">endgame@cadenabitcoin.com</span> — splits automatically. 50% to surf programs, 50% to author.
+          <strong>Suggested donation:</strong> 21,000 sats in Bitcoin — splits automatically. 50% to surf programs, 50% to author.
         </p>
-      </div>
-    </section>
-
-    <section id="pricing">
-      <div class="container">
-        <h2 class="section-title">Order a copy</h2>
-        <p>
-          For readers who want the physical book, signed paperbacks and the audiobook are available below. Bitcoin and Lightning payments at the listed price. Fiat payments at double the price — a sound-money discount in honor of what the book argues for.
-        </p>
-
-        <div class="pricing-grid">
-          <div class="price-card">
-            <div class="price-tier">eBook</div>
-            <div class="price-name">Kindle / EPUB</div>
-            <div class="price-rows">
-              <div class="price-row"><span class="label">Bitcoin / Lightning</span><span class="amount btc">21,000 sats</span></div>
-              <div class="price-row"><span class="label">Fiat (Stripe)</span><span class="amount fiat">$15.00</span></div>
-            </div>
-            <a href="#" class="btn btn-secondary" style="width:100%;text-align:center">Buy eBook</a>
-          </div>
-
-          <div class="price-card featured">
-            <div class="price-tier">Recommended</div>
-            <div class="price-name">Signed Paperback</div>
-            <div class="price-rows">
-              <div class="price-row"><span class="label">Bitcoin / Lightning</span><span class="amount btc">$30 in BTC</span></div>
-              <div class="price-row"><span class="label">Fiat (Stripe)</span><span class="amount fiat">$60.00</span></div>
-            </div>
-            <a href="#" class="btn btn-primary" style="width:100%;text-align:center">Buy Signed Paperback</a>
-          </div>
-
-          <div class="price-card">
-            <div class="price-tier">Print on Demand</div>
-            <div class="price-name">Unsigned Paperback (Amazon)</div>
-            <div class="price-rows">
-              <div class="price-row"><span class="label">Amazon list price</span><span class="amount">$24.99</span></div>
-              <div class="price-row"><span class="label">Royalties to surf programs</span><span class="amount btc">~$5.00</span></div>
-            </div>
-            <a href="#" class="btn btn-secondary" style="width:100%;text-align:center">Buy on Amazon</a>
-          </div>
-
-          <div class="price-card">
-            <div class="price-tier">Audio</div>
-            <div class="price-name">Audiobook</div>
-            <div class="price-rows">
-              <div class="price-row"><span class="label">Bitcoin / Lightning</span><span class="amount btc">$20 in BTC</span></div>
-              <div class="price-row"><span class="label">Fiat (Stripe)</span><span class="amount fiat">$40.00</span></div>
-            </div>
-            <span class="placeholder">Coming Q2 2026</span>
-          </div>
-        </div>
-
-        <div class="pricing-note">
-          <strong>Why fiat is double the price.</strong> Because what the book argues for is a world in which money holds its value across time. Pay in the unit that does, get the listed price. Pay in the unit that does not, pay a premium that approximates ten years of fiat debasement up front. The split to charity is the same in both cases.
-        </div>
       </div>
     </section>
 
@@ -167,19 +125,8 @@
           Everyone has a cost of capital. Households have one. Corporations have one. Sovereigns have one. Whether they admit it or not, it determines what they can build, fund, finance, and forego. The current monetary regime distorts this price signal across the entire structure of capital users, in a hierarchy almost nobody questions. This hierarchy is not a function of true credit risk. It is a function of distance from the central bank's spigot.
         </blockquote>
         <p>
-          <a href="/endgame-chapter-18.pdf">Read the full chapter →</a>
+          <a href="/endgame.pdf">Read the full chapter →</a>
         </p>
-      </div>
-    </section>
-
-    <section id="endorsements">
-      <div class="container">
-        <h2 class="section-title">Reviews</h2>
-        <p class="muted">As they come in.</p>
-        <div class="endorsement" style="margin-top:24px">
-          <p>"Reserved for endorsements as they arrive."</p>
-          <cite>— Placeholder. Replace as blurbs land.</cite>
-        </div>
       </div>
     </section>
 
@@ -200,14 +147,29 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
+
+const btcAddress = 'bc1qvt3ytuvch7p5ukqhlxmds2frydk5y7hc8vv2s8c0ax3lmn8jyyqqhef36t'
+const btcQrUrl = computed(() =>
+  `https://api.qrserver.com/v1/create-qr-code/?size=180x180&ecc=M&data=${encodeURIComponent('bitcoin:' + btcAddress)}`
+)
+
+const btcExpanded = ref(false)
+const copied = ref('')
+
+function copy(text, key) {
+  navigator.clipboard.writeText(text)
+  copied.value = key
+  setTimeout(() => { copied.value = '' }, 2000)
+}
 </script>
 
 <style scoped>
   .endgame-page {
-    --bg: #000000;
-    --surface: #0f0f0f;
-    --surface-2: #1a1a1a;
+    --bg: #081123;
+    --surface: #0d1a2e;
+    --surface-2: #112038;
     --border: #2e2e2e;
     --text: #f0f0f0;
     --text-muted: #888888;
@@ -407,6 +369,74 @@ import TheFooter from '../components/TheFooter.vue'
     line-height: 1.6;
   }
   .pricing-note strong { color: var(--accent); font-weight: 600; }
+
+  /* DONATE */
+  .donate-grid {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  .donate-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .donate-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #f97316;
+  }
+  .donate-qr {
+    border-radius: 8px;
+    background: #fff;
+    padding: 8px;
+    display: block;
+  }
+  .donate-addr-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+  }
+  .donate-addr-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #f97316;
+    flex: 1;
+    min-width: 0;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .donate-addr-text.expanded {
+    white-space: normal;
+    word-break: break-all;
+  }
+  .addr-icons {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .addr-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+  }
+  .addr-icon:hover { color: var(--text); }
+  .addr-icon svg { width: 14px; height: 14px; }
 
   /* CHARITY */
   .charity-grid {
