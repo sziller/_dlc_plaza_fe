@@ -34,8 +34,6 @@ const Resources          = () => import('../views/Resources.vue')
 const LoanExplained      = () => import('../views/LoanExplained.vue')
 const LoanExplainedLender = () => import('../views/LoanExplainedLender.vue')
 const Security           = () => import('../views/Security.vue')
-const SazminingLP   = () => import('../views/lp/Sazmining.vue')
-const SazminingShop = () => import('../views/lp/SazminingShop.vue')
 // Blog CMS pages
 const BlogListPage       = () => import('../pages/BlogListPage.vue')
 const BlogPostPage       = () => import('../pages/BlogPostPage.vue')
@@ -173,17 +171,6 @@ const routes = [
   { path: '/loan-explained-lender', name: 'LoanExplainedLender', component: LoanExplainedLender, meta: {
     title: 'Earn Fixed Returns Lending Bitcoin — Cadena',
     description: 'Generate 10% APR fixed returns with Bitcoin-backed lending. Guaranteed USD claims, no volatility exposure, self-enforcing DLC enforcement.',
-    robots: 'index,follow',
-  }},
-  { path: '/sazmining', name: 'SazminingShop', component: SazminingShop, meta: {
-    title: 'Bitcoin-Native Mining Finance — Sazmining × Cadena Bitcoin',
-    description: 'Get a running Bitcoin miner today. Financed by Cadena Bitcoin — non-custodial DLC loan, repay $5,000 in one year.',
-    robots: 'noindex,nofollow',
-  }},
-  // Sazmining Partnership Landing Page
-  { path: '/lp/sazmining', name: 'SazminingLP', component: SazminingLP, meta: {
-    title: 'Bitcoin Mining with Cadena + Sazmining — Leverage BTC for Mining',
-    description: 'Borrow against your Bitcoin to fund mining equipment. Self-custodial DLC loans, 100% renewable hosting, keep your BTC upside + earn mining rewards.',
     robots: 'index,follow',
   }},
   { path: '/cadena-paper', name: 'CadenaPaper', component: TechnicalOverview, meta: {

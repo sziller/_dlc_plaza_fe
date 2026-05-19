@@ -710,12 +710,6 @@ onBeforeUnmount(() => {
             <p class="inst-card-desc">Non-custodial liquidity without selling</p>
             <span class="inst-card-link">View →</span>
           </router-link>
-          <router-link to="/sazmining" class="inst-card">
-            <div class="inst-card-badge inst-card-badge-lend">Mine</div>
-            <div class="inst-card-amount">130 rigs</div>
-            <p class="inst-card-desc">Mining flywheel via Sazmining + Cadena</p>
-            <span class="inst-card-link">View →</span>
-          </router-link>
         </div>
 
         <!-- Kevin -->

@@ -55,7 +55,7 @@ const {
 
 const EXCLUDED_PATHS = new Set(['/login', '/loginpage', '/register', '/admin/login', '/signerapp'])
 
-const hideChrome = computed(() => route.path === '/sazmining')
+const hideChrome = computed(() => false)
 
 const exitIntentEnabled = computed(() => {
   return !isLoggedIn.value && !EXCLUDED_PATHS.has(route.path)
