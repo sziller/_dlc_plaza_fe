@@ -376,9 +376,12 @@ import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
-import { getPrice } from '../api/price' // ⬅️ oracle price helper
+import { getPrice } from '../api/price'
+import { useOracle } from '../composables/useOracle'
 import { formatBtcValue } from '../functions/amount_formatting'
 import { isSignerAuthCode } from '../lib/authCode'
+
+const { selectedOracleId } = useOracle()
 
 /** ---- Emits (kept for the Retry button in the template) ---- */
 const emit = defineEmits(['retry'])
@@ -430,7 +433,7 @@ const fetchBTCPrice = async () => {
   try {
     // getPrice is typed Promise<number>, but be defensive in case
     // the implementation returns a JSON object instead.
-    const raw = await getPrice()
+    const raw = await getPrice(selectedOracleId.value)
 
     let usd = null
 

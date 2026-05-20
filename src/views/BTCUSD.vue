@@ -16,23 +16,30 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, watchEffect } from 'vue'
 import MarketOverviewTable from '../components/MarketOverviewTable.vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 import { notifySlackNewBtcusdUser } from '../api/slackNotify'
 
-const { setUserFromApi } = useAuth()
+const { user, setUserFromApi } = useAuth()
 
 onMounted(() => {
   setUserFromApi()
-  notifySlackNewBtcusdUser()
 
   // Fire X conversion event for dashboard view
   if (typeof window !== 'undefined' && window.twq) {
     window.twq('event', 'tw-prcqf-qvn13', {
       email_address: null
     })
+  }
+})
+
+// Fire Slack notification once user is resolved (requires signed-in user)
+watchEffect(() => {
+  const email = user.value?.payload?.email ?? user.value?.email ?? 'unknown'
+  if (email && email !== 'unknown') {
+    notifySlackNewBtcusdUser(email)
   }
 })
 </script>

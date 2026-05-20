@@ -230,7 +230,7 @@ import { getToken } from '../api/token'
 import { postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
 import { generateIdempotencyKey } from '../lib/idempotencyKey'
 import { formatBtcValue } from '../functions/amount_formatting'
-import { DEFAULT_ORACLE } from '../config'
+import { useOracle } from '../composables/useOracle'
 import { postProductQueryV0 } from '../api/productQuery' // ApiEnvelope<ProductLendBorrowDtoLtd[]>
 
 const props = defineProps({
@@ -244,6 +244,7 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const { selectedOracleId } = useOracle()
 
 // ---- Staging detection (prod = any cadenabitcoin.com except staging.cadenabitcoin.com) ----
 const IS_STAGING = (() => {
@@ -536,7 +537,7 @@ async function handleOrderSubmit(data) {
     await postLiquidityAllocationV1({
       ini_role: String(data.action || '').toLowerCase(),
       interest,
-      oracle: [DEFAULT_ORACLE],
+      oracle: [selectedOracleId.value],
       base_product: buildProductId(days, ltv, cntr),
       liquidity_sat: 0,
     }, currentIdempotencyKey.value)

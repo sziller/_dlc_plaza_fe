@@ -1,5 +1,8 @@
 import { getReferralCookie } from '../lib/referral'
 
+const IS_LOCAL = typeof location !== 'undefined'
+  && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+
 const WEBHOOK_URL = import.meta.env.VITE_SLACK_COLLATERAL_WEBHOOK_URL as string | undefined
 
 let hasFiredThisSession = false
@@ -10,8 +13,10 @@ export function notifySlackCollateralShortfall(
   availableSats: number,
   requiredSats: number,
 ) {
+  if (IS_LOCAL) return
   if (hasFiredThisSession) return
   if (!WEBHOOK_URL) return
+  if (!email || email === 'unknown') return
 
   hasFiredThisSession = true
 
@@ -46,9 +51,11 @@ export function notifySlackCollateralShortfall(
   })
 }
 
-export function notifySlackNewBtcusdUser() {
+export function notifySlackNewBtcusdUser(email: string) {
+  if (IS_LOCAL) return
   if (localStorage.getItem('cadena:btcusd-visited')) return
   if (!WEBHOOK_URL) return
+  if (!email || email === 'unknown') return
 
   localStorage.setItem('cadena:btcusd-visited', Date.now().toString())
 
@@ -65,6 +72,7 @@ export function notifySlackNewBtcusdUser() {
   const text = [
     ':wave: *New User on /btcusd*',
     '',
+    `*User:* ${email}`,
     `*URL:* ${window.location.href}`,
     `*Referral:* ${referral}`,
     `*UTM:* ${utmStr}`,
