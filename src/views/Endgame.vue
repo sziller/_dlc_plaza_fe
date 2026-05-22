@@ -110,10 +110,24 @@
         </p>
         <div class="cta-row" style="margin-top:8px">
           <a href="/endgame.pdf" class="btn btn-primary">Download PDF</a>
+          <a href="#buy" class="btn btn-secondary" @click.prevent="scrollToBuy">Order physical copy →</a>
         </div>
         <p class="pricing-note" style="margin-top:24px">
           <strong>Suggested donation:</strong> 21,000 sats in Bitcoin — splits automatically. 50% to surf programs, 50% to author.
         </p>
+      </div>
+    </section>
+
+    <section id="buy">
+      <div class="container">
+        <h2 class="section-title">Order a physical copy</h2>
+        <p>
+          $29.99 USD · Printed on demand via Lulu Press · Shipped worldwide · <strong>Paid in Bitcoin</strong>.
+          50% of the cover price goes to the surf programs above.
+        </p>
+        <div class="buy-layout">
+          <BookCheckout />
+        </div>
       </div>
     </section>
 
@@ -149,6 +163,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
+import BookCheckout from '../components/BookCheckout.vue'
 
 const btcAddress = 'bc1qvt3ytuvch7p5ukqhlxmds2frydk5y7hc8vv2s8c0ax3lmn8jyyqqhef36t'
 const btcQrUrl = computed(() =>
@@ -162,6 +177,10 @@ function copy(text, key) {
   navigator.clipboard.writeText(text)
   copied.value = key
   setTimeout(() => { copied.value = '' }, 2000)
+}
+
+function scrollToBuy() {
+  document.getElementById('buy')?.scrollIntoView({ behavior: 'smooth' })
 }
 </script>
 
@@ -500,6 +519,12 @@ function copy(text, key) {
   .endorsement p { font-family: var(--serif); font-style: italic; font-size: 17px; margin-bottom: 12px; }
   .endorsement cite { font-style: normal; color: var(--text-muted); font-size: 14px; }
   .endorsement cite strong { color: var(--text); font-weight: 600; }
+
+  /* BUY SECTION */
+  .buy-layout {
+    max-width: 560px;
+    margin-top: 28px;
+  }
 
   /* MISC */
   a { color: var(--accent); }

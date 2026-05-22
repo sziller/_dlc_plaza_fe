@@ -2,203 +2,238 @@
   <main class="min-h-screen w-full text-white pt-20 md:pt-32 relative">
     <div class="absolute inset-0 -z-10 bg-page-gradient"></div>
 
-    <!-- 1. Header -->
-    <section class="max-w-4xl mx-auto text-center mb-16 px-6">
+    <!-- H1 + Intro -->
+    <section class="max-w-4xl mx-auto text-center mb-20 px-6">
       <span class="inline-block text-sm font-semibold tracking-wide uppercase text-secondary mb-4 border border-secondary/40 rounded-full px-4 py-1">
-        Security &amp; Self-Custody
+        Risk Model &amp; Security
       </span>
       <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-        Your Bitcoin stays in your hands.
+        How Cadena protects your Bitcoin
       </h1>
-      <p class="text-tertiary text-lg md:text-xl max-w-2xl mx-auto">
-        Cadena uses Discreet Log Contracts to keep you in control of your keys at every step.
-        No custodians, no middlemen, no counterparty risk.
+      <p class="text-white text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+        Cadena is built on a simple principle: no one should be able to take your Bitcoin —
+        not Cadena, not a counterparty, not a failed price feed, not a platform outage.
+      </p>
+      <p class="text-white text-base max-w-2xl mx-auto mt-4 leading-relaxed">
+        This page explains how that holds up under pressure. Read the first few sections for the plain-language version.
+        The links at the bottom go as deep as you want — open-source code, the on-chain proof, and a full security memo
+        built for institutional risk teams.
       </p>
     </section>
 
-    <!-- 2. Big statement card -->
-    <section class="max-w-4xl mx-auto px-6 mb-20">
-      <div class="relative rounded-2xl p-[1px] bg-gradient-to-br from-secondary via-secondary/40 to-transparent">
-        <div class="rounded-2xl bg-dark px-8 py-10 md:px-12 md:py-14 text-center">
-          <p class="text-2xl md:text-3xl font-bold leading-snug">
-            Cadena never holds your Bitcoin.
+    <!-- Section 1: Foundation -->
+    <section class="max-w-4xl mx-auto px-6 mb-20 fade-in-el">
+      <h2 class="text-2xl md:text-3xl font-extrabold mb-4 leading-snug">
+        The foundation: your Bitcoin never leaves a contract you can verify
+      </h2>
+      <p class="text-white mb-8 leading-relaxed">
+        When you use Cadena, your Bitcoin is committed to a Discreet Log Contract (DLC) on Bitcoin's base layer.
+        Not a Cadena wallet. Not a pooled account. A contract on Bitcoin's blockchain that you can verify yourself.
+      </p>
+      <div class="space-y-5">
+        <div v-for="(item, i) in foundationPoints" :key="i" class="flex items-start gap-4">
+          <div class="flex-shrink-0 w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center mt-0.5">
+            <svg class="w-4 h-4 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="text-white leading-relaxed">
+            <span class="font-semibold text-white">{{ item.title }}</span> {{ item.desc }}
+          </div>
+        </div>
+      </div>
+      <p class="mt-8 text-white text-sm border-l-2 border-secondary/40 pl-4 leading-relaxed">
+        This is the structural difference between Cadena and the lenders that failed in 2022.
+        They held customer keys. Cadena never does.
+      </p>
+    </section>
+
+    <!-- Section 2: Oracle (featured) -->
+    <section class="mb-20 fade-in-el">
+      <div class="max-w-4xl mx-auto px-6">
+        <div class="rounded-2xl border border-secondary/30 bg-secondary/[0.07] p-8 md:p-10">
+          <div class="mb-5">
+            <span class="inline-block text-xs font-semibold tracking-wide uppercase text-secondary border border-secondary/40 rounded-full px-3 py-0.5">
+              Key mechanism
+            </span>
+          </div>
+          <h2 class="text-2xl md:text-3xl font-extrabold mb-4 leading-snug">
+            The Oracle: how settlement price is determined
+          </h2>
+          <p class="text-white mb-6 leading-relaxed">
+            A Cadena contract settles at maturity based on the BTC/USD price. Something has to report that price.
+            That something is the oracle — and because it matters, here is exactly how it works.
           </p>
-          <p class="text-tertiary mt-4 text-base md:text-lg max-w-xl mx-auto">
-            Your collateral is locked in a Discreet Log Contract on the Bitcoin blockchain &mdash;
-            not on our servers, not in a multisig we control, and not on a sidechain.
+          <p class="text-white font-semibold mb-4">Cadena uses the DLCP Oracle. It is:</p>
+          <div class="space-y-4 mb-7">
+            <div v-for="(point, i) in oraclePoints" :key="i" class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-7 h-7 rounded-md bg-secondary/20 flex items-center justify-center mt-0.5">
+                <svg class="w-3.5 h-3.5 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="text-white leading-relaxed">
+                <span class="font-semibold text-white">{{ point.title }}</span> {{ point.desc }}
+              </div>
+            </div>
+          </div>
+          <p class="text-white mb-7 leading-relaxed">
+            <span class="font-semibold text-white">The oracle selects; it does not authorize.</span>
+            This is the key point. Every settlement outcome is already pre-signed before the oracle does anything.
+            The oracle's only job at maturity is to point at which of the pre-signed transactions broadcasts.
+            It cannot invent an outcome, refuse to settle, or move your Bitcoin.
           </p>
+
+          <!-- Oracle failure callout box -->
+          <div class="rounded-xl border border-white/10 bg-black/30 p-6">
+            <h3 class="font-bold text-white mb-3">What happens if the oracle fails?</h3>
+            <p class="text-white leading-relaxed mb-3">
+              If the oracle goes offline or fails to publish at maturity, a refund timelock path activates.
+              After a defined window, a pre-signed refund transaction returns the Bitcoin to both parties —
+              the lender's principal and the borrower's collateral go home. This path is enforced by Bitcoin script;
+              it does not require Cadena's cooperation or the oracle's. A silent oracle cannot trap your Bitcoin.
+            </p>
+            <p class="text-white text-sm leading-relaxed">
+              For larger institutional contracts, Cadena's roadmap includes multi-oracle attestation
+              (settlement contingent on 2-of-3 or 3-of-5 independent oracles), further reducing single-oracle risk.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 3. How it works -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-12">How it works</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div
-          v-for="(step, i) in howItWorks"
+    <!-- Section 3: No margin calls -->
+    <section class="max-w-4xl mx-auto px-6 mb-20 fade-in-el">
+      <h2 class="text-2xl md:text-3xl font-extrabold mb-4 leading-snug">
+        No margin calls, no forced liquidations
+      </h2>
+      <p class="text-white mb-4 leading-relaxed">
+        A Cadena contract has no in-term liquidation mechanism. There is no margin call.
+        There is no liquidation bot watching the price.
+      </p>
+      <p class="text-white mb-4 leading-relaxed">
+        Settlement is a single event at maturity. During the term, the contract is locked —
+        no party, including Cadena, can move the other party's Bitcoin or trigger an early settlement.
+        Whatever Bitcoin does between funding and maturity, the outcome is decided once, at the end,
+        by the pre-signed transaction matching the oracle's attested price.
+      </p>
+      <p class="text-white leading-relaxed">
+        For a borrower, this means no risk of being liquidated by a temporary price swing.
+        For a lender, it means no path risk during the term — the outcome depends only on the price at maturity.
+      </p>
+    </section>
+
+    <!-- Section 4: Gap risk -->
+    <section class="max-w-4xl mx-auto px-6 mb-20 fade-in-el">
+      <h2 class="text-2xl md:text-3xl font-extrabold mb-4 leading-snug">
+        Gap risk, honestly
+      </h2>
+      <p class="text-white mb-4 leading-relaxed">
+        Cadena's contract pool is sized to cover the lender's full dollar-denominated target down to a 50% drop
+        in Bitcoin's price between funding and maturity. That covers the overwhelming majority of historical scenarios.
+      </p>
+      <p class="text-white mb-4 leading-relaxed">
+        If Bitcoin falls more than 50% over the contract term, the pool is no longer sufficient to cover the lender's
+        full target — the lender absorbs the shortfall. This is gap risk, and we state it plainly rather than hide it.
+        It is hedgeable: a lender can purchase a put option struck near the 50% threshold to cap the downside.
+        The construction is detailed in the Security &amp; Operations Memo linked below.
+      </p>
+      <p class="text-white leading-relaxed">
+        No Bitcoin credit product eliminates all risk. Cadena's design eliminates custody risk,
+        counterparty-discretion risk, rehypothecation risk, and margin-call risk by structure.
+        Gap risk is the one that remains — and it is bounded, disclosed, and hedgeable.
+      </p>
+    </section>
+
+    <!-- Section 5: Verify it yourself (3 cards) -->
+    <section class="max-w-5xl mx-auto px-6 mb-20 fade-in-el">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-center mb-3">Verify it yourself</h2>
+      <p class="text-white text-center max-w-xl mx-auto mb-10 leading-relaxed">
+        Cadena's security claims are not things you have to take on trust. They are verifiable.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a
+          v-for="(card, i) in verifyCards"
           :key="i"
-          class="sec-card rounded-xl p-6 flex gap-5 items-start fade-in-el"
-        >
-          <span class="flex-shrink-0 w-10 h-10 rounded-full bg-secondary/20 text-secondary font-bold flex items-center justify-center text-lg">
-            {{ i + 1 }}
-          </span>
-          <div>
-            <h3 class="text-lg font-semibold mb-1">{{ step.title }}</h3>
-            <p class="text-white/70 text-sm leading-relaxed">{{ step.desc }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. The Signer App -->
-    <section class="max-w-6xl mx-auto px-6 mb-20">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-12">The Signer App</h2>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Left: feature card -->
-        <div class="sec-card rounded-xl p-8 fade-in-el">
-          <h3 class="text-xl font-bold mb-4">Your keys live on your phone</h3>
-          <p class="text-white/70 text-sm mb-6">
-            The Cadena Signer App generates and stores your private keys locally.
-            Keys never leave your device.
-          </p>
-          <ul class="space-y-3">
-            <li v-for="(f, fi) in signerFeatures" :key="fi" class="flex items-start gap-3">
-              <svg class="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-              </svg>
-              <span class="text-sm text-white/80">{{ f }}</span>
-            </li>
-          </ul>
-        </div>
-        <!-- Right: stat cards -->
-        <div class="grid grid-cols-2 gap-4">
-          <div
-            v-for="(s, si) in signerStats"
-            :key="si"
-            class="sec-card rounded-xl p-6 text-center flex flex-col items-center justify-center fade-in-el"
-          >
-            <span class="text-3xl md:text-4xl font-extrabold text-secondary">{{ s.value }}</span>
-            <span class="text-xs text-white/60 mt-2 uppercase tracking-wide">{{ s.label }}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. Why DLCs change everything -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-12">Why DLCs change everything</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div
-          v-for="(card, ci) in dlcCards"
-          :key="ci"
-          class="sec-card rounded-xl p-6 fade-in-el"
+          :href="card.href"
+          :target="card.external ? '_blank' : '_self'"
+          :rel="card.external ? 'noopener noreferrer' : undefined"
+          class="verify-card rounded-xl p-6 flex flex-col group"
         >
           <div class="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center mb-4 text-xl">
             {{ card.icon }}
           </div>
-          <h3 class="text-lg font-semibold mb-2">{{ card.title }}</h3>
-          <p class="text-white/70 text-sm leading-relaxed">{{ card.desc }}</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6. Cadena vs. the rest -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-12">Cadena vs. the rest</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-white/10">
-              <th class="py-4 px-4 text-white/50 font-medium">Feature</th>
-              <th class="py-4 px-4 text-secondary font-semibold">Cadena</th>
-              <th class="py-4 px-4 text-white/50 font-medium">BlockFi / Celsius</th>
-              <th class="py-4 px-4 text-white/50 font-medium">Traditional Bank</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, ri) in comparisonRows" :key="ri" class="border-b border-white/[0.06]">
-              <td class="py-4 px-4 text-white/80">{{ row.feature }}</td>
-              <td class="py-4 px-4 text-white font-medium">{{ row.cadena }}</td>
-              <td class="py-4 px-4 text-white/60">{{ row.cefi }}</td>
-              <td class="py-4 px-4 text-white/60">{{ row.bank }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- 7. FAQ -->
-    <section class="max-w-4xl mx-auto px-6 mb-20">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-center mb-12">Security FAQ</h2>
-      <div class="space-y-3">
-        <div v-for="(item, i) in faqs" :key="i" class="rounded-md border border-white/10 bg-dark overflow-hidden">
-          <button
-            class="w-full flex items-center justify-between gap-3 text-left p-4"
-            @click="toggle(i)"
-            :aria-expanded="isOpen(i)"
-            :aria-controls="`sec-faq-panel-${i}`"
-          >
-            <h3 class="text-lg font-medium">{{ item.q }}</h3>
-            <svg class="size-5 shrink-0 transition-transform duration-300" :class="isOpen(i) ? '-rotate-180' : ''" xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          <h3 class="font-bold text-white mb-2">{{ card.title }}</h3>
+          <p class="text-white text-sm leading-relaxed mb-5 flex-1">{{ card.desc }}</p>
+          <span class="text-secondary text-sm font-medium inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all duration-150">
+            {{ card.linkText }}
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
             </svg>
-          </button>
-          <transition @enter="onEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave" @leave="onLeave" @after-leave="onAfterLeave">
-            <div v-show="isOpen(i)" :id="`sec-faq-panel-${i}`" role="region" class="faq-panel">
-              <div class="px-4 pt-3 pb-5 text-white/90 leading-relaxed">
-                {{ item.a }}
-              </div>
+          </span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Section 6: For institutional risk teams -->
+    <section class="mb-20 fade-in-el">
+      <div class="max-w-5xl mx-auto px-6">
+        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-8 md:p-12">
+          <span class="inline-block text-xs font-semibold tracking-wide uppercase text-white border border-white/15 rounded-full px-3 py-0.5 mb-6">
+            For Institutional Risk Teams
+          </span>
+          <h2 class="text-2xl md:text-3xl font-extrabold mb-4 leading-snug">
+            The Security &amp; Operations Memo
+          </h2>
+          <p class="text-white mb-6 leading-relaxed">
+            The Security &amp; Operations Memo is written specifically for balance-sheet providers and institutional
+            risk officers evaluating Cadena. It covers, in depth:
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 mb-8">
+            <div v-for="(item, i) in institutionalPoints" :key="i" class="flex items-start gap-3">
+              <svg class="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-white text-sm leading-relaxed">{{ item }}</span>
             </div>
-          </transition>
+          </div>
+          <p class="text-white text-sm mb-8 leading-relaxed">
+            The full diligence package — including code repository access, mainnet transaction history,
+            regulatory documentation, and counterparty profiles — is available within 48 hours of an institutional request.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <router-link
+              to="/contact"
+              class="inline-flex items-center justify-center rounded-full bg-secondary px-7 py-3 text-sm font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
+            >
+              Request the diligence package
+            </router-link>
+            <router-link
+              to="/contact"
+              class="inline-flex items-center justify-center rounded-full border border-white/20 px-7 py-3 text-sm font-semibold text-white transition hover:border-white/40 focus:ring-4 focus:ring-white/10 focus:outline-none"
+            >
+              Talk to the founder
+            </router-link>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- 8. Trust bar -->
-    <section class="max-w-5xl mx-auto px-6 mb-20">
-      <div class="flex flex-wrap justify-center gap-6 md:gap-10">
-        <div
-          v-for="(t, ti) in trustSignals"
-          :key="ti"
-          class="flex items-center gap-2 text-sm text-white/70"
-        >
-          <svg class="w-5 h-5 text-secondary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.351.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-          </svg>
-          <span>{{ t }}</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 9. CTA block -->
-    <section class="max-w-4xl mx-auto px-6 pb-20 text-center">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
-        Keep your Bitcoin. Unlock its value.
-      </h2>
-      <p class="text-tertiary text-lg mb-8 max-w-xl mx-auto">
-        Get started with a self-custody loan in minutes. No banks, no custodians, no counterparty risk.
+    <!-- Closing line -->
+    <section class="max-w-4xl mx-auto px-6 pb-28 text-center fade-in-el">
+      <p class="text-white text-base md:text-lg leading-relaxed">
+        Sound money deserves sound infrastructure. Every claim on this page is verifiable on Bitcoin's blockchain
+        or in open-source code. If something here doesn't hold up to your scrutiny, we want to hear about it.
       </p>
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <router-link
-          to="/register"
-          class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3 text-base font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
-        >
-          Get Started
-        </router-link>
-        <router-link
-          to="/loan-explained"
-          class="inline-flex items-center justify-center rounded-full border border-white/20 px-8 py-3 text-base font-semibold text-white transition hover:border-white/40 focus:ring-4 focus:ring-white/10 focus:outline-none"
-        >
-          How It Works
-        </router-link>
-      </div>
     </section>
   </main>
+
+  <TheFooter />
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
+import TheFooter from '../components/TheFooter.vue'
 
 onMounted(() => {
   window.scrollTo(0, 0)
@@ -209,7 +244,6 @@ onUnmounted(() => {
   if (observer) observer.disconnect()
 })
 
-// ─── Intersection Observer for fade-in ───
 let observer = null
 function initObserver() {
   const els = document.querySelectorAll('.fade-in-el')
@@ -222,152 +256,79 @@ function initObserver() {
         }
       })
     },
-    { rootMargin: '0px 0px -10% 0px', threshold: 0.08 }
+    { rootMargin: '0px 0px -10% 0px', threshold: 0.06 }
   )
   els.forEach((el) => observer.observe(el))
 }
 
-// ─── Data arrays ───
-
-const howItWorks = [
+const foundationPoints = [
   {
-    title: 'Keys stay on your phone',
-    desc: 'The Cadena Signer App generates your private keys locally. They never leave your device and are never shared with Cadena or anyone else.',
+    title: 'Cadena holds no key.',
+    desc: 'At no point can Cadena move, freeze, or seize your Bitcoin.',
   },
   {
-    title: 'DLC contract is signed',
-    desc: 'You and the lender each sign a Discreet Log Contract on the Bitcoin blockchain. The contract defines all possible outcomes at maturity.',
+    title: 'Every outcome is pre-signed at funding.',
+    desc: "Before any Bitcoin moves, both parties sign every possible settlement transaction. The contract's full lifecycle is mathematically determined before it begins.",
   },
   {
-    title: 'No margin calls, ever',
-    desc: 'DLCs pre-compute every payout scenario at contract creation. There are no margin calls and no forced liquidations during the loan term.',
-  },
-  {
-    title: 'On-chain settlement',
-    desc: 'At maturity, an oracle attests to the BTC/USD price and the contract settles automatically on-chain. No human intervention required.',
+    title: 'No commingling.',
+    desc: "Each contract sits in its own unique on-chain pool. Your Bitcoin is never lent to a third party or used as collateral for anything else.",
   },
 ]
 
-const signerFeatures = [
-  'Private keys generated and stored on your device',
-  'Keys never transmitted to Cadena servers',
-  'Signs DLC contracts directly from your phone',
-  'Open-source and auditable',
-]
-
-const signerStats = [
-  { value: '100%', label: 'Self-custody' },
-  { value: '0', label: 'Keys held by Cadena' },
-  { value: 'DLC', label: 'Contract type' },
-  { value: 'L1', label: 'Bitcoin layer' },
-]
-
-const dlcCards = [
+const oraclePoints = [
   {
-    icon: '\u20BF',
-    title: 'Bitcoin-native',
-    desc: 'DLCs run on Bitcoin Layer 1. No sidechains, no wrapped tokens, no bridges. Your Bitcoin stays on the Bitcoin network.',
+    title: 'Independent of Cadena.',
+    desc: 'Separate operating entity, separate key infrastructure. Cadena cannot influence what the oracle reports.',
   },
   {
-    icon: '\u2699',
-    title: 'Pre-computed outcomes',
-    desc: 'Every possible settlement outcome is calculated and signed before the contract is funded. No surprises, no discretion.',
+    title: 'Multi-source.',
+    desc: 'The oracle aggregates BTC/USD prices from multiple independent exchanges, with publicly documented methodology. No single exchange can move the settlement price.',
   },
   {
-    icon: '\u26A1',
-    title: 'No margin calls',
-    desc: 'Because all outcomes are pre-signed, there is no mechanism for margin calls or forced liquidations during the contract term.',
-  },
-  {
-    icon: '\u2713',
-    title: 'Publicly verifiable',
-    desc: 'All contract transactions are recorded on the Bitcoin blockchain. Anyone can independently verify the contract state.',
+    title: 'Cryptographically pre-committed.',
+    desc: "The oracle publishes its public key when your contract is funded. Any attestation it makes later is verifiable against that key — it cannot retroactively change a price without the change being detectable on-chain.",
   },
 ]
 
-const comparisonRows = [
-  { feature: 'Custody model', cadena: 'Self-custody (DLC)', cefi: 'Custodial', bank: 'Custodial' },
-  { feature: 'Margin calls', cadena: 'None', cefi: 'Yes', bank: 'N/A' },
-  { feature: 'Forced liquidation', cadena: 'None', cefi: 'Yes', bank: 'Yes (collateral seizure)' },
-  { feature: 'Counterparty risk', cadena: 'Minimized', cefi: 'High (bankruptcy risk)', bank: 'Moderate' },
-  { feature: 'Blockchain', cadena: 'Bitcoin L1', cefi: 'Various / off-chain', bank: 'None' },
-  { feature: 'Key control', cadena: 'You hold keys', cefi: 'Platform holds keys', bank: 'N/A' },
-]
-
-const faqs = [
+const verifyCards = [
   {
-    q: 'What is a Discreet Log Contract (DLC)?',
-    a: 'A DLC is a type of smart contract built on Bitcoin that enables two parties to make conditional payments based on an oracle-attested outcome. All possible payouts are pre-signed before funding, so neither party can change the terms after the contract is live.',
+    icon: '⌥',
+    title: 'Open-source Signer App',
+    desc: 'The software that handles your keys is fully open-source. Read the code. Build it yourself. Verify that key generation, signing, and KYC do exactly what we describe.',
+    linkText: 'github.com/CadenaWizard/cryptlib',
+    href: 'https://github.com/CadenaWizard/cryptlib',
+    external: true,
   },
   {
-    q: 'Does Cadena ever have access to my private keys?',
-    a: 'No. Your private keys are generated and stored locally on your device by the Cadena Signer App. They are never transmitted to Cadena or any third party.',
+    icon: '⛓',
+    title: 'On-chain proof',
+    desc: "An early Cadena contract settled on Bitcoin’s mainnet on May 9, 2026 — funded Nov 2025, 6-month term. The architecture executed exactly per the pre-signed structure.",
+    linkText: 'Verify the settlement transaction',
+    href: '#',
+    external: false,
   },
   {
-    q: 'What happens if the price of Bitcoin drops significantly?',
-    a: 'Because DLCs pre-compute all possible outcomes, there are no margin calls or forced liquidations. The contract settles at maturity based on the oracle-attested price, regardless of price movements during the term.',
-  },
-  {
-    q: 'How is the settlement price determined?',
-    a: 'An independent oracle attests to the BTC/USD price at the contract maturity date. This attestation triggers the automatic on-chain settlement of the DLC.',
-  },
-  {
-    q: 'Is the Signer App open source?',
-    a: 'Yes. The Cadena Signer App is open-source and publicly auditable. You can review the code to verify that keys are generated and stored securely on your device.',
+    icon: '📄',
+    title: 'Security & Operations Memo',
+    desc: 'A full institutional-grade memo covering collateral security, oracle architecture, settlement mechanics, failure-mode coverage, and gap-risk hedging.',
+    linkText: 'Read the Security & Operations Memo',
+    href: '/Security Operations Memo.pdf',
+    external: false,
   },
 ]
 
-const trustSignals = [
-  'Keys on your device',
-  'No margin calls',
-  'No liquidations',
-  'DLC contracts',
-  'El Salvador licensed',
+const institutionalPoints = [
+  'Collateral security architecture and the pre-signed CET structure',
+  'Oracle architecture, redundancy, and failure-mode handling',
+  'Settlement mechanics and what happens in every operational failure scenario',
+  'Gap-risk quantification and hedge construction',
+  'Regulatory posture (El Salvador BSP, Sumsub KYC on-device)',
+  'A line-by-line diligence checklist with independent verification paths',
 ]
-
-// ─── FAQ accordion (same pattern as FAQ.vue) ───
-
-const openSet = ref(new Set([0]))
-const isOpen = (i) => openSet.value.has(i)
-function toggle(i) {
-  const s = new Set(openSet.value)
-  s.has(i) ? s.delete(i) : s.add(i)
-  openSet.value = s
-}
-
-function onEnter(el) {
-  el.style.height = '0px'
-  el.style.opacity = '0'
-  el.style.willChange = 'height,opacity'
-  void el.offsetHeight
-  el.style.transition = 'height 300ms cubic-bezier(.22,.61,.36,1), opacity 220ms ease-out'
-  el.style.height = el.scrollHeight + 'px'
-  el.style.opacity = '1'
-}
-function onAfterEnter(el) {
-  el.style.transition = ''
-  el.style.height = 'auto'
-  el.style.willChange = ''
-}
-function onBeforeLeave(el) {
-  el.style.height = el.scrollHeight + 'px'
-  el.style.opacity = '1'
-  el.style.willChange = 'height,opacity'
-  void el.offsetHeight
-}
-function onLeave(el) {
-  el.style.transition = 'height 300ms cubic-bezier(.22,.61,.36,1), opacity 200ms ease-in'
-  el.style.height = '0px'
-  el.style.opacity = '0'
-}
-function onAfterLeave(el) {
-  el.style.transition = ''
-  el.style.willChange = ''
-}
 </script>
 
 <style scoped>
-/* Page background: same gradient as FAQ.vue */
 .bg-page-gradient {
   background-color: #000;
   background-image:
@@ -407,16 +368,16 @@ function onAfterLeave(el) {
   }
 }
 
-/* Section cards */
-.sec-card {
+.verify-card {
   background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.verify-card:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(103,56,228,0.35);
 }
 
-/* FAQ panel */
-.faq-panel { overflow: hidden; background: transparent; border: 0; }
-
-/* Fade-in animation */
 .fade-in-el {
   opacity: 0;
   transform: translateY(16px);

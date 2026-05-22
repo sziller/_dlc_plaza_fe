@@ -90,6 +90,13 @@ const { isLoggedIn, setUserFromApi } = useAuth()
 
 const articles = [
   {
+    id: 0,
+    title: 'Security & Risk Model',
+    description: 'How Cadena manages oracle risk, gap risk, and liquidation — with on-chain verification.',
+    imageBase: 'article10',
+    link: '/security'
+  },
+  {
     id: 1,
     title: 'Cadena & Decentralized Finance',
     description: 'What makes Cadena Bitcoin different from centralized lenders and sidechains.',

@@ -11,9 +11,18 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
   server: {
+    port: 3000,
     proxy: {
       '/app': {
-        target: 'http://127.0.0.1:8000',
+        target: 'https://staging.purabitcoin.com',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/webhook': {
+        target: 'http://localhost:3001',
         changeOrigin: true,
       },
     },

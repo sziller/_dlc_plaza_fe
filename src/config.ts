@@ -12,6 +12,7 @@ if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
 }
 export { API_URL };
 export const DEFAULT_ORACLE = 'oracle_dlcp';
+export const DEFAULT_SYMBOL = 'BTCUSD';
 
 export const ORACLE_LABELS = {
   oracle_dlcp: 'DLCP Oracle',

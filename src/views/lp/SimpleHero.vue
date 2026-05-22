@@ -481,9 +481,12 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div class="text-center mt-8">
+        <div class="text-center mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <router-link :to="heroCtaTo" class="cta-primary inline-flex">
             {{ howItWorksTab === 'borrow' ? 'Build your borrower scenario →' : 'Build your lender scenario →' }}
+          </router-link>
+          <router-link to="/security" class="text-secondary text-sm font-semibold hover:underline">
+            Read more about the risk model →
           </router-link>
         </div>
       </div>
@@ -516,6 +519,11 @@ onBeforeUnmount(() => {
             <h3 class="text-base font-bold mb-2 text-white">{{ feat.title }}</h3>
             <p class="text-sm text-white leading-relaxed">{{ feat.desc }}</p>
           </div>
+        </div>
+        <div class="text-center mt-8">
+          <router-link to="/security" class="text-secondary text-sm font-semibold hover:underline">
+            Read more about the risk model →
+          </router-link>
         </div>
       </div>
     </section>

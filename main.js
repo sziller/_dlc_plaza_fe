@@ -5,6 +5,8 @@ import './src/index.css';
 import { installSeo } from './src/plugins/seo.js'
 import { installStructuredData } from './src/plugins/structured-data.js'
 import './src/api/axiosSetup'
+import { loadSavedToken } from './src/blogApi/auth'
+loadSavedToken()
 import {
   captureReferralFromURL,
   purgeLegacyReferralCookies,

@@ -143,7 +143,7 @@ import { postLiquidityAllocation, postLiquidityAllocationV1, getLiquidityMarket 
 import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
-import { DEFAULT_ORACLE, oracleDisplayName } from '../config'
+import { useOracle } from '../composables/useOracle'
 import { generateIdempotencyKey } from '../lib/idempotencyKey'
 import { notifySlackCollateralShortfall } from '../api/slackNotify'
 
@@ -268,9 +268,8 @@ const selectedRate = ref('')
 const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
 const selectedLtv = ref(50)
-const selectedOracle = ref(DEFAULT_ORACLE)
+const { selectedOracle, selectedOracleLabel, setOracle, fetchOracles } = useOracle()
 const selectedFiat   = ref('USD')
-const selectedOracleLabel = computed(() => oracleDisplayName(selectedOracle.value))
 const modalLoading = ref(false)
 const modalNotice  = ref({ type: '', text: '' })
 
@@ -968,7 +967,7 @@ async function prefetchProducts() {
     if (payload.length > 0) {
       const first = payload[0]
       if (Array.isArray(first.orcl_id) && first.orcl_id.length > 0) {
-        selectedOracle.value = first.orcl_id[0]
+        setOracle(first.orcl_id[0])
       }
       if (Number.isFinite(first.ltv) && first.ltv > 0) {
         selectedLtv.value = first.ltv
@@ -1028,6 +1027,7 @@ onMounted(async () => {
     return
   }
 
+  fetchOracles()
   await prefetchProducts()
   await loadOffersOnce()
   offersIntervalId = setInterval(loadOffersOnce, props.offersPollMs)

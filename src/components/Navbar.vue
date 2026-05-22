@@ -376,7 +376,8 @@ import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
-import { getPrice } from '../api/price' // ⬅️ oracle price helper
+import { getPrice } from '../api/price'
+import { useOracle } from '../composables/useOracle'
 import { formatBtcValue } from '../functions/amount_formatting'
 import { isSignerAuthCode } from '../lib/authCode'
 
@@ -412,6 +413,7 @@ const {
 const isMobileMenuOpen = ref(false)
 
 /** ---- BTC price polling (via oracle) ---- */
+const { selectedOracle } = useOracle()
 const btcPrice = ref('...')
 let priceIntervalId = null
 let priceStarted = false
@@ -430,7 +432,7 @@ const fetchBTCPrice = async () => {
   try {
     // getPrice is typed Promise<number>, but be defensive in case
     // the implementation returns a JSON object instead.
-    const raw = await getPrice()
+    const raw = await getPrice(selectedOracle.value)
 
     let usd = null
 
