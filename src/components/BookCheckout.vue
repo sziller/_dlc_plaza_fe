@@ -73,11 +73,23 @@
           </div>
         </div>
         <div class="bc-summary-line">
-          <span class="bc-summary-desc">Bitcoin · {{ form.quantity }} × $29</span>
-          <span class="bc-summary-total">${{ totalBtc }}</span>
+          <span class="bc-summary-desc">Book × {{ form.quantity }}</span>
+          <span class="bc-summary-total bc-summary-subtle">$15 BTC / $30 card</span>
         </div>
         <div class="bc-summary-line">
-          <span class="bc-summary-desc">Card · {{ form.quantity }} × $45</span>
+          <span class="bc-summary-desc">Shipping</span>
+          <span class="bc-summary-total bc-summary-subtle">
+            <span v-if="shippingLoading" class="bc-shipping-calc">calculating…</span>
+            <span v-else-if="shippingCost !== null">${{ shippingCost.toFixed(2) }}</span>
+            <span v-else class="bc-shipping-calc">enter address above</span>
+          </span>
+        </div>
+        <div class="bc-summary-line bc-summary-line--total">
+          <span class="bc-summary-desc">Bitcoin total</span>
+          <span class="bc-summary-total">${{ totalBtc }}</span>
+        </div>
+        <div class="bc-summary-line bc-summary-line--total">
+          <span class="bc-summary-desc">Card total</span>
           <span class="bc-summary-total">${{ totalCard }}</span>
         </div>
       </div>
@@ -104,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import axios from 'axios'
 
 const form = ref({
@@ -124,14 +136,54 @@ const form = ref({
 const loadingBtc = ref(false)
 const loadingCard = ref(false)
 const error = ref('')
+const shippingCost = ref(null)
+const shippingLoading = ref(false)
 
-const totalBtc = computed(() => (form.value.quantity * 29).toFixed(2))
-const totalCard = computed(() => (form.value.quantity * 45).toFixed(2))
+const BASE_BTC = 15
+const BASE_CARD = 30
+
+const totalBtc = computed(() => {
+  const shipping = shippingCost.value ?? 0
+  return (BASE_BTC * form.value.quantity + shipping).toFixed(2)
+})
+const totalCard = computed(() => {
+  const shipping = shippingCost.value ?? 0
+  return (BASE_CARD * form.value.quantity + shipping).toFixed(2)
+})
 
 function incQty() { form.value.quantity++ }
 function decQty() { if (form.value.quantity > 1) form.value.quantity-- }
 
 const base = import.meta.env.VITE_BOOK_API || ''
+
+let shippingDebounce = null
+watch(
+  () => [form.value.street1, form.value.city, form.value.postcode, form.value.country, form.value.quantity],
+  ([street1, city, postcode, country]) => {
+    if (!street1 || !city || !postcode || !country) return
+    clearTimeout(shippingDebounce)
+    shippingDebounce = setTimeout(async () => {
+      shippingLoading.value = true
+      try {
+        const { data } = await axios.post(`${base}/api/get-shipping-cost`, {
+          quantity: form.value.quantity,
+          shipping: {
+            street1,
+            city,
+            postcode,
+            country_code: country,
+            state_code: form.value.state || undefined,
+          },
+        })
+        shippingCost.value = data.shippingCost
+      } catch {
+        shippingCost.value = null
+      } finally {
+        shippingLoading.value = false
+      }
+    }, 600)
+  }
+)
 
 async function validateAddress() {
   try {
@@ -338,6 +390,11 @@ async function submitCard() {
   border-top: 1px solid #2e3a4e;
 }
 
+.bc-summary-line--total .bc-summary-desc {
+  color: #f0f0f0;
+  font-weight: 600;
+}
+
 .bc-summary-desc {
   font-size: 14px;
   color: #aaa;
@@ -348,6 +405,19 @@ async function submitCard() {
   font-weight: 700;
   color: #f0f0f0;
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+.bc-summary-subtle {
+  font-size: 14px;
+  font-weight: 400;
+  color: #aaa;
+}
+
+.bc-shipping-calc {
+  font-style: italic;
+  color: #555;
+  font-family: inherit;
+  font-size: 13px;
 }
 
 /* Error */

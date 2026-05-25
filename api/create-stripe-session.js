@@ -1,4 +1,7 @@
 import Stripe from 'stripe'
+import { getShippingCost } from './_shipping.js'
+
+const BASE_PRICE_CARD = 30
 
 const allowed = [
   'https://cadenabitcoin.com',
@@ -27,8 +30,29 @@ export default async function handler(req, res) {
   const REDIRECT_URL = process.env.REDIRECT_URL || 'https://cadenabitcoin.com'
 
   try {
+    const { shippingCost } = await getShippingCost(shipping, quantity)
+    const shippingCents = Math.round(shippingCost * 100)
+    const bookCents = BASE_PRICE_CARD * quantity * 100
+
     const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity }],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: 'Endgame — Kevin Bell' },
+            unit_amount: BASE_PRICE_CARD * 100,
+          },
+          quantity,
+        },
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: 'Shipping' },
+            unit_amount: shippingCents,
+          },
+          quantity: 1,
+        },
+      ],
       mode: 'payment',
       success_url: `${REDIRECT_URL}/order-confirmed`,
       cancel_url: `${REDIRECT_URL}/endgame`,

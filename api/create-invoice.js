@@ -1,13 +1,15 @@
 import axios from 'axios'
+import { getShippingCost } from './_shipping.js'
 
-const BOOK_PRICE = 29
+const BASE_PRICE_BTC = 15
+
+const allowed = [
+  'https://cadenabitcoin.com',
+  'https://www.cadenabitcoin.com',
+  'https://staging.purabitcoin.com',
+]
 
 export default async function handler(req, res) {
-  const allowed = [
-    'https://cadenabitcoin.com',
-    'https://www.cadenabitcoin.com',
-    'https://staging.purabitcoin.com',
-  ]
   const origin = req.headers.origin || ''
   const allowedOrigin = allowed.includes(origin) || origin.startsWith('http://localhost')
     ? origin
@@ -24,11 +26,13 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing shipping or contact_email' })
   }
 
-  const amount = Math.round(quantity * BOOK_PRICE * 100) / 100
   const BASE_URL = process.env.BASE_URL
   const REDIRECT_URL = process.env.REDIRECT_URL || 'https://cadenabitcoin.com'
 
   try {
+    const { shippingCost } = await getShippingCost(shipping, quantity)
+    const amount = Math.round((BASE_PRICE_BTC * quantity + shippingCost) * 100) / 100
+
     const sbpRes = await axios.post(
       'https://api.swiss-bitcoin-pay.ch/checkout',
       {
