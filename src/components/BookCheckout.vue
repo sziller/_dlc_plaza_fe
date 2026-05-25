@@ -73,8 +73,12 @@
           </div>
         </div>
         <div class="bc-summary-line">
-          <span class="bc-summary-desc">{{ form.quantity }} × $29.99 USD</span>
-          <span class="bc-summary-total">${{ total }} USD</span>
+          <span class="bc-summary-desc">Bitcoin · {{ form.quantity }} × $29</span>
+          <span class="bc-summary-total">${{ totalBtc }}</span>
+        </div>
+        <div class="bc-summary-line">
+          <span class="bc-summary-desc">Card · {{ form.quantity }} × $45</span>
+          <span class="bc-summary-total">${{ totalCard }}</span>
         </div>
       </div>
 
@@ -85,14 +89,14 @@
           <svg v-if="!loadingBtc" class="bc-btc-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M11.5 2C6.25 2 2 6.25 2 11.5S6.25 21 11.5 21 21 16.75 21 11.5 16.75 2 11.5 2zm1.41 9.07c.87.35 1.59 1.07 1.59 2.18 0 1.47-1.16 2.3-2.75 2.5v1.25h-1v-1.23c-.37-.03-.76-.08-1.17-.16v-1.14c.44.1.9.17 1.17.17h.83c.73 0 1.17-.3 1.17-.8 0-.46-.28-.73-1.2-1.01l-.93-.29C9.55 13.2 8.88 12.52 8.88 11.4c0-1.3 1.02-2.15 2.62-2.37V7.75h1v1.27c.32.03.66.08 1 .15v1.12c-.35-.07-.73-.12-1-.12H12c-.64 0-1.04.26-1.04.72 0 .42.24.65 1.07.93l.88.29z"/>
           </svg>
-          <span>{{ loadingBtc ? 'Redirecting…' : `Pay with Bitcoin · $${total} USD` }}</span>
+          <span>{{ loadingBtc ? 'Redirecting…' : `Pay with Bitcoin · $${totalBtc} USD` }}</span>
         </button>
 
         <button type="button" class="bc-pay-btn bc-pay-btn--card" :disabled="loadingBtc || loadingCard" @click="submitCard">
           <svg v-if="!loadingCard" class="bc-btc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
           </svg>
-          <span>{{ loadingCard ? 'Redirecting…' : `Pay with Card · $${total} USD` }}</span>
+          <span>{{ loadingCard ? 'Redirecting…' : `Pay with Card · $${totalCard} USD` }}</span>
         </button>
       </div>
     </form>
@@ -121,17 +125,36 @@ const loadingBtc = ref(false)
 const loadingCard = ref(false)
 const error = ref('')
 
-const total = computed(() => (form.value.quantity * 29.99).toFixed(2))
+const totalBtc = computed(() => (form.value.quantity * 29).toFixed(2))
+const totalCard = computed(() => (form.value.quantity * 45).toFixed(2))
 
 function incQty() { form.value.quantity++ }
 function decQty() { if (form.value.quantity > 1) form.value.quantity-- }
 
 const base = import.meta.env.VITE_BOOK_API || ''
 
+async function validateAddress() {
+  try {
+    await axios.post(`${base}/api/validate-address`, {
+      shipping: {
+        country_code: form.value.country,
+        postcode: form.value.postcode,
+        state_code: form.value.state || undefined,
+        city: form.value.city,
+        street1: form.value.street1,
+        phone_number: form.value.phone,
+      },
+    })
+  } catch (err) {
+    throw new Error(err.response?.data?.error || 'We can\'t ship to this address. Please check your details.')
+  }
+}
+
 async function submit() {
   loadingBtc.value = true
   error.value = ''
   try {
+    await validateAddress()
     const { data } = await axios.post(`${base}/api/create-invoice`, {
       quantity: form.value.quantity,
       contact_email: form.value.email,
@@ -149,7 +172,7 @@ async function submit() {
     })
     window.location.href = data.checkoutUrl
   } catch (err) {
-    error.value = err.response?.data?.error || 'Something went wrong. Please try again.'
+    error.value = err.message || err.response?.data?.error || 'Something went wrong. Please try again.'
     loadingBtc.value = false
   }
 }
@@ -158,6 +181,7 @@ async function submitCard() {
   loadingCard.value = true
   error.value = ''
   try {
+    await validateAddress()
     const { data } = await axios.post(`${base}/api/create-stripe-session`, {
       quantity: form.value.quantity,
       contact_email: form.value.email,
@@ -174,7 +198,7 @@ async function submitCard() {
     })
     window.location.href = data.checkoutUrl
   } catch (err) {
-    error.value = err.response?.data?.error || 'Something went wrong. Please try again.'
+    error.value = err.message || err.response?.data?.error || 'Something went wrong. Please try again.'
     loadingCard.value = false
   }
 }

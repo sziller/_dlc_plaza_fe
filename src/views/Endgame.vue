@@ -122,7 +122,7 @@
       <div class="container">
         <h2 class="section-title">Order a physical copy</h2>
         <p>
-          $29.99 USD · Printed on demand via Lulu Press · Shipped worldwide · <strong>Paid in Bitcoin</strong>.
+          $29 in Bitcoin · $45 by card · Printed on demand via Lulu Press · Shipped worldwide.
           50% of the cover price goes to the surf programs above.
         </p>
         <div class="buy-layout">

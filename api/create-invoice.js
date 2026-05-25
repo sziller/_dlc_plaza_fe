@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BOOK_PRICE = 29.99
+const BOOK_PRICE = 29
 
 export default async function handler(req, res) {
   const allowed = [
