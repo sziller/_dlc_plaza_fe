@@ -3,7 +3,16 @@ import axios from 'axios'
 const BOOK_PRICE = 29.99
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const allowed = [
+    'https://cadenabitcoin.com',
+    'https://www.cadenabitcoin.com',
+    'https://staging.purabitcoin.com',
+  ]
+  const origin = req.headers.origin || ''
+  const allowedOrigin = allowed.includes(origin) || origin.startsWith('http://localhost')
+    ? origin
+    : allowed[0]
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin)
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.status(200).end()
