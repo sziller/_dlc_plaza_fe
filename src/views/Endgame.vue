@@ -18,7 +18,7 @@
         </div>
 
         <div class="cta-row">
-          <a href="/endgame.pdf" class="btn btn-primary">Download free PDF</a>
+          <a href="/Endgame (Final).pdf" class="btn btn-primary">Download free PDF</a>
         </div>
       </div>
     </header>
@@ -109,7 +109,7 @@
           The PDF is free. No email gate, no paywall. If the framework changes how you allocate, send the price of a paperback to the surf programs above. If it does not, send nothing. Either way, read it.
         </p>
         <div class="cta-row" style="margin-top:8px">
-          <a href="/endgame.pdf" class="btn btn-primary">Download PDF</a>
+          <a href="/Endgame (Final).pdf" class="btn btn-primary">Download PDF</a>
           <a href="#buy" class="btn btn-secondary" @click.prevent="scrollToBuy">Order physical copy →</a>
         </div>
         <p class="pricing-note" style="margin-top:24px">
@@ -139,7 +139,7 @@
           Everyone has a cost of capital. Households have one. Corporations have one. Sovereigns have one. Whether they admit it or not, it determines what they can build, fund, finance, and forego. The current monetary regime distorts this price signal across the entire structure of capital users, in a hierarchy almost nobody questions. This hierarchy is not a function of true credit risk. It is a function of distance from the central bank's spigot.
         </blockquote>
         <p>
-          <a href="/endgame.pdf">Read the full chapter →</a>
+          <a href="/Endgame (Final).pdf">Read the full chapter →</a>
         </p>
       </div>
     </section>

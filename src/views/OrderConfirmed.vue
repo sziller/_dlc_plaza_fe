@@ -22,7 +22,7 @@
 
       <div class="oc-actions">
         <RouterLink to="/endgame" class="oc-btn-primary">Back to Endgame</RouterLink>
-        <a href="/endgame.pdf" class="oc-btn-secondary">Download PDF</a>
+        <a href="/Endgame (Final).pdf" class="oc-btn-secondary">Download PDF</a>
       </div>
 
     </div>

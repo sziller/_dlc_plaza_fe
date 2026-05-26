@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         amount,
         title: 'Endgame — Kevin Bell',
         unit: 'USD',
-        onChain: true,
+        onChain: false,
         redirectAfterPaid: `${REDIRECT_URL}/order-confirmed`,
         webhook: { url: `${BASE_URL}/api/webhook/sbp` },
         extra: { quantity, shipping, contact_email },
