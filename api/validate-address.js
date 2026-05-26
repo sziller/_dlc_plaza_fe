@@ -20,10 +20,12 @@ function evaluate(result) {
   const goodGranularity = DELIVERABLE.includes(granularity)
   const googleSaysAccept = verdict.possibleNextAction === 'ACCEPT'
   const unconfirmed = verdict.hasUnconfirmedComponents === true
+  const replaced = verdict.hasReplacedComponents === true
 
-  // Trust Google's explicit ACCEPT signal over our own unconfirmed check —
-  // unconfirmed components can be minor (e.g. apt number) on an otherwise real building.
-  if (!goodGranularity || (unconfirmed && !googleSaysAccept)) {
+  // Allow minor unconfirmed components (e.g. apt number) only when Google says ACCEPT
+  // and nothing was actually replaced/corrected — a replaced postal code means the
+  // entered ZIP was wrong and we must not silently accept it.
+  if (!goodGranularity || (unconfirmed && !(googleSaysAccept && !replaced))) {
     return { valid: false, granularity }
   }
   return { valid: true, granularity }
