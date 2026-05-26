@@ -35,6 +35,8 @@ export async function getShippingCost(shipping, quantity = 1) {
   )
 
   // Lulu returns costs as strings — parse to float
+  console.log('Lulu cost-calc response:', JSON.stringify(data, null, 2))
+
   const shippingCost = parseFloat(
     data.shipping_cost?.total_cost_excl_tax ??
     data.shipping_cost?.total_cost_incl_tax ??
