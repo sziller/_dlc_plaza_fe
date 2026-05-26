@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     const { shippingCost } = await getShippingCost(shipping, quantity)
     res.json({ shippingCost })
   } catch (err) {
-    console.error('get-shipping-cost:', err.response?.data || err.message)
+    console.error('get-shipping-cost:', JSON.stringify(err.response?.data, null, 2) || err.message)
     res.status(500).json({ error: 'Could not calculate shipping cost.' })
   }
 }

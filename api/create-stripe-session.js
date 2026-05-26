@@ -73,7 +73,7 @@ export default async function handler(req, res) {
 
     res.json({ checkoutUrl: session.url })
   } catch (err) {
-    console.error('create-stripe-session:', err.message)
+    console.error('create-stripe-session:', JSON.stringify(err.response?.data, null, 2) || err.message)
     res.status(500).json({ error: 'Failed to create checkout session. Please try again.' })
   }
 }

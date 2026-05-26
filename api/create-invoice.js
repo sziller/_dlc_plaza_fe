@@ -49,7 +49,7 @@ export default async function handler(req, res) {
 
     res.json({ checkoutUrl: sbpRes.data.checkoutUrl })
   } catch (err) {
-    console.error('create-invoice:', err.response?.data || err.message)
+    console.error('create-invoice:', JSON.stringify(err.response?.data, null, 2) || err.message)
     res.status(500).json({ error: 'Failed to create invoice. Please try again.' })
   }
 }

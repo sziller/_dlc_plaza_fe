@@ -18,6 +18,7 @@ export async function getShippingCost(shipping, quantity = 1) {
         },
       ],
       shipping_address: {
+        name: shipping.name ?? `${shipping.firstName ?? ''} ${shipping.lastName ?? ''}`.trim() || 'Customer',
         country_code: shipping.country_code ?? shipping.country,
         postcode: shipping.postcode,
         state_code: shipping.state_code ?? shipping.state ?? undefined,
