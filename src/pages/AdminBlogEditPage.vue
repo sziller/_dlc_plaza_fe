@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { createPost, fetchAdminPostById, updatePost, type PostStatus } from '../blogApi/blog'
+import { createPost, fetchAdminPostById, updatePost, type PostStatus, type PostAccessLevel } from '../blogApi/blog'
 
 const route = useRoute()
 const router = useRouter()
@@ -28,6 +28,7 @@ const form = reactive<{
   ctaButtonText: string
   body: string
   status: PostStatus
+  accessLevel: PostAccessLevel
 }>({
   title: '',
   slug: '',
@@ -42,7 +43,8 @@ const form = reactive<{
   ctaTextSmall: '',
   ctaButtonText: '',
   body: '',
-  status: 'draft'
+  status: 'draft',
+  accessLevel: 'public'
 })
 
 const loadPost = async () => {
@@ -66,6 +68,7 @@ const loadPost = async () => {
     form.ctaButtonText = post.cta_button_text ?? ''
     form.body = post.body
     form.status = post.status
+    form.accessLevel = post.access_level ?? 'public'
   } catch (e: any) {
     error.value = 'Failed to load post'
   } finally {
@@ -92,7 +95,8 @@ const onSubmit = async () => {
         cta_text_small: form.ctaTextSmall || null,
         cta_button_text: form.ctaButtonText,
         body: form.body,
-        status: form.status
+        status: form.status,
+        access_level: form.accessLevel,
       })
     } else {
       await createPost({
@@ -108,12 +112,16 @@ const onSubmit = async () => {
         cta_text_small: form.ctaTextSmall || null,
         cta_button_text: form.ctaButtonText,
         body: form.body,
-        status: form.status
+        status: form.status,
+        access_level: form.accessLevel,
       })
     }
     await router.push({ name: 'AdminBlogList' })
   } catch (e: any) {
-    error.value = 'Failed to save post'
+    const detail = e?.response?.data?.detail
+    error.value = detail
+      ? (Array.isArray(detail) ? detail.map((d: any) => d.msg).join(', ') : String(detail))
+      : (e?.message ?? 'Failed to save post')
   } finally {
     saving.value = false
   }
@@ -239,7 +247,7 @@ onMounted(loadPost)
           />
         </div>
 
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="grid gap-4 md:grid-cols-3">
           <div>
             <label class="block text-sm font-medium text-white/80 mb-1">Status</label>
             <select
@@ -248,6 +256,16 @@ onMounted(loadPost)
             >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-white/80 mb-1">Access</label>
+            <select
+              v-model="form.accessLevel"
+              class="w-full rounded border border-white/20 bg-black/60 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary"
+            >
+              <option value="public">Public</option>
+              <option value="subscriber">Subscribers only</option>
             </select>
           </div>
           <div class="flex items-end justify-end">

@@ -18,7 +18,7 @@
         </div>
 
         <div class="cta-row">
-          <a href="/endgame.pdf" class="btn btn-primary">Download free PDF</a>
+          <a href="/Endgame (Final).pdf" class="btn btn-primary">Download free PDF</a>
         </div>
       </div>
     </header>
@@ -109,11 +109,25 @@
           The PDF is free. No email gate, no paywall. If the framework changes how you allocate, send the price of a paperback to the surf programs above. If it does not, send nothing. Either way, read it.
         </p>
         <div class="cta-row" style="margin-top:8px">
-          <a href="/endgame.pdf" class="btn btn-primary">Download PDF</a>
+          <a href="/Endgame (Final).pdf" class="btn btn-primary">Download PDF</a>
+          <a href="#buy" class="btn btn-secondary" @click.prevent="scrollToBuy">Order physical copy →</a>
         </div>
         <p class="pricing-note" style="margin-top:24px">
           <strong>Suggested donation:</strong> 21,000 sats in Bitcoin — splits automatically. 50% to surf programs, 50% to author.
         </p>
+      </div>
+    </section>
+
+    <section id="buy">
+      <div class="container">
+        <h2 class="section-title">Order a physical copy</h2>
+        <p>
+          $29 in Bitcoin · $45 by card · Printed on demand via Lulu Press · Shipped worldwide.
+          50% of the cover price goes to the surf programs above.
+        </p>
+        <div class="buy-layout">
+          <BookCheckout />
+        </div>
       </div>
     </section>
 
@@ -125,7 +139,7 @@
           Everyone has a cost of capital. Households have one. Corporations have one. Sovereigns have one. Whether they admit it or not, it determines what they can build, fund, finance, and forego. The current monetary regime distorts this price signal across the entire structure of capital users, in a hierarchy almost nobody questions. This hierarchy is not a function of true credit risk. It is a function of distance from the central bank's spigot.
         </blockquote>
         <p>
-          <a href="/endgame.pdf">Read the full chapter →</a>
+          <a href="/Endgame (Final).pdf">Read the full chapter →</a>
         </p>
       </div>
     </section>
@@ -149,6 +163,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
+import BookCheckout from '../components/BookCheckout.vue'
 
 const btcAddress = 'bc1qvt3ytuvch7p5ukqhlxmds2frydk5y7hc8vv2s8c0ax3lmn8jyyqqhef36t'
 const btcQrUrl = computed(() =>
@@ -162,6 +177,10 @@ function copy(text, key) {
   navigator.clipboard.writeText(text)
   copied.value = key
   setTimeout(() => { copied.value = '' }, 2000)
+}
+
+function scrollToBuy() {
+  document.getElementById('buy')?.scrollIntoView({ behavior: 'smooth' })
 }
 </script>
 
@@ -500,6 +519,12 @@ function copy(text, key) {
   .endorsement p { font-family: var(--serif); font-style: italic; font-size: 17px; margin-bottom: 12px; }
   .endorsement cite { font-style: normal; color: var(--text-muted); font-size: 14px; }
   .endorsement cite strong { color: var(--text); font-weight: 600; }
+
+  /* BUY SECTION */
+  .buy-layout {
+    max-width: 560px;
+    margin-top: 28px;
+  }
 
   /* MISC */
   a { color: var(--accent); }

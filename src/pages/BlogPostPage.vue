@@ -4,6 +4,8 @@ import { RouterLink, useRoute } from 'vue-router'
 import { marked } from 'marked'
 import { fetchPostBySlug, fetchPublishedPosts, type BlogPost } from '../blogApi/blog'
 import { useAuth } from '../composables/useAuth'
+import { isSubscriberAuthCode } from '../lib/authCode'
+import { postContactEmail, isValidEmail } from '../api/publicContact'
 import TheFooter from '../components/TheFooter.vue'
 import ComparisonTable from '../components/ComparisonTable.vue'
 import RelatedResources from '../components/RelatedResources.vue'
@@ -15,7 +17,40 @@ const post = ref<BlogPost | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const posts = ref<BlogPost[]>([])
-const { isLoggedIn, setUserFromApi } = useAuth()
+const { isLoggedIn, setUserFromApi, user } = useAuth()
+
+const isSubscriber = computed(() => {
+  const code = (user.value as any)?.auth_code ?? (user.value as any)?.payload?.auth_code
+  return isSubscriberAuthCode(code)
+})
+
+const isGated = computed(() =>
+  post.value?.access_level === 'subscriber' && !isSubscriber.value
+)
+
+// Newsletter CTA state
+const nlEmail = ref('')
+const nlLoading = ref(false)
+const nlSuccess = ref(false)
+const nlError = ref('')
+
+const submitNewsletter = async () => {
+  nlError.value = ''
+  if (!isValidEmail(nlEmail.value)) {
+    nlError.value = 'Please enter a valid email.'
+    return
+  }
+  nlLoading.value = true
+  try {
+    await postContactEmail(nlEmail.value)
+    nlSuccess.value = true
+  } catch {
+    nlError.value = 'Something went wrong. Please try again.'
+  } finally {
+    nlLoading.value = false
+  }
+}
+
 const comparisonFeatures = [
   { feature: 'Non-custodial collateral', cadena: true, traditional: false, defi: true },
   { feature: 'Transparent liquidation', cadena: true, traditional: false, defi: true },
@@ -116,6 +151,10 @@ const loadPost = async () => {
   error.value = null
   try {
     post.value = await fetchPostBySlug(slug.value)
+    if (import.meta.env.DEV) {
+      console.log('[BlogPost] loaded post:', { access_level: post.value?.access_level, title: post.value?.title })
+      console.log('[BlogPost] user auth_code:', (user.value as any)?.auth_code, '| isSubscriber:', isSubscriber.value, '| isGated:', isGated.value)
+    }
   } catch (e: any) {
     error.value = e?.message ?? 'Failed to load post'
     post.value = null
@@ -156,60 +195,52 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen bg-black text-white">
-    <!-- Hero Section (matches Knowledge Hub) -->
-    <section class="bg-secondary px-4 py-6 lg:py-10 text-center">
-      <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-3">
-          {{ post?.title || 'Loading article...' }}
+  <main class="min-h-screen w-full text-white pt-20 md:pt-32 relative">
+    <div class="absolute inset-0 -z-10 bg-page-gradient"></div>
+
+    <!-- Loading / error -->
+    <div v-if="loading" class="max-w-4xl mx-auto px-6 py-20 text-white/50">Loading…</div>
+    <div v-else-if="error" class="max-w-4xl mx-auto px-6 py-20 text-red-400 font-semibold">{{ error }}</div>
+    <p v-else-if="!post" class="max-w-4xl mx-auto px-6 py-20 text-white/50">Post not found.</p>
+
+    <template v-else>
+      <!-- Hero -->
+      <section class="max-w-4xl mx-auto text-center mb-14 px-6">
+        <div class="flex items-center justify-center gap-3 text-sm text-white/50 mb-6">
+          <RouterLink to="/knowledge-hub" class="hover:text-secondary transition-colors">Knowledge Hub</RouterLink>
+          <span>/</span>
+          <span>{{ formatDate(post.published_at || post.created_at) }}</span>
+          <template v-if="post.access_level === 'subscriber'">
+            <span>/</span>
+            <span class="text-secondary font-semibold">Subscribers</span>
+          </template>
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-5">
+          {{ post.title }}
         </h1>
-        <p v-if="post?.subheading" class="text-white/80 text-base sm:text-lg font-medium max-w-3xl mx-auto">
+        <p v-if="post.subheading" class="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
           {{ post.subheading }}
         </p>
-        <p v-if="post?.author_name" class="text-white/70 text-sm mt-2">{{ post.author_name }}</p>
-      </div>
-    </section>
+        <p v-if="post.author_name" class="text-sm text-white/40 mt-4">{{ post.author_name }}</p>
+      </section>
 
-    <!-- Article Content -->
-    <section class="bg-black px-6 py-12 lg:py-16 max-w-[1100px] mx-auto">
-      <div v-if="loading" class="text-white/80">Loading post…</div>
-      <div v-else-if="error" class="text-red-300 font-semibold">
-        {{ error }}
-      </div>
-      <article v-else-if="post" class="space-y-8">
-        <div class="flex items-center text-white/60 text-sm">
-          <span>{{ formatDate(post.published_at || post.created_at) }}</span>
-          <span class="mx-3 text-white/20">•</span>
-          <RouterLink to="/knowledge-hub" class="text-secondary hover:text-white font-semibold transition">Back to Hub</RouterLink>
+      <!-- Hero image -->
+      <section v-if="post.hero_image_url && !post.article_image_url" class="max-w-4xl mx-auto px-6 mb-12">
+        <div class="rounded-2xl overflow-hidden border border-white/10">
+          <img :src="post.hero_image_url" :alt="post.title" class="w-full h-auto" loading="lazy" decoding="async" />
         </div>
+      </section>
 
-        <div v-if="post.hero_image_url && !post.article_image_url" class="rounded-2xl overflow-hidden border border-white/10 shadow-xl shadow-black/30">
-          <img
-            :src="post.hero_image_url"
-            :alt="post.title"
-            class="w-full h-auto"
-            loading="lazy"
-            decoding="async"
-          />
+      <!-- Article image -->
+      <section v-if="post.article_image_url" class="max-w-4xl mx-auto px-6 mb-12">
+        <div class="rounded-2xl overflow-hidden border border-white/10">
+          <img :src="post.article_image_url" :alt="post.title" class="w-full h-auto" loading="lazy" decoding="async" />
         </div>
+      </section>
 
-        <div v-if="post.article_image_url" class="rounded-2xl overflow-hidden border border-white/10 shadow-lg shadow-black/25">
-          <img
-            :src="post.article_image_url"
-            :alt="post.title"
-            class="w-full h-auto"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-
-        <div
-          v-if="post.slides_presentation_url"
-          class="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 shadow-lg space-y-4"
-        >
-          <p class="text-white/75">
-            Read the slides without leaving the page. Use your browser’s toolbar to zoom or open in a new tab.
-          </p>
+      <!-- Slides -->
+      <section v-if="post.slides_presentation_url" class="max-w-4xl mx-auto px-6 mb-12">
+        <div class="bg-white/[0.04] border border-white/10 rounded-2xl p-6 md:p-8 space-y-4">
           <div class="w-full rounded-xl overflow-hidden border border-white/10 bg-black">
             <iframe
               :src="post.slides_presentation_url"
@@ -220,92 +251,188 @@ watch(
               referrerpolicy="no-referrer"
             ></iframe>
           </div>
-          <div class="flex flex-col sm:flex-row gap-3">
-            <a
-              :href="post.slides_presentation_url"
-              target="_blank"
-              rel="noopener"
-              class="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 text-white font-semibold px-6 py-3 text-base hover:bg-white/10 transition"
+          <a
+            :href="post.slides_presentation_url"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-2 rounded-full border border-white/20 text-white text-sm font-semibold px-5 py-2.5 hover:bg-white/10 transition"
+          >
+            Open in new tab
+          </a>
+        </div>
+      </section>
+
+      <!-- Gate (full-width blur) -->
+      <div v-if="isGated" class="relative w-full overflow-hidden mb-0">
+        <div class="pointer-events-none select-none blur-sm opacity-30 max-h-48 overflow-hidden px-6">
+          <div class="max-w-5xl mx-auto prose prose-invert prose-xl max-w-none" v-html="contentSegments.find(s => s.type === 'html')?.content ?? ''" />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/70 to-black"></div>
+        <div class="relative max-w-4xl mx-auto px-6 mt-8 pb-16">
+          <div class="rounded-2xl border border-secondary/30 bg-secondary/[0.07] p-8 text-center">
+            <p class="text-xs font-semibold tracking-widest uppercase text-secondary mb-3">Subscribers only</p>
+            <h3 class="text-xl font-bold mb-2">This article is for newsletter subscribers</h3>
+            <p class="text-white/60 text-sm mb-6 max-w-sm mx-auto leading-relaxed">
+              Subscribe to the Cadena newsletter to unlock this article and all subscriber content.
+            </p>
+
+            <!-- Create account -->
+            <RouterLink
+              v-if="!isLoggedIn"
+              to="/register"
+              class="inline-flex items-center justify-center rounded-full bg-secondary px-7 py-3 text-sm font-semibold text-white transition hover:bg-secondary/90"
             >
-              <span>Open in New Tab</span>
-            </a>
+              Create an account
+            </RouterLink>
+            <p v-else class="text-white/50 text-sm mb-6">
+              Your account is not yet subscribed. Sign up for the newsletter to unlock access.
+            </p>
+
+            <!-- Already have an account -->
+            <div class="mt-6 border-t border-white/10 pt-5">
+              <p class="text-sm text-white/50">
+                Already have an account?
+                <RouterLink to="/login" class="text-secondary hover:underline font-semibold">Sign in</RouterLink>
+              </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <h2 class="text-3xl sm:text-4xl font-extrabold leading-tight text-white">
-          {{ post.title }}
-        </h2>
-
+      <!-- Body -->
+      <section v-if="!isGated" class="max-w-5xl mx-auto px-6 pb-16">
         <template v-for="(segment, idx) in contentSegments" :key="idx">
           <div
             v-if="segment.type === 'html'"
-            class="prose prose-invert prose-lg max-w-none prose-headings:text-secondary prose-strong:text-white prose-a:text-secondary hover:prose-a:text-white prose-blockquote:text-white/80 prose-li:marker:text-secondary prose-img:rounded-xl prose-img:border prose-img:border-white/10"
+            class="prose prose-invert prose-xl max-w-none
+              prose-p:text-white prose-p:leading-relaxed
+              prose-headings:text-white prose-headings:font-extrabold
+              prose-h2:text-4xl prose-h3:text-2xl
+              prose-strong:text-white
+              prose-a:text-secondary hover:prose-a:text-white prose-a:no-underline hover:prose-a:underline
+              prose-blockquote:text-white prose-blockquote:border-secondary
+              prose-li:text-white prose-li:marker:text-secondary
+              prose-img:rounded-xl prose-img:border prose-img:border-white/10
+              prose-code:text-secondary prose-code:bg-white/5 prose-code:rounded prose-code:px-1"
             v-html="segment.content"
           />
           <ComparisonTable
             v-else-if="segment.type === 'table'"
-            class="mt-8"
+            class="mt-10"
             :title="segment.config.title"
             :subtitle="segment.config.subtitle"
             :features="segment.config.features"
           />
           <RelatedResources
             v-else-if="segment.type === 'related'"
-            class="mt-8"
+            class="mt-10"
             :title="segment.config.title"
             :links="segment.config.links"
           />
         </template>
+      </section>
 
-      </article>
-      <p v-else class="text-white/70">Post not found.</p>
-    </section>
-
-    <!-- CTA Section (matches Knowledge Hub) -->
-    <section class="bg-gradient-to-br from-secondary via-secondary to-purple-700 text-white py-20 px-6 relative overflow-hidden">
-      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnptMCAyYy0yLjIxIDAtNCAxLjc5LTQgNHMxLjc5IDQgNCA0IDQtMS43OSA0LTQtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjA1Ii8+PC9nPjwvc3ZnPg==')] opacity-20"></div>
-      <div class="max-w-5xl mx-auto relative">
-        <div class="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 rounded-3xl shadow-2xl p-8 md:p-12 text-center">
-          <h2 class="text-3xl md:text-4xl font-extrabold mb-6 bg-gradient-to-r from-white to-white/90 bg-clip-text text-transparent">
-            {{ post?.cta_text_big || 'Ready to Borrow Against Your Bitcoin?' }}
-          </h2>
-          <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-8">
-            {{ post?.cta_text_small || 'Access instant liquidity without selling your Bitcoin. Decentralized, non-custodial, and secured by DLCs.' }}
-          </p>
-          <div class="mt-6 flex flex-col items-center gap-3 md:grid md:grid-cols-3 md:items-center md:gap-4">
-            <RouterLink
-              to="/knowledge-hub"
-              class="inline-flex items-center gap-2 rounded-full bg-white/10 text-white font-semibold px-6 py-3 shadow-lg shadow-black/30 hover:bg-white/20 transition md:justify-self-start"
-            >
-              <span class="text-xl">←</span>
-              <span>Back to Knowledge Hub</span>
-            </RouterLink>
-            <RouterLink
-              :to="isLoggedIn ? '/btcusd' : '/register'"
-              class="inline-flex items-center gap-3 rounded-full bg-white text-secondary font-bold px-10 py-5 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 md:justify-self-center"
-            >
-              <span>{{ post?.cta_button_text || 'Get Started Today' }}</span>
-            </RouterLink>
-            <RouterLink
-              v-if="nextSlug"
-              :to="{ name: 'BlogPost', params: { slug: nextSlug } }"
-              class="inline-flex items-center gap-2 rounded-full bg-white text-secondary font-bold px-6 py-3 shadow-lg shadow-secondary/30 hover:shadow-secondary/50 transition group md:justify-self-end"
-            >
-              <span>Next Article</span>
-              <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-              </svg>
-            </RouterLink>
-          </div>
+      <!-- CTA -->
+      <section class="max-w-4xl mx-auto px-6 pb-28">
+        <!-- Newsletter CTA (non-subscribers) -->
+        <div v-if="!isSubscriber" class="rounded-2xl border border-secondary/30 bg-secondary/[0.06] p-8 md:p-12 mb-6">
+          <template v-if="!nlSuccess">
+            <p class="text-xs font-semibold tracking-widest uppercase text-secondary mb-3">Cadena Newsletter</p>
+            <h2 class="text-3xl md:text-4xl font-extrabold mb-3">Stay ahead of Bitcoin lending</h2>
+            <p class="text-white/60 text-lg max-w-xl mb-8 leading-relaxed">
+              Educational explainers, product updates, and market insights — delivered to your inbox.
+            </p>
+            <form class="flex flex-col sm:flex-row gap-3 max-w-lg" @submit.prevent="submitNewsletter">
+              <input
+                v-model="nlEmail"
+                type="email"
+                placeholder="your@email.com"
+                required
+                class="flex-1 rounded-full bg-white/10 border border-white/20 text-white placeholder-white/40 px-5 py-3 text-base focus:outline-none focus:ring-2 focus:ring-secondary"
+              />
+              <button
+                type="submit"
+                :disabled="nlLoading"
+                class="rounded-full bg-secondary px-7 py-3 text-base font-semibold text-white transition hover:bg-secondary/90 disabled:opacity-60 whitespace-nowrap"
+              >
+                {{ nlLoading ? 'Joining...' : 'Join newsletter' }}
+              </button>
+            </form>
+            <p v-if="nlError" class="mt-3 text-sm text-red-400">{{ nlError }}</p>
+            <p class="mt-4 text-sm text-white/40">
+              Already have an account?
+              <RouterLink to="/login" class="text-secondary hover:underline">Log in</RouterLink>
+            </p>
+          </template>
+          <template v-else>
+            <p class="text-xs font-semibold tracking-widest uppercase text-secondary mb-3">Almost there</p>
+            <h2 class="text-3xl font-extrabold mb-2">Confirm your email</h2>
+            <p class="text-white/60 text-lg leading-relaxed">
+              We sent a confirmation link to <span class="text-white font-semibold">{{ nlEmail }}</span>. Click it to complete your subscription.
+            </p>
+          </template>
         </div>
-      </div>
-    </section>
-  </div>
+
+        <!-- Navigation row -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <RouterLink
+            v-if="isSubscriber"
+            :to="isLoggedIn ? '/btcusd' : '/register'"
+            class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3 text-base font-semibold text-white transition hover:bg-secondary/90"
+          >
+            {{ post.cta_button_text || 'Get started' }}
+          </RouterLink>
+          <RouterLink
+            v-if="nextSlug"
+            :to="{ name: 'BlogPost', params: { slug: nextSlug } }"
+            class="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-8 py-3 text-base font-semibold text-white transition hover:border-white/40 group"
+          >
+            Next article
+            <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </RouterLink>
+          <RouterLink
+            to="/knowledge-hub"
+            class="inline-flex items-center justify-center rounded-full border border-white/20 px-8 py-3 text-base font-semibold text-white transition hover:border-white/40"
+          >
+            &larr; Knowledge Hub
+          </RouterLink>
+        </div>
+      </section>
+    </template>
+  </main>
 
   <TheFooter />
 </template>
 
 <style scoped>
+.bg-page-gradient {
+  background-color: #000;
+  background-image:
+    radial-gradient(
+      125% 75% at 50% 100%,
+      rgba(103,56,228,0.58) 0%,
+      rgba(103,56,228,0.36) 26%,
+      rgba(103,56,228,0.16) 52%,
+      rgba(0,0,0,0) 76%
+    );
+}
+
+@supports (background: radial-gradient(in oklch, black, white)) {
+  .bg-page-gradient {
+    background-color: oklch(0 0 0);
+    background-image:
+      radial-gradient(
+        in oklch 125% 75% at 50% 100%,
+        oklch(from #6738e4 l c h / 0.60) 0%,
+        oklch(from #6738e4 l c h / 0.36) 26%,
+        oklch(from #6738e4 l c h / 0.16) 52%,
+        oklch(0 0 0 / 0) 76%
+      );
+  }
+}
+
 :deep(.kb-box) {
   background: linear-gradient(135deg, rgba(103, 56, 227, 0.1), rgba(103, 56, 227, 0.05));
   border: 1px solid rgba(103, 56, 227, 0.4);

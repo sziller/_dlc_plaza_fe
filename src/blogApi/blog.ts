@@ -3,6 +3,8 @@ import api from "./client";
 
 export type PostStatus = "draft" | "published";
 
+export type PostAccessLevel = 'public' | 'subscriber';
+
 export interface BlogPost {
   id: number;
   slug: string;
@@ -18,6 +20,7 @@ export interface BlogPost {
   cta_button_text: string | null;
   body: string;
   status: PostStatus;
+  access_level: PostAccessLevel;
   author_id: number;
   created_at: string;
   updated_at: string;
@@ -61,6 +64,7 @@ export interface BlogPostCreatePayload {
   cta_button_text?: string | null;
   body: string;
   status: PostStatus;
+  access_level?: PostAccessLevel;
 }
 
 export interface BlogPostUpdatePayload {
@@ -77,6 +81,7 @@ export interface BlogPostUpdatePayload {
   cta_button_text?: string | null;
   body?: string;
   status?: PostStatus;
+  access_level?: PostAccessLevel;
 }
 
 export async function createPost(payload: BlogPostCreatePayload): Promise<BlogPost> {

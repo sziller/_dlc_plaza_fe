@@ -42,6 +42,7 @@ const AdminBlogListPage  = () => import('../pages/AdminBlogListPage.vue')
 const AdminBlogEditPage  = () => import('../pages/AdminBlogEditPage.vue')
 const ForLLMs            = () => import('../views/ForLLMs.vue')
 const Endgame            = () => import('../views/Endgame.vue')
+const OrderConfirmed     = () => import('../views/OrderConfirmed.vue')
 const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
 const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
@@ -63,6 +64,11 @@ const routes = [
     title: 'Endgame — Bitcoin, Sovereign Debt, and the Return of Sound Capital',
     description: 'A serious framework for allocating in a Bitcoin-anchored monetary order. By Kevin Bell, Founder of Cadena Bitcoin.',
     robots: 'index,follow',
+  }},
+  { path: '/order-confirmed', name: 'OrderConfirmed', component: OrderConfirmed, meta: {
+    title: 'Order Confirmed — Endgame by Kevin Bell',
+    description: 'Your Bitcoin payment was received. Your copy of Endgame is being printed and shipped.',
+    robots: 'noindex,nofollow',
   }},
   { path: '/', name: 'Home', component: Home, meta: {
     title: 'Cadena Bitcoin — Decentralized BTC Lending & Borrowing',
@@ -115,8 +121,8 @@ const routes = [
     robots: 'index,follow',
   }},
   { path: '/security', name: 'Security', component: Security, meta: {
-    title: 'Security — Cadena Bitcoin',
-    description: 'Your Bitcoin stays in your hands. Learn how Cadena uses Discreet Log Contracts for self-custody lending with no margin calls.',
+    title: 'How Cadena Protects Your Bitcoin — Security & Risk Model',
+    description: 'Non-custodial DLC contracts, independent oracle architecture, no margin calls, and honest gap-risk disclosure. Open-source code and on-chain proof you can verify yourself.',
     robots: 'index,follow',
   }},
   // Blog CMS (Knowledge Hub)
