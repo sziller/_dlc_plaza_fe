@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(200).end()
   }
 
-  if (status !== 'paid') return res.status(200).end()
+  if (status !== 'paid' && status !== 'settled') return res.status(200).end()
 
   if (!extra?.shipping) {
     console.error('SBP webhook: missing extra data for id', id)
