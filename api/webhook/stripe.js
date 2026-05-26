@@ -39,15 +39,14 @@ export default async function handler(req, res) {
   const order = {
     quantity: parseInt(metadata.quantity, 10),
     shipping: {
-      firstName: metadata.name,
-      lastName: '',
+      name: metadata.name,
       street1: metadata.street1,
       street2: metadata.street2 || undefined,
       city: metadata.city,
-      state: metadata.state_code || undefined,
+      state_code: metadata.state_code || '',
       postcode: metadata.postcode,
-      country: metadata.country_code,
-      phone: metadata.phone_number,
+      country_code: metadata.country_code,
+      phone_number: metadata.phone_number,
     },
   }
 
