@@ -18,11 +18,12 @@ function evaluate(result) {
   const granularity = verdict.validationGranularity || 'OTHER'
 
   const goodGranularity = DELIVERABLE.includes(granularity)
+  const googleSaysAccept = verdict.possibleNextAction === 'ACCEPT'
   const unconfirmed = verdict.hasUnconfirmedComponents === true
 
-  // Reject when Google couldn't pin the address to a real building,
-  // or when it confirmed only part of what was entered.
-  if (!goodGranularity || unconfirmed) {
+  // Trust Google's explicit ACCEPT signal over our own unconfirmed check —
+  // unconfirmed components can be minor (e.g. apt number) on an otherwise real building.
+  if (!goodGranularity || (unconfirmed && !googleSaysAccept)) {
     return { valid: false, granularity }
   }
   return { valid: true, granularity }
