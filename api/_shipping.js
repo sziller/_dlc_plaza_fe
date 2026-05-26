@@ -4,8 +4,18 @@ import axios from 'axios'
 const PAGE_COUNT = 101
 const POD_PACKAGE_ID = '0600X0900.BW.STD.PB.060UW444.MXX'
 
+// Strip spaces, dashes, dots, parens — keep digits and leading +
+function cleanPhone(raw) {
+  if (!raw) return undefined
+  const cleaned = String(raw).replace(/[\s\-().]/g, '')
+  return cleaned || undefined
+}
+
 export async function getShippingCost(shipping, quantity = 1) {
   const token = await getLuluToken()
+
+  const rawPhone = shipping.phone_number ?? shipping.phone
+  const phone_number = cleanPhone(rawPhone) || '+10000000000'
 
   const { data } = await axios.post(
     'https://api.lulu.com/print-job-cost-calculations/',
@@ -19,6 +29,7 @@ export async function getShippingCost(shipping, quantity = 1) {
       ],
       shipping_address: {
         name: shipping.name ?? (`${shipping.firstName ?? ''} ${shipping.lastName ?? ''}`.trim() || 'Customer'),
+        phone_number,
         country_code: shipping.country_code ?? shipping.country,
         postcode: shipping.postcode,
         state_code: shipping.state_code ?? shipping.state ?? undefined,

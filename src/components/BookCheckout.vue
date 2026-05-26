@@ -173,6 +173,7 @@ watch(
             postcode,
             country_code: country,
             state_code: form.value.state || undefined,
+            phone: form.value.phone || undefined,
           },
         })
         shippingCost.value = data.shippingCost
