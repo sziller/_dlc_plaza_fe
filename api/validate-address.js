@@ -20,14 +20,20 @@ function evaluate(result) {
   const goodGranularity = DELIVERABLE.includes(granularity)
   const googleSaysAccept = verdict.possibleNextAction === 'ACCEPT'
   const unconfirmed = verdict.hasUnconfirmedComponents === true
-  const replaced = verdict.hasReplacedComponents === true
 
-  // Allow minor unconfirmed components (e.g. apt number) only when Google says ACCEPT
-  // and nothing was actually replaced/corrected — a replaced postal code means the
-  // entered ZIP was wrong and we must not silently accept it.
-  if (!goodGranularity || (unconfirmed && !(googleSaysAccept && !replaced))) {
-    return { valid: false, granularity }
-  }
+  if (!goodGranularity) return { valid: false, granularity }
+
+  // Postal code must be confirmed at the component level — verdict-level flags
+  // can say ACCEPT even when the ZIP belongs to a different city/state.
+  const components = result?.address?.addressComponents ?? []
+  const postalComp = components.find(c => c.componentType === 'postal_code')
+  const postalConfirmed = !postalComp || postalComp.confirmationLevel === 'CONFIRMED'
+
+  if (!postalConfirmed) return { valid: false, granularity }
+
+  // Allow minor unconfirmed components (e.g. apt number) when Google says ACCEPT.
+  if (unconfirmed && !googleSaysAccept) return { valid: false, granularity }
+
   return { valid: true, granularity }
 }
 
