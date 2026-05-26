@@ -29,9 +29,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid signature' })
   }
 
-  res.status(200).end()
-
-  if (event.type !== 'checkout.session.completed') return
+  if (event.type !== 'checkout.session.completed') return res.status(200).end()
 
   const session = event.data.object
   const { metadata } = session
@@ -54,6 +52,8 @@ export default async function handler(req, res) {
     const job = await createLuluPrintJob(`stripe-${session.id}`, order)
     console.log(`Lulu print job created: ${job.id} for Stripe session ${session.id}`)
   } catch (err) {
-    console.error('Lulu createPrintJob failed:', err.response?.data || err.message)
+    console.error('Lulu createPrintJob failed:', JSON.stringify(err.response?.data, null, 2) || err.message)
   }
+
+  res.status(200).end()
 }
