@@ -3,6 +3,8 @@ import { createLuluPrintJob } from '../_lulu.js'
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
+  console.log('SBP webhook body:', JSON.stringify(req.body, null, 2))
+
   const { id, status, extra } = req.body
 
   if (status === 'unconfirmed') {
