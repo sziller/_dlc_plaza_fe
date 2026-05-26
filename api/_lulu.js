@@ -48,12 +48,13 @@ export async function createLuluPrintJob(invoiceId, { quantity, shipping }) {
       line_items: [
         {
           external_id: `item-${invoiceId}`,
-          printable_normalization: {},
-          pod_package_id: '0600X0900.BW.STD.PB.060UW444.MXX',
+          printable_normalization: {
+            pod_package_id: '0600X0900.BW.STD.PB.060UW444.MXX',
+            interior: { source_url: process.env.BOOK_INTERIOR_URL },
+            cover: { source_url: process.env.BOOK_COVER_URL },
+          },
           quantity,
           title: 'Endgame — Kevin Bell',
-          interior: { source_url: process.env.BOOK_INTERIOR_URL },
-          cover: { source_url: process.env.BOOK_COVER_URL },
         },
       ],
       production_delay: 120,
