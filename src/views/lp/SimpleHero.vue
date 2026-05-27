@@ -133,7 +133,7 @@ let io
 const faqs = [
   {
     q: 'What is the loan amount?',
-    a: 'Loan size ranges from $1,000 minimum to $1M per single contract. Loans above $1M are syndicated across multiple parallel contracts funded the same day. We\'ve structured $3M+ facilities this way.',
+    a: 'Loan size ranges from $1,000 minimum to $1M per single contract. Loans above $1M are syndicated across multiple parallel contracts funded the same day.',
   },
   {
     q: 'Is there a credit check?',

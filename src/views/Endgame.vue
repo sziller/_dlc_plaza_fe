@@ -18,7 +18,7 @@
         </div>
 
         <div class="cta-row">
-          <a href="/Endgame (Final).pdf" class="btn btn-primary">Download free PDF</a>
+          <a href="/Endgame_Kevin_Bell.pdf" class="btn btn-primary">Download free PDF</a>
         </div>
       </div>
     </header>
@@ -109,7 +109,7 @@
           The PDF is free. No email gate, no paywall. If the framework changes how you allocate, send the price of a paperback to the surf programs above. If it does not, send nothing. Either way, read it.
         </p>
         <div class="cta-row" style="margin-top:8px">
-          <a href="/Endgame (Final).pdf" class="btn btn-primary">Download PDF</a>
+          <a href="/Endgame_Kevin_Bell.pdf" class="btn btn-primary">Download PDF</a>
           <a href="#buy" class="btn btn-secondary" @click.prevent="scrollToBuy">Order physical copy →</a>
         </div>
         <p class="pricing-note" style="margin-top:24px">
@@ -122,10 +122,13 @@
       <div class="container">
         <h2 class="section-title">Order a physical copy</h2>
         <p>
-          $29 in Bitcoin · $45 by card · Printed on demand via Lulu Press · Shipped worldwide.
+          $15 via Lightning Network · $30 by card · Printed on demand via Lulu Press · Shipped worldwide.
           50% of the cover price goes to the surf programs above.
         </p>
-        <div class="buy-layout">
+        <div v-if="!showCheckout" style="margin-top:28px">
+          <button class="btn btn-primary" @click="showCheckout = true">Order a physical copy →</button>
+        </div>
+        <div v-else class="buy-layout">
           <BookCheckout />
         </div>
       </div>
@@ -139,7 +142,7 @@
           Everyone has a cost of capital. Households have one. Corporations have one. Sovereigns have one. Whether they admit it or not, it determines what they can build, fund, finance, and forego. The current monetary regime distorts this price signal across the entire structure of capital users, in a hierarchy almost nobody questions. This hierarchy is not a function of true credit risk. It is a function of distance from the central bank's spigot.
         </blockquote>
         <p>
-          <a href="/Endgame (Final).pdf">Read the full chapter →</a>
+          <a href="/Endgame_Kevin_Bell.pdf">Read the full chapter →</a>
         </p>
       </div>
     </section>
@@ -170,6 +173,7 @@ const btcQrUrl = computed(() =>
   `https://api.qrserver.com/v1/create-qr-code/?size=180x180&ecc=M&data=${encodeURIComponent('bitcoin:' + btcAddress)}`
 )
 
+const showCheckout = ref(false)
 const btcExpanded = ref(false)
 const copied = ref('')
 

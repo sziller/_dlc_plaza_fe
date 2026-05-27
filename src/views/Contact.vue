@@ -134,7 +134,7 @@
             <div class="uc-tag uc-tag-borrow">Borrower</div>
             <h3 class="uc-title">Leverage Your Conviction</h3>
             <p class="uc-persona">The "Mini Saylor" — Corporate Bitcoin Strategy</p>
-            <p class="uc-desc">Amplify your BTC exposure without selling your stack or depleting business capital. Just like MicroStrategy's strategy, but truly decentralized.</p>
+            <p class="uc-desc">Amplify your BTC exposure without selling your stack or depleting business capital. Just like MicroStrategy's strategy, but truly non-custodial.</p>
             <ul class="uc-list">
               <li>Increase exposure up to 5× your current stack</li>
               <li>No taxable event — your original stack stays intact</li>

@@ -7,7 +7,7 @@
           Knowledge Hub
         </h1>
         <p class="text-xl text-white/90 max-w-2xl mx-auto">
-          Learn everything about Bitcoin-backed loans, decentralized lending,
+          Learn everything about Bitcoin-backed loans, non-custodial lending,
           and how to unlock liquidity from your Bitcoin holdings.
         </p>
       </div>
@@ -66,7 +66,7 @@
         </h2>
         <p class="text-lg text-white/90 mb-8">
           Access instant liquidity without selling your Bitcoin.
-          Decentralized, non-custodial, and secured by DLCs.
+          Non-custodial, peer-to-peer, and secured by DLCs.
         </p>
         <router-link
           :to="isLoggedIn ? '/btcusd' : '/register'"
@@ -98,7 +98,7 @@ const articles = [
   },
   {
     id: 1,
-    title: 'Cadena & Decentralized Finance',
+    title: 'Cadena & Bitcoin-Native Finance',
     description: 'What makes Cadena Bitcoin different from centralized lenders and sidechains.',
     imageBase: 'article14',
     link: '/article/cadena-decentralized-finance'

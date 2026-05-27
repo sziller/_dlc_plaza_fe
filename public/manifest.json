@@ -1,7 +1,7 @@
 {
   "name": "Cadena Bitcoin",
   "short_name": "Cadena",
-  "description": "Decentralized Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains.",
+  "description": "Non-custodial Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",

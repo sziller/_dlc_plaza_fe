@@ -8,7 +8,7 @@
           Cadena Bitcoin Presentation
         </h1>
         <p class="text-white/80 text-base sm:text-lg font-medium max-w-3xl mx-auto">
-          Slide deck overview of Cadena Bitcoin’s mission, decentralized lending model, and how DLCs
+          Slide deck overview of Cadena Bitcoin’s mission, non-custodial lending model, and how DLCs
           keep your keys in your control.
         </p>
       </div>
@@ -58,7 +58,7 @@
             Ready to keep your Bitcoin working for you?
           </h2>
           <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-8">
-            Access decentralized, non-custodial lending. No sidechains, no rehypothecation, just DLC-secured contracts.
+            Access non-custodial, peer-to-peer lending. No sidechains, no rehypothecation, just DLC-secured contracts.
           </p>
           <router-link
             :to="isLoggedIn ? '/btcusd' : '/register'"

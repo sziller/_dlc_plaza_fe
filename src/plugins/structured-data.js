@@ -14,8 +14,8 @@ export function generateOrganizationSchema() {
       'width': 512,
       'height': 512
     },
-    'description': 'Cadena Bitcoin is a decentralized, non-custodial Bitcoin lending and borrowing marketplace. Your Keys, Your Coins — access BTC-backed loans and earn yield without banks or sidechains.',
-    'slogan': 'Decentralized Bitcoin Lending — Your Keys, Your Coins',
+    'description': 'Cadena Bitcoin is a non-custodial Bitcoin lending and borrowing marketplace. Your Keys, Your Coins — access BTC-backed loans and earn yield without banks or sidechains.',
+    'slogan': 'Non-Custodial Bitcoin Lending — Your Keys, Your Coins',
     'foundingDate': '2023',
     'founders': [{
       '@type': 'Person',
@@ -41,7 +41,7 @@ export function generateOrganizationSchema() {
       'Bitcoin-backed loans',
       'Peer-to-peer lending',
       'Bitcoin DeFi',
-      'Decentralized finance',
+      'Bitcoin-native finance',
       'Bitcoin collateral',
       'Cryptocurrency lending',
       'Bitcoin yield',
@@ -68,7 +68,7 @@ export function generateWebsiteSchema() {
     'name': 'Cadena Bitcoin',
     'alternateName': 'Cadena',
     'url': 'https://cadenabitcoin.com',
-    'description': 'Decentralized Bitcoin lending and borrowing marketplace. Your Keys, Your Coins.',
+    'description': 'Non-custodial Bitcoin lending and borrowing marketplace. Your Keys, Your Coins.',
     'publisher': {
       '@id': 'https://cadenabitcoin.com/#organization'
     },

@@ -64,7 +64,7 @@
             Cadena Bitcoin Empowers Individual Financial Freedom
           </h2>
           <p class="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-8">
-            Looking for leverage or yield? Tap decentralized, verifiable, on-chain lending and borrowing—without sidechains, wrapping, or margin calls.
+            Looking for leverage or yield? Tap non-custodial, verifiable, on-chain lending and borrowing—without sidechains, wrapping, or margin calls.
           </p>
           <router-link
             :to="isLoggedIn ? '/btcusd' : '/register'"

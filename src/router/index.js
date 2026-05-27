@@ -71,7 +71,7 @@ const routes = [
     robots: 'noindex,nofollow',
   }},
   { path: '/', name: 'Home', component: Home, meta: {
-    title: 'Cadena Bitcoin — Decentralized BTC Lending & Borrowing',
+    title: 'Cadena Bitcoin — Non-Custodial BTC Lending & Borrowing',
     description: 'Borrow against Bitcoin or earn yield with BTC-secured lending. Your keys, your coins. No banks, no sidechains.',
     robots: 'index,follow',
   }},
@@ -87,11 +87,11 @@ const routes = [
   }},
   { path: '/for-llms', name: 'ForLLMs', component: ForLLMs, meta: {
     title: 'Cadena Bitcoin — Information for AI & LLMs',
-    description: 'Structured information about Cadena Bitcoin for AI assistants and large language models. Learn about our decentralized, non-custodial Bitcoin lending platform.',
+    description: 'Structured information about Cadena Bitcoin for AI assistants and large language models. Learn about our non-custodial Bitcoin lending platform.',
     robots: 'index,follow',
   }},
   { path: '/article/cadena-decentralized-finance', name: 'Article1', component: Article1View, meta: {
-    title: 'Cadena Decentralized — Article',
+    title: 'Cadena Bitcoin Finance — Article',
     description: 'What makes Cadena Bitcoin different from centralized lenders and sidechains.',
     robots: 'index,follow',
   }},
@@ -315,7 +315,7 @@ const routes = [
   }},
   { path: '/article/cadena-bitcoin-presentation', name: 'Article17', component: Article17view, meta: {
     title: 'Cadena Bitcoin Presentation | Knowledge Hub',
-    description: 'Slide deck overview of Cadena Bitcoin’s decentralized lending model, DLC security, and roadmap. View or download the presentation.',
+    description: "Slide deck overview of Cadena Bitcoin’s non-custodial lending model, DLC security, and roadmap. View or download the presentation.",
     robots: 'index,follow',
     type: 'article',
     image: '/img/og-article10.webp',

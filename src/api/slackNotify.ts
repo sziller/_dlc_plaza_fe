@@ -4,6 +4,7 @@ const IS_LOCAL = typeof location !== 'undefined'
   && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
 
 const WEBHOOK_URL = import.meta.env.VITE_SLACK_COLLATERAL_WEBHOOK_URL as string | undefined
+const BOOK_API = import.meta.env.VITE_BOOK_API as string | undefined
 
 let hasFiredThisSession = false
 
@@ -15,7 +16,6 @@ export function notifySlackCollateralShortfall(
 ) {
   if (IS_LOCAL) return
   if (hasFiredThisSession) return
-  if (!WEBHOOK_URL) return
   if (!email || email === 'unknown') return
 
   hasFiredThisSession = true
@@ -41,14 +41,22 @@ export function notifySlackCollateralShortfall(
     'This user got to the funding screen — they\'re deep in the funnel.',
   ].join('\n')
 
-  // Use text/plain to avoid CORS preflight — Slack webhooks accept JSON with this content type
-  fetch(WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ text }),
-  }).catch(() => {
-    // silent — must never break user flow
-  })
+  if (WEBHOOK_URL) {
+    // Use text/plain to avoid CORS preflight — Slack webhooks accept JSON with this content type
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ text }),
+    }).catch(() => {})
+  }
+
+  if (BOOK_API) {
+    fetch(`${BOOK_API}/api/send-collateral-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, loanUsd, availableSats, requiredSats }),
+    }).catch(() => {})
+  }
 }
 
 export function notifySlackNewBtcusdUser(email: string) {

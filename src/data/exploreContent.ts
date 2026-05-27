@@ -76,7 +76,7 @@ export const exploreUseCases = [
         <li>✅ No banks — pure peer-to-peer Bitcoin finance.</li>
       </ul>
 
-      <p class="mt-4 italic text-white/75">“Just like MicroStrategy’s strategy, but truly decentralized.”</p>
+      <p class=”mt-4 italic text-white/75”>”Just like MicroStrategy’s strategy, but truly non-custodial.”</p>
 
       <a href="/register" class="btn-primary mt-5 inline-flex" aria-label="Get Started">Get Started →</a>
     `,

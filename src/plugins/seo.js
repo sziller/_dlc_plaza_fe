@@ -4,7 +4,7 @@ export function installSeo(router) {
   const defaults = {
     title: 'Cadena Bitcoin',
     description:
-      'Cadena Bitcoin is a decentralized Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains.',
+      'Cadena Bitcoin is a non-custodial Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains.',
     robots: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
     image: '/og-homepage.png',
     locale: 'en_US',

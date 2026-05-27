@@ -14,7 +14,7 @@
     <!-- ARTICLE CONTENT (solid black) -->
     <section class="bg-black px-4 py-10 lg:py-14 max-w-[1000px] mx-auto space-y-6 text-base sm:text-lg leading-snug text-white/90">
       <p>
-        Cadena Bitcoin is a decentralized lending and borrowing product where
+        Cadena Bitcoin is a non-custodial lending and borrowing product where
         users lock Bitcoin collateral in a Discreet Log Contract (DLC) to facilitate loans. Here’s a breakdown
         of the key actions:
       </p>
