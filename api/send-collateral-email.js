@@ -76,7 +76,7 @@ function buildHtml({ name, loanUsd, requiredBtc, availableBtc, shortfallBtc }) {
                 <td style="padding:12px 18px;border-bottom:1px solid #1b2d47;font-size:13px;color:#a8b4cc;"><span style="color:#6738e3;font-weight:700;margin-right:10px;">1.</span> Move your Bitcoin into your Cadena wallet from wherever it's currently held.</td>
               </tr>
               <tr>
-                <td style="padding:12px 18px;border-bottom:1px solid #1b2d47;font-size:13px;color:#a8b4cc;"><span style="color:#6738e3;font-weight:700;margin-right:10px;">2.</span> Confirm the balance covers <strong style="color:#ffffff;">${requiredBtc} BTC</strong>.</td>
+                <td style="padding:12px 18px;border-bottom:1px solid #1b2d47;font-size:13px;color:#a8b4cc;"><span style="color:#6738e3;font-weight:700;margin-right:10px;">2.</span> Confirm the balance covers <strong style="color:#c8d0e0;">${requiredBtc} BTC</strong>.</td>
               </tr>
               <tr>
                 <td style="padding:12px 18px;font-size:13px;color:#a8b4cc;"><span style="color:#6738e3;font-weight:700;margin-right:10px;">3.</span> Return to the funding screen — the loan will be ready to fund.</td>
