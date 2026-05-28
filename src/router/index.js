@@ -46,6 +46,8 @@ const OrderConfirmed     = () => import('../views/OrderConfirmed.vue')
 const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
 const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
+const Sazmining            = () => import('../views/lp/Sazmining.vue')
+const SazminingShop        = () => import('../views/lp/SazminingShop.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -60,6 +62,16 @@ const hasBlogToken = () => {
 }
 
 const routes = [
+  { path: '/sazmining/shop', name: 'SazminingShop', component: SazminingShop, meta: {
+    title: 'Sazmining Shop × Cadena Bitcoin',
+    description: 'Buy mining hardware and fund it with a non-custodial Bitcoin-backed loan from Cadena.',
+    robots: 'index,follow',
+  }},
+  { path: '/sazmining', name: 'Sazmining', component: Sazmining, meta: {
+    title: 'Sazmining × Cadena Bitcoin — Mine Smarter, Borrow Cheaper',
+    description: 'Pair Sazmining\'s managed Bitcoin mining with Cadena\'s non-custodial BTC-backed loans. Keep your keys, grow your stack.',
+    robots: 'index,follow',
+  }},
   { path: '/endgame', name: 'Endgame', component: Endgame, meta: {
     title: 'Endgame — Bitcoin, Sovereign Debt, and the Return of Sound Capital',
     description: 'A serious framework for allocating in a Bitcoin-anchored monetary order. By Kevin Bell, Founder of Cadena Bitcoin.',

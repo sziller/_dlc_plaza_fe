@@ -3,126 +3,166 @@
 
     <!-- ══════════════ HEADER ══════════════ -->
     <header class="saz-header">
-      <img src="/img/partners/sazmining-logo.png" alt="Sazmining" class="saz-logo" />
-      <span class="saz-badge">Bitcoin-Native Financing</span>
+      <div class="saz-header-left">
+        <img src="/img/partners/sazmining-logo.png" alt="Sazmining" class="saz-logo" />
+        <span class="saz-x">×</span>
+        <img :src="cadenaLogo" alt="Cadena Bitcoin" class="cadena-logo-sm" />
+        <span class="saz-badge">Bitcoin-Native Mining Finance</span>
+      </div>
+      <router-link to="/" class="back-link">Back to Cadena Bitcoin →</router-link>
     </header>
 
     <!-- ══════════════ HERO ══════════════ -->
     <section class="saz-hero">
       <p class="saz-eyebrow">Sazmining × Cadena Bitcoin</p>
-      <h1 class="saz-h1">Bitcoin-Native Mining Finance</h1>
+      <h1 class="saz-h1">Buy a mining rig today.<br />Keep your Bitcoin stack.</h1>
       <p class="saz-sub">
-        Get a running miner today. DLC settles at $5,000 in Bitcoin after 12 months.<br class="hidden sm:block" />
-        Keep every sat you mine.
+        Pay Sazmining directly in Bitcoin for a running miner. Cadena's Discreet Log Contract
+        preserves your original Bitcoin position through the 12-month term.
+        No surrender of stack, no margin calls, no custodian.
       </p>
+      <a href="#financing" class="btn-hero">Finance with Cadena →</a>
     </section>
 
-    <!-- ══════════════ MAIN GRID ══════════════ -->
-    <section class="saz-grid">
+    <!-- ══════════════ THE RIG ══════════════ -->
+    <section class="saz-section">
+      <div class="saz-container">
+        <div class="rig-layout">
 
-      <!-- ── Rig Card ── -->
-      <div class="saz-card">
-        <div class="saz-rig-img">
-          <span class="img-placeholder">&lt;image&gt;</span>
+          <!-- Image -->
+          <div class="rig-img-wrap">
+            <div class="rig-img-placeholder">Antminer S21 XP</div>
+          </div>
+
+          <!-- Spec block -->
+          <div class="rig-spec-block">
+            <h2 class="rig-name">Bitmain Antminer S21 XP</h2>
+            <p class="rig-tagline">270 TH/s · 3,645 W · Air-cooled · Renewable energy</p>
+
+            <div class="rig-stats">
+              <div class="stat-row">
+                <span class="stat-label">Rig bundle price</span>
+                <span class="stat-val accent">$4,545 <span class="stat-btc">≈ 0.04329 BTC at current spot</span></span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Est. monthly mining revenue</span>
+                <span class="stat-val">~$345</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Sazmining service fee</span>
+                <span class="stat-val">~$157/month <span class="stat-btc">hosting, electricity, repairs</span></span>
+              </div>
+              <div class="stat-row stat-row--highlight">
+                <span class="stat-label">Net monthly to your wallet</span>
+                <span class="stat-val">~$188</span>
+              </div>
+            </div>
+
+            <ul class="rig-perks">
+              <li>First-year repair costs included</li>
+              <li>Support resolved in under 12 hours</li>
+              <li>20% more carbon-free energy than the network</li>
+            </ul>
+          </div>
         </div>
-        <div class="saz-card-body">
-          <div class="rig-header">
+      </div>
+    </section>
+
+    <!-- ══════════════ HOW THE FINANCING WORKS ══════════════ -->
+    <section class="saz-section saz-section--alt" id="financing">
+      <div class="saz-container">
+        <h2 class="saz-section-title">How the financing works</h2>
+        <div class="steps-grid">
+
+          <div class="step-card">
+            <div class="step-num">1</div>
             <div>
-              <h2 class="rig-name">Bitmain Antminer S21 XP</h2>
-              <p class="rig-spec">270 TH/s · 3,645 W · Air-cooled · Renewable</p>
-            </div>
-            <div class="rig-price-block">
-              <p class="rig-price">$4,545</p>
-              <p class="rig-price-btc">≈ 0.04329 BTC</p>
-            </div>
-          </div>
-
-          <div class="rig-stats">
-            <div class="stat-box">
-              <p class="stat-label">Est. Monthly Revenue</p>
-              <p class="stat-val accent">~$345</p>
-            </div>
-            <div class="stat-box">
-              <p class="stat-label">Service Fee</p>
-              <p class="stat-val">~$157</p>
-            </div>
-            <div class="stat-box">
-              <p class="stat-label">Net Monthly</p>
-              <p class="stat-val">~$188</p>
+              <p class="step-title">You pay Sazmining directly in Bitcoin</p>
+              <p class="step-desc">
+                Send the rig bundle price (≈ 0.04329 BTC) directly to Sazmining.
+                Sazmining confirms payment on-chain and begins deploying your rig at
+                their data center — typically within days.
+              </p>
             </div>
           </div>
 
-          <ul class="rig-perks">
-            <li>First-year repair costs included</li>
-            <li>Support resolved in under 12 hours</li>
-            <li>20% more carbon-free energy than the network</li>
-          </ul>
-
-          <button class="btn-finance" @click="scrollToFinancing">
-            Finance with Cadena – 1 Year Plan →
-          </button>
-        </div>
-      </div>
-
-      <!-- ── Financing Card ── -->
-      <div class="saz-card financing-card" ref="financingCard">
-
-        <!-- Cadena branding -->
-        <div class="cadena-header">
-          <img :src="cadenaLogo" alt="Cadena Bitcoin" class="cadena-logo" />
-          <div>
-            <p class="cadena-name">Cadena Bitcoin</p>
-            <p class="cadena-desc">1-Year Bullet Loan · Fixed USD Settlement</p>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div>
+              <p class="step-title">You commit collateral to Cadena</p>
+              <p class="step-desc">
+                Separately, commit Bitcoin as collateral to a Cadena Discreet Log Contract
+                on Bitcoin's base layer. The collateral pool covers a USD-denominated loan
+                equal to the rig's purchase price.
+                <strong>You keep your keys throughout. Cadena holds no key at any point.</strong>
+              </p>
+            </div>
           </div>
-        </div>
 
-        <!-- Loan terms -->
-        <div class="loan-terms">
-          <div v-for="row in loanTerms" :key="row.label" class="term-row">
-            <span class="term-label">{{ row.label }}</span>
-            <span class="term-val" :class="{ accent: row.highlight }">{{ row.value }}</span>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div>
+              <p class="step-title">The contract settles itself at month 12</p>
+              <p class="step-desc">
+                At maturity, the pre-signed Contract Execution Transaction broadcasts on-chain.
+                The lender's USD-denominated target is paid in Bitcoin at the maturity price.
+                You receive the residual back to self-custody.
+                <strong>No margin calls during the term. No active repayment step.</strong>
+              </p>
+            </div>
           </div>
-        </div>
 
-        <!-- Key insight -->
-        <div class="insight-box">
-          <p class="insight-title">Only one number to remember</p>
-          <p class="insight-body">
-            Send <strong>0.10 BTC</strong> as collateral today. Cadena disburses
-            <strong>0.04329 BTC</strong> directly to Sazmining. The DLC settles
-            at <strong>$5,000 in Bitcoin</strong> automatically at the end of year one.
-          </p>
-        </div>
-
-        <!-- CTA -->
-        <router-link to="/register" class="btn-apply">
-          Apply for Financing →
-        </router-link>
-        <p class="trust-line">Non-custodial · DLC-secured · No counterparty risk</p>
-      </div>
-    </section>
-
-    <!-- ══════════════ HOW IT WORKS ══════════════ -->
-    <section class="saz-steps">
-      <h2 class="saz-section-title">How It Works</h2>
-      <div class="steps-grid">
-        <div v-for="(step, i) in steps" :key="i" class="step-item">
-          <div class="step-num">{{ i + 1 }}</div>
-          <div>
-            <p class="step-title">{{ step.title }}</p>
-            <p class="step-desc">{{ step.desc }}</p>
-          </div>
         </div>
       </div>
     </section>
 
-    <!-- ══════════════ WHY IT WORKS ══════════════ -->
-    <section class="saz-why">
-      <h2 class="saz-section-title">Why This Works</h2>
-      <div class="why-grid">
-        <div v-for="point in whyPoints" :key="point.title" class="why-card">
-          <p class="why-title">{{ point.title }}</p>
-          <p class="why-body">{{ point.body }}</p>
+    <!-- ══════════════ INDICATIVE ECONOMICS ══════════════ -->
+    <section class="saz-section">
+      <div class="saz-container">
+        <h2 class="saz-section-title">Indicative economics</h2>
+        <div class="econ-box">
+          <table class="econ-table">
+            <tbody>
+              <tr v-for="row in economics" :key="row.item" :class="{ 'econ-row--highlight': row.highlight }">
+                <td class="econ-item">{{ row.item }}</td>
+                <td class="econ-val">{{ row.value }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="econ-disclosure">
+            Rates are determined by the Cadena marketplace at the time of match and can change with supply
+            and demand. The economics above are indicative. Mining revenue, electricity costs, and BTC price
+            all vary and are not guaranteed. Sazmining's service fee covers hosting, electricity, and
+            first-year repairs. Mining rewards flow daily to your self-custody wallet, net of Sazmining's
+            revenue share.
+          </div>
+        </div>
+
+        <div class="econ-cta">
+          <router-link to="/register" class="btn-apply">Get started →</router-link>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════ TWO INCOME STREAMS ══════════════ -->
+    <section class="saz-section saz-section--alt">
+      <div class="saz-container">
+        <h2 class="saz-section-title">Two income streams</h2>
+        <div class="streams-grid">
+          <div class="stream-card">
+            <p class="stream-title">Mining rewards for 12 months</p>
+            <p class="stream-body">
+              Bitcoin mined daily flows directly to your self-custody wallet (net of
+              Sazmining's revenue share). You own every sat you earn.
+            </p>
+          </div>
+          <div class="stream-card">
+            <p class="stream-title">Bitcoin position preserved through collateral</p>
+            <p class="stream-body">
+              Your locked collateral is what brings the Bitcoin back at maturity.
+              The Cadena contract structurally reconstructs your stack over the term.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -134,88 +174,39 @@
         <a href="https://www.sazmining.com" target="_blank" rel="noopener" class="footer-link">Sazmining</a>
         · Financing by
         <a href="/" class="footer-link">Cadena Bitcoin</a>
+        · Cadena Bitcoin S.A. de C.V., El Salvador BSP registered
       </p>
-      <p class="footer-legal">Bitcoin-backed loans involve risk. Mining rewards are not guaranteed. Not financial advice.</p>
+      <p class="footer-legal">
+        Bitcoin-backed loans involve risk. Mining rewards are not guaranteed.
+        Not financial advice. KYC required via Sumsub through the Cadena Signer App.
+      </p>
     </footer>
 
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import cadenaLogo from '../../assets/logos/cadena_bitcoin_logo_2.png'
 
-const financingCard = ref(null)
-
-function scrollToFinancing() {
-  financingCard.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
-
-const loanTerms = [
-  { label: 'Rig bundle price',              value: '$4,545.45  (≈ 0.04329 BTC)' },
-  { label: 'Loan disbursed to Sazmining',   value: '0.04329 BTC',                highlight: true },
-  { label: 'Collateral required',           value: '0.10 BTC — held in DLC' },
-  { label: 'Term',                          value: '12 months · single bullet' },
-  { label: 'Interest rate',                 value: '10% simple interest (fixed USD)' },
-  { label: 'DLC settlement at maturity',     value: '$5,000 in BTC at spot price', highlight: true },
-]
-
-const steps = [
-  {
-    title: 'Select your rig bundle',
-    desc: 'Choose the Bitmain S21 XP. Price shown in USD and BTC at current rate.',
-  },
-  {
-    title: 'Cadena quote appears instantly',
-    desc: 'See the exact terms: 0.04329 BTC disbursed to Sazmining today → DLC settles at $5,000 in BTC at month 12.',
-  },
-  {
-    title: 'Send two Bitcoin payments',
-    desc: '0.10 BTC to your Cadena DLC wallet as collateral. Cadena disburses 0.04329 BTC directly to Sazmining for the rigs.',
-  },
-  {
-    title: 'Sazmining confirms & deploys',
-    desc: 'Payment confirmed on-chain. Rig deployment begins at the data center — typically within days.',
-  },
-  {
-    title: 'Mine for 12 months',
-    desc: 'Mining rewards flow directly to your wallet every day. You own every sat you earn.',
-  },
-  {
-    title: 'Day 365 settlement',
-    desc: 'The DLC auto-executes on-chain. No action needed — the contract settles at $5,000 in BTC and your collateral is returned.',
-  },
-]
-
-const whyPoints = [
-  {
-    title: 'One number to send',
-    body: '0.10 BTC covers everything — collateral plus the rig is financed. No complex multi-step funding.',
-  },
-  {
-    title: 'One settlement number',
-    body: '$5,000 USD in Bitcoin. Fixed, simple, easy to plan around — and the DLC handles it automatically, no repayment to anyone.',
-  },
-  {
-    title: 'Two income streams',
-    body: 'Mining rewards for 12 months plus Bitcoin price appreciation on your collateral. Both work in your favour.',
-  },
-  {
-    title: 'Zero counterparty risk',
-    body: 'Your collateral sits in a Discreet Log Contract on Bitcoin\'s base layer. Cadena holds no keys, runs no pool.',
-  },
+const economics = [
+  { item: 'Rig bundle price (today)',      value: '$4,545 (≈ 0.04329 BTC)' },
+  { item: 'Cadena loan amount',            value: '$4,545 — matches purchase price' },
+  { item: 'Collateral commitment',         value: '≈ 0.10 BTC (sized for 50% LTV protection)' },
+  { item: 'Term',                          value: '12 months · single settlement at maturity' },
+  { item: 'Indicative rate',              value: '~12% annualized · rates clear at the marketplace' },
+  { item: 'Cadena platform fee',           value: '1% (borrower side)' },
+  { item: 'Estimated settlement',          value: '~$5,136 in Bitcoin at maturity spot price', highlight: true },
 ]
 </script>
 
 <style scoped>
-/* ─── Palette ───────────────────────────────────────
-   white:   #ffffff
-   teal:    #0e9f97
-   yellow:  #fecf4e
-   mist:    #e7f5f5
-──────────────────────────────────────────────────── */
+/* ─── Palette ─────────────────────────
+   teal:   #0e9f97
+   yellow: #fecf4e
+   mist:   #e7f5f5
+   dark:   #1a1a1a
+──────────────────────────────────────── */
 
-/* ─── Base ──────────────────────────────────────── */
 .saz-page {
   min-height: 100vh;
   background: #ffffff;
@@ -223,19 +214,28 @@ const whyPoints = [
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* ─── Header ────────────────────────────────────── */
+/* ─── Header ─────────────────────────── */
 .saz-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  max-width: 1024px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  max-width: 1080px;
   margin: 0 auto;
+  gap: 16px;
 }
-.saz-logo { height: 32px; width: auto; }
+.saz-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.saz-logo { height: 28px; width: auto; }
+.cadena-logo-sm { height: 26px; width: auto; }
+.saz-x { font-size: 1rem; color: rgba(0,0,0,0.3); font-weight: 300; }
 .saz-badge {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -244,196 +244,173 @@ const whyPoints = [
   border-radius: 999px;
   padding: 3px 12px;
 }
+.back-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(0,0,0,0.4);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.back-link:hover { color: #0e9f97; }
 
-/* ─── Hero ──────────────────────────────────────── */
+/* ─── Hero ───────────────────────────── */
 .saz-hero {
   text-align: center;
-  padding: 60px 24px 48px;
-  max-width: 720px;
+  padding: 72px 24px 56px;
+  max-width: 760px;
   margin: 0 auto;
 }
 .saz-eyebrow {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #0e9f97;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 .saz-h1 {
   font-size: clamp(2rem, 5vw, 3.25rem);
   font-weight: 800;
   line-height: 1.15;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: #1a1a1a;
 }
 .saz-sub {
-  font-size: 1.1rem;
-  color: rgba(0, 0, 0, 0.55);
-  line-height: 1.6;
+  font-size: 1.05rem;
+  color: rgba(0,0,0,0.55);
+  line-height: 1.7;
+  margin-bottom: 32px;
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.btn-hero {
+  display: inline-block;
+  background: #fecf4e;
+  color: #1a1a1a;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 15px 36px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.btn-hero:hover { opacity: 0.85; }
+
+/* ─── Sections ───────────────────────── */
+.saz-section {
+  padding: 64px 0;
+}
+.saz-section--alt {
+  background: #e7f5f5;
+}
+.saz-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.saz-section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #1a1a1a;
 }
 
-/* ─── Grid ──────────────────────────────────────── */
-.saz-grid {
+/* ─── Rig Layout ─────────────────────── */
+.rig-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
-  max-width: 1024px;
-  margin: 0 auto;
-  padding: 0 20px 48px;
+  gap: 32px;
+  align-items: start;
 }
-@media (min-width: 900px) {
-  .saz-grid { grid-template-columns: 1fr 1fr; }
+@media (min-width: 800px) {
+  .rig-layout { grid-template-columns: 1fr 1fr; }
 }
-
-/* ─── Cards ─────────────────────────────────────── */
-.saz-card {
-  background: #e7f5f5;
-  border: 1px solid rgba(14, 159, 151, 0.2);
-  border-radius: 20px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.saz-card-body { padding: 24px; flex: 1; display: flex; flex-direction: column; }
-.financing-card { padding: 28px; }
-
-/* ─── Rig Card ──────────────────────────────────── */
-.saz-rig-img {
+.rig-img-wrap {
   background: #cce9e8;
-  height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4/3;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
-.img-placeholder {
-  font-size: 1rem;
+.rig-img-placeholder {
+  font-size: 0.9rem;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.3);
+  color: rgba(0,0,0,0.3);
   letter-spacing: 0.05em;
 }
-
-.rig-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 12px; }
-.rig-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; color: #1a1a1a; }
-.rig-spec { font-size: 0.75rem; color: rgba(0, 0, 0, 0.45); }
-.rig-price-block { text-align: right; flex-shrink: 0; }
-.rig-price { font-size: 1.6rem; font-weight: 800; color: #0e9f97; line-height: 1; }
-.rig-price-btc { font-size: 0.72rem; color: rgba(0, 0, 0, 0.4); margin-top: 2px; }
-
-.rig-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
-.stat-box {
-  background: #ffffff;
-  border: 1px solid rgba(14, 159, 151, 0.25);
-  border-radius: 10px;
-  padding: 10px;
-  text-align: center;
+.rig-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 6px;
 }
-.stat-label { font-size: 0.65rem; color: rgba(0, 0, 0, 0.45); margin-bottom: 4px; line-height: 1.3; }
-.stat-val { font-size: 0.9rem; font-weight: 700; color: #1a1a1a; }
-.stat-val.accent { color: #0e9f97; }
-
-.rig-perks { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-.rig-perks li {
+.rig-tagline {
   font-size: 0.8rem;
-  color: rgba(0, 0, 0, 0.55);
-  padding-left: 16px;
+  color: rgba(0,0,0,0.45);
+  margin-bottom: 24px;
+}
+.rig-stats {
+  border: 1px solid rgba(14,159,151,0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(14,159,151,0.12);
+  gap: 12px;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-row--highlight { background: #fefbec; }
+.stat-label { font-size: 0.8rem; color: rgba(0,0,0,0.5); flex-shrink: 0; }
+.stat-val { font-size: 0.85rem; font-weight: 700; color: #1a1a1a; text-align: right; }
+.stat-val.accent { color: #0e9f97; font-size: 1rem; }
+.stat-btc { font-size: 0.72rem; font-weight: 400; color: rgba(0,0,0,0.35); display: block; }
+.rig-perks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rig-perks li {
+  font-size: 0.82rem;
+  color: rgba(0,0,0,0.55);
+  padding-left: 18px;
   position: relative;
 }
 .rig-perks li::before { content: '✓'; position: absolute; left: 0; color: #0e9f97; font-weight: 700; }
 
-.btn-finance {
-  width: 100%;
-  background: #fecf4e;
-  color: #1a1a1a;
-  font-weight: 800;
-  font-size: 0.95rem;
-  padding: 14px 20px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.2s;
-  margin-top: auto;
-}
-.btn-finance:hover { opacity: 0.85; }
-
-/* ─── Financing Card ────────────────────────────── */
-.cadena-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-.cadena-logo { height: 36px; width: auto; }
-.cadena-name { font-size: 0.9rem; font-weight: 700; color: #1a1a1a; }
-.cadena-desc { font-size: 0.7rem; color: rgba(0, 0, 0, 0.4); margin-top: 2px; }
-
-.loan-terms { display: flex; flex-direction: column; gap: 2px; margin-bottom: 20px; }
-.term-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  gap: 12px;
-}
-.term-row:last-child { border-bottom: none; }
-.term-label { font-size: 0.8rem; color: rgba(0, 0, 0, 0.5); flex-shrink: 0; }
-.term-val { font-size: 0.85rem; font-weight: 600; text-align: right; color: #1a1a1a; }
-.term-val.accent {
-  color: #1a1a1a;
-  font-weight: 800;
-  background: #fecf4e;
-  border-radius: 6px;
-  padding: 2px 8px;
-}
-
-.insight-box {
-  background: #ffffff;
-  border: 1px solid rgba(14, 159, 151, 0.3);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-.insight-title { font-size: 0.75rem; font-weight: 700; color: #0e9f97; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-.insight-body { font-size: 0.85rem; color: rgba(0, 0, 0, 0.7); line-height: 1.55; }
-
-.btn-apply {
-  display: block;
-  width: 100%;
-  background: #0e9f97;
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 1rem;
-  padding: 15px 20px;
-  border-radius: 12px;
-  text-align: center;
-  text-decoration: none;
-  transition: opacity 0.2s;
-  margin-bottom: 10px;
-}
-.btn-apply:hover { opacity: 0.88; }
-.trust-line { font-size: 0.7rem; color: rgba(0, 0, 0, 0.3); text-align: center; }
-
-/* ─── How It Works ──────────────────────────────── */
-.saz-steps {
-  max-width: 860px;
+/* ─── Steps ──────────────────────────── */
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 0 24px 64px;
 }
-.saz-section-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 36px;
-  color: #1a1a1a;
+@media (min-width: 700px) {
+  .steps-grid { grid-template-columns: repeat(3, 1fr); }
 }
-.steps-grid { display: flex; flex-direction: column; gap: 20px; }
-.step-item { display: flex; gap: 16px; align-items: flex-start; }
+.step-card {
+  background: #ffffff;
+  border: 1px solid rgba(14,159,151,0.2);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 .step-num {
-  flex-shrink: 0;
   width: 34px;
   height: 34px;
   background: #0e9f97;
@@ -443,48 +420,97 @@ const whyPoints = [
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 0.85rem;
-  margin-top: 2px;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
-.step-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; color: #1a1a1a; }
-.step-desc { font-size: 0.82rem; color: rgba(0, 0, 0, 0.55); line-height: 1.55; }
+.step-title { font-size: 0.9rem; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+.step-desc { font-size: 0.8rem; color: rgba(0,0,0,0.55); line-height: 1.6; }
+.step-desc strong { color: #1a1a1a; display: block; margin-top: 8px; }
 
-/* ─── Why It Works ──────────────────────────────── */
-.saz-why {
+/* ─── Economics ──────────────────────── */
+.econ-box {
   background: #e7f5f5;
-  padding: 56px 24px;
+  border: 1px solid rgba(14,159,151,0.25);
+  border-radius: 16px;
+  overflow: hidden;
+  max-width: 720px;
+  margin: 0 auto 32px;
 }
-.saz-why .saz-section-title { margin-bottom: 36px; }
-.why-grid {
+.econ-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.econ-table tr {
+  border-bottom: 1px solid rgba(14,159,151,0.15);
+}
+.econ-table tr:last-child { border-bottom: none; }
+.econ-row--highlight { background: #fefbec; }
+.econ-item {
+  padding: 14px 20px;
+  font-size: 0.82rem;
+  color: rgba(0,0,0,0.55);
+  width: 55%;
+}
+.econ-val {
+  padding: 14px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: right;
+}
+.econ-row--highlight .econ-val { color: #0e9f97; }
+.econ-disclosure {
+  padding: 16px 20px;
+  font-size: 0.72rem;
+  color: rgba(0,0,0,0.4);
+  line-height: 1.65;
+  border-top: 1px solid rgba(14,159,151,0.15);
+  background: #ffffff;
+}
+.econ-cta { text-align: center; }
+.btn-apply {
+  display: inline-block;
+  background: #0e9f97;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 15px 40px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.btn-apply:hover { opacity: 0.88; }
+
+/* ─── Two income streams ─────────────── */
+.streams-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
-  max-width: 860px;
+  max-width: 800px;
   margin: 0 auto;
 }
-@media (max-width: 600px) { .why-grid { grid-template-columns: 1fr; } }
-.why-card {
-  background: #ffffff;
-  border: 1px solid rgba(14, 159, 151, 0.2);
-  border-radius: 14px;
-  padding: 20px;
+@media (min-width: 600px) {
+  .streams-grid { grid-template-columns: 1fr 1fr; }
 }
-.why-title { font-size: 0.9rem; font-weight: 700; color: #0e9f97; margin-bottom: 6px; }
-.why-body { font-size: 0.82rem; color: rgba(0, 0, 0, 0.55); line-height: 1.55; }
+.stream-card {
+  background: #ffffff;
+  border: 1px solid rgba(14,159,151,0.2);
+  border-radius: 14px;
+  padding: 24px;
+}
+.stream-title { font-size: 0.95rem; font-weight: 700; color: #0e9f97; margin-bottom: 10px; }
+.stream-body { font-size: 0.82rem; color: rgba(0,0,0,0.55); line-height: 1.6; }
 
-/* ─── Footer ────────────────────────────────────── */
+/* ─── Footer ─────────────────────────── */
 .saz-footer {
   text-align: center;
-  padding: 24px;
-  border-top: 1px solid rgba(0, 0, 0, 0.07);
-  font-size: 0.8rem;
-  color: rgba(0, 0, 0, 0.35);
+  padding: 28px 24px;
+  border-top: 1px solid rgba(0,0,0,0.07);
+  font-size: 0.78rem;
+  color: rgba(0,0,0,0.35);
   background: #ffffff;
 }
 .footer-link { color: #0e9f97; text-decoration: none; }
 .footer-link:hover { text-decoration: underline; }
-.footer-legal { margin-top: 6px; font-size: 0.7rem; color: rgba(0, 0, 0, 0.25); }
-
-/* ─── Accent util ───────────────────────────────── */
-.accent { color: #0e9f97; }
+.footer-legal { margin-top: 8px; font-size: 0.7rem; color: rgba(0,0,0,0.25); }
 </style>

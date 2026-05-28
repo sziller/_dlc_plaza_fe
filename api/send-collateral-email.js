@@ -155,22 +155,23 @@ export default async function handler(req, res) {
 
   const resend = new Resend(process.env.RESEND_API_KEY)
 
-  try {
-    await resend.emails.send({
-      from: 'Kevin Bell — Cadena Bitcoin <hello@cadenabitcoin.com>',
-      to: email,
-      subject: 'Your Cadena loan — completing the collateral step',
-      html: buildHtml({
-        name: firstName || 'there',
-        loanUsd: fmtUsd(loanUsd),
-        requiredBtc,
-        availableBtc,
-        shortfallBtc,
-      }),
-    })
-    res.json({ ok: true })
-  } catch (err) {
-    console.error('send-collateral-email:', err.message)
-    res.status(500).json({ error: 'Failed to send email' })
+  const { data, error } = await resend.emails.send({
+    from: 'Kevin Bell — Cadena Bitcoin <hello@cadenabitcoin.com>',
+    to: email,
+    subject: 'Your Cadena loan — completing the collateral step',
+    html: buildHtml({
+      name: firstName || 'there',
+      loanUsd: fmtUsd(loanUsd),
+      requiredBtc,
+      availableBtc,
+      shortfallBtc,
+    }),
+  })
+
+  if (error) {
+    console.error('send-collateral-email:', JSON.stringify(error))
+    return res.status(500).json({ error: error.message })
   }
+
+  res.json({ ok: true, id: data?.id })
 }
