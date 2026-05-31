@@ -46,6 +46,7 @@ const OrderConfirmed     = () => import('../views/OrderConfirmed.vue')
 const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
 const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
+const Newsletter             = () => import('../views/Newsletter.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -409,6 +410,16 @@ const routes = [
   meta: {
     title: 'Settlement Calculator — Cadena Bitcoin',
     description: 'Calculate your DLC payout at any BTC settlement price.',
+    robots: 'index,follow',
+  }
+},
+{
+  path: '/newsletter',
+  name: 'Newsletter',
+  component: Newsletter,
+  meta: {
+    title: 'Newsletter — Cadena Bitcoin',
+    description: 'Subscribe to the Cadena Bitcoin newsletter for Bitcoin education, market insights, security best practices, and product updates.',
     robots: 'index,follow',
   }
 },

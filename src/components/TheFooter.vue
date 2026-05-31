@@ -26,6 +26,7 @@
             <li><router-link to="/about" class="hover:text-white transition-colors">About</router-link></li>
             <li><router-link to="/about" class="hover:text-white transition-colors">Founders</router-link></li>
             <li><router-link to="/contact" class="hover:text-white transition-colors">Contact</router-link></li>
+            <li><router-link to="/newsletter" class="hover:text-white transition-colors">Newsletter</router-link></li>
             <li><router-link to="/security" class="hover:text-white transition-colors">Security</router-link></li>
           </ul>
         </div>
