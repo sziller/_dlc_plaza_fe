@@ -88,6 +88,11 @@
                 LinkedIn <span class="sr-only">(opens in a new tab)</span>
               </a>
             </li>
+            <li>
+              <a href="https://discord.gg/RPUa6q7cs" class="hover:text-white transition-colors" rel="noopener noreferrer" target="_blank">
+                Discord <span class="sr-only">(opens in a new tab)</span>
+              </a>
+            </li>
           </ul>
         </div>
 

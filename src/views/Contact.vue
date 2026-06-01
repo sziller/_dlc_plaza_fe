@@ -213,6 +213,10 @@
               <i-simple-icons-youtube class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-youtube>
               <span class="text-base font-medium">YouTube</span>
             </a>
+            <a href="https://discord.gg/RPUa6q7cs" target="_blank" rel="noopener noreferrer nofollow" referrerpolicy="no-referrer" aria-label="Join our Discord" class="social-tile">
+              <i-simple-icons-discord class="w-16 h-16 md:w-20 md:h-20" aria-hidden="true"></i-simple-icons-discord>
+              <span class="text-base font-medium">Discord</span>
+            </a>
           </div>
         </div>
 
