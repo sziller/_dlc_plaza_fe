@@ -15,6 +15,7 @@ declare module 'vue' {
     DLCDetails: typeof import('./components/DLCDetails.vue')['default']
     HeroRatesDisplay: typeof import('./components/HeroRatesDisplay.vue')['default']
     HubStyleMosaic: typeof import('./components/HubStyleMosaic.vue')['default']
+    ISimpleIconsDiscord: typeof import('~icons/simple-icons/discord')['default']
     ISimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']
     ISimpleIconsX: typeof import('~icons/simple-icons/x')['default']
     ISimpleIconsYoutube: typeof import('~icons/simple-icons/youtube')['default']
