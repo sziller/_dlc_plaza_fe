@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import TheFooter from '../../components/TheFooter.vue'
 import HeroRatesDisplay from '../../components/HeroRatesDisplay.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
+import FeaturesCarousel from '../../components/FeaturesCarousel.vue'
 import { useAuth } from '../../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../../api/publicContact'
 import { blogArticles } from '../../data/exploreContent'
@@ -276,19 +277,15 @@ onMounted(() => {
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
 
-  const sections = document.querySelectorAll('.animated-section')
   io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const idx = [...sections].indexOf(entry.target)
-        if (idx !== -1) {
-          sectionInView.value[idx] = true
-          io.unobserve(entry.target)
-        }
+        entry.target.classList.add('visible')
+        io.unobserve(entry.target)
       }
     })
-  }, { rootMargin: '0px 0px -100px 0px' })
-  sections.forEach(el => io.observe(el))
+  }, { rootMargin: '0px 0px -70px 0px', threshold: 0.07 })
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el))
 })
 
 onBeforeUnmount(() => {
@@ -304,7 +301,8 @@ onBeforeUnmount(() => {
          HERO
     ═══════════════════════════════════════════════════ -->
     <section class="hero-shell text-white">
-      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 pt-1 pb-2 sm:py-3 lg:py-4 relative z-10">
+
+<div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 pt-1 pb-2 sm:py-3 lg:py-4 relative z-10">
 
         <!-- Desktop: side-by-side | Mobile: stacked -->
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-12">
@@ -386,6 +384,7 @@ onBeforeUnmount(() => {
               class="w-full max-w-sm sm:max-w-md lg:max-w-none lg:w-[360px]"
             />
           </div>
+
         </div>
 
         <!-- Mobile CTAs -->
@@ -406,9 +405,9 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          PARTNERS MARQUEE
     ═══════════════════════════════════════════════════ -->
-    <section class="w-full bg-transparent text-white pt-6 pb-4 px-4">
-      <div class="max-w-screen-xl mx-auto text-center mb-4">
-        <p class="text-xs font-semibold text-white uppercase tracking-widest">Listed &amp; verified</p>
+    <section class="w-full bg-transparent text-white pt-10 pb-6 px-4">
+      <div class="max-w-screen-xl mx-auto text-center mb-4 reveal">
+        <p class="text-xs font-semibold text-white/60 uppercase tracking-widest">Listed &amp; verified</p>
       </div>
       <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-12 max-w-screen-xl mx-auto px-4">
         <a
@@ -446,11 +445,12 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          HOW IT WORKS
     ═══════════════════════════════════════════════════ -->
-    <section class="px-4 pt-16 pb-10 sm:px-6 lg:px-8">
+    <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-screen-xl mx-auto">
-        <div class="text-center mb-8">
+        <div class="reveal text-center mb-10">
+          <span class="eyebrow">The mechanism</span>
           <h2 class="text-3xl md:text-4xl font-extrabold">How it works</h2>
-          <p class="mt-3 text-white text-base max-w-2xl mx-auto leading-relaxed">
+          <p class="mt-3 text-white/80 text-base max-w-2xl mx-auto leading-relaxed">
             Both parties commit Bitcoin. Both parties pre-sign every possible outcome. Bitcoin's base layer enforces the result.
           </p>
         </div>
@@ -473,6 +473,7 @@ onBeforeUnmount(() => {
             v-for="(step, i) in howItWorksTab === 'borrow' ? borrowSteps : lendSteps"
             :key="`${howItWorksTab}-${i}`"
             class="step-card"
+            :style="{ animationDelay: i * 80 + 'ms' }"
           >
             <div class="step-number font-mono">{{ String(i + 1).padStart(2, '0') }}</div>
             <h3 class="text-base font-bold mt-4 mb-2 text-white">{{ step.title }}</h3>
@@ -485,9 +486,6 @@ onBeforeUnmount(() => {
           <router-link :to="heroCtaTo" class="cta-primary inline-flex">
             {{ howItWorksTab === 'borrow' ? 'Build your borrower scenario →' : 'Build your lender scenario →' }}
           </router-link>
-          <router-link to="/security" class="text-secondary text-sm font-semibold hover:underline">
-            Read more about the risk model →
-          </router-link>
         </div>
       </div>
     </section>
@@ -495,50 +493,24 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          WHY CADENA
     ═══════════════════════════════════════════════════ -->
-    <section class="px-4 pt-8 pb-12 sm:px-6 lg:px-8">
+    <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-screen-xl mx-auto">
-        <div class="text-center mb-10">
-          <h2 class="text-3xl md:text-4xl font-extrabold">Why Cadena</h2>
-          <p class="mt-3 text-white text-lg">Most Bitcoin lenders take your coins. We never touch them.</p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px feature-grid">
-          <div v-for="(feat, fi) in features" :key="feat.title" class="feature-card">
-            <div class="feature-icon">
-              <!-- 🔐 Self-custody: lock -->
-              <svg v-if="fi === 0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <!-- ⚖️ No margin calls: scales -->
-              <svg v-if="fi === 1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 4-1 6-2 2 1 4 2 6 2h2"/></svg>
-              <!-- 🔗 Fully on-chain: chain link -->
-              <svg v-if="fi === 2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              <!-- ⚡ Fast + verified: bolt -->
-              <svg v-if="fi === 3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              <!-- 🛡️ Regulated: shield -->
-              <svg v-if="fi === 4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <h3 class="text-base font-bold mb-2 text-white">{{ feat.title }}</h3>
-            <p class="text-sm text-white leading-relaxed">{{ feat.desc }}</p>
-          </div>
-        </div>
-        <div class="text-center mt-8">
-          <router-link to="/security" class="text-secondary text-sm font-semibold hover:underline">
-            Read more about the risk model →
-          </router-link>
-        </div>
+        <FeaturesCarousel />
       </div>
     </section>
 
     <!-- ═══════════════════════════════════════════════════
          COMPARISON TABLE
     ═══════════════════════════════════════════════════ -->
-    <section class="bg-transparent px-4 pt-4 pb-14 sm:px-6 lg:px-8">
+    <section class="bg-transparent px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
-        <div class="text-center mb-8">
+        <div class="reveal text-center mb-10">
+          <span class="eyebrow">Comparison</span>
           <h2 class="text-3xl md:text-4xl font-extrabold">How Cadena compares</h2>
-          <p class="mt-3 text-white text-base max-w-2xl mx-auto">Why non-custodial Bitcoin credit is structurally different from every other option.</p>
+          <p class="mt-3 text-white/80 text-base max-w-2xl mx-auto">Why non-custodial Bitcoin credit is structurally different from every other option.</p>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-white/10">
+        <div class="reveal overflow-x-auto rounded-xl border border-white/10">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-white/5">
@@ -594,15 +566,16 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          VERIFIED ON-CHAIN
     ═══════════════════════════════════════════════════ -->
-    <section class="px-4 py-20 sm:px-6 lg:px-8" style="background:#081123">
+    <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8" style="background:#081123">
       <div class="max-w-2xl mx-auto">
 
-        <div class="text-center mb-8">
+        <div class="reveal text-center mb-8">
+          <span class="eyebrow">On-chain proof</span>
           <h2 class="text-3xl md:text-4xl font-extrabold">Verified on mainnet</h2>
         </div>
 
         <!-- Explorer card -->
-        <div class="voc-card">
+        <div class="voc-card reveal" style="transition-delay:120ms">
 
           <!-- Card header -->
           <div class="voc-card-header">
@@ -653,14 +626,15 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          FAQ
     ═══════════════════════════════════════════════════ -->
-    <section id="faq" class="bg-transparent text-white px-4 pt-12 pb-16 sm:px-6 lg:px-8">
+    <section id="faq" class="bg-transparent text-white px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto">
-        <div class="text-center mb-8">
+        <div class="reveal text-center mb-10">
+          <span class="eyebrow">Common questions</span>
           <h2 class="text-3xl md:text-4xl font-extrabold">Frequently asked questions</h2>
-          <p class="mt-3 text-white text-base">The questions every prospect asks before their first contract.</p>
+          <p class="mt-3 text-white/80 text-base">The questions every prospect asks before their first contract.</p>
         </div>
 
-        <div class="space-y-2">
+        <div class="reveal space-y-2" style="transition-delay:100ms">
           <div v-for="(item, i) in faqs" :key="i" class="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
             <button
               class="w-full flex items-center justify-between gap-3 text-left px-5 py-4"
@@ -696,16 +670,19 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          FOR INSTITUTIONS
     ═══════════════════════════════════════════════════ -->
-    <section class="inst-root px-4 py-20 sm:px-6 lg:px-8">
+    <section class="inst-root px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-2xl mx-auto text-center">
 
         <!-- Label + heading -->
-        <h2 class="text-3xl md:text-4xl font-extrabold mb-3">For institutions</h2>
-        <p class="inst-sub">If you're managing a Bitcoin treasury, running a fund, operating a mining business, or sitting on a sec-lending desk — Cadena's architecture maps onto your existing collateral and settlement mental model.</p>
+        <div class="reveal">
+          <span class="eyebrow">Institutional</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold mb-3">For institutions</h2>
+        </div>
+        <p class="inst-sub reveal" style="transition-delay:80ms">If you're managing a Bitcoin treasury, running a fund, operating a mining business, or sitting on a sec-lending desk — Cadena's architecture maps onto your existing collateral and settlement mental model.</p>
 
         <!-- Cards -->
-        <p class="inst-examples-label">Worked examples by use case</p>
-        <div class="inst-cards">
+        <p class="inst-examples-label reveal" style="transition-delay:140ms">Worked examples by use case</p>
+        <div class="inst-cards reveal" style="transition-delay:200ms">
           <router-link to="/btcusd" class="inst-card">
             <div class="inst-card-badge inst-card-badge-lend">Lend</div>
             <div class="inst-card-amount">$1M</div>
@@ -741,8 +718,8 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          NEWSLETTER
     ═══════════════════════════════════════════════════ -->
-    <section class="bg-transparent px-4 py-10 sm:px-6 lg:px-8">
-      <div class="max-w-lg mx-auto text-center">
+    <section class="bg-transparent px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+      <div class="max-w-lg mx-auto text-center reveal">
         <h3 class="text-2xl font-bold text-white mb-2">Stay in the loop</h3>
         <p class="text-white text-sm mb-5">Rate updates, on-chain settlements, and chapter excerpts from Endgame — Kevin's book on the credit function on Bitcoin.</p>
         <form class="flex flex-col sm:flex-row gap-3 sm:justify-center" @submit.prevent="handleFooterSubscribe">
@@ -773,8 +750,8 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          FINAL CTA BANNER
     ═══════════════════════════════════════════════════ -->
-    <section class="bg-secondary text-white py-16 px-6">
-      <div class="max-w-4xl mx-auto text-center">
+    <section class="bg-secondary text-white py-20 px-6">
+      <div class="max-w-4xl mx-auto text-center reveal">
         <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
           Ready to put your Bitcoin to work?
         </h2>
@@ -827,6 +804,7 @@ onBeforeUnmount(() => {
    HERO
 ═══════════════════════════════════════════════════ */
 .hero-shell {
+  overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -855,9 +833,9 @@ onBeforeUnmount(() => {
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
+  border-radius: 0.75rem;
   transition: background-color 0.15s, box-shadow 0.15s;
   white-space: nowrap;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
 .cta-primary:hover {
   background-color: #7a4af0;
@@ -865,7 +843,7 @@ onBeforeUnmount(() => {
 }
 .cta-outline-wrap {
   display: inline-flex;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  border-radius: 0.75rem;
   background: rgba(103,56,228,0.6);
   padding: 1px;
   transition: background-color 0.15s;
@@ -877,7 +855,7 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+  border-radius: calc(0.75rem - 1px);
   background: #081123;
   padding: 0.875rem 2rem;
   font-size: 1rem;
@@ -904,7 +882,7 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: #fff;
   letter-spacing: 0.02em;
-  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  border-radius: 0.75rem;
 }
 .trust-icon {
   width: 0.9rem;
@@ -930,6 +908,7 @@ onBeforeUnmount(() => {
   display: flex;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 0.75rem;
   padding: 3px;
   gap: 2px;
 }
@@ -938,6 +917,7 @@ onBeforeUnmount(() => {
   font-size: 0.875rem;
   font-weight: 600;
   color: #fff;
+  border-radius: calc(0.75rem - 3px);
   transition: color 0.15s, background-color 0.15s;
   white-space: nowrap;
 }
@@ -953,11 +933,18 @@ onBeforeUnmount(() => {
 .step-grid {
   background: rgba(103,56,228,0.12);
   border: 1px solid rgba(103,56,228,0.2);
+  border-radius: 0.75rem;
+  overflow: hidden;
 }
 .step-card {
   background: #081123;
   padding: 1.75rem;
   position: relative;
+  animation: step-enter 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes step-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
 }
 .step-number {
   font-size: 1.75rem;
@@ -1004,8 +991,40 @@ onBeforeUnmount(() => {
 
 
 /* ═══════════════════════════════════════════════════
-   SCROLL-IN ANIMATIONS
+   SCROLL-REVEAL
 ═══════════════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ═══════════════════════════════════════════════════
+   EYEBROW LABEL
+═══════════════════════════════════════════════════ */
+.eyebrow {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6738e3;
+  margin-bottom: 0.6rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION DIVIDER
+═══════════════════════════════════════════════════ */
+.{
+  border-top: 1px solid rgba(255,255,255,0.055);
+}
+
+/* legacy — kept for backward compat */
 .animated-section {
   opacity: 0;
   pointer-events: none;
@@ -1181,6 +1200,7 @@ onBeforeUnmount(() => {
   padding: 1.75rem 2rem;
   border: 1px solid rgba(103,56,228,0.25);
   background: rgba(103,56,228,0.04);
+  border-radius: 0.75rem;
   text-decoration: none; width: 200px;
   transition: border-color 0.2s, background 0.2s;
 }
@@ -1189,6 +1209,7 @@ onBeforeUnmount(() => {
 .inst-card-badge {
   font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   padding: 0.15rem 0.5rem; margin-bottom: 1rem; display: inline-block;
+  border-radius: 0.375rem;
 }
 .inst-card-badge-lend { color: #22c55e; border: 1px solid rgba(34,197,94,0.35); }
 .inst-card-badge-borrow { color: #6738e3; border: 1px solid rgba(103,56,228,0.4); }
@@ -1221,15 +1242,15 @@ onBeforeUnmount(() => {
 .inst-cta-primary {
   display: inline-flex; align-items: center;
   background: #6738e3; color: #fff; font-weight: 700; font-size: 0.82rem;
-  padding: 0.7rem 1.6rem; text-decoration: none; transition: background 0.2s;
+  padding: 0.7rem 1.6rem; border-radius: 0.75rem; text-decoration: none; transition: background 0.2s;
 }
 .inst-cta-primary:hover { background: #7b4df5; }
 
 .inst-cta-secondary {
   display: inline-flex; align-items: center;
   border: 1px solid rgba(255,255,255,0.25); color: #fff;
-  font-weight: 600; font-size: 0.82rem; padding: 0.7rem 1.6rem; text-decoration: none;
-  transition: border-color 0.2s;
+  font-weight: 600; font-size: 0.82rem; padding: 0.7rem 1.6rem; border-radius: 0.75rem;
+  text-decoration: none; transition: border-color 0.2s;
 }
 .inst-cta-secondary:hover { border-color: #fff; }
 

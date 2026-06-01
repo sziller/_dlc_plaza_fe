@@ -9,15 +9,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BookCheckout: typeof import('./components/BookCheckout.vue')['default']
+    ChainAnimation: typeof import('./components/ChainAnimation.vue')['default']
     ChatBot: typeof import('./components/ChatBot.vue')['default']
     ComparisonTable: typeof import('./components/ComparisonTable.vue')['default']
     CookieBanner: typeof import('./components/CookieBanner.vue')['default']
     DLCDetails: typeof import('./components/DLCDetails.vue')['default']
+    FeaturesCarousel: typeof import('./components/FeaturesCarousel.vue')['default']
     HeroRatesDisplay: typeof import('./components/HeroRatesDisplay.vue')['default']
     HubStyleMosaic: typeof import('./components/HubStyleMosaic.vue')['default']
-    ISimpleIconsGithub: typeof import('~icons/simple-icons/github')['default']
-    ISimpleIconsX: typeof import('~icons/simple-icons/x')['default']
-    ISimpleIconsYoutube: typeof import('~icons/simple-icons/youtube')['default']
     MailingListModal: typeof import('./components/MailingListModal.vue')['default']
     MarketOverviewTable: typeof import('./components/MarketOverviewTable.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
