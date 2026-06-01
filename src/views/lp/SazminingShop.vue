@@ -46,15 +46,15 @@
               </div>
               <div class="stat-row">
                 <span class="stat-label">Est. monthly mining revenue</span>
-                <span class="stat-val">~$345</span>
+                <span class="stat-val">~$345 <span class="stat-btc">≈ 0.00329 BTC/month</span></span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Sazmining service fee</span>
-                <span class="stat-val">~$157/month <span class="stat-btc">hosting, electricity, repairs</span></span>
+                <span class="stat-val">~$157/month <span class="stat-btc">≈ 0.00150 BTC · hosting, electricity, repairs</span></span>
               </div>
               <div class="stat-row stat-row--highlight">
                 <span class="stat-label">Net monthly to your wallet</span>
-                <span class="stat-val">~$188</span>
+                <span class="stat-val">~$188 <span class="stat-btc">≈ 0.00179 BTC/month</span></span>
               </div>
             </div>
 
@@ -92,8 +92,8 @@
               <p class="step-title">You commit collateral to Cadena</p>
               <p class="step-desc">
                 Separately, commit Bitcoin as collateral to a Cadena Discreet Log Contract
-                on Bitcoin's base layer. The collateral pool covers a USD-denominated loan
-                equal to the rig's purchase price.
+                on Bitcoin's base layer. The collateral pool covers a $5,000 USD-denominated loan
+                (≈ 0.09524 BTC at 50% LTV). Cadena loans are sized in $1,000 increments.
                 <strong>You keep your keys throughout. Cadena holds no key at any point.</strong>
               </p>
             </div>
@@ -189,13 +189,13 @@
 import cadenaLogo from '../../assets/logos/cadena_bitcoin_logo_2.png'
 
 const economics = [
-  { item: 'Rig bundle price (today)',      value: '$4,545 (≈ 0.04329 BTC)' },
-  { item: 'Cadena loan amount',            value: '$4,545 — matches purchase price' },
-  { item: 'Collateral commitment',         value: '≈ 0.10 BTC (sized for 50% LTV protection)' },
+  { item: 'Rig bundle price (today)',      value: '$4,545 (≈ 0.04329 BTC at current spot)' },
+  { item: 'Cadena loan amount',            value: '$5,000 (≈ 0.04762 BTC) — rounded to $1,000 denomination' },
+  { item: 'Collateral commitment',         value: '≈ 0.09524 BTC ($10,000 at current spot · 50% LTV)' },
   { item: 'Term',                          value: '12 months · single settlement at maturity' },
   { item: 'Indicative rate',              value: '~12% annualized · rates clear at the marketplace' },
   { item: 'Cadena platform fee',           value: '1% (borrower side)' },
-  { item: 'Estimated settlement',          value: '~$5,136 in Bitcoin at maturity spot price', highlight: true },
+  { item: 'Estimated settlement',          value: '~$5,650 (≈ 0.05381 BTC at maturity spot price)', highlight: true },
 ]
 </script>
 
