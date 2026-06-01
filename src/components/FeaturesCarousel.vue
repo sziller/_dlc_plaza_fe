@@ -411,7 +411,7 @@ onBeforeUnmount(() => {
   color: #fff;
   text-decoration: none;
   white-space: nowrap;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  border-radius: 0.75rem;
   transition: background-color 0.15s, box-shadow 0.15s;
 }
 .fc-footer-link:hover {

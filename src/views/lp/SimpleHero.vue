@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import TheFooter from '../../components/TheFooter.vue'
 import HeroRatesDisplay from '../../components/HeroRatesDisplay.vue'
 import MailingListModal from '../../components/MailingListModal.vue'
-import ChainAnimation from '../../components/ChainAnimation.vue'
 import FeaturesCarousel from '../../components/FeaturesCarousel.vue'
 import { useAuth } from '../../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../../api/publicContact'
@@ -303,12 +302,7 @@ onBeforeUnmount(() => {
     ═══════════════════════════════════════════════════ -->
     <section class="hero-shell text-white">
 
-      <!-- 3D Chain — starts right edge, angles toward top-center, behind content -->
-      <div class="absolute top-0 h-full pointer-events-none select-none" style="width:min(640px,72vw);right:-50px;z-index:0;">
-        <ChainAnimation />
-      </div>
-
-      <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 pt-1 pb-2 sm:py-3 lg:py-4 relative z-10">
+<div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8 pt-1 pb-2 sm:py-3 lg:py-4 relative z-10">
 
         <!-- Desktop: side-by-side | Mobile: stacked -->
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-12">
@@ -839,9 +833,9 @@ onBeforeUnmount(() => {
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
+  border-radius: 0.75rem;
   transition: background-color 0.15s, box-shadow 0.15s;
   white-space: nowrap;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
 .cta-primary:hover {
   background-color: #7a4af0;
@@ -849,7 +843,7 @@ onBeforeUnmount(() => {
 }
 .cta-outline-wrap {
   display: inline-flex;
-  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  border-radius: 0.75rem;
   background: rgba(103,56,228,0.6);
   padding: 1px;
   transition: background-color 0.15s;
@@ -861,7 +855,7 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  clip-path: polygon(7px 0%, 100% 0%, calc(100% - 7px) 100%, 0% 100%);
+  border-radius: calc(0.75rem - 1px);
   background: #081123;
   padding: 0.875rem 2rem;
   font-size: 1rem;
@@ -888,7 +882,7 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: #fff;
   letter-spacing: 0.02em;
-  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  border-radius: 0.75rem;
 }
 .trust-icon {
   width: 0.9rem;
@@ -914,6 +908,7 @@ onBeforeUnmount(() => {
   display: flex;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 0.75rem;
   padding: 3px;
   gap: 2px;
 }
@@ -922,6 +917,7 @@ onBeforeUnmount(() => {
   font-size: 0.875rem;
   font-weight: 600;
   color: #fff;
+  border-radius: calc(0.75rem - 3px);
   transition: color 0.15s, background-color 0.15s;
   white-space: nowrap;
 }
@@ -937,6 +933,8 @@ onBeforeUnmount(() => {
 .step-grid {
   background: rgba(103,56,228,0.12);
   border: 1px solid rgba(103,56,228,0.2);
+  border-radius: 0.75rem;
+  overflow: hidden;
 }
 .step-card {
   background: #081123;
@@ -1202,6 +1200,7 @@ onBeforeUnmount(() => {
   padding: 1.75rem 2rem;
   border: 1px solid rgba(103,56,228,0.25);
   background: rgba(103,56,228,0.04);
+  border-radius: 0.75rem;
   text-decoration: none; width: 200px;
   transition: border-color 0.2s, background 0.2s;
 }
@@ -1210,6 +1209,7 @@ onBeforeUnmount(() => {
 .inst-card-badge {
   font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
   padding: 0.15rem 0.5rem; margin-bottom: 1rem; display: inline-block;
+  border-radius: 0.375rem;
 }
 .inst-card-badge-lend { color: #22c55e; border: 1px solid rgba(34,197,94,0.35); }
 .inst-card-badge-borrow { color: #6738e3; border: 1px solid rgba(103,56,228,0.4); }
@@ -1242,15 +1242,15 @@ onBeforeUnmount(() => {
 .inst-cta-primary {
   display: inline-flex; align-items: center;
   background: #6738e3; color: #fff; font-weight: 700; font-size: 0.82rem;
-  padding: 0.7rem 1.6rem; text-decoration: none; transition: background 0.2s;
+  padding: 0.7rem 1.6rem; border-radius: 0.75rem; text-decoration: none; transition: background 0.2s;
 }
 .inst-cta-primary:hover { background: #7b4df5; }
 
 .inst-cta-secondary {
   display: inline-flex; align-items: center;
   border: 1px solid rgba(255,255,255,0.25); color: #fff;
-  font-weight: 600; font-size: 0.82rem; padding: 0.7rem 1.6rem; text-decoration: none;
-  transition: border-color 0.2s;
+  font-weight: 600; font-size: 0.82rem; padding: 0.7rem 1.6rem; border-radius: 0.75rem;
+  text-decoration: none; transition: border-color 0.2s;
 }
 .inst-cta-secondary:hover { border-color: #fff; }
 
