@@ -1,0 +1,44 @@
+plugins = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/Users/noahbell/Developer/work/cadena-website/dist"
+publishOrigin = "ui"
+commandOrigin = "ui"
+command = "npm run build"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[headers]]
+for = "/downloads/update.apk"
+
+[headers.values]
+Content-Type = "application/vnd.android.package-archive"
+Content-Disposition = "attachment; filename=\"update.apk\""
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
