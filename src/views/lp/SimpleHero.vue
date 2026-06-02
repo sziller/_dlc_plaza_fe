@@ -18,6 +18,7 @@ const { setUserFromApi } = useAuth()
 const heroCtaTo = computed(() => '/btcusd')
 function onHeroCtaClick() {}
 
+const heroReady = ref(false)
 const showMailingList = ref(false)
 const footerEmail = ref('')
 const footerSubscribeLoading = ref(false)
@@ -268,6 +269,7 @@ let updateIsMobile
 
 onMounted(() => {
   setUserFromApi()
+  requestAnimationFrame(() => { heroReady.value = true })
 
   updateIsMobile = () => {
     const width = window.innerWidth
@@ -405,7 +407,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          PARTNERS MARQUEE
     ═══════════════════════════════════════════════════ -->
-    <section class="w-full bg-transparent text-white pt-10 pb-6 px-4">
+    <section class="w-full section-bg-deep section-divider text-white pt-10 pb-6 px-4">
       <div class="max-w-screen-xl mx-auto text-center mb-4 reveal">
         <p class="text-xs font-semibold text-white/60 uppercase tracking-widest">Listed &amp; verified</p>
       </div>
@@ -445,7 +447,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          HOW IT WORKS
     ═══════════════════════════════════════════════════ -->
-    <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+    <section class="section-bg-raised section-divider px-4 py-20 sm:py-24 sm:px-6 lg:px-8 how-it-works-section">
       <div class="max-w-screen-xl mx-auto">
         <div class="reveal text-center mb-10">
           <span class="eyebrow">The mechanism</span>
@@ -493,7 +495,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          WHY CADENA
     ═══════════════════════════════════════════════════ -->
-    <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+    <section class="section-bg-deep section-divider px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-screen-xl mx-auto">
         <FeaturesCarousel />
       </div>
@@ -502,7 +504,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          COMPARISON TABLE
     ═══════════════════════════════════════════════════ -->
-    <section class="bg-transparent px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+    <section class="section-bg-raised section-divider px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
         <div class="reveal text-center mb-10">
           <span class="eyebrow">Comparison</span>
@@ -566,7 +568,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          VERIFIED ON-CHAIN
     ═══════════════════════════════════════════════════ -->
-    <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8" style="background:#081123">
+    <section class="section-bg-voc section-divider voc-section px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-2xl mx-auto">
 
         <div class="reveal text-center mb-8">
@@ -626,7 +628,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          FAQ
     ═══════════════════════════════════════════════════ -->
-    <section id="faq" class="bg-transparent text-white px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+    <section id="faq" class="section-bg-raised section-divider text-white px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto">
         <div class="reveal text-center mb-10">
           <span class="eyebrow">Common questions</span>
@@ -670,7 +672,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          FOR INSTITUTIONS
     ═══════════════════════════════════════════════════ -->
-    <section class="inst-root px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+    <section class="inst-root section-divider px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-2xl mx-auto text-center">
 
         <!-- Label + heading -->
@@ -718,7 +720,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          NEWSLETTER
     ═══════════════════════════════════════════════════ -->
-    <section class="bg-transparent px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+    <section class="section-bg-base section-divider px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-lg mx-auto text-center reveal">
         <h3 class="text-2xl font-bold text-white mb-2">Stay in the loop</h3>
         <p class="text-white text-sm mb-5">Rate updates, on-chain settlements, and chapter excerpts from Endgame — Kevin's book on the credit function on Bitcoin.</p>
@@ -750,7 +752,7 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          FINAL CTA BANNER
     ═══════════════════════════════════════════════════ -->
-    <section class="bg-secondary text-white py-20 px-6">
+    <section class="bg-secondary section-divider text-white py-20 px-6">
       <div class="max-w-4xl mx-auto text-center reveal">
         <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
           Ready to put your Bitcoin to work?
@@ -801,6 +803,30 @@ onBeforeUnmount(() => {
 }
 
 /* ═══════════════════════════════════════════════════
+   SECTION BACKGROUNDS & DIVIDERS
+═══════════════════════════════════════════════════ */
+.section-bg-base   { background-color: #081123; }
+.section-bg-deep   { background-color: #050c18; }
+.section-bg-raised { background-color: #0d1a2e; }
+.section-bg-voc    { background-color: #080e1d; }
+
+/* Clean 1px divider between sections */
+.section-divider { border-top: 1px solid rgba(255,255,255,0.06); }
+
+/* Dot grid ambient background for How it Works */
+.how-it-works-section {
+  background-image: radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-color: #0d1a2e;
+}
+
+/* Green ambient glow for Verified on-chain */
+.voc-section {
+  background-image: radial-gradient(circle at 65% 50%, rgba(34,197,94,0.06) 0%, transparent 60%);
+  background-color: #080e1d;
+}
+
+/* ═══════════════════════════════════════════════════
    HERO
 ═══════════════════════════════════════════════════ */
 .hero-shell {
@@ -812,6 +838,17 @@ onBeforeUnmount(() => {
   min-height: 60vh;
   padding-top: 0;
   padding-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+.hero-shell::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -8%;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, rgba(103,56,228,0.14) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
 }
 @media (min-width: 1024px) {
   .hero-shell { justify-content: center; }
@@ -937,7 +974,7 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 .step-card {
-  background: #081123;
+  background: rgba(0,0,0,0.22);
   padding: 1.75rem;
   position: relative;
   animation: step-enter 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -1015,6 +1052,16 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
   color: #6738e3;
   margin-bottom: 0.6rem;
+  position: relative;
+}
+.eyebrow::before {
+  content: '';
+  display: block;
+  width: 1.5rem;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #6738e3, transparent);
+  border-radius: 1px;
+  margin: 0 auto 0.6rem;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1170,7 +1217,7 @@ onBeforeUnmount(() => {
 .voc-tx-link:hover { color: #fff; border-color: rgba(103,56,228,0.8); background: rgba(103,56,228,0.1); }
 
 /* ── For Institutions ── */
-.inst-root { background: #081123; }
+.inst-root { background: #050c18; }
 
 .inst-label {
   font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
