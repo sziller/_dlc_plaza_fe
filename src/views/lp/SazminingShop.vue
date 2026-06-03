@@ -27,44 +27,47 @@
     <!-- ══════════════ THE RIG ══════════════ -->
     <section class="saz-section">
       <div class="saz-container">
-        <div class="rig-layout">
+        <div class="rig-header">
+          <h2 class="rig-name">Bitmain S21 Xp 270 TH</h2>
+          <p class="rig-tagline">270 TH/s · 3,645 W · Air-cooled · Renewable energy</p>
+        </div>
 
+        <div class="rig-layout">
           <!-- Image -->
           <div class="rig-img-wrap">
-            <div class="rig-img-placeholder">Antminer S21 XP</div>
+            <img src="https://store.sazmining.com/s21xp.webp" alt="Bitmain S21 Xp 270 TH" class="rig-img" />
           </div>
 
-          <!-- Spec block -->
-          <div class="rig-spec-block">
-            <h2 class="rig-name">Bitmain Antminer S21 XP</h2>
-            <p class="rig-tagline">270 TH/s · 3,645 W · Air-cooled · Renewable energy</p>
-
-            <div class="rig-stats">
-              <div class="stat-row">
-                <span class="stat-label">Rig bundle price</span>
-                <span class="stat-val accent">$4,545 <span class="stat-btc">≈ 0.04329 BTC at current spot</span></span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Est. monthly mining revenue</span>
-                <span class="stat-val">~$345 <span class="stat-btc">≈ 0.00329 BTC/month</span></span>
-              </div>
-              <div class="stat-row">
-                <span class="stat-label">Sazmining service fee</span>
-                <span class="stat-val">~$157/month <span class="stat-btc">≈ 0.00150 BTC · hosting, electricity, repairs</span></span>
-              </div>
-              <div class="stat-row stat-row--highlight">
-                <span class="stat-label">Net monthly to your wallet</span>
-                <span class="stat-val">~$188 <span class="stat-btc">≈ 0.00179 BTC/month</span></span>
-              </div>
+          <!-- Stats -->
+          <div class="rig-stats">
+            <div class="stat-row">
+              <span class="stat-label">Rig cost</span>
+              <span class="stat-val accent">$5,547</span>
             </div>
-
-            <ul class="rig-perks">
-              <li>First-year repair costs included</li>
-              <li>Support resolved in under 12 hours</li>
-              <li>20% more carbon-free energy than the network</li>
-            </ul>
+            <div class="stat-row">
+              <span class="stat-label">Sales tax</span>
+              <span class="stat-val">$347</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">First month service fee</span>
+              <span class="stat-val">$173</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">BTC discount</span>
+              <span class="stat-val stat-val--discount">−$303</span>
+            </div>
+            <div class="stat-row stat-row--highlight">
+              <span class="stat-label">Total</span>
+              <span class="stat-val">$5,763</span>
+            </div>
           </div>
         </div>
+
+        <ul class="rig-perks">
+          <li>First-year repair costs included</li>
+          <li>Support resolved in under 12 hours</li>
+          <li>20% more carbon-free energy than the network</li>
+        </ul>
       </div>
     </section>
 
@@ -79,7 +82,7 @@
             <div>
               <p class="step-title">You pay Sazmining directly in Bitcoin</p>
               <p class="step-desc">
-                Send the rig bundle price (≈ 0.04329 BTC) directly to Sazmining.
+                Send the rig bundle price (≈ 0.05489 BTC) directly to Sazmining.
                 Sazmining confirms payment on-chain and begins deploying your rig at
                 their data center — typically within days.
               </p>
@@ -92,8 +95,8 @@
               <p class="step-title">You commit collateral to Cadena</p>
               <p class="step-desc">
                 Separately, commit Bitcoin as collateral to a Cadena Discreet Log Contract
-                on Bitcoin's base layer. The collateral pool covers a $5,000 USD-denominated loan
-                (≈ 0.09524 BTC at 50% LTV). Cadena loans are sized in $1,000 increments.
+                on Bitcoin's base layer. The collateral pool covers a $5,000 or $6,000 USD-denominated loan at 50% LTV.
+                Cadena loans are sized in $1,000 increments.
                 <strong>You keep your keys throughout. Cadena holds no key at any point.</strong>
               </p>
             </div>
@@ -125,16 +128,19 @@
             <tbody>
               <tr v-for="row in economics" :key="row.item" :class="{ 'econ-row--highlight': row.highlight }">
                 <td class="econ-item">{{ row.item }}</td>
-                <td class="econ-val">{{ row.value }}</td>
+                <td class="econ-val">
+                  {{ row.value }}
+                  <span v-if="row.btc" class="econ-btc">{{ row.btc }}</span>
+                </td>
               </tr>
             </tbody>
           </table>
           <div class="econ-disclosure">
+            <span class="econ-assumption">* BTC equivalents assume $70,000/BTC</span>
             Rates are determined by the Cadena marketplace at the time of match and can change with supply
-            and demand. The economics above are indicative. Mining revenue, electricity costs, and BTC price
-            all vary and are not guaranteed. Sazmining's service fee covers hosting, electricity, and
-            first-year repairs. Mining rewards flow daily to your self-custody wallet, net of Sazmining's
-            revenue share.
+            and demand. The economics above are indicative. BTC price and mining revenue are not guaranteed.
+            Rig bundle price reflects the S21 Xp 270 TH as listed at Sazmining including sales tax, first
+            month service fee, and BTC discount at time of publication.
           </div>
         </div>
 
@@ -147,7 +153,7 @@
     <!-- ══════════════ TWO INCOME STREAMS ══════════════ -->
     <section class="saz-section saz-section--alt">
       <div class="saz-container">
-        <h2 class="saz-section-title">Two income streams</h2>
+        <h2 class="saz-section-title">Two ways to participate in Bitcoin</h2>
         <div class="streams-grid">
           <div class="stream-card">
             <p class="stream-title">Mining rewards for 12 months</p>
@@ -188,14 +194,19 @@
 <script setup>
 import cadenaLogo from '../../assets/logos/cadena_bitcoin_logo_2.png'
 
+const BTC_PRICE = 70_000
+const fmt = (n) => (n).toFixed(5)
+const RIG_PRICE = 5763
+const LOAN = 6000
+const COLLATERAL_USD = 7500   // Cadena DLC calculation: principal + 12% interest + 1% fee at 50% LTV
+
 const economics = [
-  { item: 'Rig bundle price (today)',      value: '$4,545 (≈ 0.04329 BTC at current spot)' },
-  { item: 'Cadena loan amount',            value: '$5,000 (≈ 0.04762 BTC) — rounded to $1,000 denomination' },
-  { item: 'Collateral commitment',         value: '≈ 0.09524 BTC ($10,000 at current spot · 50% LTV)' },
-  { item: 'Term',                          value: '12 months · single settlement at maturity' },
-  { item: 'Indicative rate',              value: '~12% annualized · rates clear at the marketplace' },
-  { item: 'Cadena platform fee',           value: '1% (borrower side)' },
-  { item: 'Estimated settlement',          value: '~$5,650 (≈ 0.05381 BTC at maturity spot price)', highlight: true },
+  { item: 'Rig bundle price (today)',   value: `$${RIG_PRICE.toLocaleString()}`,                              btc: `≈ ${fmt(RIG_PRICE/BTC_PRICE)} BTC` },
+  { item: 'Cadena loan amount',         value: `$${LOAN.toLocaleString()} — rounded to $1,000 denomination`,  btc: `≈ ${fmt(LOAN/BTC_PRICE)} BTC` },
+  { item: 'Collateral required',        value: `$${COLLATERAL_USD.toLocaleString()} at 50% LTV`,              btc: `≈ ${fmt(COLLATERAL_USD/BTC_PRICE)} BTC` },
+  { item: 'Term',                       value: '12 months · single settlement at maturity' },
+  { item: 'Indicative rate',            value: '~12% annualized · rates clear at the marketplace' },
+  { item: 'Cadena platform fee',        value: '1% (borrower side)' },
 ]
 </script>
 
@@ -319,29 +330,34 @@ const economics = [
 }
 
 /* ─── Rig Layout ─────────────────────── */
+.rig-header {
+  margin-bottom: 24px;
+}
 .rig-layout {
   display: grid;
   grid-template-columns: 1fr;
   gap: 32px;
-  align-items: start;
+  align-items: center;
 }
 @media (min-width: 800px) {
-  .rig-layout { grid-template-columns: 1fr 1fr; }
+  .rig-layout { grid-template-columns: auto 1fr; }
 }
 .rig-img-wrap {
   background: #cce9e8;
   border-radius: 16px;
   overflow: hidden;
-  aspect-ratio: 4/3;
+  aspect-ratio: 1 / 1;
+  max-width: 320px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.rig-img-placeholder {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: rgba(0,0,0,0.3);
-  letter-spacing: 0.05em;
+.rig-img {
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
+  object-fit: contain;
+  display: block;
 }
 .rig-name {
   font-size: 1.3rem;
@@ -373,14 +389,15 @@ const economics = [
 .stat-label { font-size: 0.8rem; color: rgba(0,0,0,0.5); flex-shrink: 0; }
 .stat-val { font-size: 0.85rem; font-weight: 700; color: #1a1a1a; text-align: right; }
 .stat-val.accent { color: #0e9f97; font-size: 1rem; }
+.stat-val--discount { color: #0e9f97; }
 .stat-btc { font-size: 0.72rem; font-weight: 400; color: rgba(0,0,0,0.35); display: block; }
 .rig-perks {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 24px 0 0;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 8px 24px;
 }
 .rig-perks li {
   font-size: 0.82rem;
@@ -459,6 +476,8 @@ const economics = [
   text-align: right;
 }
 .econ-row--highlight .econ-val { color: #0e9f97; }
+.econ-btc { display: block; font-size: 0.82rem; font-weight: 400; color: rgba(0,0,0,0.55); margin-top: 2px; }
+.econ-assumption { display: block; font-size: 0.68rem; color: rgba(0,0,0,0.4); margin-bottom: 6px; font-style: italic; }
 .econ-disclosure {
   padding: 16px 20px;
   font-size: 0.72rem;
