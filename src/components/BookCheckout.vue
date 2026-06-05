@@ -97,14 +97,14 @@
       <div v-if="error" class="bc-error">{{ error }}</div>
 
       <div class="bc-btn-row">
-        <button type="submit" class="bc-pay-btn bc-pay-btn--btc" :disabled="loadingBtc || loadingCard || shippingCost === null || shippingLoading">
+        <button type="submit" class="bc-pay-btn bc-pay-btn--btc" :disabled="loadingBtc || loadingCard">
           <svg class="bc-btc-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M11.5 2C6.25 2 2 6.25 2 11.5S6.25 21 11.5 21 21 16.75 21 11.5 16.75 2 11.5 2zm1.41 9.07c.87.35 1.59 1.07 1.59 2.18 0 1.47-1.16 2.3-2.75 2.5v1.25h-1v-1.23c-.37-.03-.76-.08-1.17-.16v-1.14c.44.1.9.17 1.17.17h.83c.73 0 1.17-.3 1.17-.8 0-.46-.28-.73-1.2-1.01l-.93-.29C9.55 13.2 8.88 12.52 8.88 11.4c0-1.3 1.02-2.15 2.62-2.37V7.75h1v1.27c.32.03.66.08 1 .15v1.12c-.35-.07-.73-.12-1-.12H12c-.64 0-1.04.26-1.04.72 0 .42.24.65 1.07.93l.88.29z"/>
           </svg>
-          <span>{{ loadingBtc ? 'Redirecting…' : shippingCost === null ? `Pay with Lightning · $${totalBtc} USD + shipping` : `Pay with Lightning · $${totalBtc} USD` }}</span>
+          <span>{{ loadingBtc ? 'Redirecting…' : `Pay with Lightning · $${totalBtc} USD` }}</span>
         </button>
 
-        <button type="button" class="bc-pay-btn bc-pay-btn--card" :disabled="loadingBtc || loadingCard || shippingCost === null || shippingLoading" @click="submitCard">
+        <button type="button" class="bc-pay-btn bc-pay-btn--card" :disabled="loadingBtc || loadingCard" @click="submitCard">
           <svg v-if="!loadingCard" class="bc-btc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
           </svg>

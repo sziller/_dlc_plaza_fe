@@ -48,7 +48,7 @@
             <span>Limit Order</span>
             <span class="text-xs px-2 py-1 rounded bg-secondary/20 border border-secondary/40">required</span>
           </div>
-          <p class="text-xs text-white/70 mt-1">No live offers right now. Set your rate below — your order will be held and filled automatically when a counterparty matches it.</p>
+          <p class="text-xs text-white/70 mt-1">No market quote. Set your own rate.</p>
         </div>
 
         <div v-else>

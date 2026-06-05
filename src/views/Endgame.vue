@@ -185,6 +185,7 @@ function copy(text, key) {
   copied.value = key
   setTimeout(() => { copied.value = '' }, 2000)
 }
+
 </script>
 
 <style scoped>
@@ -571,7 +572,7 @@ function copy(text, key) {
     border-bottom: 1px solid #2e2e2e;
   }
   .modal-title {
-    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-family: var(--serif);
     font-size: 22px;
     font-weight: 600;
     color: #f0f0f0;
