@@ -74,7 +74,7 @@
         </div>
         <div class="bc-summary-line">
           <span class="bc-summary-desc">Book × {{ form.quantity }}</span>
-          <span class="bc-summary-total bc-summary-subtle">$15 BTC / $30 card + shipping</span>
+          <span class="bc-summary-total bc-summary-subtle">$22.99 BTC / $34.99 card + shipping</span>
         </div>
         <div class="bc-summary-line">
           <span class="bc-summary-desc">Shipping</span>
@@ -139,8 +139,8 @@ const error = ref('')
 const shippingCost = ref(null)
 const shippingLoading = ref(false)
 
-const BASE_BTC = 15
-const BASE_CARD = 30
+const BASE_BTC = 22.99
+const BASE_CARD = 34.99
 
 const totalBtc = computed(() => {
   const shipping = shippingCost.value ?? 0

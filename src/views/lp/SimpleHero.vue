@@ -445,10 +445,9 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          HOW IT WORKS
     ═══════════════════════════════════════════════════ -->
-    <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+    <section class="px-4 pt-28 pb-20 sm:pt-32 sm:pb-24 sm:px-6 lg:px-8">
       <div class="max-w-screen-xl mx-auto">
         <div class="reveal text-center mb-10">
-          <span class="eyebrow">The mechanism</span>
           <h2 class="text-3xl md:text-4xl font-extrabold">How it works</h2>
           <p class="mt-3 text-white/80 text-base max-w-2xl mx-auto leading-relaxed">
             Both parties commit Bitcoin. Both parties pre-sign every possible outcome. Bitcoin's base layer enforces the result.
@@ -505,7 +504,6 @@ onBeforeUnmount(() => {
     <section class="bg-transparent px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-4xl mx-auto">
         <div class="reveal text-center mb-10">
-          <span class="eyebrow">Comparison</span>
           <h2 class="text-3xl md:text-4xl font-extrabold">How Cadena compares</h2>
           <p class="mt-3 text-white/80 text-base max-w-2xl mx-auto">Why non-custodial Bitcoin credit is structurally different from every other option.</p>
         </div>
@@ -567,15 +565,15 @@ onBeforeUnmount(() => {
          VERIFIED ON-CHAIN
     ═══════════════════════════════════════════════════ -->
     <section class="px-4 py-20 sm:py-24 sm:px-6 lg:px-8" style="background:#081123">
-      <div class="max-w-2xl mx-auto">
+      <div class="max-w-3xl mx-auto">
 
-        <div class="reveal text-center mb-8">
-          <span class="eyebrow">On-chain proof</span>
+        <div class="text-center mb-8">
           <h2 class="text-3xl md:text-4xl font-extrabold">Verified on mainnet</h2>
+          <p class="mt-3 text-white/80 text-base max-w-2xl mx-auto leading-relaxed">An early Cadena contract settled on Bitcoin's mainnet. Every outcome was pre-signed.</p>
         </div>
 
         <!-- Explorer card -->
-        <div class="voc-card reveal" style="transition-delay:120ms">
+        <div class="voc-card">
 
           <!-- Card header -->
           <div class="voc-card-header">
@@ -629,7 +627,6 @@ onBeforeUnmount(() => {
     <section id="faq" class="bg-transparent text-white px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
       <div class="max-w-3xl mx-auto">
         <div class="reveal text-center mb-10">
-          <span class="eyebrow">Common questions</span>
           <h2 class="text-3xl md:text-4xl font-extrabold">Frequently asked questions</h2>
           <p class="mt-3 text-white/80 text-base">The questions every prospect asks before their first contract.</p>
         </div>
@@ -675,7 +672,6 @@ onBeforeUnmount(() => {
 
         <!-- Label + heading -->
         <div class="reveal">
-          <span class="eyebrow">Institutional</span>
           <h2 class="text-3xl md:text-4xl font-extrabold mb-3">For institutions</h2>
         </div>
         <p class="inst-sub reveal" style="transition-delay:80ms">If you're managing a Bitcoin treasury, running a fund, operating a mining business, or sitting on a sec-lending desk — Cadena's architecture maps onto your existing collateral and settlement mental model.</p>
@@ -810,7 +806,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   justify-content: flex-start;
   min-height: 60vh;
-  padding-top: 0;
+  padding-top: 2.5rem;
   padding-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 @media (min-width: 1024px) {
@@ -1098,73 +1094,73 @@ onBeforeUnmount(() => {
 }
 
 .voc-card-header {
-  display: flex; align-items: center; gap: 0.6rem;
+  display: flex; align-items: center; gap: 0.75rem;
   background: rgba(103,56,228,0.08);
   border-bottom: 1px solid rgba(103,56,228,0.2);
-  padding: 0.65rem 1.25rem;
+  padding: 1rem 1.75rem;
 }
 .voc-status-dot {
-  width: 6px; height: 6px; border-radius: 50%;
+  width: 8px; height: 8px; border-radius: 50%;
   background: #22c55e;
   box-shadow: 0 0 6px rgba(34,197,94,0.8);
   flex-shrink: 0;
 }
 .voc-card-header-label {
-  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-  color: #fff; font-family: monospace; flex: 1;
+  font-size: 0.85rem; font-weight: 600; letter-spacing: 0.06em;
+  color: #fff; flex: 1;
 }
 .voc-verified-badge {
-  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  color: #22c55e; border: 1px solid rgba(34,197,94,0.35); padding: 0.15rem 0.5rem;
+  font-size: 0.8rem; font-weight: 700;
+  color: #22c55e; border: 1px solid rgba(34,197,94,0.35); padding: 0.25rem 0.75rem;
 }
 
 .voc-body {
-  padding: 1.75rem 1.5rem 1.5rem;
+  padding: 2rem 1.75rem 1.75rem;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .voc-body-heading {
   font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -0.02em; margin-bottom: 0.35rem;
 }
 .voc-body-sub {
-  font-size: 0.78rem; font-family: monospace; color: #fff; margin-bottom: 0.6rem;
+  font-size: 1rem; color: #fff; margin-bottom: 0.6rem;
 }
 .voc-body-stats {
-  font-size: 0.72rem; font-family: monospace; font-weight: 700; color: #6738e3;
-  letter-spacing: 0.04em; margin-bottom: 1rem;
+  font-size: 0.95rem; font-weight: 700; color: #6738e3;
+  letter-spacing: 0.02em; margin-bottom: 1.25rem;
 }
 .voc-body-desc {
-  font-size: 0.88rem; color: #fff; line-height: 1.65;
+  font-size: 1rem; color: #fff; line-height: 1.7;
 }
 
 .voc-tx-block {
-  padding: 1rem 1.5rem;
+  padding: 1.25rem 1.75rem;
   background: rgba(0,0,0,0.25);
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .voc-tx-label {
-  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-  color: #fff; font-family: monospace; margin-bottom: 0.35rem;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #fff; margin-bottom: 0.5rem;
 }
 .voc-tx-hash {
-  font-family: monospace; font-size: 0.75rem; color: #6738e3;
-  text-decoration: none; word-break: break-all; line-height: 1.5; display: block;
+  font-family: monospace; font-size: 0.9rem; color: #6738e3;
+  text-decoration: none; word-break: break-all; line-height: 1.6; display: block;
   transition: color 0.15s;
 }
 .voc-tx-hash:hover { color: #8b63f0; }
 
 .voc-card-footer {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  padding: 0.875rem 1.5rem;
+  padding: 1.25rem 1.75rem;
   flex-wrap: wrap;
 }
 .voc-footer-note {
-  font-size: 0.72rem; color: #fff; font-family: monospace; line-height: 1.5; flex: 1;
+  font-size: 0.9rem; color: #fff; line-height: 1.6; flex: 1;
 }
 .voc-tx-link {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  font-size: 0.72rem; font-weight: 600; color: #6738e3;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.9rem; font-weight: 600; color: #6738e3;
   text-decoration: none; border: 1px solid rgba(103,56,228,0.4);
-  padding: 0.35rem 0.75rem; white-space: nowrap; flex-shrink: 0;
+  padding: 0.5rem 1rem; white-space: nowrap; flex-shrink: 0;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .voc-tx-link:hover { color: #fff; border-color: rgba(103,56,228,0.8); background: rgba(103,56,228,0.1); }

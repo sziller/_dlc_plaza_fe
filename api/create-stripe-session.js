@@ -1,7 +1,7 @@
 import Stripe from 'stripe'
 import { getShippingCost } from './_shipping.js'
 
-const BASE_PRICE_CARD = 30
+const BASE_PRICE_CARD = 34.99
 
 const allowed = [
   'https://cadenabitcoin.com',

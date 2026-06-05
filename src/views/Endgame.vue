@@ -110,7 +110,7 @@
         </p>
         <div class="cta-row" style="margin-top:8px">
           <a href="/Endgame_Kevin_Bell.pdf" class="btn btn-primary">Download PDF</a>
-          <a href="#buy" class="btn btn-secondary" @click.prevent="scrollToBuy">Order physical copy →</a>
+          <button class="btn btn-secondary" @click="showOrderModal = true">Order physical copy →</button>
         </div>
         <p class="pricing-note" style="margin-top:24px">
           <strong>Suggested donation:</strong> 21,000 sats in Bitcoin — splits automatically. 50% to surf programs, 50% to author.
@@ -118,21 +118,24 @@
       </div>
     </section>
 
-    <section id="buy">
-      <div class="container">
-        <h2 class="section-title">Order a physical copy</h2>
-        <p>
-          $15 via Lightning Network · $30 by card · Printed on demand via Lulu Press · Shipped worldwide.
-          50% of the cover price goes to the surf programs above.
-        </p>
-        <div v-if="!showCheckout" style="margin-top:28px">
-          <button class="btn btn-primary" @click="showCheckout = true">Order a physical copy →</button>
-        </div>
-        <div v-else class="buy-layout">
-          <BookCheckout />
+    <Teleport to="body">
+      <div v-if="showOrderModal" class="modal-backdrop" @click.self="showOrderModal = false">
+        <div class="modal-box">
+          <div class="modal-header">
+            <div>
+              <div class="modal-title">Order a physical copy</div>
+              <div class="modal-subtitle">$22.99 via Lightning · $34.99 by card · Shipped worldwide</div>
+            </div>
+            <button class="modal-close" @click="showOrderModal = false" aria-label="Close">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <BookCheckout />
+          </div>
         </div>
       </div>
-    </section>
+    </Teleport>
 
     <section id="excerpt">
       <div class="container">
@@ -173,7 +176,7 @@ const btcQrUrl = computed(() =>
   `https://api.qrserver.com/v1/create-qr-code/?size=180x180&ecc=M&data=${encodeURIComponent('bitcoin:' + btcAddress)}`
 )
 
-const showCheckout = ref(false)
+const showOrderModal = ref(false)
 const btcExpanded = ref(false)
 const copied = ref('')
 
@@ -183,9 +186,6 @@ function copy(text, key) {
   setTimeout(() => { copied.value = '' }, 2000)
 }
 
-function scrollToBuy() {
-  document.getElementById('buy')?.scrollIntoView({ behavior: 'smooth' })
-}
 </script>
 
 <style scoped>
@@ -540,5 +540,62 @@ function scrollToBuy() {
     font-style: italic;
     padding: 8px 0;
     display: block;
+  }
+
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+  }
+  .modal-box {
+    background: #081123;
+    border: 1px solid #2e2e2e;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  }
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid #2e2e2e;
+  }
+  .modal-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 4px;
+  }
+  .modal-subtitle {
+    font-size: 13px;
+    color: #888888;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888888;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+  .modal-close:hover { color: #f0f0f0; }
+  .modal-close svg { width: 20px; height: 20px; }
+  .modal-body {
+    padding: 28px;
   }
 </style>
