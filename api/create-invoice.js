@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getShippingCost } from './_shipping.js'
 
-const BASE_PRICE_BTC = 15
+const BASE_PRICE_BTC = 22.99
 
 const allowed = [
   'https://cadenabitcoin.com',

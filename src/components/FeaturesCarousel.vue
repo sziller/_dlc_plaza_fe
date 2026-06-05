@@ -105,7 +105,6 @@ onBeforeUnmount(() => {
 
     <!-- Section header -->
     <div class="fc-header reveal">
-      <span class="fc-eyebrow">Advantages</span>
       <h2 class="fc-heading">Why Cadena</h2>
       <p class="fc-sub">Most Bitcoin lenders take your coins. We never touch them.</p>
     </div>
