@@ -16,8 +16,8 @@ async function fetchOracles(): Promise<void> {
     const list = Array.isArray(res?.payload) ? res.payload : []
     if (list.length > 0) {
       oracles.value = list
-      // Use the first oracle from the list if available
-      selectedOracleId.value = list[0].oracle_id
+      const firstId = list[0].oracle_id
+      if (firstId) selectedOracleId.value = firstId
     }
     fetched = true
   } catch (e) {
@@ -32,7 +32,8 @@ function resolveOracleFromProducts(
   if (!products || products.length === 0) return
   const first = products[0]
   if (Array.isArray(first.orcl_id) && first.orcl_id.length > 0) {
-    selectedOracleId.value = first.orcl_id[0]
+    const id = first.orcl_id[0]
+    if (id) selectedOracleId.value = id
   }
 }
 
