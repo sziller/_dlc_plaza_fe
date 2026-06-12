@@ -50,6 +50,7 @@
     "cross-env": "^10.1.0",
     "jsdom": "^27.1.0",
     "pdfjs-dist": "^5.4.149",
+    "playwright": "^1.60.0",
     "postcss": "^8.4.0",
     "puppeteer": "^24.43.1",
     "sharp": "^0.34.5",

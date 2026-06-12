@@ -196,11 +196,12 @@ function toggle(i) {
 /* ---------- Partners ---------- */
 const partners = [
   { name: '21Rates',           href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp',               alt: '21Rates' },
-  { name: 'Bitcoin Treasuries',href: 'https://bitcointreasuries.net/directory#C',         imgSrc: '/img/treasuries-640.webp',            alt: 'BitcoinTreasuries.net' },
+  { name: 'Bitcoin Treasuries',href: 'https://bitcointreasuries.net/directory#C',         imgSrc: '/img/treasuries-640.webp',            alt: 'BitcoinTreasuries.net', imgClass: 'h-5 sm:h-6' },
   { name: 'Adopting Bitcoin',  href: 'https://sv25.adoptingbitcoin.org/',                 imgSrc: '/img/adopting-640.webp',              alt: 'Adopting Bitcoin SV25' },
   { name: 'Surfdojo',          href: 'https://surfdojo.org/',                             imgSrc: '/img/surfdojo-640.webp',              alt: 'Surfdojo' },
-  { name: 'Spark Services',    href: 'https://getsparkservices.com/',                     imgSrc: '/img/partners/spark-logo.png',        alt: 'Spark Services' },
+  { name: 'BTC Intelligence',  href: 'https://www.btcintelligence.ai/',              imgSrc: '/img/BTC-Intelligence-Hero-Gold-Example-640.webp', alt: 'BTC Intelligence', imgClass: 'h-11 sm:h-13' },
   { name: 'Asobitcoin',        href: 'https://www.asobitcoin.org/',                       imgSrc: '/img/partners/asobitcoin-logo.webp',  alt: 'Asobitcoin' },
+  { name: 'Sazmining',         href: 'https://www.sazmining.com/',                         imgSrc: '/img/sazmining-640.webp',     alt: 'Sazmining', imgClass: 'h-7 sm:h-8 brightness-200' },
 ]
 
 function onEnter(el) {
@@ -405,29 +406,38 @@ onBeforeUnmount(() => {
     <!-- ═══════════════════════════════════════════════════
          PARTNERS MARQUEE
     ═══════════════════════════════════════════════════ -->
-    <section class="w-full bg-transparent text-white pt-10 pb-6 px-4">
-      <div class="max-w-screen-xl mx-auto text-center mb-4 reveal">
+    <section class="w-full bg-transparent text-white pt-10 pb-6">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-4 reveal">
         <p class="text-xs font-semibold text-white/60 uppercase tracking-widest">Listed &amp; verified</p>
       </div>
-      <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-12 max-w-screen-xl mx-auto px-4">
-        <a
-          v-for="p in partners"
-          :key="p.name"
-          :href="p.href"
-          target="_blank"
-          rel="noopener"
-          :aria-label="p.name"
-        >
-          <img
-            :src="p.imgSrc"
-            :alt="p.alt"
-            class="h-7 sm:h-8 w-auto object-contain grayscale brightness-110 opacity-70 hover:grayscale-0 hover:brightness-100 hover:opacity-100 transition-all duration-200"
-            loading="lazy"
-            decoding="async"
-          />
-        </a>
+      <div class="max-w-screen-xl mx-auto">
+      <div class="partners-outer">
+        <div class="partners-track">
+          <template v-for="n in 2" :key="n">
+            <a
+              v-for="p in partners"
+              :key="`${n}-${p.name}`"
+              :href="p.href"
+              target="_blank"
+              rel="noopener"
+              :aria-label="p.name"
+              :aria-hidden="n === 2 ? 'true' : undefined"
+              :tabindex="n === 2 ? -1 : undefined"
+              class="partners-item"
+            >
+              <img
+                :src="p.imgSrc"
+                :alt="p.alt"
+                :class="[p.imgClass || 'h-7 sm:h-8', 'w-auto object-contain grayscale brightness-150 opacity-90 hover:grayscale-0 hover:brightness-100 hover:opacity-100 transition-all duration-200']"
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </template>
+        </div>
       </div>
-      <div class="max-w-screen-xl mx-auto text-center mt-6">
+      </div>
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-6">
         <a
           href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d"
           target="_blank"
@@ -797,6 +807,35 @@ onBeforeUnmount(() => {
 }
 
 /* ═══════════════════════════════════════════════════
+   PARTNERS MARQUEE
+═══════════════════════════════════════════════════ */
+.partners-outer {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+.partners-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: partners-scroll 35s linear infinite;
+  will-change: transform;
+}
+.partners-item {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-right: 5rem;
+}
+@keyframes partners-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .partners-track { animation-play-state: paused; }
+}
+
+/* ═══════════════════════════════════════════════════
    HERO
 ═══════════════════════════════════════════════════ */
 .hero-shell {
@@ -1066,23 +1105,6 @@ onBeforeUnmount(() => {
 ═══════════════════════════════════════════════════ */
 .faq-panel { overflow: hidden; background: transparent; border: 0; }
 
-/* ═══════════════════════════════════════════════════
-   PARTNERS MARQUEE
-═══════════════════════════════════════════════════ */
-.marquee-container {
-  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
-}
-.marquee-track {
-  animation: marquee-scroll 30s linear infinite;
-  width: max-content;
-}
-@keyframes marquee-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track { animation-play-state: paused; }
-}
 
 :deep(.rate) { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
 
