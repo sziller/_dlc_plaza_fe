@@ -196,7 +196,7 @@ function toggle(i) {
 /* ---------- Partners ---------- */
 const partners = [
   { name: '21Rates',           href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp',               alt: '21Rates' },
-  { name: 'Bitcoin Treasuries',href: 'https://bitcointreasuries.net/directory#C',         imgSrc: '/img/treasuries-640.webp',            alt: 'BitcoinTreasuries.net', imgClass: 'h-5 sm:h-6' },
+  { name: 'Flux',              href: 'https://www.fluxprivateotc.com/',                  imgSrc: '/img/flux-2-640.webp',                  alt: 'Flux Private OTC', imgClass: 'h-10 sm:h-12 translate-y-1.5' },
   { name: 'Adopting Bitcoin',  href: 'https://sv25.adoptingbitcoin.org/',                 imgSrc: '/img/adopting-640.webp',              alt: 'Adopting Bitcoin SV25' },
   { name: 'Surfdojo',          href: 'https://surfdojo.org/',                             imgSrc: '/img/surfdojo-640.webp',              alt: 'Surfdojo' },
   { name: 'BTC Intelligence',  href: 'https://www.btcintelligence.ai/',              imgSrc: '/img/BTC-Intelligence-Hero-Gold-Example-640.webp', alt: 'BTC Intelligence', imgClass: 'h-11 sm:h-13' },
@@ -410,7 +410,7 @@ onBeforeUnmount(() => {
       <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-4 reveal">
         <p class="text-xs font-semibold text-white/60 uppercase tracking-widest">Listed &amp; verified</p>
       </div>
-      <div class="max-w-screen-xl mx-auto">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="partners-outer">
         <div class="partners-track">
           <template v-for="n in 2" :key="n">
@@ -811,6 +811,7 @@ onBeforeUnmount(() => {
 ═══════════════════════════════════════════════════ */
 .partners-outer {
   overflow: hidden;
+  padding-block: 0.5rem;
   mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
 }
