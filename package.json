@@ -1,6 +1,6 @@
 {
   "name": "custom-vue-dashboard",
-  "version": "2.3.22",
+  "version": "2.3.23",
   "type": "module",
   "scripts": {
     "release": "./scripts/release.sh",
