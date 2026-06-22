@@ -97,7 +97,7 @@ onBeforeUnmount(() => {
     <svg width="0" height="0" style="position:absolute;overflow:hidden;">
       <defs>
         <linearGradient id="fc-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#c4b5fd"/>
+          <stop offset="0%" stop-color="#6738e3"/>
           <stop offset="100%" stop-color="#6738e3"/>
         </linearGradient>
       </defs>
@@ -287,7 +287,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #c4b5fd;
+  color: #6738e3;
   font-family: monospace;
   letter-spacing: 0.04em;
   flex-shrink: 0;
@@ -299,14 +299,9 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);
-  filter:
-    drop-shadow(0 0 4px rgba(103, 56, 227, 0.7))
-    drop-shadow(0 0 10px rgba(196, 181, 253, 0.3));
 }
 .fc-num-track-bloom {
-  fill: none;
-  stroke: rgba(103, 56, 228, 0.1);
-  stroke-width: 7;
+  display: none;
 }
 .fc-num-track {
   fill: none;
@@ -332,28 +327,13 @@ onBeforeUnmount(() => {
   height: 3rem;
   flex-shrink: 0;
   position: relative;
-  filter:
-    drop-shadow(0 0 5px rgba(103, 56, 227, 0.5))
-    drop-shadow(0 0 12px rgba(196, 181, 253, 0.2));
   transition:
     width 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    filter 0.6s ease;
+    height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .fc-card--active .fc-icon {
   width: 2rem;
   height: 2rem;
-  filter:
-    drop-shadow(0 0 7px rgba(103, 56, 227, 0.85))
-    drop-shadow(0 0 20px rgba(196, 181, 253, 0.35));
-}
-.fc-icon::before {
-  content: '';
-  position: absolute;
-  inset: -55%;
-  background: radial-gradient(circle, rgba(103, 56, 227, 0.13) 0%, transparent 65%);
-  border-radius: 50%;
-  pointer-events: none;
 }
 .fc-icon svg { width: 100%; height: 100%; }
 

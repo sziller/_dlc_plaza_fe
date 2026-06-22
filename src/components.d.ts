@@ -11,6 +11,7 @@ declare module 'vue' {
     BookCheckout: typeof import('./components/BookCheckout.vue')['default']
     ChainAnimation: typeof import('./components/ChainAnimation.vue')['default']
     ChatBot: typeof import('./components/ChatBot.vue')['default']
+    ComparisonCell: typeof import('./components/ComparisonCell.vue')['default']
     ComparisonTable: typeof import('./components/ComparisonTable.vue')['default']
     CookieBanner: typeof import('./components/CookieBanner.vue')['default']
     DLCDetails: typeof import('./components/DLCDetails.vue')['default']

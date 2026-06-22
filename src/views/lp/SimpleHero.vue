@@ -196,10 +196,10 @@ function toggle(i) {
 /* ---------- Partners ---------- */
 const partners = [
   { name: '21Rates',           href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp',               alt: '21Rates' },
-  { name: 'Flux',              href: 'https://www.fluxprivateotc.com/',                  imgSrc: '/img/flux-2-640.webp',                  alt: 'Flux Private OTC', imgClass: 'h-10 sm:h-12 translate-y-1.5' },
+  { name: 'Flux',              href: 'https://www.fluxprivateotc.com/',                  imgSrc: '/img/flux-4-640.webp',                  alt: 'Flux Private OTC', imgClass: 'h-10 sm:h-12 translate-y-1.5 invert' },
   { name: 'Adopting Bitcoin',  href: 'https://sv25.adoptingbitcoin.org/',                 imgSrc: '/img/adopting-640.webp',              alt: 'Adopting Bitcoin SV25' },
   { name: 'Surfdojo',          href: 'https://surfdojo.org/',                             imgSrc: '/img/surfdojo-640.webp',              alt: 'Surfdojo' },
-  { name: 'BTC Intelligence',  href: 'https://www.btcintelligence.ai/',              imgSrc: '/img/BTC-Intelligence-Hero-Gold-Example-640.webp', alt: 'BTC Intelligence', imgClass: 'h-11 sm:h-13' },
+  { name: 'BTC Intelligence',  href: 'https://btcintelligence.ai/cadena',              imgSrc: '/img/BTC-Intelligence-Hero-Gold-Example-640.webp', alt: 'BTC Intelligence', imgClass: 'h-11 sm:h-13' },
   { name: 'Asobitcoin',        href: 'https://www.asobitcoin.org/',                       imgSrc: '/img/partners/asobitcoin-logo.webp',  alt: 'Asobitcoin' },
   { name: 'Sazmining',         href: 'https://www.sazmining.com/',                         imgSrc: '/img/sazmining-640.webp',     alt: 'Sazmining', imgClass: 'h-7 sm:h-8 brightness-200' },
 ]
@@ -567,6 +567,11 @@ onBeforeUnmount(() => {
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="reveal text-center mt-8">
+          <router-link to="/compare" class="cta-primary">
+            See the full breakdown: Cadena vs. Ledn, Unchained &amp; SALT
+          </router-link>
         </div>
       </div>
     </section>

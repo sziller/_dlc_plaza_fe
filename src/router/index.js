@@ -47,6 +47,7 @@ const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
 const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
 const Newsletter             = () => import('../views/Newsletter.vue')
+const Comparison             = () => import('../views/Comparison.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -61,6 +62,11 @@ const hasBlogToken = () => {
 }
 
 const routes = [
+  { path: '/compare', name: 'Comparison', component: Comparison, meta: {
+    title: 'Bitcoin Loan Comparison: Cadena vs. Ledn, Unchained, SALT',
+    description: 'An honest, sourced comparison of Bitcoin-backed loan platforms. Non-custodial DLC lending vs. custodial alternatives — rates, rehypothecation risk, margin calls, and access.',
+    robots: 'index,follow',
+  }},
   { path: '/endgame', name: 'Endgame', component: Endgame, meta: {
     title: 'Endgame — Bitcoin, Sovereign Debt, and the Return of Sound Capital',
     description: 'A serious framework for allocating in a Bitcoin-anchored monetary order. By Kevin Bell, Founder of Cadena Bitcoin.',
