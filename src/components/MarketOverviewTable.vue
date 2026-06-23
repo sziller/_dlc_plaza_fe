@@ -24,34 +24,66 @@
           </p>
         </div>
         <div v-else class="overflow-y-auto overflow-x-hidden flex-1 min-h-0">
-          <!-- Simplified CTA layout -->
-          <div class="flex flex-col items-center gap-8 py-8 sm:py-12">
-            <!-- USD Amount Input + Slider -->
-            <div class="w-full max-w-md bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8">
-              <label class="block text-white/70 text-sm font-semibold uppercase tracking-wide mb-4 text-center">Choose your amount</label>
+          <!-- 4-step loan configurator -->
+          <div class="flex flex-col gap-0 py-6 sm:py-8 w-full max-w-md mx-auto">
 
-              <!-- Large USD input -->
-              <div class="flex items-center justify-center gap-1">
-                <span class="text-4xl sm:text-5xl font-bold text-white/50">$</span>
-                <input
-                  type="text"
-                  inputmode="numeric"
-                  :value="usdInputFocused ? usdInputRaw : usdInputRaw"
-                  @input="onUsdInput"
-                  @focus="onUsdFocus"
-                  @blur="onUsdBlur"
-                  class="text-4xl sm:text-5xl font-bold bg-transparent border-none outline-none text-white text-center w-full max-w-[280px] tabular-nums"
-                  aria-label="USD amount"
-                />
+            <!-- ── Step 1: Currency ── always visible -->
+            <div class="px-1 pb-6">
+              <div class="flex items-center gap-2.5 mb-4">
+                <div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-[11px] font-black text-white shrink-0 shadow shadow-secondary/40">1</div>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-white/50">Choose Currency</span>
               </div>
-
-              <!-- BTC equivalent -->
-              <div class="text-center text-white/60 text-sm mt-2 tabular-nums">
-                ≈ {{ btcEquivalentDisplay }}
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  v-for="cur in ['USD', 'EUR']"
+                  :key="cur"
+                  type="button"
+                  @click="handleCurrencySelect(cur)"
+                  class="relative flex flex-col items-start gap-1.5 p-4 rounded-xl border transition-all duration-200 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60"
+                  :class="selectedCurrency === cur && currencyChosen
+                    ? 'border-secondary bg-secondary/10 shadow-lg shadow-secondary/20'
+                    : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.07]'"
+                >
+                  <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xl leading-none">{{ cur === 'USD' ? '🇺🇸' : '🇪🇺' }}</span>
+                      <span class="text-xl font-black" :class="selectedCurrency === cur && currencyChosen ? 'text-white' : 'text-white/55'">{{ cur }}</span>
+                    </div>
+                    <div v-if="selectedCurrency === cur && currencyChosen" class="w-2 h-2 rounded-full bg-secondary shrink-0"></div>
+                  </div>
+                  <span class="text-xs text-white/45">{{ cur === 'USD' ? 'US Dollar' : 'Euro' }}</span>
+                  <span class="text-[10px]" :class="selectedCurrency === cur && currencyChosen ? 'text-secondary/70' : 'text-white/25'">
+                    {{ cur === 'USD' ? '90 / 180 / 365 days' : '1 year only' }}
+                  </span>
+                </button>
               </div>
+            </div>
 
-              <!-- Range slider -->
-              <div class="mt-6">
+            <div class="w-full h-px bg-white/[0.07] mb-6"></div>
+
+            <!-- ── Step 2: Amount ── -->
+            <div class="px-1 pb-6">
+              <div class="flex items-center gap-2.5 mb-4">
+                <div class="w-6 h-6 rounded-full border border-secondary/50 bg-secondary/15 flex items-center justify-center text-[11px] font-black text-secondary shrink-0">2</div>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-white/50">Choose Amount</span>
+              </div>
+              <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 sm:p-6">
+                <div class="flex items-center justify-center gap-1 mb-1">
+                  <span class="text-4xl sm:text-5xl font-bold text-white/40">{{ currencySymbol }}</span>
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    :value="usdInputRaw"
+                    @input="onUsdInput"
+                    @focus="onUsdFocus"
+                    @blur="onUsdBlur"
+                    class="text-4xl sm:text-5xl font-bold bg-transparent border-none outline-none text-white text-center w-full max-w-[260px] tabular-nums"
+                    aria-label="Amount"
+                  />
+                </div>
+                <div class="text-center text-white/40 text-sm mb-5 tabular-nums min-h-[1.25rem]">
+                  <span v-if="selectedCurrency === 'USD'">≈ {{ btcEquivalentDisplay }}</span>
+                </div>
                 <input
                   type="range"
                   :min="AMOUNT_MIN"
@@ -63,33 +95,140 @@
                   :style="{ '--fill': sliderFillPct + '%' }"
                   aria-label="Amount slider"
                 />
-                <div class="flex justify-between text-xs text-white/50 mt-1 tabular-nums">
-                  <span>$1,000</span>
-                  <span>$1,000,000</span>
+                <div class="flex justify-between text-xs text-white/35 mt-1.5 tabular-nums">
+                  <span>{{ currencySymbol }}1,000</span>
+                  <span>{{ currencySymbol }}1,000,000</span>
                 </div>
               </div>
             </div>
 
-            <!-- CTA buttons -->
-            <div class="w-full max-w-md flex flex-col sm:flex-row gap-4">
-              <button
-                type="button"
-                @click="handleSimpleLend"
-                class="flex-1 bg-secondary hover:bg-secondary/90 text-white px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
+            <div class="w-full h-px bg-white/[0.07] mb-6"></div>
+
+            <!-- ── Step 3: Term (duration only, no rates) ── -->
+            <div class="px-1 pb-2">
+              <div class="flex items-center gap-2.5 mb-4">
+                <div class="w-6 h-6 rounded-full border border-secondary/50 bg-secondary/15 flex items-center justify-center text-[11px] font-black text-secondary shrink-0">3</div>
+                <span class="text-[11px] font-bold uppercase tracking-widest text-white/50">Choose Term</span>
+              </div>
+              <div
+                class="grid gap-3"
+                :class="activeTargetTerms.length === 1 ? 'grid-cols-1 max-w-[200px] mx-auto' : 'grid-cols-3'"
               >
-                Lend for Fixed Fiat Returns
-              </button>
-              <button
-                type="button"
-                @click="handleSimpleBorrow"
-                class="flex-1 border-2 border-secondary text-white hover:bg-secondary/10 px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
-              >
-                Borrow Bitcoin Exposure
-              </button>
+                <button
+                  v-for="termDays in activeTargetTerms"
+                  :key="termDays"
+                  type="button"
+                  @click="handleTermSelect(termDays)"
+                  class="relative flex flex-col items-center py-5 px-2 rounded-xl border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/60"
+                  :class="activeTermDays === termDays && termChosen
+                    ? 'border-secondary bg-secondary/10 shadow-lg shadow-secondary/20'
+                    : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.07]'"
+                >
+                  <span
+                    class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-2 transition-colors"
+                    :class="activeTermDays === termDays && termChosen ? 'text-secondary' : 'text-white/30'"
+                  >{{ termShortLabel(termDays) }}</span>
+                  <span
+                    class="text-3xl sm:text-4xl font-black tabular-nums leading-none"
+                    :class="activeTermDays === termDays && termChosen ? 'text-white' : 'text-white/55'"
+                  >{{ termDays }}</span>
+                  <span class="text-[9px] text-white/30 mt-1">days</span>
+                  <div v-if="activeTermDays === termDays && termChosen" class="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                </button>
+              </div>
+              <p class="text-white/25 text-[9px] text-center mt-3">50% LTV &middot; {{ selectedCurrency }}/BTC</p>
             </div>
+
+            <!-- ── Step 4: Rate & Action ── revealed after term click -->
+            <Transition name="step-reveal">
+              <div v-if="termChosen" class="flex flex-col gap-0">
+                <div class="w-full h-px bg-white/[0.07] mt-6 mb-6"></div>
+
+                <div class="px-1">
+                  <div class="flex items-center gap-2.5 mb-4">
+                    <div class="w-6 h-6 rounded-full border border-secondary/50 bg-secondary/15 flex items-center justify-center text-[11px] font-black text-secondary shrink-0">4</div>
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-white/50">Rate &amp; Action</span>
+                  </div>
+
+                  <!-- Recap summary row -->
+                  <div class="flex items-center gap-4 mb-5 pb-5 border-b border-white/[0.08]">
+                    <div>
+                      <div class="text-[10px] uppercase tracking-widest text-white/30 mb-0.5">Currency</div>
+                      <div class="text-sm font-semibold text-white">{{ selectedCurrency === 'USD' ? '🇺🇸' : '🇪🇺' }} {{ selectedCurrency }}</div>
+                    </div>
+                    <div class="w-px h-8 bg-white/10 shrink-0"></div>
+                    <div>
+                      <div class="text-[10px] uppercase tracking-widest text-white/30 mb-0.5">Term</div>
+                      <div class="text-sm font-semibold text-white">{{ termShortLabel(activeTermDays) }}</div>
+                    </div>
+                    <div class="w-px h-8 bg-white/10 shrink-0"></div>
+                    <div>
+                      <div class="text-[10px] uppercase tracking-widest text-white/30 mb-0.5">Amount</div>
+                      <div class="text-sm font-semibold text-white">{{ currencySymbol }}{{ usdAmount.toLocaleString('en-US') }}</div>
+                    </div>
+                    <div class="w-px h-8 bg-white/10 shrink-0"></div>
+                    <div>
+                      <div class="text-[10px] uppercase tracking-widest text-white/30 mb-0.5">LTV</div>
+                      <div class="text-sm font-semibold text-white">50%</div>
+                    </div>
+                  </div>
+
+                  <!-- Live rates -->
+                  <template v-if="hasRates(activeTermDays)">
+                    <div class="space-y-3">
+                      <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-secondary/[0.06] border border-secondary/20">
+                        <div class="min-w-0">
+                          <div class="text-[10px] font-bold uppercase tracking-wider text-secondary/70 mb-0.5">Lend APR</div>
+                          <div class="text-2xl font-black text-white tabular-nums">{{ getTermRate(activeTermDays, 'lend') }}</div>
+                          <div class="text-[10px] text-white/35 mt-0.5">Earn fixed returns in {{ selectedCurrency }}</div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                          <button type="button" @click="handleSimpleLendLimit" class="border border-white/15 hover:border-white/30 text-white/50 hover:text-white px-3 py-2.5 rounded-lg text-xs font-medium transition-all hover:bg-white/[0.05]">Change rate</button>
+                          <button type="button" @click="handleSimpleLend" class="bg-secondary/20 hover:bg-secondary/30 border border-secondary/35 text-white px-4 py-2.5 rounded-lg font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]">Lend →</button>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-secondary/[0.06] border border-secondary/20">
+                        <div class="min-w-0">
+                          <div class="text-[10px] font-bold uppercase tracking-wider text-secondary/70 mb-0.5">Borrow APR</div>
+                          <div class="text-2xl font-black text-white tabular-nums">{{ getTermRate(activeTermDays, 'borrow') }}</div>
+                          <div class="text-[10px] text-white/35 mt-0.5">Keep BTC exposure, access {{ selectedCurrency }}</div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                          <button type="button" @click="handleSimpleBorrowLimit" class="border border-white/15 hover:border-white/30 text-white/50 hover:text-white px-3 py-2.5 rounded-lg text-xs font-medium transition-all hover:bg-white/[0.05]">Change rate</button>
+                          <button type="button" @click="handleSimpleBorrow" class="bg-secondary/20 hover:bg-secondary/30 border border-secondary/35 text-white px-4 py-2.5 rounded-lg font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]">Borrow →</button>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+
+                  <!-- No live rates — limit order -->
+                  <template v-else>
+                    <div class="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-center mb-4">
+                      <div class="text-sm text-white/50 mb-1">No current offers for {{ activeTermDays }}-day {{ selectedCurrency }} loans</div>
+                      <div class="text-xs text-secondary/60">You'll set your own rate — limit order</div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                      <button type="button" @click="handleSimpleLend" class="flex-1 bg-secondary hover:bg-secondary/90 text-white px-5 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/25">Lend — Set My Rate</button>
+                      <button type="button" @click="handleSimpleBorrow" class="flex-1 border-2 border-secondary/80 text-white hover:bg-secondary/10 hover:border-secondary px-5 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]">Borrow — Set My Rate</button>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </Transition>
+
           </div>
 
-          <!-- Modal -->
+          <!-- Rate Select Modal -->
+          <RateSelectModal
+            v-if="showRateModal"
+            :action-type="rateModalAction"
+            :term-days="activeTermDays"
+            :market-rate="rateModalMarketRate"
+            @confirm="handleRateModalConfirm"
+            @close="showRateModal = false"
+          />
+
+          <!-- Order Modal -->
           <OrderModal
             v-if="showModal"
             :rate="selectedRate"
@@ -134,6 +273,7 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import OrderModal from './OrderModal.vue'
+import RateSelectModal from './RateSelectModal.vue'
 import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { formatBtcValue } from '../functions/amount_formatting'
@@ -144,6 +284,7 @@ import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
 import { useOracle } from '../composables/useOracle'
+import { usePriceSymbol } from '../composables/usePriceSymbol'
 import { generateIdempotencyKey } from '../lib/idempotencyKey'
 import { notifySlackCollateralShortfall } from '../api/slackNotify'
 
@@ -260,7 +401,14 @@ async function fetchBtcPrice() {
 }
 
 // -------- Modal state ----------
+const activeTermDays = ref(365)
+const currencyChosen = ref(false)
+const termChosen = ref(false)
+
 const showModal = ref(false)
+const showRateModal = ref(false)
+const rateModalAction = ref('Lend')
+const rateModalMarketRate = ref('*')
 const showFundingScreen = ref(false)
 const showAuthPrompt = ref(false)
 const lastOrderPayload = ref(null)
@@ -269,6 +417,7 @@ const selectedAction = ref('Lend')
 const selectedTermDays = ref(30)
 const selectedLtv = ref(50)
 const { selectedOracleId: selectedOracle, oracleLabel: selectedOracleLabel, resolveOracleFromProducts, fetchOracles } = useOracle()
+const { priceSymbol } = usePriceSymbol()
 const selectedFiat   = ref('USD')
 const modalLoading = ref(false)
 const modalNotice  = ref({ type: '', text: '' })
@@ -299,25 +448,67 @@ function handleCellClick(row, key) {
   showModal.value = true
 }
 
+function handleCurrencySelect(cur) {
+  selectedCurrency.value = cur
+  priceSymbol.value = cur === 'EUR' ? 'BTCEUR' : 'BTCUSD'
+  currencyChosen.value = true
+  termChosen.value = false
+}
+
+function handleTermSelect(days) {
+  activeTermDays.value = days
+  termChosen.value = true
+}
+
 function handleSimpleBorrow() {
   modalNotice.value = { type: '', text: '' }
   selectedContract.value = nearestContractSize.value
-  const yearRow = terms.value.find(r => r.label === '365 Days')
-  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50b, SIMPLE_BORROW_RATE, 'borrow')
+  const termRow = terms.value.find(r => r.label === `${activeTermDays.value} Days`)
+  const marketRate = termRow?.ltv50b
+  const hasMarket = marketRate && marketRate !== '*' && toNum(marketRate) > 0
+  selectedRate.value = hasMarket ? marketRate : '*'
   selectedAction.value = 'Borrow'
-  selectedTermDays.value = SIMPLE_TERM_DAYS
+  selectedTermDays.value = activeTermDays.value
   selectedLtv.value = 50
+  selectedFiat.value = selectedCurrency.value
   showModal.value = true
 }
 
 function handleSimpleLend() {
   modalNotice.value = { type: '', text: '' }
   selectedContract.value = nearestContractSize.value
-  const yearRow = terms.value.find(r => r.label === '365 Days')
-  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50a, SIMPLE_LEND_RATE, 'lend')
+  const termRow = terms.value.find(r => r.label === `${activeTermDays.value} Days`)
+  const marketRate = termRow?.ltv50a
+  const hasMarket = marketRate && marketRate !== '*' && toNum(marketRate) > 0
+  selectedRate.value = hasMarket ? marketRate : '*'
   selectedAction.value = 'Lend'
-  selectedTermDays.value = SIMPLE_TERM_DAYS
+  selectedTermDays.value = activeTermDays.value
   selectedLtv.value = 50
+  selectedFiat.value = selectedCurrency.value
+  showModal.value = true
+}
+
+function handleSimpleLendLimit() {
+  rateModalAction.value = 'Lend'
+  rateModalMarketRate.value = getTermRate(activeTermDays.value, 'lend')
+  showRateModal.value = true
+}
+
+function handleSimpleBorrowLimit() {
+  rateModalAction.value = 'Borrow'
+  rateModalMarketRate.value = getTermRate(activeTermDays.value, 'borrow')
+  showRateModal.value = true
+}
+
+function handleRateModalConfirm(rateStr) {
+  showRateModal.value = false
+  modalNotice.value = { type: '', text: '' }
+  selectedContract.value = nearestContractSize.value
+  selectedRate.value = rateStr
+  selectedAction.value = rateModalAction.value
+  selectedTermDays.value = activeTermDays.value
+  selectedLtv.value = 50
+  selectedFiat.value = selectedCurrency.value
   showModal.value = true
 }
 
@@ -698,14 +889,51 @@ function handleModalClose() {
 
 // -------- Table rows / offers polling ----------
 const terms = ref([
-  { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId:null, ltv50bId:null },
+  { label: '90 Days',  ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId: null, ltv50bId: null },
+  { label: '180 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId: null, ltv50bId: null },
+  { label: '365 Days', ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*', ltv50pid: null, ltv50aId: null, ltv50bId: null },
 ])
 
 const flashActive = ref(new Set())
 let offersIntervalId = null
 let isFetchingOffers = false
 
-const PID_PREFIX = 'LendBorrowBTCUSD:'
+const selectedCurrency = ref('USD')
+const currencySymbol = computed(() => selectedCurrency.value === 'EUR' ? '€' : '$')
+const activePidPrefix = computed(() =>
+  selectedCurrency.value === 'EUR' ? 'LendBorrowBTCEUR:' : 'LendBorrowBTCUSD:'
+)
+const activeTargetTerms = computed(() =>
+  selectedCurrency.value === 'EUR' ? [365] : [90, 180, 365]
+)
+
+function hasRates(days) {
+  const row = terms.value.find(r => r.label === `${days} Days`)
+  if (!row) return false
+  return (row.ltv50a !== '*' && toNum(row.ltv50a) > 0) ||
+         (row.ltv50b !== '*' && toNum(row.ltv50b) > 0)
+}
+
+watch(selectedCurrency, async () => {
+  termChosen.value = false
+  selectedFiat.value = selectedCurrency.value
+  activeTermDays.value = 365
+  terms.value = activeTargetTerms.value.map(d => ({
+    label: `${d} Days`,
+    ltv50a: '*', ltv50aEar: '*', ltv50b: '*', ltv50bEar: '*',
+    ltv50pid: null, ltv50aId: null, ltv50bId: null,
+  }))
+  await loadOffersOnce()
+})
+
+watch(priceSymbol, (sym) => {
+  const cur = sym === 'BTCEUR' ? 'EUR' : 'USD'
+  if (selectedCurrency.value !== cur) {
+    selectedCurrency.value = cur
+    currencyChosen.value = true
+    termChosen.value = false
+  }
+})
 
 function parseFiatFromPrefix(prefix) {
   const m = prefix.match(/LendBorrowBTC(\w+):/)
@@ -722,7 +950,7 @@ function getEar(row, key) {
   const v = row[`${key}Ear`]
   return v ?? '*'
 }
-const TARGET_TERMS = [365]
+const TARGET_TERMS = [90, 180, 365]
 
 function parseLtv(pid) {
   const m = String(pid || '').match(/ltv-(\d{1,3})/i)
@@ -814,26 +1042,28 @@ function buildTermsFromOffers(offers, contractStr) {
   })
 }
 
-function buildTermsFromLiquidityMarket(marketResults) {
-  return TARGET_TERMS.map((d) => {
+function buildTermsFromLiquidityMarket(marketResults, termsArr = [90, 180, 365]) {
+  return termsArr.map((d) => {
     const entry = marketResults[d] || {}
     const lendBuckets = entry.lend || {}
     const borrowBuckets = entry.borrow || {}
 
     // Lend column (ltv50a) = best rate for lender = highest from BORROW bucket
     const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
-    const bestLendRate = borrowRates.length ? borrowRates[0] / 100 : 12.0
-    const bestLendEar = annualize360(bestLendRate, d)
+    const hasLend = borrowRates.length > 0
+    const bestLendRate = hasLend ? borrowRates[0] / 100 : null
 
     // Borrow column (ltv50b) = best rate for borrower = lowest from LEND bucket
     const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
-    const bestBorrowRate = lendRates.length ? lendRates[0] / 100 : 12.0
-    const bestBorrowEar = annualize360(bestBorrowRate, d)
+    const hasBorrow = lendRates.length > 0
+    const bestBorrowRate = hasBorrow ? lendRates[0] / 100 : null
 
     return {
       label: `${d} Days`,
-      ltv50a: fmtPct2(bestLendRate),   ltv50aEar: fmtPct2(bestLendEar),
-      ltv50b: fmtPct2(bestBorrowRate), ltv50bEar: fmtPct2(bestBorrowEar),
+      ltv50a: hasLend ? fmtPct2(bestLendRate) : '*',
+      ltv50aEar: hasLend ? fmtPct2(bestLendRate) : '*',
+      ltv50b: hasBorrow ? fmtPct2(bestBorrowRate) : '*',
+      ltv50bEar: hasBorrow ? fmtPct2(bestBorrowRate) : '*',
       ltv50pid: null,
       ltv50aId: null, ltv50bId: null,
     }
@@ -970,7 +1200,7 @@ async function prefetchProducts() {
       if (Number.isFinite(first.ltv) && first.ltv > 0) {
         selectedLtv.value = first.ltv
       }
-      selectedFiat.value = parseFiatFromPrefix(PID_PREFIX)
+      selectedFiat.value = selectedCurrency.value
     }
   } catch (e) {
     console.debug('Product catalog prefetch failed:', e)
@@ -981,12 +1211,13 @@ async function loadOffersOnce() {
   if (isServerDown.value || serverStatus.value === 'checking') return
   if (isFetchingOffers) return
   isFetchingOffers = true
+  const prefix = activePidPrefix.value
+  const termsToFetch = activeTargetTerms.value
   try {
-    // Fetch v1 liquidity-market for each term
     const marketResults = {}
     const ltv = 50
-    const fetches = TARGET_TERMS.map(async (d) => {
-      const pid = buildBaseProductId(d, ltv)
+    const fetches = termsToFetch.map(async (d) => {
+      const pid = buildBaseProductId(d, ltv, prefix)
       try {
         const res = await getLiquidityMarket(pid, selectedOracle.value)
         marketResults[d] = res?.payload || {}
@@ -996,7 +1227,7 @@ async function loadOffersOnce() {
       }
     })
     await Promise.all(fetches)
-    const nextTerms = buildTermsFromLiquidityMarket(marketResults)
+    const nextTerms = buildTermsFromLiquidityMarket(marketResults, termsToFetch)
     diffAndFlash(terms.value, nextTerms)
     terms.value = nextTerms
   } catch (e) {
@@ -1048,11 +1279,11 @@ onUnmounted(() => {
 })
 
 // -------- Local helpers ----------
-function buildProductId(days, ltv, contractStr) {
-  return `${PID_PREFIX}ltv-50_d-365_c-xxx`
+function buildProductId(days, ltv, _contractStr, prefix = activePidPrefix.value) {
+  return `${prefix}ltv-${ltv}_d-${days}_c-xxx`
 }
-function buildBaseProductId(days, ltv) {
-  return `${PID_PREFIX}ltv-50_d-365_c-xxx`
+function buildBaseProductId(days, ltv, prefix = activePidPrefix.value) {
+  return `${prefix}ltv-${ltv}_d-${days}_c-xxx`
 }
 function getDaysFromLabel(label) {
   const m = String(label || '').match(/(\d+)/)
@@ -1062,6 +1293,20 @@ function toNum(rateStr) {
   const m = String(rateStr ?? '').match(/([\d.]+)/)
   return m ? parseFloat(m[1]) : NaN
 }
+function termShortLabel(days) {
+  if (days === 90) return '3 months'
+  if (days === 180) return '6 months'
+  if (days === 365) return '1 year'
+  return `${days} days`
+}
+
+function getTermRate(days, side) {
+  const row = terms.value.find(r => r.label === `${days} Days`)
+  if (!row) return '*'
+  if (side === 'lend') return row.ltv50aEar !== '*' ? row.ltv50aEar : row.ltv50a
+  return row.ltv50bEar !== '*' ? row.ltv50bEar : row.ltv50b
+}
+
 // Refresh offers whenever selection changes
 watch(selectedContract, () => {
   loadOffersOnce()
@@ -1071,6 +1316,14 @@ defineExpose({ loadOffersOnce, getEar })
 </script>
 
 <style scoped>
+.step-reveal-enter-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.step-reveal-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
 .flash-text {
   animation: flashPop 0.18s ease-in-out;
 }

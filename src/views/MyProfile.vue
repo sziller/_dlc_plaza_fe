@@ -171,8 +171,40 @@
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-4">
             <h2 class="text-2xl font-bold">Add funds</h2>
 
-            <div v-if="addrError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm flex items-center justify-between gap-3">
-              <span>{{ addrError }}</span>
+            <!-- Needs Signer pairing (detected from auth_code or 422 response) -->
+            <div
+              v-if="needsSigner || addrErrorKind === 'setup'"
+              class="p-3 rounded border border-amber-400/30 bg-amber-400/10 text-amber-100 text-sm space-y-1"
+              role="status"
+            >
+              <p class="font-semibold">Pair the Cadena Signer to get your deposit address.</p>
+              <p class="text-amber-100/80">
+                Download the <span class="font-semibold">Cadena Signer</span> app, sign out, sign back in, then
+                scan the QR code using the Signer app to complete setup.
+              </p>
+            </div>
+
+            <!-- Session expired -->
+            <div
+              v-else-if="addrErrorKind === 'auth'"
+              class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm flex items-center justify-between gap-3"
+            >
+              <span>Your session has expired. Please sign out and sign back in.</span>
+              <button
+                type="button"
+                class="shrink-0 rounded border border-white/30 px-3 py-1 text-white hover:bg-white/10 transition"
+                @click="logout(); router.push('/login')"
+              >
+                Sign out
+              </button>
+            </div>
+
+            <!-- Generic fetch error -->
+            <div
+              v-else-if="addrErrorKind === 'generic'"
+              class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm flex items-center justify-between gap-3"
+            >
+              <span>Could not load your deposit address. Please try again or contact support.</span>
               <button
                 type="button"
                 class="shrink-0 rounded border border-white/30 px-3 py-1 text-white hover:bg-white/10 transition"
@@ -223,8 +255,16 @@
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-3">
             <h2 class="text-2xl font-bold">DLC History</h2>
 
-            <div v-if="pastError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
-              {{ pastError }}
+            <div v-if="pastError === 'auth'" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm flex items-center justify-between gap-3">
+              <span>Your session has expired. Please sign out and sign back in.</span>
+              <button
+                type="button"
+                class="shrink-0 rounded border border-white/30 px-3 py-1 text-white hover:bg-white/10 transition"
+                @click="logout(); router.push('/login')"
+              >Sign out</button>
+            </div>
+            <div v-else-if="pastError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm">
+              Could not load DLC history. Please refresh or contact support.
             </div>
 
             <div v-else-if="pastLoading" class="text-white/80 text-sm">Loading past DLCs…</div>
@@ -439,11 +479,12 @@ async function load() {
 async function reloadAll() {
   await load()
   await nextTick()
-  if (!isPending.value) {
+  if (!isPending.value && !needsSigner.value) {
     await fetchTopup()
   } else {
     address.value = ''
     qrCode.value = null
+    addrError.value = null
   }
   await fetchPastDlcs()
 }
@@ -475,9 +516,7 @@ async function fetchTopup() {
       }
     }
   } catch (e) {
-    const msg = e && e.message ? e.message : String(e)
-    addrError.value = 'Could not load your deposit address. Please try again or contact support.'
-    qrError.value = msg
+    addrError.value = e?.message || String(e) || 'Unknown error'
   } finally {
     addrLoading.value = false
   }
@@ -547,7 +586,11 @@ async function copyText(text, which) {
 }
 
 // ---- Registration state ----
-const isPending = computed(() => Number(profile.value?.payload?.auth_code) === 0)
+const isPending   = computed(() => Number(profile.value?.payload?.auth_code) === 0)
+const needsSigner = computed(() => {
+  const code = Number(profile.value?.payload?.auth_code)
+  return Number.isFinite(code) && code !== 0 && !isSignerAuthCode(code)
+})
 const registrationLevel = computed(() => {
   const code = Number(profile.value?.payload?.auth_code)
   if (isSignerAuthCode(code)) return 'Signer'
@@ -555,6 +598,15 @@ const registrationLevel = computed(() => {
   if (code === 0) return 'Pending email confirmation'
   if (!Number.isFinite(code)) return '—'
   return `Code ${code}`
+})
+
+// Classify deposit-address errors so we can show targeted messages
+const addrErrorKind = computed(() => {
+  const e = String(addrError.value || '').toLowerCase()
+  if (!e) return null
+  if (e.includes('unauthorized') || e.includes('401')) return 'auth'
+  if (e.includes('422') || e.includes('unprocessable')) return 'setup'
+  return 'generic'
 })
 
 const showMailingList = ref(false)
@@ -655,7 +707,12 @@ async function fetchPastDlcs() {
 
     pastRows.value = rows
   } catch (e) {
-    pastError.value = e?.message || 'Failed to fetch past DLCs.'
+    const msg = String(e?.message || '').toLowerCase()
+    if (msg.includes('unauthorized') || msg.includes('401')) {
+      pastError.value = 'auth'
+    } else {
+      pastError.value = 'generic'
+    }
   } finally {
     pastLoading.value = false
   }
@@ -702,7 +759,7 @@ async function onConfirmDelete() {
 /* ===================== Lifecycle ===================== */
 onMounted(async () => {
   await load()
-  if (!isPending.value) {
+  if (!isPending.value && !needsSigner.value) {
     await fetchTopup()
   }
   await fetchPastDlcs()

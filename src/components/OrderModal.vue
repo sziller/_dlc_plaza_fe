@@ -350,78 +350,7 @@
           <p class="text-base font-semibold text-white">{{ collateralRequirementText }}</p>
         </div>
 
-        <!-- Edit Rate Warning + Checkbox Flow -->
-        <div v-if="showEditRateWarning" class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mt-4">
-          <p class="text-sm text-white/90 mb-3">
-            Changing the interest rate will convert your order to a limit order instead of matching at the current market rate.
-            Limit orders are filled on a best-efforts basis and are not guaranteed to execute.
-          </p>
-          <label class="flex items-start gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              v-model="editRateAcknowledged"
-              class="mt-0.5 accent-secondary"
-            />
-            <span class="text-sm text-white/80">I understand this will become a limit order</span>
-          </label>
-        </div>
-
-        <!-- Inline Rate Editor (shown after acknowledging warning) -->
-        <div v-if="showEditRateWarning && editRateAcknowledged" class="bg-white/5 border border-white/10 rounded-lg p-4 mt-4">
-          <div class="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              aria-label="Decrease rate"
-              @click="decrement"
-              @pointerdown.prevent="startHold(-1)"
-              @pointerup="stopHold"
-              @pointerleave="stopHold"
-              :disabled="minusDisabled"
-              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
-            >−</button>
-
-            <input
-              type="text"
-              inputmode="decimal"
-              pattern="[0-9]*[.]?[0-9]*"
-              v-model="rateInput"
-              @input="onRateInput"
-              @focus="onRateFocus"
-              @blur="onRateBlur"
-              class="w-32 text-center px-3 py-2 rounded bg-white/10 border border-white/20 focus:outline-none font-bold tabular-nums"
-              aria-label="Rate percentage"
-            />
-
-            <button
-              type="button"
-              aria-label="Increase rate"
-              @click="increment"
-              @pointerdown.prevent="startHold(1)"
-              @pointerup="stopHold"
-              @pointerleave="stopHold"
-              :disabled="plusDisabled"
-              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
-            >+</button>
-          </div>
-          <div class="text-center mt-3">
-            <button
-              type="button"
-              @click="finishEditRate"
-              class="text-sm text-secondary hover:text-secondary/80 font-semibold"
-            >Done</button>
-          </div>
-        </div>
-
-        <div class="flex justify-between items-center mt-6">
-          <button
-            type="button"
-            @click="handleEditRateClick"
-            :disabled="loading || allocationLoading"
-            class="text-white hover:text-secondary text-sm underline disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {{ skipToReview && !showEditRateWarning ? 'Edit Rate' : (showEditRateWarning ? 'Cancel Edit' : 'Back') }}
-          </button>
-
+        <div class="flex justify-end items-center mt-6">
           <button
             type="button"
             @click="submitOrder"
@@ -560,8 +489,6 @@ const { loading, notice, termDays, actionType, rate, ltv, contractSize,
 
 const orderType = ref(props.skipToReview ? 'limit' : 'market')
 const step = ref(props.skipToReview ? 2 : 1)
-const showEditRateWarning = ref(false)
-const editRateAcknowledged = ref(false)
 const rateWasEdited = ref(false)
 const showResult = ref(false)
 const isBorrower = computed(() => (actionType.value || '').toLowerCase() === 'borrow')
@@ -976,29 +903,6 @@ const collateralRequirementText = computed(() => {
 })
 
 /* ==== Edit Rate Flow ==== */
-function handleEditRateClick() {
-  if (showEditRateWarning.value) {
-    // Cancel edit
-    showEditRateWarning.value = false
-    editRateAcknowledged.value = false
-  } else if (skipToReview.value || step.value === 2) {
-    showEditRateWarning.value = true
-    editRateAcknowledged.value = false
-  } else {
-    step.value = 1
-  }
-}
-
-
-function finishEditRate() {
-  showEditRateWarning.value = false
-  editRateAcknowledged.value = false
-  rateWasEdited.value = true
-  // If rate was edited after allocation, clear allocation so user must re-Confirm
-  if (allocationResult.value) {
-    emit('confirm', buildConfirmPayload())
-  }
-}
 
 /* ==== Review Handler (triggers allocation API call) ==== */
 function handleReviewOrder() {
