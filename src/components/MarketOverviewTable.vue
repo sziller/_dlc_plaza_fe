@@ -208,8 +208,8 @@
                       <div class="text-xs text-secondary/60">You'll set your own rate — limit order</div>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3">
-                      <button type="button" @click="handleSimpleLend" class="flex-1 bg-secondary hover:bg-secondary/90 text-white px-5 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/25">Lend — Set My Rate</button>
-                      <button type="button" @click="handleSimpleBorrow" class="flex-1 border-2 border-secondary/80 text-white hover:bg-secondary/10 hover:border-secondary px-5 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]">Borrow — Set My Rate</button>
+                      <button type="button" @click="handleSimpleLendLimit" class="flex-1 bg-secondary hover:bg-secondary/90 text-white px-5 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/25">Lend — Set My Rate</button>
+                      <button type="button" @click="handleSimpleBorrowLimit" class="flex-1 border-2 border-secondary/80 text-white hover:bg-secondary/10 hover:border-secondary px-5 py-3.5 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]">Borrow — Set My Rate</button>
                     </div>
                   </template>
                 </div>
