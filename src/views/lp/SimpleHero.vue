@@ -15,7 +15,7 @@ const articles = blogArticles
 
 /* ---------- Auth / CTA ---------- */
 const { setUserFromApi } = useAuth()
-const heroCtaTo = computed(() => '/btcusd')
+const heroCtaTo = computed(() => '/allocate_liquidity')
 function onHeroCtaClick() {}
 
 const showMailingList = ref(false)
@@ -694,13 +694,13 @@ onBeforeUnmount(() => {
         <!-- Cards -->
         <p class="inst-examples-label reveal" style="transition-delay:140ms">Worked examples by use case</p>
         <div class="inst-cards reveal" style="transition-delay:200ms">
-          <router-link to="/btcusd" class="inst-card">
+          <router-link to="/allocate_liquidity" class="inst-card">
             <div class="inst-card-badge inst-card-badge-lend">Lend</div>
             <div class="inst-card-amount">$1M</div>
             <p class="inst-card-desc">12% annualized USD yield on Bitcoin</p>
             <span class="inst-card-link">View →</span>
           </router-link>
-          <router-link to="/btcusd" class="inst-card">
+          <router-link to="/allocate_liquidity" class="inst-card">
             <div class="inst-card-badge inst-card-badge-borrow">Borrow</div>
             <div class="inst-card-amount">$3M</div>
             <p class="inst-card-desc">Non-custodial liquidity without selling</p>
@@ -771,13 +771,13 @@ onBeforeUnmount(() => {
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
           <router-link
-            to="/btcusd"
+            to="/allocate_liquidity"
             class="inline-flex items-center justify-center rounded-full bg-white text-secondary font-extrabold px-8 py-4 text-base transition hover:bg-white/90 shadow-xl"
           >
             Get a Loan
           </router-link>
           <router-link
-            to="/btcusd"
+            to="/allocate_liquidity"
             class="inline-flex items-center justify-center rounded-full border-2 border-white/70 text-white font-bold px-8 py-4 text-base transition hover:border-white hover:bg-white/10"
           >
             Start Lending

@@ -104,7 +104,7 @@
         <!-- Right: Desktop Nav + CTA -->
         <div class="hidden md:flex items-center justify-end gap-4 flex-nowrap whitespace-nowrap">
           <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
-          <router-link :class="linkClass" to="/btcusd">Create Loan</router-link>
+          <router-link :class="linkClass" to="/allocate_liquidity">Create Loan</router-link>
 
           <!-- Calculators dropdown -->
           <div class="relative" data-dropdown>
@@ -358,7 +358,7 @@
         @keyup.esc="closeMobileMenu"
       >
         <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
-        <router-link @click="closeMobileMenu" to="/btcusd" class="block text-lg font-semibold hover:text-secondary">Create Loan</router-link>
+        <router-link @click="closeMobileMenu" to="/allocate_liquidity" class="block text-lg font-semibold hover:text-secondary">Create Loan</router-link>
         <div>
           <div class="text-white/50 uppercase text-xs mt-4 mb-2">Calculators</div>
           <router-link @click="closeMobileMenu" to="/loan-calculator" class="block pl-2 py-2 hover:text-secondary">Loan Calculator</router-link>

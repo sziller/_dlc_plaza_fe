@@ -79,7 +79,7 @@
               <li>Up to 50% LTV with no margin calls</li>
               <li>Earn ~11% APY lending your idle stack</li>
             </ul>
-            <router-link to="/btcusd" class="serve-cta">Get Started →</router-link>
+            <router-link to="/allocate_liquidity" class="serve-cta">Get Started →</router-link>
           </div>
 
           <!-- Family Offices -->
@@ -140,7 +140,7 @@
               <li>No taxable event — your original stack stays intact</li>
               <li>True self-custody throughout the loan term</li>
             </ul>
-            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Get Started →</router-link>
+            <router-link to="/allocate_liquidity" class="btn-primary mt-auto inline-flex">Get Started →</router-link>
           </div>
 
           <!-- Dividend Debbie -->
@@ -154,7 +154,7 @@
               <li>Your keys, your coins — maintain full custody</li>
               <li>Secured by on-chain DLC collateral</li>
             </ul>
-            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Start Lending →</router-link>
+            <router-link to="/allocate_liquidity" class="btn-primary mt-auto inline-flex">Start Lending →</router-link>
           </div>
 
           <!-- Boat Liquidity -->
@@ -168,7 +168,7 @@
               <li>No margin calls — collateral only matters at settlement</li>
               <li>Keep full BTC price upside throughout the term</li>
             </ul>
-            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Borrow Now →</router-link>
+            <router-link to="/allocate_liquidity" class="btn-primary mt-auto inline-flex">Borrow Now →</router-link>
           </div>
 
           <!-- Yield Arber -->

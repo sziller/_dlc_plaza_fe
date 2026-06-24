@@ -61,11 +61,11 @@ export function notifySlackCollateralShortfall(
 
 export function notifySlackNewBtcusdUser(email: string) {
   if (IS_LOCAL) return
-  if (localStorage.getItem('cadena:btcusd-visited')) return
+  if (localStorage.getItem('cadena:allocate_liquidity-visited')) return
   if (!WEBHOOK_URL) return
   if (!email || email === 'unknown') return
 
-  localStorage.setItem('cadena:btcusd-visited', Date.now().toString())
+  localStorage.setItem('cadena:allocate_liquidity-visited', Date.now().toString())
 
   const referral = getReferralCookie() || 'none'
 
@@ -78,7 +78,7 @@ export function notifySlackNewBtcusdUser(email: string) {
   const utmStr = utmParts.length ? utmParts.join(', ') : 'none'
 
   const text = [
-    ':wave: *New User on /btcusd*',
+    ':wave: *New User on /allocate_liquidity*',
     '',
     `*User:* ${email}`,
     `*URL:* ${window.location.href}`,

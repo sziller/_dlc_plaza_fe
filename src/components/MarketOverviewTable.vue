@@ -46,7 +46,7 @@
                 >
                   <div class="flex items-center justify-between w-full">
                     <div class="flex items-center gap-2">
-                      <span class="text-xl leading-none">{{ cur === 'USD' ? '🇺🇸' : '🇪🇺' }}</span>
+                      <img :src="`https://flagcdn.com/${cur === 'USD' ? 'us' : 'eu'}.svg`" :alt="cur === 'USD' ? 'US Flag' : 'EU Flag'" class="w-6 h-4 rounded-[3px] object-cover shadow-sm" />
                       <span class="text-xl font-black" :class="selectedCurrency === cur && currencyChosen ? 'text-white' : 'text-white/55'">{{ cur }}</span>
                     </div>
                     <div v-if="selectedCurrency === cur && currencyChosen" class="w-2 h-2 rounded-full bg-secondary shrink-0"></div>
@@ -154,7 +154,10 @@
                   <div class="flex items-center gap-4 mb-5 pb-5 border-b border-white/[0.08]">
                     <div>
                       <div class="text-[10px] uppercase tracking-widest text-white/30 mb-0.5">Currency</div>
-                      <div class="text-sm font-semibold text-white">{{ selectedCurrency === 'USD' ? '🇺🇸' : '🇪🇺' }} {{ selectedCurrency }}</div>
+                      <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
+                        <img :src="`https://flagcdn.com/${selectedCurrency === 'USD' ? 'us' : 'eu'}.svg`" :alt="selectedCurrency === 'USD' ? 'US Flag' : 'EU Flag'" class="w-5 h-3.5 rounded-[2px] object-cover shadow-sm" />
+                        {{ selectedCurrency }}
+                      </div>
                     </div>
                     <div class="w-px h-8 bg-white/10 shrink-0"></div>
                     <div>

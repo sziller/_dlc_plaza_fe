@@ -33,8 +33,8 @@
         <div>
           <p class="text-sm font-semibold text-secondary mb-4 uppercase tracking-wide">Product</p>
           <ul class="space-y-2 text-sm text-white/70">
-            <li><router-link to="/btcusd" class="hover:text-white transition-colors">Borrow</router-link></li>
-            <li><router-link to="/btcusd" class="hover:text-white transition-colors">Lend</router-link></li>
+            <li><router-link to="/allocate_liquidity" class="hover:text-white transition-colors">Borrow</router-link></li>
+            <li><router-link to="/allocate_liquidity" class="hover:text-white transition-colors">Lend</router-link></li>
             <li><router-link to="/loan-calculator" class="hover:text-white transition-colors">Calculators</router-link></li>
             <li><router-link to="/signerapp" class="hover:text-white transition-colors">Signer App</router-link></li>
           </ul>

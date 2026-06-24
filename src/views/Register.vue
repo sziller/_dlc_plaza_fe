@@ -297,7 +297,7 @@ const formValid = computed(() =>
 // --- Router ---
 const route = useRoute()
 const router = useRouter()
-const DASHBOARD_PATH = '/btcusd'
+const DASHBOARD_PATH = '/allocate_liquidity'
 
 // poll timer for step 3
 const step3PollId = ref<number | null>(null)

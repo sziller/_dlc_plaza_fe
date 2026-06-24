@@ -157,9 +157,9 @@ const submitLogin = async () => {
     // 6) Route based on auth_code if present (fallback to home)
     const code = Number(profilePayload?.auth_code)
     if (code === 2) {
-      await router.push('/btcusd')
+      await router.push('/allocate_liquidity')
     } else if (isSignerAuthCode(code)) {
-      await router.push('/btcusd')
+      await router.push('/allocate_liquidity')
     } else {
       await router.push('/')
     }

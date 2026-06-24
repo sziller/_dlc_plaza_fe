@@ -434,7 +434,7 @@ import { getPrice } from '../api/price'
 import { formatBtcValue } from '../functions/amount_formatting'
 
 const { isLoggedIn, setUserFromApi } = useAuth()
-const ctaLink = computed(() => isLoggedIn.value ? '/btcusd' : '/register')
+const ctaLink = computed(() => isLoggedIn.value ? '/allocate_liquidity' : '/register')
 
 // BTC Price fetching
 const btcPriceRaw = ref(100000) // Default fallback

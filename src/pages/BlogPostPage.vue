@@ -377,7 +377,7 @@ watch(
         <div class="flex flex-col sm:flex-row gap-4">
           <RouterLink
             v-if="isSubscriber"
-            :to="isLoggedIn ? '/btcusd' : '/register'"
+            :to="isLoggedIn ? '/allocate_liquidity' : '/register'"
             class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3 text-base font-semibold text-white transition hover:bg-secondary/90"
           >
             {{ post.cta_button_text || 'Get started' }}

@@ -115,7 +115,7 @@ onMounted(() => {
         Access liquidity without selling your Bitcoin. Non-custodial, no margin calls, settled on-chain.
       </p>
       <RouterLink
-        :to="isLoggedIn ? '/btcusd' : '/register'"
+        :to="isLoggedIn ? '/allocate_liquidity' : '/register'"
         class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3 text-base font-semibold text-white transition hover:bg-secondary/90 focus:ring-4 focus:ring-secondary/30 focus:outline-none"
       >
         Get started

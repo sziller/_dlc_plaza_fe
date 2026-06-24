@@ -102,7 +102,7 @@ const routes = [
     description: 'What makes Cadena Bitcoin different from centralized lenders and sidechains.',
     robots: 'index,follow',
   }},
-  { path: '/btcusd', name: 'BTCUSD', component: BTCUSD, meta: {
+  { path: '/allocate_liquidity', name: 'BTCUSD', component: BTCUSD, meta: {
     title: 'BTC/USD — Markets • Cadena Bitcoin',
     description: 'BTCUSD page for borrowing, lending, and market details.',
     robots: 'index,follow',

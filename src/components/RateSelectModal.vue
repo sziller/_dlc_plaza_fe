@@ -17,24 +17,34 @@
       >×</button>
 
       <div>
-        <h2 id="rate-modal-title" class="text-xl font-bold">Set Your Rate</h2>
+        <h2 id="rate-modal-title" class="text-xl font-bold">{{ noMarket ? 'No Offers Available' : 'Set Your Rate' }}</h2>
         <p class="text-sm text-white/50 mt-1">{{ actionType }} · {{ termDays }}-day term</p>
       </div>
 
-      <!-- Limit order warning -->
-      <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 space-y-3">
+      <!-- No-rates context: queue explanation -->
+      <div v-if="noMarket" class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 space-y-3">
+        <p class="text-sm text-white/85 leading-relaxed">
+          There are <span class="font-semibold text-yellow-300">no open offers</span> for this term right now.
+          You can still place a <span class="font-semibold">limit order</span> — set your preferred rate and your
+          order will sit in the queue until a counterparty matches it.
+          Execution is <span class="font-semibold">not guaranteed</span> and depends on market activity.
+        </p>
+        <label class="flex items-start gap-2.5 cursor-pointer select-none">
+          <input type="checkbox" v-model="acknowledged" class="mt-0.5 accent-secondary w-4 h-4 shrink-0" />
+          <span class="text-sm text-white/75">I understand my order will wait in the queue and may not execute</span>
+        </label>
+      </div>
+
+      <!-- Has-rates context: changing away from market rate -->
+      <div v-else class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 space-y-3">
         <p class="text-sm text-white/85 leading-relaxed">
           This places a <span class="font-semibold text-yellow-300">limit order</span> at your chosen rate
-          instead of matching the current market rate.
+          instead of the current market rate of <span class="font-semibold text-white">{{ marketRate }}</span>.
           Limit orders are filled on a best-efforts basis and are <span class="font-semibold">not guaranteed</span> to execute.
         </p>
         <label class="flex items-start gap-2.5 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            v-model="acknowledged"
-            class="mt-0.5 accent-secondary w-4 h-4 shrink-0"
-          />
-          <span class="text-sm text-white/75">I understand this is a limit order and may not execute</span>
+          <input type="checkbox" v-model="acknowledged" class="mt-0.5 accent-secondary w-4 h-4 shrink-0" />
+          <span class="text-sm text-white/75">I understand this is a limit order and may not execute immediately</span>
         </label>
       </div>
 
@@ -42,7 +52,7 @@
       <Transition name="rate-reveal">
         <div v-if="acknowledged" class="bg-white/[0.04] border border-white/10 rounded-xl p-4 space-y-3">
           <div class="text-xs text-white/40 text-center">
-            {{ marketRate && marketRate !== '*' ? `Market rate: ${marketRate}` : 'No market rate — set your own' }}
+            {{ noMarket ? 'Set your desired rate' : `Market rate: ${marketRate}` }}
           </div>
           <div class="flex items-center gap-3">
             <button
@@ -119,8 +129,10 @@ const RATE_MAX = 25
 const acknowledged = ref(false)
 const rateInputFocused = ref(false)
 
+const noMarket = computed(() => !props.marketRate || props.marketRate === '*')
+
 const initialRate = computed(() => {
-  if (!props.marketRate || props.marketRate === '*') return 0
+  if (noMarket.value) return 0
   const m = props.marketRate.match(/([\d.]+)/)
   return m ? parseFloat(m[1]) : 0
 })

@@ -73,7 +73,7 @@
           </p>
 
           <router-link
-            :to="isLoggedIn ? '/btcusd' : '/register'"
+            :to="isLoggedIn ? '/allocate_liquidity' : '/register'"
             class="inline-flex items-center gap-3 rounded-full bg-white text-secondary font-bold px-10 py-5 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
           >
             <span>Get Started with Cadena</span>
