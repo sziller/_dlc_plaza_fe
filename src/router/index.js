@@ -47,6 +47,8 @@ const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
 const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
 const Newsletter             = () => import('../views/Newsletter.vue')
+const BitcoinAllocationCalculator = () => import('../views/BitcoinAllocationCalculator.vue')
+const EndgameStudyGuide = () => import('../views/EndgameStudyGuide.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -61,6 +63,11 @@ const hasBlogToken = () => {
 }
 
 const routes = [
+  { path: '/endgame-study-guide', name: 'EndgameStudyGuide', component: EndgameStudyGuide, meta: {
+    title: 'Endgame Study Guide — Bitcoin, Sovereign Debt, and Sound Capital',
+    description: 'Chapter summaries, key numbers, mental models, glossary, quotes, and a 14-question self-test for Endgame by Kevin Bell, CFA.',
+    robots: 'index,follow',
+  }},
   { path: '/endgame', name: 'Endgame', component: Endgame, meta: {
     title: 'Endgame — Bitcoin, Sovereign Debt, and the Return of Sound Capital',
     description: 'A serious framework for allocating in a Bitcoin-anchored monetary order. By Kevin Bell, Founder of Cadena Bitcoin.',
@@ -410,6 +417,16 @@ const routes = [
   meta: {
     title: 'Settlement Calculator — Cadena Bitcoin',
     description: 'Calculate your DLC payout at any BTC settlement price.',
+    robots: 'index,follow',
+  }
+},
+{
+  path: '/bitcoin-allocation',
+  name: 'BitcoinAllocationCalculator',
+  component: BitcoinAllocationCalculator,
+  meta: {
+    title: 'How Much Bitcoin Should I Own? — Cadena Bitcoin',
+    description: 'Kelly Criterion and Modern Portfolio Theory show why 1–5% is too small. Run the math for yourself: enter your conviction, payoff, and net worth.',
     robots: 'index,follow',
   }
 },

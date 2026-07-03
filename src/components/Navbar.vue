@@ -83,6 +83,7 @@
               <router-link to="/loan-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Loan Calculator</router-link>
               <router-link to="/settlement-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Settlement Calculator</router-link>
               <router-link to="/liquidation-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Liquidation Risk</router-link>
+              <router-link to="/bitcoin-allocation" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Bitcoin Allocation</router-link>
             </div>
           </div>
 
@@ -101,6 +102,7 @@
               <router-link to="/knowledge-hub" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Knowledge Hub</router-link>
               <router-link to="/cadena-paper" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
               <router-link to="/endgame" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Endgame Book</router-link>
+              <router-link to="/endgame-study-guide" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Endgame Study Guide</router-link>
               <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Podcast</a>
               <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">GitHub</a>
             </div>
@@ -319,6 +321,7 @@
           <router-link @click="closeMobileMenu" to="/loan-calculator" class="block pl-2 py-2 hover:text-secondary">Loan Calculator</router-link>
           <router-link @click="closeMobileMenu" to="/settlement-calculator" class="block pl-2 py-2 hover:text-secondary">Settlement Calculator</router-link>
           <router-link @click="closeMobileMenu" to="/liquidation-calculator" class="block pl-2 py-2 hover:text-secondary">Liquidation Risk</router-link>
+          <router-link @click="closeMobileMenu" to="/bitcoin-allocation" class="block pl-2 py-2 hover:text-secondary">Bitcoin Allocation</router-link>
         </div>
 
         <div>
@@ -326,6 +329,7 @@
           <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block pl-2 py-2 hover:text-secondary">Knowledge Hub</router-link>
           <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
           <router-link @click="closeMobileMenu" to="/endgame" class="block pl-2 py-2 hover:text-secondary">Endgame Book</router-link>
+          <router-link @click="closeMobileMenu" to="/endgame-study-guide" class="block pl-2 py-2 hover:text-secondary">Endgame Study Guide</router-link>
           <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Podcast</a>
           <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">GitHub</a>
         </div>
@@ -376,7 +380,7 @@ import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
-import { getPrice } from '../api/price'
+import { useBtcPrice } from '../composables/useBtcPrice'
 import { useOracle } from '../composables/useOracle'
 import { formatBtcValue } from '../functions/amount_formatting'
 import { isSignerAuthCode } from '../lib/authCode'
@@ -414,69 +418,23 @@ const {
 /** ---- UI state ---- */
 const isMobileMenuOpen = ref(false)
 
-/** ---- BTC price polling (via oracle) ---- */
-const btcPrice = ref('...')
-let priceIntervalId = null
-let priceStarted = false
-
+/** ---- Numeric field extractor (used by balance computeds below) ---- */
 function pickNumber (obj, keys) {
   const src = obj ?? {}
   for (const k of keys) {
-    const v = src[k]
-    const n = Number(v)
+    const n = Number(src[k])
     if (Number.isFinite(n)) return n
   }
   return null
 }
 
-const fetchBTCPrice = async () => {
-  try {
-    // getPrice is typed Promise<number>, but be defensive in case
-    // the implementation returns a JSON object instead.
-    const raw = await getPrice(selectedOracleId.value)
-
-    let usd = null
-
-    if (typeof raw === 'number') {
-      usd = raw
-    } else if (raw && typeof raw === 'object') {
-      // Try common field names on the top level
-      usd = pickNumber(raw, ['price', 'value', 'last_price', 'price_usd'])
-      // Or inside payload if present
-      if (usd == null && raw.payload && typeof raw.payload === 'object') {
-        usd = pickNumber(raw.payload, ['price', 'value', 'last_price', 'price_usd'])
-      }
-    }
-
-    if (usd == null || !Number.isFinite(Number(usd))) {
-      throw new Error('Invalid oracle response for BTCUSD')
-    }
-
-    btcPrice.value = Number(usd).toLocaleString(undefined, {
-      style: 'decimal',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-  } catch (err) {
-    console.error('Failed to fetch BTC price from oracle:', err)
-    btcPrice.value = 'N/A'
-  }
-}
-
-function startPricePolling () {
-  if (priceStarted) return
-  priceStarted = true
-  fetchBTCPrice()
-  priceIntervalId = setInterval(fetchBTCPrice, 30_000)
-}
-
-function stopPricePolling () {
-  if (priceIntervalId) {
-    clearInterval(priceIntervalId)
-    priceIntervalId = null
-  }
-  priceStarted = false
-}
+/** ---- BTC price (shared singleton — no local interval) ---- */
+const { btcPriceUsd } = useBtcPrice()
+const btcPrice = computed(() => {
+  const v = btcPriceUsd.value
+  if (!v) return '...'
+  return Number(v).toLocaleString(undefined, { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 })
+})
 
 /** ---- Fixed nav + info measurement ---- */
 const navRef = ref(null)
@@ -576,9 +534,6 @@ onMounted(async () => {
     window.addEventListener('resize', onResize, { passive: true })
   }
 
-  // Start BTC price polling once (from oracle)
-  startPricePolling()
-
   // If logged in but no cached profile yet, refresh without blanking UI
   if (isLoggedIn.value && !authUser.value) {
     // IMPORTANT: your composable should implement SWR so this doesn’t toggle loading if data exists
@@ -587,7 +542,6 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  stopPricePolling()
   if (resizeObs) resizeObs.disconnect()
   unregAfterEach && unregAfterEach()
   stopStatusWatch && stopStatusWatch()

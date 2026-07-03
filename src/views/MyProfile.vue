@@ -171,8 +171,8 @@
           <section class="p-4 border border-white/20 bg-white/5 rounded-lg space-y-4">
             <h2 class="text-2xl font-bold">Add funds</h2>
 
-            <div v-if="addrError" class="p-3 rounded border border-red-500/40 bg-red-500/10 text-red-200 text-sm flex items-center justify-between gap-3">
-              <span>{{ addrError }}</span>
+            <div v-if="addrError" class="p-3 rounded border border-amber-400/30 bg-amber-400/10 text-amber-100 text-sm flex items-center justify-between gap-3">
+              <span>Please login to the Cadena Bitcoin Signer App and <router-link to="/register?step=3" class="underline underline-offset-2 font-semibold hover:text-white transition-colors">scan the QR code</router-link>.</span>
               <button
                 type="button"
                 class="shrink-0 rounded border border-white/30 px-3 py-1 text-white hover:bg-white/10 transition"

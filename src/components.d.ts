@@ -22,6 +22,7 @@ declare module 'vue' {
     ISimpleIconsX: typeof import('~icons/simple-icons/x')['default']
     ISimpleIconsYoutube: typeof import('~icons/simple-icons/youtube')['default']
     MailingListModal: typeof import('./components/MailingListModal.vue')['default']
+    MaintenanceBanner: typeof import('./components/MaintenanceBanner.vue')['default']
     MarketOverviewTable: typeof import('./components/MarketOverviewTable.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
     OrderModal: typeof import('./components/OrderModal.vue')['default']

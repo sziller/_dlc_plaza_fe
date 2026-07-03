@@ -12,7 +12,6 @@
             {{ title }}
           </div>
         </div>
-
         <!-- Content Wrapper -->
         <div
           v-if="isServerDown"
@@ -70,23 +69,71 @@
               </div>
             </div>
 
-            <!-- CTA buttons -->
-            <div class="w-full max-w-md flex flex-col sm:flex-row gap-4">
-              <button
-                type="button"
-                @click="handleSimpleLend"
-                class="flex-1 bg-secondary hover:bg-secondary/90 text-white px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
-              >
-                Lend for Fixed Fiat Returns
-              </button>
-              <button
-                type="button"
-                @click="handleSimpleBorrow"
-                class="flex-1 border-2 border-secondary text-white hover:bg-secondary/10 px-6 py-4 rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-secondary/20"
-              >
-                Borrow Bitcoin Exposure
-              </button>
+            <!-- Live rates -->
+            <!-- Rate cards — each side shown independently -->
+            <div v-if="hasRates(365)" class="w-full max-w-md flex gap-3">
+              <!-- Lend -->
+              <div class="flex-1 flex flex-col gap-2">
+                <div class="text-center text-base font-bold uppercase tracking-widest text-white">Lend APR</div>
+                <template v-if="hasLendRate(365)">
+                  <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
+                    <div class="text-3xl font-black text-white tabular-nums leading-none text-center">{{ getTermRate(365, 'lend') }}</div>
+                    <button type="button" @click="handleSimpleLend"
+                      class="w-full bg-secondary hover:bg-secondary/90 text-white py-2.5 rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-secondary/30 flex items-center justify-center">
+                      Lend →
+                    </button>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 flex flex-col gap-4 items-center justify-center">
+                    <p class="text-xs text-white/35 text-center">No live rate</p>
+                    <button type="button" @click="handleSimpleLend"
+                      class="w-full bg-secondary hover:bg-secondary/90 text-white py-2.5 rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-secondary/30 flex items-center justify-center">
+                      Set own rate
+                    </button>
+                  </div>
+                </template>
+              </div>
+              <!-- Borrow -->
+              <div class="flex-1 flex flex-col gap-2">
+                <div class="text-center text-base font-bold uppercase tracking-widest text-white">Borrow APR</div>
+                <template v-if="hasBorrowRate(365)">
+                  <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 flex flex-col gap-4">
+                    <div class="text-3xl font-black text-white tabular-nums leading-none text-center">{{ getTermRate(365, 'borrow') }}</div>
+                    <button type="button" @click="handleSimpleBorrow"
+                      class="w-full bg-secondary hover:bg-secondary/90 text-white py-2.5 rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-secondary/30 flex items-center justify-center">
+                      Borrow →
+                    </button>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 flex flex-col gap-4 items-center justify-center">
+                    <p class="text-xs text-white/35 text-center">No live rate</p>
+                    <button type="button" @click="handleSimpleBorrow"
+                      class="w-full bg-secondary hover:bg-secondary/90 text-white py-2.5 rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-secondary/30 flex items-center justify-center">
+                      Set own rate
+                    </button>
+                  </div>
+                </template>
+              </div>
             </div>
+
+            <!-- No live rates at all -->
+            <template v-else>
+              <div class="w-full max-w-md flex flex-col items-center gap-3">
+                <p class="text-xs text-white/40 tracking-wide">No live rates — set your own</p>
+                <div class="flex gap-3 w-full">
+                  <button type="button" @click="handleSimpleLend"
+                    class="flex-1 bg-secondary hover:bg-secondary/90 text-white py-3 rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-secondary/30 flex items-center justify-center">
+                    Lend — Set Rate
+                  </button>
+                  <button type="button" @click="handleSimpleBorrow"
+                    class="flex-1 border border-secondary/50 hover:border-secondary hover:bg-secondary/10 text-white py-3 rounded-xl font-bold text-sm tracking-wide transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center">
+                    Borrow — Set Rate
+                  </button>
+                </div>
+              </div>
+            </template>
           </div>
 
           <!-- Modal -->
@@ -138,7 +185,7 @@ import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { formatBtcValue } from '../functions/amount_formatting'
 import { getServerStatus } from '../api/serverStatus'
-import { getPrice } from '../api/price'
+import { useBtcPrice } from '../composables/useBtcPrice'
 import { postLiquidityAllocation, postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
 import { getOwnDerivedBalance } from '../api/userDerivedBalance'
 import { getTopupAddressQR } from '../api/qr'
@@ -152,13 +199,14 @@ const router = useRouter()
 // -------- Collateral helper (matches OrderModal formula) ----------
 const FEE_PCT = 0.01
 
-function computeRequiredCollateralSats(loanSats, rateDecimal, ltv, isBorrow) {
+function computeRequiredCollateralSats(loanSats, rateDecimal, _ltv, isBorrow) {
   if (!Number.isFinite(loanSats) || loanSats <= 0) return 0
   const r = Number.isFinite(rateDecimal) ? rateDecimal : 0
-  const l = Number.isFinite(ltv) && ltv > 0 ? ltv : 0.5
   if (isBorrow) {
-    return Math.round(loanSats * (1 + 2 * r + FEE_PCT * (1 + r) / l))
+    // borrower locks: principal + 2× interest buffer + 1% fee
+    return Math.round(loanSats * (1 + 2 * r + FEE_PCT))
   }
+  // lender deploys principal only
   return loanSats
 }
 
@@ -234,30 +282,16 @@ async function checkServerStatus() {
 }
 
 // -------- Simplified flow constants ----------
-const SIMPLE_BORROW_RATE = 12.0
-const SIMPLE_LEND_RATE = 12.0
 const SIMPLE_TERM_DAYS = 365
 
-function resolveEffectiveRate(marketRateStr, fallback, role) {
+function resolveEffectiveRate(marketRateStr) {
   const market = toNum(marketRateStr)
-  if (!Number.isFinite(market) || market <= 0) {
-    return `${fallback.toFixed(4)}%`
-  }
+  if (!Number.isFinite(market) || market <= 0) return '*'
   return `${market.toFixed(4)}%`
 }
 
-// -------- BTC price polling ----------
-const btcPriceUsd = ref(null)
-let btcPriceIntervalId = null
-
-async function fetchBtcPrice() {
-  try {
-    const price = await getPrice(selectedOracle.value)
-    if (Number.isFinite(price) && price > 0) btcPriceUsd.value = price
-  } catch (e) {
-    console.debug('BTC price fetch failed:', e)
-  }
-}
+// -------- BTC price (shared singleton) ----------
+const { btcPriceUsd } = useBtcPrice()
 
 // -------- Modal state ----------
 const showModal = ref(false)
@@ -299,11 +333,30 @@ function handleCellClick(row, key) {
   showModal.value = true
 }
 
+function hasRates(days) {
+  return hasLendRate(days) || hasBorrowRate(days)
+}
+function hasLendRate(days) {
+  const row = terms.value.find(r => r.label === `${days} Days`)
+  return !!row && row.ltv50a !== '*' && toNum(row.ltv50a) > 0
+}
+function hasBorrowRate(days) {
+  const row = terms.value.find(r => r.label === `${days} Days`)
+  return !!row && row.ltv50b !== '*' && toNum(row.ltv50b) > 0
+}
+
+function getTermRate(days, side) {
+  const row = terms.value.find(r => r.label === `${days} Days`)
+  if (!row) return '*'
+  if (side === 'lend') return row.ltv50aEar !== '*' ? row.ltv50aEar : row.ltv50a
+  return row.ltv50bEar !== '*' ? row.ltv50bEar : row.ltv50b
+}
+
 function handleSimpleBorrow() {
   modalNotice.value = { type: '', text: '' }
   selectedContract.value = nearestContractSize.value
   const yearRow = terms.value.find(r => r.label === '365 Days')
-  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50b, SIMPLE_BORROW_RATE, 'borrow')
+  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50b)
   selectedAction.value = 'Borrow'
   selectedTermDays.value = SIMPLE_TERM_DAYS
   selectedLtv.value = 50
@@ -314,7 +367,7 @@ function handleSimpleLend() {
   modalNotice.value = { type: '', text: '' }
   selectedContract.value = nearestContractSize.value
   const yearRow = terms.value.find(r => r.label === '365 Days')
-  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50a, SIMPLE_LEND_RATE, 'lend')
+  selectedRate.value = resolveEffectiveRate(yearRow?.ltv50a)
   selectedAction.value = 'Lend'
   selectedTermDays.value = SIMPLE_TERM_DAYS
   selectedLtv.value = 50
@@ -340,93 +393,47 @@ async function handleOrderSubmit(data) {
 
   modalLoading.value = true
 
-  // Direct collateral check: compare required sats against available liquidity
-  if (allocationResult.value) {
-    const rate = toNum(data.rate) / 100
-    const isBorrowRole = String(data.action || '').toLowerCase() === 'borrow'
-    const loanSats = allocationResult.value.required_btc_liquidity ?? 0
-    const ltvDecimal = (selectedLtv.value || 50) / 100
-    const requiredSats = computeRequiredCollateralSats(loanSats, rate, ltvDecimal, isBorrowRole)
-    const availableSats = allocationResult.value.available_btc_liquidity ?? 0
-
-    if (availableSats < requiredSats) {
-      const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
-      notifySlackCollateralShortfall(userEmail, usdAmount.value, availableSats, requiredSats)
-      showFundingScreen.value = true
-      await fetchTopupAddress()
-      modalLoading.value = false
-      return
-    }
+  // Compute sats fresh from the current rate in the payload — avoids stale
+  // allocationResult when the market rate polled in after the modal opened.
+  const interest = data.rateNumeric ?? toNum(data.rate)
+  if (!Number.isFinite(interest)) {
+    modalLoading.value = false
+    modalNotice.value = { type: 'error', text: 'Invalid rate.' }
+    return
   }
+  const rateDecimal = interest / 100
+  const btcPriceForCalc = data.btcPrice ?? btcPriceUsd.value
+  const usdAmtForCalc   = data.amountUsd ?? usdAmount.value
+  const loanSatsFresh   = btcPriceForCalc > 0 ? Math.round((usdAmtForCalc / btcPriceForCalc) * 1e8) : 0
+  const ltvDecimal      = (selectedLtv.value || 50) / 100
+  const isBorrowRole    = String(data.action || '').toLowerCase() === 'borrow'
+  const requiredSats    = computeRequiredCollateralSats(loanSatsFresh, rateDecimal, ltvDecimal, isBorrowRole)
+  const availableSats   = allocationResult.value?.available_btc_liquidity ?? 0
 
-  if (!allocationResult.value?.is_covered) {
+  if (availableSats < requiredSats) {
     const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
-    const availSats = allocationResult.value?.available_btc_liquidity ?? 0
-    const reqSats = allocationResult.value?.required_collateral_sats ?? 0
-    notifySlackCollateralShortfall(userEmail, usdAmount.value, availSats, reqSats)
+    notifySlackCollateralShortfall(userEmail, usdAmount.value, availableSats, requiredSats)
     showFundingScreen.value = true
     await fetchTopupAddress()
     modalLoading.value = false
     return
   }
 
-  if (type === 'market') {
-    const interest = toNum(data.rate)
-    if (!Number.isFinite(interest)) {
-      modalLoading.value = false
-      modalNotice.value = { type: 'error', text: 'Invalid rate.' }
-      return
-    }
-    const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
-    const ltv = selectedLtv.value || 50
-    const requiredSats = allocationResult.value?.required_collateral_sats ?? 0
-    try {
-      await postLiquidityAllocationV1({
-        ini_role: String(data.action || '').toLowerCase(),
-        interest,
-        oracle: [selectedOracle.value],
-        base_product: buildBaseProductId(days, ltv),
-        liquidity_sat: requiredSats,
-      }, currentIdempotencyKey.value)
-      currentIdempotencyKey.value = null
-      modalNotice.value = { type: 'success', text: 'Order submitted.' }
-      setUserFromApi()
-    } catch (e) {
-      if (e?.status === 409 || e?.response?.status === 409) {
-        currentIdempotencyKey.value = null
-        modalNotice.value = { type: 'error', text: e.message || 'Duplicate request — please try again.' }
-      } else {
-        const detail = e?.response?.data?.detail || e?.message || ''
-        if (/insufficient/i.test(detail)) {
-          const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
-          notifySlackCollateralShortfall(userEmail, usdAmount.value, 0, 0)
-          showFundingScreen.value = true
-          await fetchTopupAddress()
-        } else {
-          modalNotice.value = { type: 'error', text: detail || 'Order failed.' }
-        }
-      }
-    } finally {
-      modalLoading.value = false
-    }
-    return
-  }
-
-  if (type !== 'limit') return
-  const interest = toNum(data.rate)
-  if (!Number.isFinite(interest)) {
+  if (!allocationResult.value?.is_covered) {
+    const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
+    notifySlackCollateralShortfall(userEmail, usdAmount.value, availableSats, requiredSats)
+    showFundingScreen.value = true
+    await fetchTopupAddress()
     modalLoading.value = false
-    modalNotice.value = { type: 'error', text: 'Invalid rate.' }
     return
   }
 
   const days = Number(data.durationDays) || getDaysFromLabel(data.duration)
-  const ltv = selectedLtv.value || 50
-  const requiredSats = allocationResult.value?.required_collateral_sats ?? 0
+  const ltv  = selectedLtv.value || 50
 
   try {
     await postLiquidityAllocationV1({
-      ini_role: String(data.action || '').toLowerCase(),
+      ini_role: isBorrowRole ? 'borrow' : 'lend',
       interest,
       oracle: [selectedOracle.value],
       base_product: buildBaseProductId(days, ltv),
@@ -442,6 +449,8 @@ async function handleOrderSubmit(data) {
     } else {
       const detail = e?.response?.data?.detail || e?.message || ''
       if (/insufficient/i.test(detail)) {
+        const userEmail = authUser.value?.payload?.email ?? authUser.value?.email ?? 'unknown'
+        notifySlackCollateralShortfall(userEmail, usdAmount.value, 0, 0)
         showFundingScreen.value = true
         await fetchTopupAddress()
       } else {
@@ -559,7 +568,13 @@ async function handleOrderConfirm(data) {
     return
   }
 
-  const requiredSats = allocationResult.value?.required_collateral_sats ?? 0
+  // Compute sats fresh — allocationResult may be stale if rate polled in after review
+  const isBorrowRole   = role === 'borrow'
+  const btcPriceForCalc = data.btcPrice ?? btcPriceUsd.value
+  const usdAmtForCalc   = data.amountUsd ?? usdAmount.value
+  const loanSatsFresh   = btcPriceForCalc > 0 ? Math.round((usdAmtForCalc / btcPriceForCalc) * 1e8) : 0
+  const ltvDecimal      = (selectedLtv.value || 50) / 100
+  const requiredSats    = computeRequiredCollateralSats(loanSatsFresh, interest / 100, ltvDecimal, isBorrowRole)
   if (requiredSats <= 0) return
 
   modalLoading.value = true
@@ -820,20 +835,24 @@ function buildTermsFromLiquidityMarket(marketResults) {
     const lendBuckets = entry.lend || {}
     const borrowBuckets = entry.borrow || {}
 
-    // Lend column (ltv50a) = best rate for lender = highest from BORROW bucket
-    const borrowRates = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite).sort((a, b) => b - a)
-    const bestLendRate = borrowRates.length ? borrowRates[0] / 100 : 12.0
-    const bestLendEar = annualize360(bestLendRate, d)
+    // Lend APR = highest rate borrowers are willing to pay (best for lenders)
+    const borrowKeys = Object.keys(borrowBuckets).map(Number).filter(Number.isFinite)
+    const hasLend = borrowKeys.length > 0
+    const bestLendRate = hasLend ? Math.max(...borrowKeys) / 100 : null
+    const bestLendEar = bestLendRate !== null ? annualize360(bestLendRate, d) : null
 
-    // Borrow column (ltv50b) = best rate for borrower = lowest from LEND bucket
-    const lendRates = Object.keys(lendBuckets).map(Number).filter(Number.isFinite).sort((a, b) => a - b)
-    const bestBorrowRate = lendRates.length ? lendRates[0] / 100 : 12.0
-    const bestBorrowEar = annualize360(bestBorrowRate, d)
+    // Borrow APR = lowest rate lenders are asking for (best for borrowers)
+    const lendKeys = Object.keys(lendBuckets).map(Number).filter(Number.isFinite)
+    const hasBorrow = lendKeys.length > 0
+    const bestBorrowRate = hasBorrow ? Math.min(...lendKeys) / 100 : null
+    const bestBorrowEar = bestBorrowRate !== null ? annualize360(bestBorrowRate, d) : null
 
     return {
       label: `${d} Days`,
-      ltv50a: fmtPct2(bestLendRate),   ltv50aEar: fmtPct2(bestLendEar),
-      ltv50b: fmtPct2(bestBorrowRate), ltv50bEar: fmtPct2(bestBorrowEar),
+      ltv50a:    hasLend   ? fmtPct2(bestLendRate)  : '*',
+      ltv50aEar: hasLend   ? fmtPct2(bestLendEar)   : '*',
+      ltv50b:    hasBorrow ? fmtPct2(bestBorrowRate) : '*',
+      ltv50bEar: hasBorrow ? fmtPct2(bestBorrowEar) : '*',
       ltv50pid: null,
       ltv50aId: null, ltv50bId: null,
     }
@@ -988,7 +1007,7 @@ async function loadOffersOnce() {
     const fetches = TARGET_TERMS.map(async (d) => {
       const pid = buildBaseProductId(d, ltv)
       try {
-        const res = await getLiquidityMarket(pid, selectedOracle.value)
+        const res = await getLiquidityMarket(pid, selectedOracle.value, 10)
         marketResults[d] = res?.payload || {}
       } catch (e) {
         console.debug(`liquidity-market fetch failed for ${pid}:`, e)
@@ -1030,8 +1049,6 @@ onMounted(async () => {
   await loadOffersOnce()
   offersIntervalId = setInterval(loadOffersOnce, props.offersPollMs)
 
-  fetchBtcPrice()
-  btcPriceIntervalId = setInterval(fetchBtcPrice, 30000)
 })
 
 onUnmounted(() => {
@@ -1043,7 +1060,6 @@ onUnmounted(() => {
   window.removeEventListener('focus', loadOffersOnce)
 
   if (offersIntervalId) clearInterval(offersIntervalId)
-  if (btcPriceIntervalId) clearInterval(btcPriceIntervalId)
   flashActive.value = new Set()
 })
 

@@ -477,10 +477,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
-import { getPrice } from '../api/price'
+import { useBtcPrice } from '../composables/useBtcPrice'
 import { formatBtcValue } from '../functions/amount_formatting'
 
 const { isLoggedIn, setUserFromApi } = useAuth()
@@ -492,20 +492,9 @@ const toggleFaq = (idx) => {
   openFaqIndex.value = openFaqIndex.value === idx ? -1 : idx
 }
 
-// BTC Price fetching
-const btcPriceRaw = ref(100000) // Default fallback
-let priceIntervalId = null
-
-async function fetchBTCPrice() {
-  try {
-    const raw = await getPrice()
-    if (typeof raw === 'number' && Number.isFinite(raw)) {
-      btcPriceRaw.value = raw
-    }
-  } catch (err) {
-    console.error('Failed to fetch BTC price:', err)
-  }
-}
+// BTC Price (shared singleton)
+const { btcPriceUsd } = useBtcPrice()
+const btcPriceRaw = computed(() => btcPriceUsd.value ?? 100000)
 
 // Formatted price for display
 const btcPriceFormatted = computed(() =>
@@ -585,12 +574,6 @@ const faqItems = [
 onMounted(() => {
   setUserFromApi()
   window.scrollTo(0, 0)
-  fetchBTCPrice()
-  priceIntervalId = setInterval(fetchBTCPrice, 30_000)
-})
-
-onUnmounted(() => {
-  if (priceIntervalId) clearInterval(priceIntervalId)
 })
 </script>
 

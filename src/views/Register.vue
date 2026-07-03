@@ -118,15 +118,15 @@
         <picture>
           <source
             type="image/avif"
-            srcset="/img/emailConfirmation-640.avif 640w, /img/emailConfirmation-960.avif 960w, /img/emailConfirmation-1280.avif 1280w"
+            srcset="/img/email_confirmed_icon-640.avif 640w, /img/email_confirmed_icon-960.avif 960w, /img/email_confirmed_icon-1280.avif 1280w"
           />
           <source
             type="image/webp"
-            srcset="/img/emailConfirmation-640.webp 640w, /img/emailConfirmation-960.webp 960w, /img/emailConfirmation-1280.webp 1280w"
+            srcset="/img/email_confirmed_icon-640.webp 640w, /img/email_confirmed_icon-960.webp 960w, /img/email_confirmed_icon-1280.webp 1280w"
           />
           <img
-            src="/img/emailConfirmation-960.webp"
-            srcset="/img/emailConfirmation-640.webp 640w, /img/emailConfirmation-960.webp 960w, /img/emailConfirmation-1280.webp 1280w"
+            src="/img/email_confirmed_icon-960.webp"
+            srcset="/img/email_confirmed_icon-640.webp 640w, /img/email_confirmed_icon-960.webp 960w, /img/email_confirmed_icon-1280.webp 1280w"
             sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 350px"
             alt="Check your email for confirmation"
             class="w-[280px] md:w-[320px] lg:w-[350px] h-auto select-none"

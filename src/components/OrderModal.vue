@@ -234,8 +234,12 @@
               </div>
             </div>
 
-            <!-- Error state: both endpoints failed -->
-            <div v-if="!topupLoading && !qrDataUri && !topupAddress && topupError" class="bg-red-500/15 border border-red-500/40 rounded-lg p-3">
+            <!-- Error state: unpaired -->
+            <div v-if="!topupLoading && !qrDataUri && !topupAddress && !isPaired" class="bg-amber-400/10 border border-amber-400/30 rounded-lg p-3">
+              <p class="text-sm text-amber-100">Please login to the Cadena Bitcoin Signer App and <router-link to="/register?step=3" class="underline underline-offset-2 font-semibold hover:text-white transition-colors">scan the QR code</router-link>.</p>
+            </div>
+            <!-- Error state: paired but both endpoints failed -->
+            <div v-else-if="!topupLoading && !qrDataUri && !topupAddress && topupError" class="bg-red-500/15 border border-red-500/40 rounded-lg p-3">
               <p class="text-sm text-white/90">{{ topupError }}</p>
             </div>
           </div>
@@ -955,11 +959,11 @@ const computedCollateralBtc = computed(() => {
   if (!Number.isFinite(L) || !Number.isFinite(r) || !Number.isFinite(ltv) || ltv <= 0) return NaN
 
   if (isBorrower.value) {
-    // LOAN * ((1 + interest) / LTV - 1 + feerate)
-    return roundBtc(L * ((1 + r) / ltv - 1 + FEE_PCT))
+    // principal + 2× interest buffer + 1% fee
+    return roundBtc(L * (1 + 2 * r + FEE_PCT))
   }
 
-  // Lender: collateral = loan amount
+  // Lender: deploys principal only
   return roundBtc(L)
 })
 
