@@ -332,26 +332,89 @@
           <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYieldWithFee }}</li>
         </ul>
 
-        <!-- Collateral Requirement Block -->
+        <!-- Collateral Breakdown Block -->
         <div v-if="allocationLoading" class="flex flex-col items-center gap-3 py-6">
           <div class="h-6 w-6 rounded-full border-3 border-white/30 border-t-white animate-spin"></div>
           <div class="text-sm text-white/80">Calculating collateral…</div>
         </div>
-        <div v-else-if="allocationResult" class="mt-4 space-y-3">
-          <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/30">
-            <p class="text-base font-semibold text-white">
-              Collateral Required: {{ Number.isFinite(computedCollateralBtc) ? formatBtcValue(computedCollateralBtc) : '0' }} BTC
-            </p>
-            <p v-if="btcPrice && Number.isFinite(computedCollateralBtc)" class="text-xs text-white/60 mt-0.5">
-              ≈ {{ (computedCollateralBtc * btcPrice).toLocaleString('en-US', { style: 'currency', currency: fiatLabel, maximumFractionDigits: 0 }) }} {{ fiatLabel }}
-            </p>
-            <p class="text-sm text-white/70 mt-1">
-              Available BTC Liquidity: {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
-            </p>
-          </div>
-        </div>
-        <div v-else class="mt-4 p-4 rounded-lg bg-secondary/10 border border-secondary/30">
-          <p class="text-base font-semibold text-white">{{ collateralRequirementText }}</p>
+        <div v-else class="mt-4 space-y-3">
+          <!-- Borrower breakdown -->
+          <template v-if="isBorrower">
+            <div class="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden text-sm">
+              <div class="px-4 py-2 bg-white/[0.04] border-b border-white/[0.06]">
+                <span class="text-xs font-bold uppercase tracking-widest text-white/40">You Lock (Borrower Collateral)</span>
+              </div>
+              <div class="divide-y divide-white/[0.05]">
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">Loan principal</span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownPrincipalUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">2× Interest buffer <span class="text-white/35 text-xs">({{ usdFmt(breakdownInterestUsd) }} × 2)</span></span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownInterestUsd * 2) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">1% Cadena fee</span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownFeeUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-3 bg-secondary/[0.08]">
+                  <span class="font-bold text-white">Your total BTC locked</span>
+                  <div class="text-right">
+                    <div class="font-black text-white tabular-nums">
+                      {{ Number.isFinite(breakdownTotalBtc) ? formatBtcValue(breakdownTotalBtc) : '—' }} BTC
+                    </div>
+                    <div v-if="btcPrice && Number.isFinite(breakdownTotalBtc)" class="text-xs text-white/50 tabular-nums">
+                      = {{ usdFmt(breakdownTotalBtc * btcPrice) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="allocationResult" class="flex justify-between items-center text-xs px-1">
+              <span class="text-white/40">Available in your wallet</span>
+              <span class="tabular-nums" :class="isCollateralCovered ? 'text-green-400' : 'text-red-400'">
+                {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
+                <span v-if="isCollateralCovered"> ✓</span>
+              </span>
+            </div>
+          </template>
+
+          <!-- Lender breakdown -->
+          <template v-else>
+            <div class="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden text-sm">
+              <div class="px-4 py-2 bg-white/[0.04] border-b border-white/[0.06]">
+                <span class="text-xs font-bold uppercase tracking-widest text-white/40">You Lock (Lender Collateral)</span>
+              </div>
+              <div class="divide-y divide-white/[0.05]">
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">USD deployed</span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownPrincipalUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">Yield you earn</span>
+                  <span class="font-semibold tabular-nums text-green-400">+{{ usdFmt(breakdownInterestUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-3 bg-secondary/[0.08]">
+                  <span class="font-bold text-white">Your BTC deployed</span>
+                  <div class="text-right">
+                    <div class="font-black text-white tabular-nums">
+                      {{ Number.isFinite(breakdownTotalBtc) ? formatBtcValue(breakdownTotalBtc) : '—' }} BTC
+                    </div>
+                    <div v-if="btcPrice && Number.isFinite(breakdownTotalBtc)" class="text-xs text-white/50 tabular-nums">
+                      = {{ usdFmt(breakdownTotalBtc * btcPrice) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="allocationResult" class="flex justify-between items-center text-xs px-1">
+              <span class="text-white/40">Available in your wallet</span>
+              <span class="tabular-nums" :class="isCollateralCovered ? 'text-green-400' : 'text-red-400'">
+                {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
+                <span v-if="isCollateralCovered"> ✓</span>
+              </span>
+            </div>
+          </template>
         </div>
 
         <!-- Edit Rate Warning + Checkbox Flow -->
@@ -371,19 +434,55 @@
         </div>
 
         <!-- Inline Rate Editor (shown after acknowledging warning) -->
-        <div v-if="showEditRateWarning && editRateAcknowledged" class="bg-white/5 border border-white/10 rounded-lg p-4 mt-4">
-          <div class="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              aria-label="Decrease rate"
-              @click="decrement"
-              @pointerdown.prevent="startHold(-1)"
-              @pointerup="stopHold"
-              @pointerleave="stopHold"
-              :disabled="minusDisabled"
-              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
-            >−</button>
+        <div v-if="showEditRateWarning && editRateAcknowledged" class="bg-white/5 border border-white/10 rounded-2xl p-5 mt-4 space-y-5">
 
+          <!-- Big rate display -->
+          <div class="text-center">
+            <div class="flex items-end justify-center gap-1 leading-none">
+              <span class="text-5xl font-black tabular-nums text-white">{{ Number.isFinite(rateNum) ? rateNum.toFixed(1) : '0.0' }}</span>
+              <span class="text-2xl font-bold text-white/50 mb-1">%</span>
+            </div>
+            <p class="text-xs text-white/35 mt-1 tracking-wide uppercase">APR</p>
+          </div>
+
+          <!-- Preset chips -->
+          <div class="flex justify-center gap-2 flex-wrap">
+            <button
+              v-for="p in [4, 6, 8, 10, 12]"
+              :key="p"
+              type="button"
+              @click="rateNum = roundRate(clampRate(p))"
+              :class="[
+                'px-3 py-1.5 rounded-full text-sm font-semibold transition',
+                Math.abs(rateNum - p) < 0.05
+                  ? 'bg-secondary text-white'
+                  : 'bg-white/[0.06] border border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+              ]"
+            >{{ p }}%</button>
+          </div>
+
+          <!-- Slider -->
+          <div>
+            <input
+              type="range"
+              :min="RATE_MIN"
+              :max="RATE_MAX"
+              :step="STEP"
+              :value="Number.isFinite(rateNum) ? rateNum : 0"
+              @input="e => { const v = parseFloat(e.target.value); if (Number.isFinite(v)) rateNum = roundRate(clampRate(v)) }"
+              class="rate-slider w-full"
+              :style="{ '--fill': ((Number.isFinite(rateNum) ? rateNum : 0) / RATE_MAX * 100) + '%' }"
+              aria-label="Interest rate"
+            />
+            <div class="flex justify-between text-xs text-white/30 mt-1">
+              <span>0%</span>
+              <span>25%</span>
+            </div>
+          </div>
+
+          <!-- Fine-tune -->
+          <div class="flex items-center justify-center gap-2">
+            <span class="text-xs text-white/40">Fine-tune:</span>
             <input
               type="text"
               inputmode="decimal"
@@ -392,28 +491,12 @@
               @input="onRateInput"
               @focus="onRateFocus"
               @blur="onRateBlur"
-              class="w-32 text-center px-3 py-2 rounded bg-white/10 border border-white/20 focus:outline-none font-bold tabular-nums"
+              class="w-24 text-center px-3 py-1.5 rounded-lg bg-white/10 border border-white/15 focus:outline-none focus:border-secondary/50 text-sm font-bold tabular-nums text-white"
               aria-label="Rate percentage"
             />
+            <span class="text-xs text-white/40">%</span>
+          </div>
 
-            <button
-              type="button"
-              aria-label="Increase rate"
-              @click="increment"
-              @pointerdown.prevent="startHold(1)"
-              @pointerup="stopHold"
-              @pointerleave="stopHold"
-              :disabled="plusDisabled"
-              class="px-3 py-2 rounded bg-white/10 hover:bg-white/15 disabled:opacity-40 disabled:cursor-not-allowed"
-            >+</button>
-          </div>
-          <div class="text-center mt-3">
-            <button
-              type="button"
-              @click="finishEditRate"
-              class="text-sm text-secondary hover:text-secondary/80 font-semibold"
-            >Done</button>
-          </div>
         </div>
 
         <div class="flex justify-between items-center mt-6">
@@ -972,6 +1055,24 @@ const computedCollateralSats = computed(() => {
   return Number.isFinite(btc) ? Math.round(btc * 1e8) : 0
 })
 
+/* ==== Collateral breakdown ==== */
+const breakdownPrincipalUsd = computed(() => props.requestedUsd ?? 0)
+const breakdownInterestUsd  = computed(() => {
+  const p = breakdownPrincipalUsd.value
+  const r = termRateDecimal.value
+  return Number.isFinite(p) && Number.isFinite(r) ? p * r : 0
+})
+const breakdownFeeUsd = computed(() => breakdownPrincipalUsd.value * FEE_PCT)
+const breakdownTotalUsd = computed(() => {
+  if (isBorrower.value) {
+    return breakdownPrincipalUsd.value + 2 * breakdownInterestUsd.value + breakdownFeeUsd.value
+  }
+  return breakdownPrincipalUsd.value
+})
+const breakdownTotalBtc = computed(() => computedCollateralBtc.value)
+const usdFmt = (n) =>
+  Number.isFinite(n) ? n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) : '—'
+
 /* ==== Collateral Requirement Text ==== */
 const collateralRequirementText = computed(() => {
   const val = computedCollateralBtc.value
@@ -1067,4 +1168,45 @@ function submitOrder () {
   })
 }
 </script>
+
+<style scoped>
+.rate-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, #6738e4 var(--fill, 0%), rgba(255,255,255,0.12) var(--fill, 0%));
+  outline: none;
+  cursor: pointer;
+}
+.rate-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #6738e4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.rate-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.rate-slider::-webkit-slider-thumb:active { transform: scale(1.05); }
+.rate-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #6738e4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+}
+.rate-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+}
+</style>
 

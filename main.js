@@ -82,6 +82,11 @@ onCookieConsentChange(syncAmplitudeConsent);
 
 const app = createApp(App)
 app.use(router)
+// Exposes the router to scripts/prerender.mjs's Playwright pass so it can
+// discover routes via getRoutes() without duplicating the route list.
+if (typeof window !== 'undefined' && window.__PRERENDER__) {
+  window.__router = router
+}
 installSeo(router)
 installStructuredData(router)
 router.afterEach((to) => {

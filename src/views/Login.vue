@@ -154,14 +154,12 @@ const submitLogin = async () => {
       })
     }
 
-    // 6) Route based on auth_code if present (fallback to home)
+    // 6) Only fully signer-paired users go to dashboard; everyone else completes pairing
     const code = Number(profilePayload?.auth_code)
-    if (code === 2) {
-      await router.push('/btcusd')
-    } else if (isSignerAuthCode(code)) {
-      await router.push('/btcusd')
+    if (isSignerAuthCode(code)) {
+      await router.push('/allocate_liquidity')
     } else {
-      await router.push('/')
+      await router.push('/register?step=3')
     }
 
     // No global "auth-changed" event here — avoids fan-out duplicate fetches

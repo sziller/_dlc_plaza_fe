@@ -513,7 +513,7 @@ import { formatBtcValue } from '../../functions/amount_formatting'
 import cadenaLogo from '../../assets/logos/cadena_bitcoin_logo_2.png'
 
 const { isLoggedIn, setUserFromApi } = useAuth()
-const ctaLink = computed(() => isLoggedIn.value ? '/btcusd' : '/register')
+const ctaLink = computed(() => isLoggedIn.value ? '/allocate_liquidity' : '/register')
 
 // FAQ accordion state
 const openFaqIndex = ref(0)

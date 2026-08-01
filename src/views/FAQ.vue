@@ -22,7 +22,7 @@
           :aria-expanded="isOpen(i)"
           :aria-controls="`faq-panel-${i}`"
         >
-          <h3 class="text-lg font-medium">{{ item.q }}</h3>
+          <h2 class="text-lg font-medium">{{ item.q }}</h2>
           <svg class="size-5 shrink-0 transition-transform duration-300" :class="isOpen(i) ? '-rotate-180' : ''" xmlns="https://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
@@ -42,9 +42,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { generateFAQSchema, setSchema } from '../plugins/structured-data.js'
 
 onMounted(() => {
   window.scrollTo(0, 0)
+  setSchema('structured-data-faq', generateFAQSchema(faqs))
 })
 
 const faqs = [

@@ -8,7 +8,7 @@ if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
 } else if (host === 'localhost' || host === '127.0.0.1') {
   API_URL = ''  // local dev — Vite proxy forwards /app to localhost:8000
 } else {
-  API_URL = 'https://staging.purabitcoin.com' // default to staging
+  API_URL = 'https://staging.purabitcoin.com' // default to local backend
 }
 export { API_URL };
 export const DEFAULT_ORACLE = 'oracle_dlcp';

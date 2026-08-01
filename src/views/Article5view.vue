@@ -49,17 +49,17 @@
 
       <!-- Financial Terms -->
       <div class="space-y-5">
-        <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Term</h4>
+        <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Term</h2>
         <p>
           Each Cadena Bitcoin contract lasts 30, 90, 180, or 365 days starting when the contract is accepted. Duration may extend slightly to align with the next available Oracle attestation after maturity.
         </p>
 
-        <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Interest</h4>
+        <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Interest</h2>
         <p>
           Simple interest using a 30/360-day count convention (commonly used in USD debt). No compounding. For tenors shorter than 1 year, the 360-day basis understates the true rate compared to a 365-day base.
         </p>
 
-        <h4 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Loan Size</h4>
+        <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Loan Size</h2>
         <p>
           Base loan value is 0.1 BTC.
         </p>
@@ -90,7 +90,7 @@
             All transactions are on-chain secured by Discreet Log Contracts and settled with a single execution based on a trusted Oracle price feed.
           </p>
           <router-link
-            :to="isLoggedIn ? '/btcusd' : '/register'"
+            :to="isLoggedIn ? '/allocate_liquidity' : '/register'"
             class="inline-flex items-center gap-3 rounded-full bg-white text-secondary font-bold px-10 py-5 text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
           >
             <span>Explore Cadena Bitcoin Contracts</span>

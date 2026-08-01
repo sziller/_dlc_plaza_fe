@@ -78,7 +78,7 @@ export function notifySlackNewBtcusdUser(email: string) {
   const utmStr = utmParts.length ? utmParts.join(', ') : 'none'
 
   const text = [
-    ':wave: *New User on /btcusd*',
+    ':wave: *New User on /allocate_liquidity*',
     '',
     `*User:* ${email}`,
     `*URL:* ${window.location.href}`,

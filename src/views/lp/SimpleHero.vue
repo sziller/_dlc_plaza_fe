@@ -15,7 +15,7 @@ const articles = blogArticles
 
 /* ---------- Auth / CTA ---------- */
 const { setUserFromApi } = useAuth()
-const heroCtaTo = computed(() => '/btcusd')
+const heroCtaTo = computed(() => '/allocate_liquidity')
 function onHeroCtaClick() {}
 
 const showMailingList = ref(false)
@@ -196,12 +196,13 @@ function toggle(i) {
 /* ---------- Partners ---------- */
 const partners = [
   { name: '21Rates',           href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp',               alt: '21Rates' },
-  { name: 'Flux',              href: 'https://www.fluxprivateotc.com/',                  imgSrc: '/img/flux-2-640.webp',                  alt: 'Flux Private OTC', imgClass: 'h-10 sm:h-12 translate-y-1.5' },
+  { name: 'Flux',              href: 'https://www.fluxprivateotc.com/',                  imgSrc: '/img/flux-4-640.webp',                  alt: 'Flux Private OTC', imgClass: 'h-10 sm:h-12 translate-y-1.5 invert' },
   { name: 'Adopting Bitcoin',  href: 'https://sv25.adoptingbitcoin.org/',                 imgSrc: '/img/adopting-640.webp',              alt: 'Adopting Bitcoin SV25' },
   { name: 'Surfdojo',          href: 'https://surfdojo.org/',                             imgSrc: '/img/surfdojo-640.webp',              alt: 'Surfdojo' },
-  { name: 'BTC Intelligence',  href: 'https://www.btcintelligence.ai/',              imgSrc: '/img/BTC-Intelligence-Hero-Gold-Example-640.webp', alt: 'BTC Intelligence', imgClass: 'h-11 sm:h-13' },
+  { name: 'BTC Intelligence',  href: 'https://btcintelligence.ai/cadena',              imgSrc: '/img/BTC-Intelligence-Hero-Gold-Example-640.webp', alt: 'BTC Intelligence', imgClass: 'h-11 sm:h-13' },
   { name: 'Asobitcoin',        href: 'https://www.asobitcoin.org/',                       imgSrc: '/img/partners/asobitcoin-logo.webp',  alt: 'Asobitcoin' },
   { name: 'Sazmining',         href: 'https://www.sazmining.com/',                         imgSrc: '/img/sazmining-640.webp',     alt: 'Sazmining', imgClass: 'h-7 sm:h-8 brightness-200' },
+  { name: 'Coinlateral',       href: 'https://coinlateral.finance/',                       imgSrc: '/img/coinlateral-640.webp',   alt: 'Coinlateral', imgClass: 'h-5 sm:h-6' },
 ]
 
 function onEnter(el) {
@@ -408,7 +409,7 @@ onBeforeUnmount(() => {
     ═══════════════════════════════════════════════════ -->
     <section class="w-full bg-transparent text-white pt-10 pb-6">
       <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-4 reveal">
-        <p class="text-xs font-semibold text-white/60 uppercase tracking-widest">Listed &amp; verified</p>
+        <p class="text-xs font-semibold text-white/60 uppercase tracking-widest">Partners</p>
       </div>
       <div class="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="partners-outer">
@@ -568,6 +569,11 @@ onBeforeUnmount(() => {
             </tbody>
           </table>
         </div>
+        <div class="reveal text-center mt-8">
+          <router-link to="/compare" class="cta-primary">
+            See the full breakdown: Cadena vs. Ledn, Unchained &amp; SALT
+          </router-link>
+        </div>
       </div>
     </section>
 
@@ -689,13 +695,13 @@ onBeforeUnmount(() => {
         <!-- Cards -->
         <p class="inst-examples-label reveal" style="transition-delay:140ms">Worked examples by use case</p>
         <div class="inst-cards reveal" style="transition-delay:200ms">
-          <router-link to="/btcusd" class="inst-card">
+          <router-link to="/allocate_liquidity" class="inst-card">
             <div class="inst-card-badge inst-card-badge-lend">Lend</div>
             <div class="inst-card-amount">$1M</div>
             <p class="inst-card-desc">12% annualized USD yield on Bitcoin</p>
             <span class="inst-card-link">View →</span>
           </router-link>
-          <router-link to="/btcusd" class="inst-card">
+          <router-link to="/allocate_liquidity" class="inst-card">
             <div class="inst-card-badge inst-card-badge-borrow">Borrow</div>
             <div class="inst-card-amount">$3M</div>
             <p class="inst-card-desc">Non-custodial liquidity without selling</p>
@@ -766,13 +772,13 @@ onBeforeUnmount(() => {
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
           <router-link
-            to="/btcusd"
+            to="/allocate_liquidity"
             class="inline-flex items-center justify-center rounded-full bg-white text-secondary font-extrabold px-8 py-4 text-base transition hover:bg-white/90 shadow-xl"
           >
             Get a Loan
           </router-link>
           <router-link
-            to="/btcusd"
+            to="/allocate_liquidity"
             class="inline-flex items-center justify-center rounded-full border-2 border-white/70 text-white font-bold px-8 py-4 text-base transition hover:border-white hover:bg-white/10"
           >
             Start Lending

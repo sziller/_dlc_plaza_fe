@@ -347,7 +347,6 @@ function sameRows(a, b) {
 
 async function load(initial = false) {
   if (isFetching) return
-  if (!auth.isLoggedIn.value) return
   if (!initial && document.hidden) return
 
   isFetching = true
@@ -385,18 +384,6 @@ async function load(initial = false) {
     isFetching = false
   }
 }
-
-// Stop polling when logged out, restart when logged back in
-watch(() => auth.isLoggedIn.value, (loggedIn) => {
-  if (!loggedIn) {
-    if (pollId) { clearInterval(pollId); pollId = null }
-    apiDlcs.value = []
-    rows.value = []
-  } else if (!pollId) {
-    load(true)
-    pollId = setInterval(() => { if (!document.hidden) load(false) }, pollMs)
-  }
-})
 
 // If the userEmail changes (e.g., after login), recompute roles/status labels
 watch(userEmail, () => {

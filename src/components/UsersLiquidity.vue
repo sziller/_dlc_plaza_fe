@@ -46,6 +46,7 @@
                 class="hover:bg-white/5 transition border-b border-white/10"
               >
                 <td class="px-4 py-3">{{ row.role }}</td>
+                <td class="px-4 py-3">{{ row.term }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ row.dollar }}</td>
                 <td class="px-4 py-3">{{ row.interest }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ row.liquidity }}</td>
@@ -62,19 +63,19 @@
                 </td>
               </tr>
               <tr v-if="sortedData.length === 0">
-                <td class="px-4 py-6 text-white/70" colspan="6">No open orders found.</td>
+                <td class="px-4 py-6 text-white/70" colspan="7">No open orders found.</td>
               </tr>
             </tbody>
 
             <tbody v-else-if="loading">
               <tr>
-                <td class="px-4 py-6 text-white/70" colspan="6">Loading…</td>
+                <td class="px-4 py-6 text-white/70" colspan="7">Loading…</td>
               </tr>
             </tbody>
 
             <tbody v-else>
               <tr>
-                <td class="px-4 py-6 text-red-400" colspan="6">{{ error }}</td>
+                <td class="px-4 py-6 text-red-400" colspan="7">{{ error }}</td>
               </tr>
             </tbody>
           </table>
@@ -96,6 +97,7 @@ const { setUserFromApi } = useAuth()
 
 const columns = Object.freeze([
   { label: 'Type', key: 'role' },
+  { label: 'Term', key: 'termDays' },
   { label: 'Dollar', key: 'dollarValue' },
   { label: 'Interest (%)', key: 'interestBp' },
   { label: 'Collateral (BTC)', key: 'liquiditySat' },
@@ -134,11 +136,20 @@ function fmtDollar(sats) {
   return '$' + usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+function fmtTerm(days) {
+  const d = Number(days)
+  if (!Number.isFinite(d) || d <= 0) return '—'
+  if (d >= 360 && d <= 366) return '365 Days'
+  return `${Math.round(d)} Days`
+}
+
 function toRow(a) {
   const collateralSats = Number(a.liquidity_sat) || 0
   return {
     uuid: a.uuid,
     role: capitalize(a.ini_role),
+    term: fmtTerm(a.duration_days),
+    termDays: Number(a.duration_days) || 0,
     dollar: fmtDollar(collateralSats),
     dollarValue: btcPrice.value ? (collateralSats / 1e8) * btcPrice.value : 0,
     interest: (a.interest_bp / 100).toFixed(2) + '%',
@@ -160,6 +171,7 @@ function sortBy(key) {
 
 function normForSort(row, key) {
   if (key === 'role') return String(row[key] || '').toLowerCase()
+  if (key === 'termDays') return row.termDays
   if (key === 'dollarValue') return row.dollarValue
   if (key === 'interestBp') return row.interestBp
   if (key === 'liquiditySat') return row.liquiditySat
@@ -177,6 +189,18 @@ const sortedData = computed(() => {
   })
 })
 
+function buildBaseProduct(raw) {
+  const st = String(raw.service_type || '')
+  const days = Number(raw.duration_days) || 0
+  const ltv = Number(raw.ltv_percent) || 0
+  if (!days || !ltv) return undefined
+  // If service_type already is the full product ID (contains ':ltv-'), use it directly
+  if (st.includes(':ltv-')) return st
+  // Otherwise service_type is just the prefix (e.g. 'LendBorrowBTCUSD')
+  if (st) return `${st}:ltv-${ltv}_d-${days}_c-xxx`
+  return undefined
+}
+
 // cancel allocation
 async function cancelAllocation(row) {
   if (!window.confirm('Are you sure you want to cancel this allocation?')) return
@@ -188,6 +212,7 @@ async function cancelAllocation(row) {
     await deleteLiquidityAllocation({
       ini_role: raw.ini_role,
       interest: raw.interest_bp / 100,
+      base_product: buildBaseProduct(raw),
     })
     await load(true)
     await setUserFromApi()

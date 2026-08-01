@@ -5,6 +5,12 @@ Allow: /
 Disallow: /login
 Disallow: /loginpage
 Disallow: /my-profile
+Disallow: /get-started
+
+# Block admin and internal-only pages
+Disallow: /admin/
+Disallow: /order-confirmed
+Disallow: /knowledge-hub-legacy
 
 # Canonical host
 Host: https://cadenabitcoin.com

@@ -11,17 +11,45 @@ const allowBots = (!NOINDEX && /cadenabitcoin\.com$/.test(BASE)) || (STAGING_SEO
 
 const routes = [
   { path: '/', priority: '1.0', changefreq: 'daily' },
+  { path: '/allocate_liquidity', priority: '0.9', changefreq: 'daily' },
   { path: '/about', priority: '0.7', changefreq: 'monthly' },
-  { path: '/btcusd', priority: '0.9', changefreq: 'daily' },
   { path: '/faq', priority: '0.7', changefreq: 'monthly' },
   { path: '/contact', priority: '0.6', changefreq: 'monthly' },
   { path: '/register', priority: '0.6', changefreq: 'monthly' },
+  { path: '/security', priority: '0.7', changefreq: 'monthly' },
   { path: '/cadena-paper', priority: '0.8', changefreq: 'monthly' },
   { path: '/signerapp', priority: '0.6', changefreq: 'monthly' },
+  { path: '/knowledge-hub', priority: '0.9', changefreq: 'weekly' },
+  { path: '/compare', priority: '0.8', changefreq: 'weekly' },
+  { path: '/loan-explained', priority: '0.7', changefreq: 'monthly' },
+  { path: '/loan-explained-lender', priority: '0.7', changefreq: 'monthly' },
+  { path: '/loan-calculator', priority: '0.6', changefreq: 'monthly' },
+  { path: '/liquidation-calculator', priority: '0.6', changefreq: 'monthly' },
+  { path: '/settlement-calculator', priority: '0.6', changefreq: 'monthly' },
+  { path: '/bitcoin-allocation', priority: '0.6', changefreq: 'monthly' },
+  { path: '/newsletter', priority: '0.5', changefreq: 'monthly' },
+  { path: '/endgame', priority: '0.7', changefreq: 'monthly' },
+  { path: '/endgame-study-guide', priority: '0.6', changefreq: 'monthly' },
+  { path: '/for-llms', priority: '0.5', changefreq: 'monthly' },
+  { path: '/lp/simple-hero', priority: '0.5', changefreq: 'monthly' },
   { path: '/terms', priority: '0.3', changefreq: 'yearly' },
   { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
   { path: '/cookies', priority: '0.3', changefreq: 'yearly' },
-  { path: '/knowledge-hub', priority: '0.9', changefreq: 'weekly' },
+  // Static content-marketing articles (CMS-authored posts are added dynamically below)
+  { path: '/article/cadena-decentralized-finance', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/cadena-improving-btc', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/cadena-empowering-financial-freedom', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/cadena-bitcoin-security', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/cadena-loan-lifecycle', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/borrow-against-bitcoin', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/bitcoin-collateral-loan', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/non-custodial-bitcoin-borrowing', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/peer-to-peer-bitcoin-loans', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/dlc-bitcoin-loans', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/bitcoin-backed-loans', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/unlock-bitcoin-liquidity', priority: '0.7', changefreq: 'monthly' },
+  { path: '/article/cadena-bitcoin-presentation', priority: '0.6', changefreq: 'monthly' },
+  { path: '/article/cadena-bitcoin-loan-walkthrough', priority: '0.6', changefreq: 'monthly' },
 ]
 
 const distPublic = resolve('public')
@@ -35,6 +63,12 @@ Allow: /
 Disallow: /login
 Disallow: /loginpage
 Disallow: /my-profile
+Disallow: /get-started
+
+# Block admin and internal-only pages
+Disallow: /admin/
+Disallow: /order-confirmed
+Disallow: /knowledge-hub-legacy
 
 # Canonical host
 Host: https://cadenabitcoin.com

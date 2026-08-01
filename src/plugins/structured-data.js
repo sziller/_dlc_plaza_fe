@@ -138,54 +138,90 @@ export function generateArticleSchema(article) {
   };
 }
 
+// schema.org's LoanOrCredit — the correct type for a lending product (unlike
+// generic Product, which implies price/reviews/stock for physical goods).
+export function generateLoanSchema(loan) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LoanOrCredit',
+    'name': loan.name,
+    'description': loan.description,
+    'provider': {
+      '@id': 'https://cadenabitcoin.com/#organization'
+    },
+    'loanType': 'Bitcoin-backed loan',
+    'loanTerm': {
+      '@type': 'QuantitativeValue',
+      'value': loan.termDays,
+      'unitCode': 'DAY'
+    },
+    'interestRate': loan.aprPercent,
+    'requiredCollateral': `Bitcoin (BTC) at ${loan.ltvPercent}% loan-to-value`,
+    'recourseLoan': false,
+    'url': loan.url
+  };
+}
+
+// Creates or updates a script[type="application/ld+json"] tag by a stable id,
+// so callers can upsert their own schema without clobbering ones owned by
+// other callers (the router's base schemas vs. a page component's own).
+export function setSchema(id, schema) {
+  let el = document.getElementById(id);
+  if (!el) {
+    el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.id = id;
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(schema);
+}
+
+export function removeSchema(id) {
+  document.getElementById(id)?.remove();
+}
+
 export function installStructuredData(router) {
   router.afterEach((to) => {
     // Wait for the next tick to ensure DOM is ready
     setTimeout(() => {
-      const existingScripts = document.querySelectorAll('script[type="application/ld+json"]');
-      existingScripts.forEach(script => script.remove());
-
       const m = to.meta || {};
-      const schemas = [];
       const site = 'https://cadenabitcoin.com';
 
-      // Always include Organization schema for brand consistency
-      schemas.push(generateOrganizationSchema());
+      setSchema('structured-data-organization', generateOrganizationSchema());
 
-      // Page-specific schemas
       if (to.path === '/' || to.path === '/for-llms') {
-        // Homepage and LLM page get full schema set
-        schemas.push(generateWebsiteSchema());
-        schemas.push(generateFinancialServiceSchema());
-      } else if (to.path.includes('/article/')) {
-        // Generate article-specific schema for article pages
-        const image = m.image ? `${site}${m.image}` : `${site}/og-image.png`;
+        setSchema('structured-data-website', generateWebsiteSchema());
+        setSchema('structured-data-financial-service', generateFinancialServiceSchema());
+      } else {
+        setSchema('structured-data-website', generateWebsiteSchema());
+        removeSchema('structured-data-financial-service');
+      }
 
-        schemas.push(generateArticleSchema({
+      if (to.path.includes('/article/')) {
+        const image = m.image
+          ? (/^https?:\/\//.test(m.image) ? m.image : `${site}${m.image}`)
+          : `${site}/og-image.png`;
+
+        // Generic baseline from route meta — BlogPostPage.vue overwrites this
+        // same id with the real post's data once it finishes loading.
+        setSchema('structured-data-article', generateArticleSchema({
           title: m.title || 'Cadena Bitcoin Article',
           description: m.description || 'Article by Cadena Bitcoin',
           author: m.author || 'Cadena Bitcoin Team',
           publishDate: m.publishedTime || new Date().toISOString(),
           modifiedDate: m.modifiedTime || new Date().toISOString(),
           url: `${site}${to.path}`,
-          image: image
+          image
         }));
-      } else if (to.path === '/faq') {
-        // FAQ page gets FAQPage schema (populated by the component)
-        schemas.push(generateWebsiteSchema());
       } else {
-        // Other pages get website schema
-        schemas.push(generateWebsiteSchema());
+        removeSchema('structured-data-article');
       }
 
-      // Add each schema as a separate script tag for better parsing
-      schemas.forEach((schema, index) => {
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.textContent = JSON.stringify(schema);
-        script.id = `structured-data-${index}`;
-        document.head.appendChild(script);
-      });
+      // Page-owned schema (FAQPage, LoanOrCredit) is added by the page
+      // component itself once mounted/loaded. Clear it here when navigating
+      // away so it doesn't leak onto unrelated pages.
+      if (to.path !== '/faq') removeSchema('structured-data-faq');
+      if (to.path !== '/allocate_liquidity') removeSchema('structured-data-loan');
     }, 0);
   });
 }

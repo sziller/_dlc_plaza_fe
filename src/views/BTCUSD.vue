@@ -7,7 +7,7 @@
     <section class="flex-1 px-4 py-4">
       <div class="w-full max-w-screen-xl mx-auto pb-10">
         <MarketOverviewTable />
-        <p class="text-center text-xs text-white/50 mt-4">1 year &middot; 50% LTV</p>
+        <p class="text-center text-xs text-white/50 mt-4">BTCUSD &middot; 50% LTV &middot; 90 / 180 / 365 day terms</p>
       </div>
     </section>
   </main>
@@ -21,10 +21,19 @@ import MarketOverviewTable from '../components/MarketOverviewTable.vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 import { notifySlackNewBtcusdUser } from '../api/slackNotify'
+import { generateLoanSchema, setSchema } from '../plugins/structured-data.js'
 
 const { user, setUserFromApi } = useAuth()
 
 onMounted(() => {
+  setSchema('structured-data-loan', generateLoanSchema({
+    name: 'Cadena Bitcoin-Backed Loan',
+    description: 'Non-custodial USD loan secured by Bitcoin collateral via a Discreet Log Contract (DLC). No margin calls — settlement occurs only at term end.',
+    termDays: 365,
+    ltvPercent: 50,
+    aprPercent: 12,
+    url: 'https://cadenabitcoin.com/allocate_liquidity'
+  }))
   setUserFromApi()
 
   // Fire X conversion event for dashboard view

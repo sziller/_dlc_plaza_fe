@@ -8,9 +8,9 @@
   >
     <!-- Header row -->
     <div class="flex items-center justify-between" :class="compact ? 'mb-1' : 'mb-7'">
-      <h3 class="font-bold text-white" :class="compact ? 'text-lg' : 'text-xl sm:text-2xl'">
+      <h2 class="font-bold text-white" :class="compact ? 'text-lg' : 'text-xl sm:text-2xl'">
         Live Market Rates
-      </h3>
+      </h2>
       <div class="flex items-center gap-1 border border-white/20 rounded px-2 py-1 text-xs text-white/70 font-mono cursor-default select-none">
         1 Year <span class="text-white/50 ml-0.5">▾</span>
       </div>

@@ -20,7 +20,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="w-5 h-5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             </div>
             <div>
-              <h4 class="c-card-title">Book a Demo</h4>
+              <h2 class="c-card-title">Book a Demo</h2>
               <p class="c-card-desc">Schedule a 30-minute meeting with the Cadena team.</p>
               <a
                 href="https://calendly.com/cadenabitcoin-info/30min?month=2026-01"
@@ -39,7 +39,7 @@
               <Mail class="w-5 h-5" aria-hidden="true" />
             </div>
             <div class="flex-1">
-              <h4 class="c-card-title">Email</h4>
+              <h2 class="c-card-title">Email</h2>
               <p class="c-card-desc">Send us your questions or request onboarding.</p>
               <div class="mt-5 flex flex-wrap items-center gap-3">
                 <a href="mailto:info@cadenabitcoin.com" class="btn-primary" aria-label="Email info@cadenabitcoin.com">
@@ -79,7 +79,7 @@
               <li>Up to 50% LTV with no margin calls</li>
               <li>Earn ~11% APY lending your idle stack</li>
             </ul>
-            <router-link to="/btcusd" class="serve-cta">Get Started →</router-link>
+            <router-link to="/allocate_liquidity" class="serve-cta">Get Started →</router-link>
           </div>
 
           <!-- Family Offices -->
@@ -140,7 +140,7 @@
               <li>No taxable event — your original stack stays intact</li>
               <li>True self-custody throughout the loan term</li>
             </ul>
-            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Get Started →</router-link>
+            <router-link to="/allocate_liquidity" class="btn-primary mt-auto inline-flex">Get Started →</router-link>
           </div>
 
           <!-- Dividend Debbie -->
@@ -154,7 +154,7 @@
               <li>Your keys, your coins — maintain full custody</li>
               <li>Secured by on-chain DLC collateral</li>
             </ul>
-            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Start Lending →</router-link>
+            <router-link to="/allocate_liquidity" class="btn-primary mt-auto inline-flex">Start Lending →</router-link>
           </div>
 
           <!-- Boat Liquidity -->
@@ -168,7 +168,7 @@
               <li>No margin calls — collateral only matters at settlement</li>
               <li>Keep full BTC price upside throughout the term</li>
             </ul>
-            <router-link to="/btcusd" class="btn-primary mt-auto inline-flex">Borrow Now →</router-link>
+            <router-link to="/allocate_liquidity" class="btn-primary mt-auto inline-flex">Borrow Now →</router-link>
           </div>
 
           <!-- Yield Arber -->

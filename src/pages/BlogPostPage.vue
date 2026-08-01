@@ -3,6 +3,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { marked } from 'marked'
 import { fetchPostBySlug, fetchPublishedPosts, type BlogPost } from '../blogApi/blog'
+import { applySeoMeta } from '../plugins/seo.js'
+import { generateArticleSchema, setSchema } from '../plugins/structured-data.js'
 import { useAuth } from '../composables/useAuth'
 import { isSubscriberAuthCode } from '../lib/authCode'
 import { postContactEmail, isValidEmail } from '../api/publicContact'
@@ -151,6 +153,27 @@ const loadPost = async () => {
   error.value = null
   try {
     post.value = await fetchPostBySlug(slug.value)
+    if (post.value) {
+      applySeoMeta(route.path, {
+        title: `${post.value.title} — Cadena Bitcoin`,
+        description: post.value.excerpt || post.value.subheading || undefined,
+        type: 'article',
+        image: post.value.hero_image_url || post.value.article_image_url || undefined,
+        publishedTime: post.value.published_at || post.value.created_at,
+        modifiedTime: post.value.updated_at,
+        author: post.value.author_name || 'Cadena Bitcoin Team',
+        section: 'Knowledge Hub',
+      })
+      setSchema('structured-data-article', generateArticleSchema({
+        title: post.value.title,
+        description: post.value.excerpt || post.value.subheading || `${post.value.title} — Cadena Bitcoin Knowledge Hub`,
+        author: post.value.author_name || 'Cadena Bitcoin Team',
+        publishDate: post.value.published_at || post.value.created_at,
+        modifiedDate: post.value.updated_at,
+        url: `https://cadenabitcoin.com${route.path}`,
+        image: post.value.hero_image_url || post.value.article_image_url || 'https://cadenabitcoin.com/og-image.png',
+      }))
+    }
     if (import.meta.env.DEV) {
       console.log('[BlogPost] loaded post:', { access_level: post.value?.access_level, title: post.value?.title })
       console.log('[BlogPost] user auth_code:', (user.value as any)?.auth_code, '| isSubscriber:', isSubscriber.value, '| isGated:', isGated.value)
@@ -377,7 +400,7 @@ watch(
         <div class="flex flex-col sm:flex-row gap-4">
           <RouterLink
             v-if="isSubscriber"
-            :to="isLoggedIn ? '/btcusd' : '/register'"
+            :to="isLoggedIn ? '/allocate_liquidity' : '/register'"
             class="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3 text-base font-semibold text-white transition hover:bg-secondary/90"
           >
             {{ post.cta_button_text || 'Get started' }}

@@ -5,7 +5,7 @@
 
     <div class="max-w-7xl mx-auto space-y-14">
       <!-- Hero -->
-      <header class="text-center space-y-5">
+      <header class="text-center space-y-5 fade-in-el">
         <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">
           Cadena <em>Signer</em> App
         </h1>
@@ -16,7 +16,7 @@
       </header>
 
       <!-- Image slot: wide banner or product shot -->
-      <section aria-label="Image preview" class="max-w-5xl mx-auto flex justify-center">
+      <section aria-label="Image preview" class="max-w-5xl mx-auto flex justify-center fade-in-el">
         <div class="relative title-glow">
           <picture>
             <source
@@ -42,7 +42,7 @@
       </section>
 
       <!-- What it is -->
-      <section class="grid md:grid-cols-2 gap-8 items-start">
+      <section class="grid md:grid-cols-2 gap-8 items-start fade-in-el">
         <div class="space-y-4">
           <h2 class="text-2xl sm:text-3xl font-bold">What is the Signer?</h2>
           <p class="text-white/80">
@@ -71,7 +71,7 @@
       </section>
 
       <!-- Security model -->
-      <section class="grid md:grid-cols-2 gap-8 items-center">
+      <section class="grid md:grid-cols-2 gap-8 items-center fade-in-el">
         <div class="space-y-6 self-center">
           <h2 class="text-4xl md:text-5xl font-extrabold">Security model</h2>
           <div class="grid gap-4 md:gap-5">
@@ -110,7 +110,7 @@
       </section>
 
       <!-- CTA -->
-      <section class="text-center space-y-3">
+      <section class="text-center space-y-3 fade-in-el">
         <p class="text-white/70">
           Ready to keep your keys on your device and use Cadena securely?
         </p>
@@ -151,7 +151,7 @@
       </section>
 
       <!-- GitHub link (near bottom) -->
-      <section class="text-center pt-1">
+      <section class="text-center pt-1 fade-in-el">
         <a
           class="github-badge"
           href="https://github.com/CadenaWizard/signer_app"
@@ -174,7 +174,35 @@
 </template>
 
 <script setup lang="js">
+import { onMounted, onUnmounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
+
+let observer = null
+
+function initObserver() {
+  const els = document.querySelectorAll('.fade-in-el')
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible')
+          observer.unobserve(entry.target)
+        }
+      })
+    },
+    { rootMargin: '0px 0px -10% 0px', threshold: 0.06 }
+  )
+  els.forEach((el) => observer.observe(el))
+}
+
+onMounted(() => {
+  window.scrollTo(0, 0)
+  initObserver()
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
+})
 </script>
 
 <style scoped>
@@ -246,5 +274,23 @@ import TheFooter from '../components/TheFooter.vue'
 }
 .github-badge svg {
   display: block;
+}
+
+.fade-in-el {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in-el.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-el {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 </style>

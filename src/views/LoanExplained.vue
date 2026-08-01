@@ -434,7 +434,7 @@ import { useBtcPrice } from '../composables/useBtcPrice'
 import { formatBtcValue } from '../functions/amount_formatting'
 
 const { isLoggedIn, setUserFromApi } = useAuth()
-const ctaLink = computed(() => isLoggedIn.value ? '/btcusd' : '/register')
+const ctaLink = computed(() => isLoggedIn.value ? '/allocate_liquidity' : '/register')
 
 // BTC Price (shared singleton)
 const { btcPriceUsd } = useBtcPrice()

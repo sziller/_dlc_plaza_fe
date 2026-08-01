@@ -47,8 +47,10 @@ const SettlementCalculator = () => import('../views/SettlementCalculator.vue')
 const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
 const Newsletter             = () => import('../views/Newsletter.vue')
+const GetStarted             = () => import('../views/GetStarted.vue')
 const BitcoinAllocationCalculator = () => import('../views/BitcoinAllocationCalculator.vue')
 const EndgameStudyGuide = () => import('../views/EndgameStudyGuide.vue')
+const Comparison             = () => import('../views/Comparison.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -66,6 +68,11 @@ const routes = [
   { path: '/endgame-study-guide', name: 'EndgameStudyGuide', component: EndgameStudyGuide, meta: {
     title: 'Endgame Study Guide — Bitcoin, Sovereign Debt, and Sound Capital',
     description: 'Chapter summaries, key numbers, mental models, glossary, quotes, and a 14-question self-test for Endgame by Kevin Bell, CFA.',
+    robots: 'index,follow',
+  }},
+  { path: '/compare', name: 'Comparison', component: Comparison, meta: {
+    title: 'Bitcoin Loan Comparison: Cadena vs. Ledn, Unchained, SALT',
+    description: 'An honest, sourced comparison of Bitcoin-backed loan platforms. Non-custodial DLC lending vs. custodial alternatives — rates, rehypothecation risk, margin calls, and access.',
     robots: 'index,follow',
   }},
   { path: '/endgame', name: 'Endgame', component: Endgame, meta: {
@@ -103,7 +110,7 @@ const routes = [
     description: 'What makes Cadena Bitcoin different from centralized lenders and sidechains.',
     robots: 'index,follow',
   }},
-  { path: '/btcusd', name: 'BTCUSD', component: BTCUSD, meta: {
+  { path: '/allocate_liquidity', name: 'BTCUSD', component: BTCUSD, meta: {
     title: 'BTC/USD — Markets • Cadena Bitcoin',
     description: 'BTCUSD page for borrowing, lending, and market details.',
     robots: 'index,follow',
@@ -438,6 +445,16 @@ const routes = [
     title: 'Newsletter — Cadena Bitcoin',
     description: 'Subscribe to the Cadena Bitcoin newsletter for Bitcoin education, market insights, security best practices, and product updates.',
     robots: 'index,follow',
+  }
+},
+{
+  path: '/get-started',
+  name: 'GetStarted',
+  component: GetStarted,
+  meta: {
+    title: 'Get Started — Cadena Bitcoin',
+    description: 'How to fund your Cadena wallet and create your first Bitcoin-backed loan.',
+    robots: 'noindex,nofollow',
   }
 },
 {

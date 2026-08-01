@@ -69,7 +69,7 @@
           Non-custodial, peer-to-peer, and secured by DLCs.
         </p>
         <router-link
-          :to="isLoggedIn ? '/btcusd' : '/register'"
+          :to="isLoggedIn ? '/allocate_liquidity' : '/register'"
           class="inline-block bg-white text-secondary hover:bg-white/90 px-8 py-4 rounded-full font-semibold text-lg transition"
         >
           Get Started Today
