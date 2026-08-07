@@ -265,7 +265,7 @@ import OrderModal from './OrderModal.vue'
 import { getToken } from '../api/token'
 import { postProductQueryV0 } from '../api/productQuery' // uses ApiEnvelope<{...}[]>
 import { formatBtcValue } from '../functions/amount_formatting'
-import { getServerStatus } from '../api/serverStatus'
+import { useServerStatus } from '../composables/useServerStatus'
 import { useBtcPrice } from '../composables/useBtcPrice'
 import { postLiquidityAllocation, postLiquidityAllocationV1, getLiquidityMarket } from '../api/liquidityAllocation'
 import { getOwnDerivedBalance } from '../api/userDerivedBalance'
@@ -328,42 +328,13 @@ function updateAuthState() {
   isLoggedIn.value = !!getToken()
 }
 
-// -------- Server availability ----------
-const FORCE_SERVER_DOWN = false
-const serverStatus = ref(FORCE_SERVER_DOWN ? 'down' : 'checking')
-const serverStatusMessage = ref('')
-const DEFAULT_DOWNTIME_MSG =
-  'There are no live rates right now and you will not be able to log in while the Cadena servers are under maintenance. Please try again shortly.'
-
-const isServerDown = computed(() => serverStatus.value === 'down')
-
-async function checkServerStatus() {
-  if (FORCE_SERVER_DOWN) {
-    serverStatus.value = 'down'
-    serverStatusMessage.value = DEFAULT_DOWNTIME_MSG
-    return
-  }
-  try {
-    const res = await getServerStatus()
-    const payload = res?.payload
-    if (payload?.ok && payload?.status === 'up') {
-      serverStatus.value = 'up'
-      serverStatusMessage.value = ''
-      return
-    }
-    serverStatus.value = 'down'
-    serverStatusMessage.value = DEFAULT_DOWNTIME_MSG
-  } catch (error) {
-    const statusCode = error?.response?.status
-    if (statusCode === 429) {
-      serverStatusMessage.value =
-        'Too many health-check requests from this IP. Please wait a moment and refresh. Rates are temporarily unavailable and logins are disabled until we reconnect.'
-    } else {
-      serverStatusMessage.value = DEFAULT_DOWNTIME_MSG
-    }
-    serverStatus.value = 'down'
-  }
-}
+// -------- Server availability (shared app-wide status; see App.vue's ServerStatusBanner) ----------
+const {
+  status: serverStatus,
+  message: serverStatusMessage,
+  isDown: isServerDown,
+  checkNow: checkServerStatus,
+} = useServerStatus()
 
 // -------- Simplified flow constants ----------
 const SIMPLE_TERM_DAYS = 365

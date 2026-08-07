@@ -165,7 +165,11 @@ const submitLogin = async () => {
     // No global "auth-changed" event here — avoids fan-out duplicate fetches
   } catch (err: any) {
     const msg = String(err?.message || '').toLowerCase()
-    if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('invalid')) {
+    if (msg.includes('no response received') || msg.includes('took too long')) {
+      // Cadena's backend didn't respond at all — distinct from bad credentials,
+      // and the global server-status banner (App.vue) will also light up shortly.
+      error.value = "Cadena's servers are currently unavailable. Please try again shortly."
+    } else if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('invalid')) {
       error.value = 'Invalid email or password.'
     } else {
       error.value = 'Login failed. Please try again.'

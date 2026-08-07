@@ -1,5 +1,7 @@
 <template>
   <div class="text-white min-h-screen">
+    <ServerStatusBanner />
+
     <!-- Fixed navbar includes the top info strip when logged in -->
     <Navbar
       v-if="!hideChrome"
@@ -33,6 +35,7 @@ import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import CookieBanner from './components/CookieBanner.vue'
+import ServerStatusBanner from './components/ServerStatusBanner.vue'
 
 const ChatBot = defineAsyncComponent(() => import('./components/ChatBot.vue'))
 const MailingListModal = defineAsyncComponent(() => import('./components/MailingListModal.vue'))

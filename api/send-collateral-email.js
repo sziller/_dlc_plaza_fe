@@ -157,7 +157,7 @@ export default async function handler(req, res) {
 
   try {
     await resend.emails.send({
-      from: 'Kevin Bell — Cadena Bitcoin <hello@cadenabitcoin.com>',
+      from: 'Kevin Bell — Cadena Bitcoin <info@cadenabitcoin.com>',
       to: email,
       subject: 'Your Cadena loan — completing the collateral step',
       html: buildHtml({

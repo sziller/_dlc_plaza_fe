@@ -4,13 +4,13 @@
     <nav
       ref="navRef"
       :class="[
-        'w-full fixed top-0 left-0 right-0 z-50 nav-bg text-white'
+        'w-full fixed top-0 left-0 right-0 z-[65] nav-bg text-white'
       ]"
       role="navigation"
       aria-label="Main"
     >
       <!-- Mobile-only BTCUSD strip -->
-      <div class="md:hidden flex items-center justify-center gap-1.5 px-4 py-1 text-xs font-medium border-b border-white/10">
+      <div v-if="!serverDown" class="md:hidden flex items-center justify-center gap-1.5 px-4 py-1 text-xs font-medium border-b border-white/10">
         <img
           src="https://flagcdn.com/us.svg"
           alt="US Flag"
@@ -22,7 +22,11 @@
           referrerpolicy="no-referrer"
         />
         <span class="text-white/60">BTCUSD</span>
-        <span class="text-secondary font-semibold">${{ btcPrice }}</span>
+        <span
+          class="text-secondary font-semibold"
+          :class="{ 'opacity-50': btcPriceStale }"
+          :title="btcPriceStale ? 'Price feed may be outdated — Cadena is having trouble reaching its servers.' : undefined"
+        >${{ btcPrice }}</span>
       </div>
 
       <!-- Main navbar row -->
@@ -48,7 +52,7 @@
         </router-link>
 
         <!-- Center: BTCUSD ticker -->
-        <div class="hidden md:flex justify-center items-center gap-1.5 text-sm font-medium">
+        <div v-if="!serverDown" class="hidden md:flex justify-center items-center gap-1.5 text-sm font-medium">
           <img
             src="https://flagcdn.com/us.svg"
             alt="US Flag"
@@ -60,7 +64,11 @@
             referrerpolicy="no-referrer"
           />
           <span class="text-white/70">BTCUSD</span>
-          <span class="text-secondary font-semibold text-base">${{ btcPrice }}</span>
+          <span
+            class="text-secondary font-semibold text-base"
+            :class="{ 'opacity-50': btcPriceStale }"
+            :title="btcPriceStale ? 'Price feed may be outdated — Cadena is having trouble reaching its servers.' : undefined"
+          >${{ btcPrice }}</span>
         </div>
 
         <!-- Right: Desktop Nav + CTA -->
@@ -77,7 +85,7 @@
               </svg>
             </button>
             <div
-              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
+              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-[70] opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
               role="menu"
             >
               <router-link to="/loan-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Loan Calculator</router-link>
@@ -96,7 +104,7 @@
               </svg>
             </button>
             <div
-              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-50 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
+              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-[70] opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
               role="menu"
             >
               <router-link to="/knowledge-hub" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Knowledge Hub</router-link>
@@ -276,7 +284,7 @@
       <div
         v-if="isMobileMenuOpen"
         id="mobile-menu"
-        class="fixed inset-0 text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-xl pt-[var(--nav-h)] mobile-menu-bg"
+        class="fixed inset-0 text-white px-6 pb-6 space-y-6 z-[70] md:hidden overflow-y-auto shadow-xl pt-[var(--nav-h)] mobile-menu-bg"
         @keyup.esc="closeMobileMenu"
       >
         <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
@@ -346,6 +354,7 @@ import { useRouter } from 'vue-router'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
 import { useAuth } from '../composables/useAuth'
 import { useBtcPrice } from '../composables/useBtcPrice'
+import { useServerStatus } from '../composables/useServerStatus'
 import { useOracle } from '../composables/useOracle'
 import { formatBtcValue } from '../functions/amount_formatting'
 import { isSignerAuthCode } from '../lib/authCode'
@@ -394,7 +403,8 @@ function pickNumber (obj, keys) {
 }
 
 /** ---- BTC price (shared singleton — no local interval) ---- */
-const { btcPriceUsd } = useBtcPrice()
+const { btcPriceUsd, isStale: btcPriceStale } = useBtcPrice()
+const { isDown: serverDown } = useServerStatus()
 const btcPrice = computed(() => {
   const v = btcPriceUsd.value
   if (!v) return '...'
