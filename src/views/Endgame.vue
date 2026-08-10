@@ -221,8 +221,7 @@ function copy(text, key) {
 
   /* HERO */
   .hero {
-    padding: 96px 0 72px;
-    border-bottom: 1px solid var(--border);
+    padding: 56px 0 32px;
   }
   .eyebrow {
     color: var(--accent);
@@ -298,10 +297,8 @@ function copy(text, key) {
 
   /* SECTIONS */
   section {
-    padding: 72px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 36px 0;
   }
-  section:last-of-type { border-bottom: none; }
   h2.section-title {
     font-family: var(--serif);
     font-size: 32px;

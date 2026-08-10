@@ -345,6 +345,7 @@ import { useAuth } from '../composables/useAuth'
 import type { QRCodeUserResponse } from '../types/common/qrFace'
 import TheFooter from '../components/TheFooter.vue'
 import { isSignerAuthCode } from '../lib/authCode'
+import { notifyKitNewSubscriber } from '../api/kitSubscribe'
 import QRCode from 'qrcode'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/cadena-bitcoin/id6753348211'
@@ -418,6 +419,12 @@ const submitForm = async () => {
       email_address: email.value,
       password: password.value,
     } as any)
+
+    // Registration succeeded — tagging in Kit right away rather than waiting
+    // for signer pairing. Kit's own automation (not this call) is what
+    // decides when the welcome email actually sends, so there's no "two
+    // emails at once" collision with the backend's confirmation email.
+    notifyKitNewSubscriber(email.value)
 
     step.value = 2
     await router.replace({ query: { ...route.query, step: '2' } })

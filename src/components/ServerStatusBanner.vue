@@ -7,20 +7,21 @@
     :aria-hidden="!isDown"
   >
     <div
-      class="px-4 py-2.5 bg-secondary/95 border-b border-secondary/40 text-white backdrop-blur flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pointer-events-auto text-center"
+      ref="barRef"
+      class="px-3 py-1.5 sm:px-4 sm:py-2.5 bg-secondary/95 border-b border-secondary/40 text-white backdrop-blur flex flex-wrap items-center justify-center gap-x-2 gap-y-1 sm:gap-x-3 pointer-events-auto text-center"
     >
-      <span class="inline-block w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0" aria-hidden="true" />
-      <p class="text-sm font-medium">
+      <span class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-pulse flex-shrink-0" aria-hidden="true" />
+      <p class="text-xs sm:text-sm font-medium">
         Cadena's servers are currently down. Logging in and placing orders is temporarily unavailable.
       </p>
       <button
-        class="px-3 py-1 rounded bg-white/15 hover:bg-white/25 border border-white/25 text-xs font-semibold flex-shrink-0 transition inline-flex items-center gap-1.5 disabled:opacity-70"
+        class="px-2 py-0.5 sm:px-3 sm:py-1 rounded bg-white/15 hover:bg-white/25 border border-white/25 text-[11px] sm:text-xs font-semibold flex-shrink-0 transition inline-flex items-center gap-1.5 disabled:opacity-70"
         :disabled="checking"
         @click="retry"
       >
         <svg
           v-if="checking"
-          class="w-3 h-3 animate-spin flex-shrink-0"
+          class="w-2.5 h-2.5 sm:w-3 sm:h-3 animate-spin flex-shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           aria-hidden="true"
@@ -35,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useServerStatus } from '../composables/useServerStatus'
 
 const { isDown, checkNow } = useServerStatus()
@@ -57,4 +58,41 @@ async function retry() {
     checking.value = false
   }
 }
+
+// Publish our own rendered height as --banner-h, mirroring how Navbar.vue
+// publishes --nav-h/--info-h, so App.vue can push page content down by
+// exactly this much instead of letting the banner overlap it.
+const barRef = ref(null)
+let resizeObs = null
+
+function publishHeight(h) {
+  document.documentElement.style.setProperty('--banner-h', h + 'px')
+}
+
+function measure() {
+  publishHeight(isDown.value && barRef.value ? barRef.value.offsetHeight : 0)
+}
+
+watch(
+  isDown,
+  async (down) => {
+    await nextTick()
+    if (down && barRef.value) {
+      if (!resizeObs && 'ResizeObserver' in window) {
+        resizeObs = new ResizeObserver(measure)
+      }
+      resizeObs?.observe(barRef.value)
+      measure()
+    } else {
+      resizeObs?.disconnect()
+      publishHeight(0)
+    }
+  },
+  { immediate: true }
+)
+
+onBeforeUnmount(() => {
+  resizeObs?.disconnect()
+  publishHeight(0)
+})
 </script>

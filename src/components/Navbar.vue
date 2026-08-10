@@ -73,27 +73,7 @@
 
         <!-- Right: Desktop Nav + CTA -->
         <div class="hidden md:flex items-center justify-end gap-4 flex-nowrap whitespace-nowrap">
-          <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
           <router-link :class="linkClass" to="/allocate_liquidity">Create Loan</router-link>
-
-          <!-- Calculators dropdown -->
-          <div class="relative group">
-            <button :class="['flex items-center gap-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
-              <span>Calculators</span>
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
-              </svg>
-            </button>
-            <div
-              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-[70] opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
-              role="menu"
-            >
-              <router-link to="/loan-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Loan Calculator</router-link>
-              <router-link to="/settlement-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Settlement Calculator</router-link>
-              <router-link to="/liquidation-calculator" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Liquidation Risk</router-link>
-              <router-link to="/bitcoin-allocation" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Bitcoin Allocation</router-link>
-            </div>
-          </div>
 
           <!-- Resources dropdown -->
           <div class="relative group">
@@ -107,12 +87,10 @@
               class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-[70] opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
               role="menu"
             >
-              <router-link to="/knowledge-hub" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Knowledge Hub</router-link>
+              <router-link to="/signerapp" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Signer App</router-link>
+              <router-link to="/security" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Security</router-link>
               <router-link to="/cadena-paper" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
               <router-link to="/endgame" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Endgame Book</router-link>
-              <router-link to="/endgame-study-guide" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Endgame Study Guide</router-link>
-              <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Podcast</a>
-              <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">GitHub</a>
             </div>
           </div>
 
@@ -287,24 +265,24 @@
         class="fixed inset-0 text-white px-6 pb-6 space-y-6 z-[70] md:hidden overflow-y-auto shadow-xl pt-[var(--nav-h)] mobile-menu-bg"
         @keyup.esc="closeMobileMenu"
       >
-        <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
+        <button
+          @click="closeMobileMenu"
+          class="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition"
+          aria-label="Close menu"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
         <router-link @click="closeMobileMenu" to="/allocate_liquidity" class="block text-lg font-semibold hover:text-secondary">Create Loan</router-link>
-        <div>
-          <div class="text-white/50 uppercase text-xs mt-4 mb-2">Calculators</div>
-          <router-link @click="closeMobileMenu" to="/loan-calculator" class="block pl-2 py-2 hover:text-secondary">Loan Calculator</router-link>
-          <router-link @click="closeMobileMenu" to="/settlement-calculator" class="block pl-2 py-2 hover:text-secondary">Settlement Calculator</router-link>
-          <router-link @click="closeMobileMenu" to="/liquidation-calculator" class="block pl-2 py-2 hover:text-secondary">Liquidation Risk</router-link>
-          <router-link @click="closeMobileMenu" to="/bitcoin-allocation" class="block pl-2 py-2 hover:text-secondary">Bitcoin Allocation</router-link>
-        </div>
 
         <div>
           <div class="text-white/50 uppercase text-xs mt-4 mb-2">Resources</div>
-          <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block pl-2 py-2 hover:text-secondary">Knowledge Hub</router-link>
+          <router-link @click="closeMobileMenu" to="/signerapp" class="block pl-2 py-2 hover:text-secondary">Signer App</router-link>
+          <router-link @click="closeMobileMenu" to="/security" class="block pl-2 py-2 hover:text-secondary">Security</router-link>
           <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
           <router-link @click="closeMobileMenu" to="/endgame" class="block pl-2 py-2 hover:text-secondary">Endgame Book</router-link>
-          <router-link @click="closeMobileMenu" to="/endgame-study-guide" class="block pl-2 py-2 hover:text-secondary">Endgame Study Guide</router-link>
-          <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Podcast</a>
-          <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">GitHub</a>
         </div>
 
         <router-link

@@ -131,7 +131,23 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error('Prerender failed:', error)
-  process.exit(1)
+// Prerendering is an SEO/performance layer on top of a fully-working SPA —
+// vercel.json already rewrites unprerendered routes to index.html, so a
+// failure OR a hang here (e.g. a headless browser that never finishes
+// launching in this build environment) shouldn't block shipping the rest of
+// the build. A rejected promise alone isn't enough of a guard — a hang never
+// rejects — so this races main() against a hard deadline and force-exits
+// either way rather than letting the build sit until Vercel's own max
+// build-time limit eventually kills it.
+const HARD_TIMEOUT_MS = 90_000
+const timeout = new Promise((_, reject) => {
+  setTimeout(() => reject(new Error(`Prerender timed out after ${HARD_TIMEOUT_MS / 1000}s`)), HARD_TIMEOUT_MS)
 })
+
+Promise.race([main(), timeout]).then(
+  () => process.exit(0),
+  (error) => {
+    console.error('Prerender failed — shipping without prerendered HTML for this build:', error)
+    process.exit(0)
+  }
+)
