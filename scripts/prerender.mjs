@@ -15,7 +15,29 @@ const BASE_URL = `http://localhost:${PORT}`
 const DIST_DIR = resolve('dist')
 const BLOG_SITEMAP_URL = process.env.BLOG_SITEMAP_URL || 'https://blog.cadenabitcoin.dev/api/blog/posts'
 
+// Guards against a real, previously-shipped bug: if something else is
+// already listening on PORT, the readiness poll below would get a 200 from
+// that instead of the freshly-built preview server and silently crawl the
+// wrong site (e.g. a leftover `npm run dev` — its dev-only markup like
+// @vite/client and an unbundled /main.js then gets baked into every
+// prerendered page's index.html in place of the real hashed assets).
+async function assertPortFree() {
+  try {
+    await fetch(BASE_URL + '/', { signal: AbortSignal.timeout(1000) })
+  } catch {
+    return // nothing responded — port is free, as expected
+  }
+  const err = new Error(
+    `Port ${PORT} is already in use by something else. Prerendering must run against a freshly-built ` +
+    `\`vite preview\` on this exact port, or it will silently snapshot whatever's already there instead. ` +
+    `Stop whatever's running on port ${PORT} (e.g. \`npm run dev\`) and re-run the build.`
+  )
+  err.portConflict = true
+  throw err
+}
+
 async function startPreviewServer() {
+  await assertPortFree()
   const proc = spawn(resolve('node_modules/.bin/vite'), ['preview', '--port', String(PORT), '--strictPort'], {
     stdio: ['ignore', 'pipe', 'pipe'],
   })
@@ -147,6 +169,13 @@ const timeout = new Promise((_, reject) => {
 Promise.race([main(), timeout]).then(
   () => process.exit(0),
   (error) => {
+    if (error?.portConflict) {
+      // Unlike other failures, this one shouldn't ship silently — it means
+      // the prerendered output is actively wrong (dev-server markup baked
+      // into shipped HTML), not just missing. Fail the build loudly.
+      console.error(error.message)
+      process.exit(1)
+    }
     console.error('Prerender failed — shipping without prerendered HTML for this build:', error)
     process.exit(0)
   }
