@@ -48,6 +48,9 @@ const LoanCalculator = () => import('../views/LoanCalculator.vue')
 const LiquidationCalculator = () => import('../views/LiquidationCalculator.vue')
 const Newsletter             = () => import('../views/Newsletter.vue')
 const Comparison             = () => import('../views/Comparison.vue')
+const BitcoinAllocationCalculator = () => import('../views/BitcoinAllocationCalculator.vue')
+const EndgameStudyGuide      = () => import('../views/EndgameStudyGuide.vue')
+const GetStarted             = () => import('../views/GetStarted.vue')
 
 const hasBlogToken = () => {
   if (typeof window === 'undefined' || !window.localStorage) return false
@@ -426,6 +429,36 @@ const routes = [
   meta: {
     title: 'Newsletter — Cadena Bitcoin',
     description: 'Subscribe to the Cadena Bitcoin newsletter for Bitcoin education, market insights, security best practices, and product updates.',
+    robots: 'index,follow',
+  }
+},
+{
+  path: '/bitcoin-allocation',
+  name: 'BitcoinAllocationCalculator',
+  component: BitcoinAllocationCalculator,
+  meta: {
+    title: 'How Much Bitcoin Should I Own? — Cadena Bitcoin',
+    description: 'Kelly Criterion and Modern Portfolio Theory show why 1–5% is too small. Run the math for yourself: enter your conviction, payoff, and net worth.',
+    robots: 'index,follow',
+  }
+},
+{
+  path: '/get-started',
+  name: 'GetStarted',
+  component: GetStarted,
+  meta: {
+    title: 'Get Started — Cadena Bitcoin',
+    description: 'How to fund your Cadena wallet and create your first Bitcoin-backed loan.',
+    robots: 'noindex,nofollow',
+  }
+},
+{
+  path: '/endgame-study-guide',
+  name: 'EndgameStudyGuide',
+  component: EndgameStudyGuide,
+  meta: {
+    title: 'Endgame Study Guide — Bitcoin, Sovereign Debt, and Sound Capital',
+    description: 'Chapter summaries, key numbers, mental models, glossary, quotes, and a 14-question self-test for Endgame by Kevin Bell, CFA.',
     robots: 'index,follow',
   }
 },

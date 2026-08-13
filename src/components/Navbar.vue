@@ -4,13 +4,13 @@
     <nav
       ref="navRef"
       :class="[
-        'w-full fixed top-0 left-0 right-0 z-50 nav-bg text-white'
+        'w-full fixed top-0 left-0 right-0 z-[65] nav-bg text-white'
       ]"
       role="navigation"
       aria-label="Main"
     >
       <!-- Mobile-only BTC price strip -->
-      <div class="md:hidden relative flex items-center justify-center border-b border-white/[0.06]" data-dropdown>
+      <div v-if="!serverDown" class="md:hidden relative flex items-center justify-center border-b border-white/[0.06]" data-dropdown>
         <button
           type="button"
           @click="priceDropdownOpen = !priceDropdownOpen"
@@ -20,7 +20,11 @@
         >
           <img :src="`https://flagcdn.com/${priceFlagCode}.svg`" :alt="priceFlagAlt" class="w-3.5 h-2.5 rounded-[2px]" width="14" height="10" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
           <span class="text-white/40 font-normal">{{ priceSymbol }}</span>
-          <span class="text-white font-semibold tracking-tight">{{ priceCurrencySign }}{{ btcPrice }}</span>
+          <span
+            class="text-white font-semibold tracking-tight"
+            :class="{ 'opacity-50': isPriceStale }"
+            :title="isPriceStale ? 'Price feed may be outdated — Cadena is having trouble reaching its servers.' : undefined"
+          >{{ priceCurrencySign }}{{ btcPrice }}</span>
           <svg class="w-3 h-3 text-white/25 transition-transform duration-200" :class="priceDropdownOpen ? 'rotate-180' : ''" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
         </button>
         <Transition name="dropdown-pop">
@@ -67,7 +71,7 @@
         </router-link>
 
         <!-- Center: BTC price ticker (clickable dropdown) -->
-        <div class="hidden md:flex justify-center relative" data-dropdown>
+        <div v-if="!serverDown" class="hidden md:flex justify-center relative" data-dropdown>
           <button
             type="button"
             @click="priceDropdownOpen = !priceDropdownOpen"
@@ -77,7 +81,11 @@
           >
             <img :src="`https://flagcdn.com/${priceFlagCode}.svg`" :alt="priceFlagAlt" class="w-4 h-3 rounded-[2px]" width="16" height="12" decoding="async" loading="lazy" draggable="false" referrerpolicy="no-referrer" />
             <span class="text-white/40 font-normal text-xs">{{ priceSymbol }}</span>
-            <span class="text-white font-semibold tracking-tight">{{ priceCurrencySign }}{{ btcPrice }}</span>
+            <span
+              class="text-white font-semibold tracking-tight"
+              :class="{ 'opacity-50': isPriceStale }"
+              :title="isPriceStale ? 'Price feed may be outdated — Cadena is having trouble reaching its servers.' : undefined"
+            >{{ priceCurrencySign }}{{ btcPrice }}</span>
             <svg class="w-3 h-3 text-white/25 transition-transform duration-200" :class="priceDropdownOpen ? 'rotate-180' : ''" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
           </button>
           <Transition name="dropdown-pop">
@@ -103,29 +111,7 @@
 
         <!-- Right: Desktop Nav + CTA -->
         <div class="hidden md:flex items-center justify-end gap-4 flex-nowrap whitespace-nowrap">
-          <router-link :class="linkClass" to="/signerapp">Signer App</router-link>
           <router-link :class="linkClass" to="/allocate_liquidity">Create Loan</router-link>
-
-          <!-- Calculators dropdown -->
-          <div class="relative" data-dropdown>
-            <button
-              type="button"
-              :class="['flex items-center gap-1.5 transition-colors duration-150 rounded-xl px-3 py-1.5 hover:bg-white/[0.05]', linkClass]"
-              aria-haspopup="menu"
-              :aria-expanded="calcDropdownOpen"
-              @click="calcDropdownOpen = !calcDropdownOpen; resourcesDropdownOpen = false"
-            >
-              <span>Calculators</span>
-              <svg class="w-3 h-3 text-white/40 transition-transform duration-200" :class="calcDropdownOpen ? 'rotate-180' : ''" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            <Transition name="dropdown-pop">
-              <div v-if="calcDropdownOpen" class="absolute top-[calc(100%+8px)] right-0 w-52 rounded-2xl border border-white/[0.08] bg-[#081123] backdrop-blur-xl shadow-2xl shadow-black/60 z-50 p-1" role="menu">
-                <router-link @click="calcDropdownOpen = false" to="/loan-calculator" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Loan Calculator</router-link>
-                <router-link @click="calcDropdownOpen = false" to="/settlement-calculator" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Settlement Calculator</router-link>
-                <router-link @click="calcDropdownOpen = false" to="/liquidation-calculator" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Liquidation Risk</router-link>
-              </div>
-            </Transition>
-          </div>
 
           <!-- Resources dropdown -->
           <div class="relative" data-dropdown>
@@ -134,19 +120,17 @@
               :class="['flex items-center gap-1.5 transition-colors duration-150 rounded-xl px-3 py-1.5 hover:bg-white/[0.05]', linkClass]"
               aria-haspopup="menu"
               :aria-expanded="resourcesDropdownOpen"
-              @click="resourcesDropdownOpen = !resourcesDropdownOpen; calcDropdownOpen = false"
+              @click="resourcesDropdownOpen = !resourcesDropdownOpen"
             >
               <span>Resources</span>
               <svg class="w-3 h-3 text-white/40 transition-transform duration-200" :class="resourcesDropdownOpen ? 'rotate-180' : ''" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
             </button>
             <Transition name="dropdown-pop">
               <div v-if="resourcesDropdownOpen" class="absolute top-[calc(100%+8px)] right-0 w-52 rounded-2xl border border-white/[0.08] bg-[#081123] backdrop-blur-xl shadow-2xl shadow-black/60 z-50 p-1" role="menu">
-                <router-link @click="resourcesDropdownOpen = false" to="/knowledge-hub" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Knowledge Hub</router-link>
+                <router-link @click="resourcesDropdownOpen = false" to="/signerapp" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Signer App</router-link>
+                <router-link @click="resourcesDropdownOpen = false" to="/security" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Security</router-link>
                 <router-link @click="resourcesDropdownOpen = false" to="/cadena-paper" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Cadena Paper</router-link>
                 <router-link @click="resourcesDropdownOpen = false" to="/endgame" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Endgame Book</router-link>
-                <div class="my-1 h-px bg-white/[0.06] mx-3"></div>
-                <a @click="resourcesDropdownOpen = false" href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Podcast</a>
-                <a @click="resourcesDropdownOpen = false" href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">GitHub</a>
               </div>
             </Transition>
           </div>
@@ -354,25 +338,27 @@
       <div
         v-if="isMobileMenuOpen"
         id="mobile-menu"
-        class="fixed inset-0 text-white px-6 pb-6 space-y-6 z-40 md:hidden overflow-y-auto shadow-xl pt-[var(--nav-h)] mobile-menu-bg"
+        class="fixed inset-0 text-white px-6 pb-6 space-y-6 z-[70] md:hidden overflow-y-auto shadow-xl pt-[var(--nav-h)] mobile-menu-bg"
         @keyup.esc="closeMobileMenu"
       >
-        <router-link @click="closeMobileMenu" to="/signerapp" class="block text-lg font-semibold hover:text-secondary">Signer App</router-link>
+        <button
+          @click="closeMobileMenu"
+          class="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition"
+          aria-label="Close menu"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
         <router-link @click="closeMobileMenu" to="/allocate_liquidity" class="block text-lg font-semibold hover:text-secondary">Create Loan</router-link>
-        <div>
-          <div class="text-white/50 uppercase text-xs mt-4 mb-2">Calculators</div>
-          <router-link @click="closeMobileMenu" to="/loan-calculator" class="block pl-2 py-2 hover:text-secondary">Loan Calculator</router-link>
-          <router-link @click="closeMobileMenu" to="/settlement-calculator" class="block pl-2 py-2 hover:text-secondary">Settlement Calculator</router-link>
-          <router-link @click="closeMobileMenu" to="/liquidation-calculator" class="block pl-2 py-2 hover:text-secondary">Liquidation Risk</router-link>
-        </div>
 
         <div>
           <div class="text-white/50 uppercase text-xs mt-4 mb-2">Resources</div>
-          <router-link @click="closeMobileMenu" to="/knowledge-hub" class="block pl-2 py-2 hover:text-secondary">Knowledge Hub</router-link>
+          <router-link @click="closeMobileMenu" to="/signerapp" class="block pl-2 py-2 hover:text-secondary">Signer App</router-link>
+          <router-link @click="closeMobileMenu" to="/security" class="block pl-2 py-2 hover:text-secondary">Security</router-link>
           <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
           <router-link @click="closeMobileMenu" to="/endgame" class="block pl-2 py-2 hover:text-secondary">Endgame Book</router-link>
-          <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">Podcast</a>
-          <a href="https://github.com/CadenaWizard/cryptlib" target="_blank" rel="noopener" class="block pl-2 py-2 hover:text-secondary" @click="closeMobileMenu">GitHub</a>
         </div>
 
         <router-link
@@ -426,12 +412,13 @@ import { useOracle } from '../composables/useOracle'
 import { usePriceSymbol } from '../composables/usePriceSymbol'
 import { formatBtcValue } from '../functions/amount_formatting'
 import { isSignerAuthCode } from '../lib/authCode'
+import { useServerStatus } from '../composables/useServerStatus'
 
 const { selectedOracleId } = useOracle()
 const { priceSymbol, priceCurrencySign, priceFlagCode, priceFlagAlt } = usePriceSymbol()
+const { isDown: serverDown } = useServerStatus()
 
 const priceDropdownOpen = ref(false)
-const calcDropdownOpen = ref(false)
 const resourcesDropdownOpen = ref(false)
 
 const priceOptions = [
@@ -446,7 +433,6 @@ function selectPriceSymbol(symbol) {
 function closeAllDropdowns(e) {
   if (!e.target.closest('[data-dropdown]')) {
     priceDropdownOpen.value = false
-    calcDropdownOpen.value = false
     resourcesDropdownOpen.value = false
   }
 }
@@ -484,6 +470,11 @@ const isMobileMenuOpen = ref(false)
 
 /** ---- BTC price polling (via oracle) ---- */
 const btcPrice = ref('...')
+const lastPriceUpdatedAt = ref(null)
+// Bumped on every poll attempt (success or failure) so isPriceStale
+// re-evaluates on a schedule, not only when a fetch actually succeeds.
+const priceTick = ref(Date.now())
+const STALE_AFTER_MS = 90_000 // 3 missed 30s cycles
 let priceIntervalId = null
 let priceStarted = false
 
@@ -523,11 +514,23 @@ const fetchBTCPrice = async () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })
+    lastPriceUpdatedAt.value = Date.now()
   } catch (err) {
     console.error('Failed to fetch BTC price from oracle:', err)
     btcPrice.value = 'N/A'
+    // don't touch lastPriceUpdatedAt — isPriceStale should reflect how old
+    // the last good value actually is, not silently reset the clock
+  } finally {
+    priceTick.value = Date.now()
   }
 }
+
+const isPriceStale = computed(() => {
+  void priceTick.value
+  if (btcPrice.value === '...' ) return false
+  if (lastPriceUpdatedAt.value === null) return true
+  return Date.now() - lastPriceUpdatedAt.value > STALE_AFTER_MS
+})
 
 function startPricePolling () {
   if (priceStarted) return

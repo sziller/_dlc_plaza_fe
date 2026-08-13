@@ -1,5 +1,7 @@
 <template>
   <div class="text-white min-h-screen">
+    <ServerStatusBanner />
+
     <!-- Fixed navbar includes the top info strip when logged in -->
     <Navbar
       v-if="!hideChrome"
@@ -33,6 +35,7 @@ import { ref, computed, onMounted, watch, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import CookieBanner from './components/CookieBanner.vue'
+import ServerStatusBanner from './components/ServerStatusBanner.vue'
 
 const ChatBot = defineAsyncComponent(() => import('./components/ChatBot.vue'))
 const MailingListModal = defineAsyncComponent(() => import('./components/MailingListModal.vue'))
@@ -141,11 +144,15 @@ onMounted(() => {
 })
 watch(isLoggedIn, () => syncPadFromCssVars())
 
-// Compute the pad-top the page needs beneath the fixed bars
-// Remove top padding so sections sit flush under the fixed navbar
+// Compute the pad-top the page needs beneath the fixed bars.
+// Pages sit flush under the fixed navbar by design (their own top padding
+// already matches nav height), so this stays '0px' normally — but when the
+// server-down banner is showing, push content down by its height too, or it
+// sits on top of the page instead of the page starting below it. ServerStatusBanner.vue
+// publishes --banner-h itself (mirrors how Navbar publishes --nav-h/--info-h).
 const contentPad = computed(() => {
   // still observe nav/info heights so reactivity stays in sync (even though we render without top padding)
   void navH.value; void infoH.value;
-  return '0px'
+  return 'var(--banner-h, 0px)'
 })
 </script>

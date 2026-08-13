@@ -31,6 +31,7 @@ declare module 'vue' {
     RelatedResources: typeof import('./components/RelatedResources.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ServerStatusBanner: typeof import('./components/ServerStatusBanner.vue')['default']
     SessionBanner: typeof import('./components/SessionBanner.vue')['default']
     TheFooter: typeof import('./components/TheFooter.vue')['default']
     UseCasesAccordion: typeof import('./components/UseCasesAccordion.vue')['default']
