@@ -68,6 +68,17 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'Kit subscribe failed' })
     }
 
+    // Per Kit's docs: 201 = new tag assignment (should trigger any "on tag
+    // applied" automation), 200 = subscriber already had this tag (won't).
+    // Logging this distinction directly answers "did we actually fire a new
+    // welcome email this time" without needing to guess from the outside.
+    console.log(
+      'kit-subscribe: tagged',
+      email,
+      'subscriberId=', subscriberId,
+      tagRes.status === 201 ? '(new tag assignment)' : '(already had this tag — no new automation trigger expected)'
+    )
+
     res.json({ ok: true })
   } catch (err) {
     console.error('kit-subscribe:', err.message)
