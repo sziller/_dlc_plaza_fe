@@ -158,7 +158,7 @@
       role="region"
       aria-label="User info"
     >
-      <div class="px-4 h-10 flex items-center justify-center gap-2">
+      <div class="px-4 py-2 sm:h-10 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2">
 
         <!-- Loading -->
         <template v-if="loading">
@@ -180,75 +180,84 @@
         <!-- Data -->
         <template v-else>
 
-          <!-- Email chip -->
-          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
-            <svg class="w-3 h-3 text-white shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-            </svg>
-            <span class="text-xs text-white truncate max-w-[22ch]" :title="email">{{ email }}</span>
-          </div>
-
-          <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
-
-          <!-- Pairing -->
-          <template v-if="isPending">
-            <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/20" role="status">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" aria-hidden="true" />
-              <span class="text-xs text-amber-200">Setup pending</span>
-              <router-link to="/register?step=3" class="text-xs text-amber-300 hover:text-white transition underline underline-offset-2">View QR</router-link>
-            </div>
-          </template>
-          <template v-else-if="showPairing">
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition"
-              :class="isPaired ? 'bg-green-500/10 border-green-400/20' : 'bg-red-500/10 border-red-400/20'"
-              role="status"
-              :aria-label="isPaired ? 'Device paired' : 'Device not paired'"
-            >
-              <span :class="['w-1.5 h-1.5 rounded-full shrink-0', isPaired ? 'bg-green-400' : 'bg-red-400 animate-pulse']" aria-hidden="true" />
-              <span :class="['text-xs font-medium', isPaired ? 'text-green-300' : 'text-red-300']">{{ isPaired ? 'Paired' : 'Not paired' }}</span>
-              <router-link v-if="!isPaired" to="/register?step=3" class="text-xs text-red-200 hover:text-white transition underline underline-offset-2 ml-0.5">Scan QR</router-link>
-            </div>
-          </template>
-          <template v-else>
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]" aria-hidden="true">
-              <span class="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
-              <span class="text-xs text-white tracking-widest">···</span>
-            </div>
-          </template>
-
-          <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
-
-          <!-- Liquid balance chip -->
-          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
-            <span class="text-xs text-white">Liquid Balance</span>
-            <span class="text-xs font-semibold text-white tabular-nums" :aria-live="live" role="status">
-              <template v-if="balanceDerivedSats !== null">{{ btc(balanceDerivedSats) }} BTC</template>
-              <template v-else><span class="text-white">—</span></template>
-            </span>
-          </div>
-
-          <!-- On-chain balance chip -->
-          <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
-            <span class="text-xs text-white">Wallet Balance</span>
-            <span class="text-xs font-semibold text-white tabular-nums" :aria-live="live" role="status">
-              <template v-if="balanceOnchainSats !== null">{{ btc(balanceOnchainSats) }} BTC</template>
-              <template v-else><span class="text-white">—</span></template>
-            </span>
-          </div>
-
-          <!-- Zero-balance nudge -->
-          <template v-if="isZeroAvailable">
-            <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
-            <router-link
-              to="/get-started"
-              class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-secondary text-xs font-bold hover:bg-white/90 transition shadow-sm"
-            >
-              <svg class="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+          <!-- Row 1 (mobile): who you are + device status -->
+          <div class="flex items-center justify-center flex-wrap gap-2">
+            <!-- Email chip -->
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
+              <svg class="w-3 h-3 text-white shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
               </svg>
-              Fund wallet
-            </router-link>
-          </template>
+              <span class="text-xs text-white truncate max-w-[14ch] sm:max-w-[22ch]" :title="email">{{ email }}</span>
+            </div>
+
+            <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
+
+            <!-- Pairing -->
+            <template v-if="isPending">
+              <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/20" role="status">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" aria-hidden="true" />
+                <span class="text-xs text-amber-200">Setup pending</span>
+                <router-link to="/register?step=3" class="text-xs text-amber-300 hover:text-white transition underline underline-offset-2">View QR</router-link>
+              </div>
+            </template>
+            <template v-else-if="showPairing">
+              <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition"
+                :class="isPaired ? 'bg-green-500/10 border-green-400/20' : 'bg-red-500/10 border-red-400/20'"
+                role="status"
+                :aria-label="isPaired ? 'Device paired' : 'Device not paired'"
+              >
+                <span :class="['w-1.5 h-1.5 rounded-full shrink-0', isPaired ? 'bg-green-400' : 'bg-red-400 animate-pulse']" aria-hidden="true" />
+                <span :class="['text-xs font-medium', isPaired ? 'text-green-300' : 'text-red-300']">{{ isPaired ? 'Paired' : 'Not paired' }}</span>
+                <router-link v-if="!isPaired" to="/register?step=3" class="text-xs text-red-200 hover:text-white transition underline underline-offset-2 ml-0.5">Scan QR</router-link>
+              </div>
+            </template>
+            <template v-else>
+              <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]" aria-hidden="true">
+                <span class="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
+                <span class="text-xs text-white tracking-widest">···</span>
+              </div>
+            </template>
+          </div>
+
+          <!-- Forces a new line on mobile only; desktop stays one row -->
+          <div class="basis-full sm:hidden" aria-hidden="true" />
+
+          <!-- Row 2 (mobile): balances -->
+          <div class="flex items-center justify-center flex-wrap gap-2">
+            <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
+
+            <!-- Liquid balance chip -->
+            <div class="flex flex-col sm:flex-row items-center gap-0 sm:gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
+              <span class="text-xs text-white whitespace-nowrap"><span class="sm:hidden">Liquid</span><span class="hidden sm:inline">Liquid Balance</span></span>
+              <span class="text-xs font-semibold text-white tabular-nums whitespace-nowrap" :aria-live="live" role="status">
+                <template v-if="balanceDerivedSats !== null">{{ btc(balanceDerivedSats) }} BTC</template>
+                <template v-else><span class="text-white">—</span></template>
+              </span>
+            </div>
+
+            <!-- On-chain balance chip -->
+            <div class="flex flex-col sm:flex-row items-center gap-0 sm:gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
+              <span class="text-xs text-white whitespace-nowrap"><span class="sm:hidden">Wallet</span><span class="hidden sm:inline">Wallet Balance</span></span>
+              <span class="text-xs font-semibold text-white tabular-nums whitespace-nowrap" :aria-live="live" role="status">
+                <template v-if="balanceOnchainSats !== null">{{ btc(balanceOnchainSats) }} BTC</template>
+                <template v-else><span class="text-white">—</span></template>
+              </span>
+            </div>
+
+            <!-- Zero-balance nudge -->
+            <template v-if="isZeroAvailable">
+              <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
+              <router-link
+                to="/get-started"
+                class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-secondary text-xs font-bold hover:bg-white/90 transition shadow-sm"
+              >
+                <svg class="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                </svg>
+                Fund wallet
+              </router-link>
+            </template>
+          </div>
 
         </template>
       </div>

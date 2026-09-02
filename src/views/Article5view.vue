@@ -51,7 +51,7 @@
       <div class="space-y-5">
         <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Term</h2>
         <p>
-          Each Cadena Bitcoin contract lasts 30, 90, 180, or 365 days starting when the contract is accepted. Duration may extend slightly to align with the next available Oracle attestation after maturity.
+          Each Cadena Bitcoin contract runs for a 365-day term starting when the contract is accepted. Duration may extend slightly to align with the next available Oracle attestation after maturity.
         </p>
 
         <h2 class="text-xl sm:text-2xl font-semibold text-secondary mb-1">Interest</h2>

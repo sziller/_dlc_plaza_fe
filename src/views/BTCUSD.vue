@@ -7,7 +7,12 @@
     <section class="flex-1 px-4 py-4">
       <div class="w-full max-w-screen-xl mx-auto pb-10">
         <MarketOverviewTable />
-        <p class="text-center text-xs text-white/50 mt-4">BTCUSD &middot; 50% LTV &middot; 90 / 180 / 365 day terms</p>
+        <p class="text-center text-xs text-white/50 mt-4">BTCUSD &middot; 50% LTV &middot; 365 day term</p>
+
+        <div v-if="isLoggedIn" class="mt-10 space-y-8">
+          <UsersLiquidity hide-when-empty />
+          <UsersDLCS hide-when-empty />
+        </div>
       </div>
     </section>
   </main>
@@ -18,12 +23,14 @@
 <script setup>
 import { onMounted, watchEffect } from 'vue'
 import MarketOverviewTable from '../components/MarketOverviewTable.vue'
+import UsersLiquidity from '../components/UsersLiquidity.vue'
+import UsersDLCS from '../components/UsersDLCS.vue'
 import TheFooter from '../components/TheFooter.vue'
 import { useAuth } from '../composables/useAuth'
 import { notifySlackNewBtcusdUser } from '../api/slackNotify'
 import { generateLoanSchema, setSchema } from '../plugins/structured-data.js'
 
-const { user, setUserFromApi } = useAuth()
+const { user, isLoggedIn, setUserFromApi } = useAuth()
 
 onMounted(() => {
   setSchema('structured-data-loan', generateLoanSchema({

@@ -1,7 +1,7 @@
 <!-- OrderModal.vue -->
 <template>
   <div
-    class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+    class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4"
     @click.self="closeSelf"
   >
     <div
@@ -612,6 +612,7 @@
 <script setup>
 import { ref, watch, computed, onMounted, onUnmounted, toRefs } from 'vue'
 import { isSignerAuthCode } from '../lib/authCode'
+import { FEE_PCT } from '../lib/fees'
 import { formatBtcValue, satsForm } from '../functions/amount_formatting'
 
 const props = defineProps({
@@ -696,7 +697,6 @@ watch(notice, (n) => {
 const RATE_DECIMALS = 4
 const ANNUAL_DECIMALS = 2
 const STEP = 0.1
-const FEE_PCT = 0.01
 const RATE_MIN = 0
 const RATE_MAX = 25
 

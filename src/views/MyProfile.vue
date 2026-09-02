@@ -5,22 +5,31 @@
     <div class="max-w-6xl mx-auto space-y-6">
 
       <!-- Header -->
-      <header class="flex items-center justify-between gap-4">
+      <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
           <p class="text-xs uppercase tracking-widest text-white/40 mb-1">Dashboard</p>
           <h1 class="text-3xl font-bold tracking-tight">My Profile</h1>
         </div>
-        <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] hover:bg-white/10 text-sm text-white/80 hover:text-white transition disabled:opacity-40"
-          :disabled="loading"
-          :aria-busy="loading ? 'true' : 'false'"
-          @click="reloadAll"
-        >
-          <svg class="w-3.5 h-3.5" :class="{ 'animate-spin': loading }" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
-          </svg>
-          {{ loading ? 'Refreshing…' : 'Refresh' }}
-        </button>
+        <div class="flex items-center gap-2">
+          <a
+            v-if="isAdmin"
+            href="/admin.html"
+            class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-secondary/20 border border-secondary/30 hover:bg-secondary/30 text-sm text-white transition"
+          >
+            Launch Admin
+          </a>
+          <button
+            class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] hover:bg-white/10 text-sm text-white/80 hover:text-white transition disabled:opacity-40"
+            :disabled="loading"
+            :aria-busy="loading ? 'true' : 'false'"
+            @click="reloadAll"
+          >
+            <svg class="w-3.5 h-3.5" :class="{ 'animate-spin': loading }" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+            </svg>
+            {{ loading ? 'Refreshing…' : 'Refresh' }}
+          </button>
+        </div>
       </header>
 
       <!-- Error -->
@@ -43,7 +52,7 @@
       <div v-else-if="profile" class="space-y-5">
 
         <!-- PENDING REGISTRATION -->
-        <section v-if="isPending" class="p-8 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] space-y-4">
+        <section v-if="isPending" class="p-4 sm:p-8 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] space-y-4">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
             <h2 class="text-lg font-semibold">Finish setting up your account</h2>
@@ -52,13 +61,13 @@
             <span class="font-semibold text-white">Sign out, sign back in</span>, then open the
             <span class="font-semibold text-white">Cadena Signer</span> app and scan the QR code to complete registration.
           </p>
-          <div class="flex flex-col gap-1 text-sm">
-            <div class="flex items-center gap-2">
-              <span class="text-white/40 w-16 shrink-0">Email</span>
-              <span class="text-white font-medium">{{ profile.payload.email }}</span>
+          <div class="flex flex-col gap-3 sm:gap-1 text-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
+              <span class="text-white/40 sm:w-16 sm:shrink-0">Email</span>
+              <span class="text-white font-medium break-all">{{ profile.payload.email }}</span>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-white/40 w-16 shrink-0">Status</span>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
+              <span class="text-white/40 sm:w-16 sm:shrink-0">Status</span>
               <span class="text-white font-medium">{{ registrationLevel }}</span>
             </div>
           </div>
@@ -68,22 +77,22 @@
         <template v-else>
 
           <!-- Account info card -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
             <h2 class="text-sm font-semibold uppercase tracking-widest text-white/40">Account</h2>
             <div class="space-y-3">
-              <div class="flex items-start gap-3">
-                <span class="text-sm text-white/40 w-32 shrink-0 pt-0.5">Email</span>
+              <div class="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                <span class="text-sm text-white/40 sm:w-32 sm:shrink-0 sm:pt-0.5">Email</span>
                 <span class="text-base text-white font-medium break-all">{{ profile.payload.email }}</span>
               </div>
               <div class="w-full h-px bg-white/[0.06]" />
-              <div class="flex items-start gap-3">
-                <span class="text-sm text-white/40 w-32 shrink-0 pt-0.5">XPUB</span>
+              <div class="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                <span class="text-sm text-white/40 sm:w-32 sm:shrink-0 sm:pt-0.5">XPUB</span>
                 <span class="text-sm text-white/70 font-mono break-all">{{ profile.payload.xpub }}</span>
               </div>
               <div class="w-full h-px bg-white/[0.06]" />
-              <div class="flex items-center gap-3">
-                <span class="text-sm text-white/40 w-32 shrink-0">Registration</span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/20 border border-secondary/30 text-xs font-semibold text-white">
+              <div class="flex flex-col sm:flex-row sm:items-start sm:gap-3 gap-1.5">
+                <span class="text-sm text-white/40 sm:w-32 sm:shrink-0">Registration</span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary/20 border border-secondary/30 text-xs font-semibold text-white w-fit">
                   <span class="w-1.5 h-1.5 rounded-full bg-green-400" aria-hidden="true" />
                   {{ registrationLevel }}
                 </span>
@@ -118,13 +127,13 @@
           </section>
 
           <!-- Balances -->
-          <section class="grid grid-cols-2 gap-3">
-            <div class="p-7 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-2">
+          <section class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-5 sm:p-7 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-2">
               <p class="text-sm uppercase tracking-widest text-white/40">Liquid Balance</p>
               <p class="text-4xl font-bold tabular-nums">{{ formatBtc(profile.payload.balance_derived) }}</p>
               <p class="text-sm text-white/50">BTC</p>
             </div>
-            <div class="p-7 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-2">
+            <div class="p-5 sm:p-7 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-2">
               <p class="text-sm uppercase tracking-widest text-white/40">Wallet Balance</p>
               <p class="text-4xl font-bold tabular-nums">{{ formatBtc(profile.payload.balance_onchain) }}</p>
               <p class="text-sm text-white/50">BTC</p>
@@ -132,14 +141,14 @@
           </section>
 
           <!-- Create Loan -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] flex items-center justify-between gap-4 flex-wrap">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="space-y-1">
               <h2 class="text-base font-semibold">Create a Loan</h2>
               <p class="text-sm text-white/50">Borrow against your Bitcoin or lend for fixed returns.</p>
             </div>
             <router-link
               to="/allocate_liquidity"
-              class="shrink-0 inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold text-white hover:bg-secondary/80 transition"
+              class="shrink-0 inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold text-white hover:bg-secondary/80 transition w-full sm:w-auto"
             >
               Get started
               <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -149,18 +158,18 @@
           </section>
 
           <!-- Locked Collateral -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
             <h2 class="text-sm font-semibold uppercase tracking-widest text-white/40">Locked Collateral</h2>
             <UsersLiquidity />
           </section>
 
           <!-- Active DLCs -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03]">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03]">
             <UsersDLCS />
           </section>
 
           <!-- Referrals -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
             <h2 class="text-sm font-semibold uppercase tracking-widest text-white/40">Referrals</h2>
 
             <div class="space-y-3" v-if="refCode">
@@ -199,14 +208,14 @@
           </section>
 
           <!-- Mailing list -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] flex items-center justify-between gap-4 flex-wrap">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="space-y-1">
               <h2 class="text-base font-semibold">Stay in the loop</h2>
               <p class="text-sm text-white/50">Product updates and educational content, straight to your inbox.</p>
             </div>
             <button
               type="button"
-              class="shrink-0 inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white hover:border-secondary hover:text-secondary transition"
+              class="shrink-0 inline-flex items-center justify-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white hover:border-secondary hover:text-secondary transition w-full sm:w-auto"
               @click="showMailingList = true"
             >
               Subscribe
@@ -214,7 +223,7 @@
           </section>
 
           <!-- Add funds -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-5">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-5">
             <h2 class="text-sm font-semibold uppercase tracking-widest text-white/40">Add Funds</h2>
 
             <div v-if="addrError" class="flex items-start justify-between gap-3 p-4 rounded-xl border border-amber-400/20 bg-amber-400/[0.06] text-sm">
@@ -252,7 +261,7 @@
           </section>
 
           <!-- DLC History -->
-          <section class="p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
+          <section class="p-4 sm:p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] space-y-4">
             <h2 class="text-sm font-semibold uppercase tracking-widest text-white/40">DLC History</h2>
 
             <div v-if="pastError" class="p-3 rounded-xl border border-red-500/20 bg-red-500/[0.07] text-xs text-red-300">{{ pastError }}</div>
@@ -284,11 +293,11 @@
                       @keydown.enter.prevent="selectPast(r)"
                       @keydown.space.prevent="selectPast(r)"
                     >
-                      <td class="px-3 py-3 font-mono text-xs text-white/60">{{ r.idShort }}</td>
-                      <td class="px-3 py-3">{{ r.term }}</td>
-                      <td class="px-3 py-3">{{ r.ltv }}</td>
-                      <td class="px-3 py-3 text-green-300">{{ r.annualized }}</td>
-                      <td class="px-3 py-3 text-white/60 text-xs">{{ r.settledAt }}</td>
+                      <td class="px-3 py-3 font-mono text-xs text-white/60 whitespace-nowrap">{{ r.idShort }}</td>
+                      <td class="px-3 py-3 whitespace-nowrap">{{ r.term }}</td>
+                      <td class="px-3 py-3 whitespace-nowrap">{{ r.ltv }}</td>
+                      <td class="px-3 py-3 text-green-300 whitespace-nowrap">{{ r.annualized }}</td>
+                      <td class="px-3 py-3 text-white/60 text-xs whitespace-nowrap">{{ r.settledAt }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -297,13 +306,13 @@
           </section>
 
           <!-- Danger Zone -->
-          <section class="p-8 rounded-2xl border border-red-500/[0.15] bg-red-500/[0.05] flex items-center justify-between gap-4 flex-wrap">
+          <section class="p-4 sm:p-8 rounded-2xl border border-red-500/[0.15] bg-red-500/[0.05] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="space-y-1">
               <h2 class="text-base font-semibold text-red-300">Delete Account</h2>
               <p class="text-sm text-red-200/50">Permanently removes your account and data. Cannot be undone.</p>
             </div>
             <button
-              class="shrink-0 px-5 py-2.5 rounded-full bg-red-600/80 hover:bg-red-600 text-white text-sm font-semibold transition"
+              class="shrink-0 px-5 py-2.5 rounded-full bg-red-600/80 hover:bg-red-600 text-white text-sm font-semibold transition w-full sm:w-auto"
               @click="delOpen = true"
             >Delete account</button>
           </section>
@@ -327,7 +336,7 @@
   <transition name="fade">
     <div
       v-if="delOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center"
+      class="fixed inset-0 z-[100] flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="del-title"
@@ -422,7 +431,7 @@ import DlcDetails from '../components/DLCDetails.vue'
 import MailingListModal from '../components/MailingListModal.vue'
 import UsersLiquidity from '../components/UsersLiquidity.vue'
 import UsersDLCS from '../components/UsersDLCS.vue'
-import { isSignerAuthCode } from '../lib/authCode'
+import { isSignerAuthCode, isAdminAuthCode } from '../lib/authCode'
 
 // ---- Router & Auth ----
 const router = useRouter()
@@ -441,6 +450,7 @@ const profile = computed(() => {
   return { payload: u?.payload ?? u }
 })
 const userEmail = computed(() => String(profile.value?.payload?.email || '').trim().toLowerCase())
+const isAdmin = computed(() => isAdminAuthCode(profile.value?.payload?.auth_code))
 
 // ---- Local UI state ----
 const loading = computed(() => !!authLoading.value)

@@ -65,7 +65,7 @@
           <tbody>
             <tr><td class="font-semibold">Loan Amount</td><td>0.1 BTC standard increments</td></tr>
             <tr><td class="font-semibold">LTV Options</td><td>50% or 80%</td></tr>
-            <tr><td class="font-semibold">Terms</td><td>30, 90, 180 days, or 1 year</td></tr>
+            <tr><td class="font-semibold">Terms</td><td>365-day term</td></tr>
             <tr><td class="font-semibold">Payments</td><td>None — settles at term end</td></tr>
             <tr><td class="font-semibold">Currency</td><td>Bitcoin in, Bitcoin out</td></tr>
             <tr><td class="font-semibold">Credit Check</td><td>None required</td></tr>

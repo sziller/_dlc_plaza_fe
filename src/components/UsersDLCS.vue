@@ -1,5 +1,5 @@
 <template>
-  <section class="w-full h-full">
+  <section v-if="!hideWhenEmpty || loading || error || sortedData.length > 0" class="w-full h-full">
     <div class="w-full h-full mx-auto">
       <div class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col">
         <!-- Title -->
@@ -9,7 +9,7 @@
 
         <!-- Table Wrapper -->
         <div class="overflow-auto flex-1 min-h-0">
-          <table class="w-full table-auto border-collapse text-white">
+          <table class="min-w-max sm:w-full table-auto border-collapse text-white">
             <thead>
               <tr class="text-white text-left text-sm md:text-base">
                 <th
@@ -49,13 +49,13 @@
                 tabindex="0"
                 class="hover:bg-white/5 cursor-pointer transition border-b border-white/10"
               >
-                <td class="px-4 py-3">{{ row.dlcId }}</td>
-                <td class="px-4 py-3">{{ row.oracle }}</td>
-                <td class="px-4 py-3">{{ row.term }}</td>
-                <td class="px-4 py-3">{{ row.ltv }}</td>
-                <td class="px-4 py-3">{{ row.annualized }}</td>
-                <td class="px-4 py-3">{{ row.role }}</td>
-                <td class="px-4 py-3">
+                <td class="px-4 py-3 whitespace-nowrap">{{ row.dlcId }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">{{ row.oracle }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">{{ row.term }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">{{ row.ltv }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">{{ row.annualized }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">{{ row.role }}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
                   <span
                     class="inline-block px-2 py-1 rounded text-xs font-semibold"
                     :class="row.statusClass"
@@ -112,6 +112,13 @@ const columns = Object.freeze([
   { label: 'Role', key: 'role' },
   { label: 'Status', key: 'status' },
 ])
+
+// When true, this section renders nothing once loaded if there's no data —
+// used on pages (like the Create Loan page) where an empty "no DLCs"
+// placeholder would just be noise, unlike My Profile where it's expected.
+defineProps({
+  hideWhenEmpty: { type: Boolean, default: false },
+})
 
 // state
 const apiDlcs = ref([])

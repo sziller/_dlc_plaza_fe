@@ -273,13 +273,12 @@ import { getTopupAddressQR } from '../api/qr'
 import { useAuth } from '../composables/useAuth'
 import { useOracle } from '../composables/useOracle'
 import { generateIdempotencyKey } from '../lib/idempotencyKey'
+import { FEE_PCT } from '../lib/fees'
 import { notifySlackCollateralShortfall } from '../api/slackNotify'
 
 const router = useRouter()
 
 // -------- Collateral helper (matches OrderModal formula) ----------
-const FEE_PCT = 0.01
-
 function computeRequiredCollateralSats(loanSats, rateDecimal, _ltv, isBorrow) {
   if (!Number.isFinite(loanSats) || loanSats <= 0) return 0
   const r = Number.isFinite(rateDecimal) ? rateDecimal : 0

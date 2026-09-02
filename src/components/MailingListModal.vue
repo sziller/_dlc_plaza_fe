@@ -2,7 +2,7 @@
   <transition name="mailing-fade">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 py-8"
       role="dialog"
       aria-modal="true"
       aria-labelledby="mailing-title"

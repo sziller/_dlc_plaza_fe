@@ -1,7 +1,7 @@
 <template>
   <!-- Backdrop (click outside + Esc to close; keyboard focusable for Esc) -->
   <div
-    class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+    class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center"
     @click.self="$emit('close')"
     @keydown.esc="$emit('close')"
     tabindex="-1"
@@ -55,7 +55,7 @@
         <div><span class="font-semibold">Term:</span> {{ termText }}</div>
         <div><span class="font-semibold">Interest (for term):</span> {{ pct2(detail.interest) }}</div>
         <div><span class="font-semibold">Annualized yield:</span> {{ annualizedYieldText }}</div>
-        <div><span class="font-semibold">Fee:</span> 0.50%</div>
+        <div><span class="font-semibold">Fee:</span> {{ feeText }}</div>
 
         <div class="h-px bg-white/10 my-2"></div>
 
@@ -94,6 +94,9 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { deleteDlc } from '../api/dlcDelete'  // adjust path if needed
 import { satsForm } from '../functions/amount_formatting'
+import { FEE_PCT } from '../lib/fees'
+
+const feeText = `${(FEE_PCT * 100).toFixed(2)}%`
 
 const props = defineProps({
   dlc: { type: Object, required: true },

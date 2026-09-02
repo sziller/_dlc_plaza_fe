@@ -154,7 +154,7 @@ const faqs = [
   },
   {
     q: 'Can I repay early?',
-    a: 'Cadena contracts don\'t have an active repayment step. Settlement is automatic at term-end via the pre-signed CET. 1-year terms are standard; 90-day terms are available subject to lender match.',
+    a: 'Cadena contracts don\'t have an active repayment step. Settlement is automatic at term-end via the pre-signed CET. Contracts currently run on a 365-day term.',
   },
   {
     q: 'How is collateral managed?',
@@ -570,7 +570,7 @@ onBeforeUnmount(() => {
           </table>
         </div>
         <div class="reveal text-center mt-8">
-          <router-link to="/compare" class="cta-primary">
+          <router-link to="/compare" class="cta-primary cta-compare">
             See the full breakdown: Cadena vs. Ledn, Unchained &amp; SALT
           </router-link>
         </div>
@@ -882,6 +882,14 @@ onBeforeUnmount(() => {
 .cta-primary:hover {
   background-color: #7a4af0;
   box-shadow: 0 0 20px rgba(103,56,228,0.4);
+}
+@media (max-width: 640px) {
+  .cta-compare {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.35;
+    max-width: 320px;
+  }
 }
 .cta-outline-wrap {
   display: inline-flex;

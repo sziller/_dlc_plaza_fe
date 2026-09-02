@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin Panel — Cadena Bitcoin</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --dark:#081123; --card:#081123; --card-border:rgba(255,255,255,0.1);
+    --white-40:rgba(255,255,255,0.4); --white-50:rgba(255,255,255,0.5); --white-60:rgba(255,255,255,0.6);
+    --white-70:rgba(255,255,255,0.7); --secondary:#6738e3;
+    --red:#f87171; --red-bg:rgba(239,68,68,0.08); --red-border:rgba(239,68,68,0.2);
+    --amber:#fbbf24;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:#000;
+    color:#fff;
+    font-family: 'Inter', sans-serif;
+    padding: 60px 16px 80px;
+    min-height: 100vh;
+  }
+  a{ color:inherit; }
+  .wrap{ max-width: 1100px; margin: 0 auto; }
+  header.top{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom: 24px; }
+  header.top .kicker{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--white-40); margin:0 0 4px; }
+  header.top h1{ font-size: 30px; font-weight:700; margin:0; letter-spacing:-0.025em; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:999px;
+    background:rgba(255,255,255,0.06); border:1px solid var(--card-border); color:#fff;
+    font-size:14px; cursor:pointer; text-decoration:none; transition:background .15s ease;
+  }
+  .btn:hover{ background:rgba(255,255,255,0.1); }
+  .btn:disabled{ opacity:.4; cursor:default; }
+  .btn.primary{ background:var(--secondary); border-color:var(--secondary); font-weight:600; }
+  .btn.primary:hover{ background:rgba(103,56,227,0.8); border-color:rgba(103,56,227,0.8); }
+  .btn.danger{ background:rgba(220,38,38,0.8); border-color:rgba(220,38,38,0.8); font-weight:600; }
+  .btn.danger:hover{ background:rgba(220,38,38,1); }
+  .btn.link{ background:none; border:none; padding:0; color:var(--secondary); font-weight:600; font-size:13px; }
+  .btn.link.danger{ background:none; border:none; color:var(--red); }
+
+  section.card{
+    background:var(--card); border:1px solid var(--card-border); border-radius:16px;
+    padding: 24px 28px; margin-bottom: 20px;
+  }
+  section.card h2{ font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--white-40); margin:0; }
+  section.card p.hint{ font-size:12px; color:var(--white-40); margin:4px 0 16px; }
+  .row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .row.between{ justify-content:space-between; }
+
+  .banner{ display:flex; gap:10px; align-items:flex-start; padding:14px 16px; border-radius:14px; font-size:13px; }
+  .banner.error{ background:var(--red-bg); border:1px solid var(--red-border); color:#fca5a5; }
+  .banner.info{ background:rgba(255,255,255,0.04); border:1px solid var(--card-border); color:var(--white-60); }
+
+  table{ width:100%; border-collapse:collapse; font-size:13px; margin-top:14px; }
+  th{ text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:.05em; color:var(--white-40); font-weight:500; padding:8px 10px; white-space:nowrap; }
+  td{ padding:10px; border-top:1px solid rgba(255,255,255,0.06); color:var(--white-70); white-space:nowrap; }
+  tr:hover td{ background:rgba(255,255,255,0.03); }
+  .table-scroll{ overflow-x:auto; }
+  code, pre{ font-family: Consolas, "DejaVu Sans Mono", monospace; }
+  code.pill{ background:rgba(255,255,255,0.06); border:1px solid var(--card-border); border-radius:6px; padding:2px 6px; }
+  pre.json{
+    background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:12px;
+    padding:16px; font-size:12px; color:var(--white-70); overflow:auto; max-height:420px; margin-top:12px;
+  }
+
+  input[type=text], textarea{
+    background:rgba(255,255,255,0.05); border:1px solid var(--card-border); border-radius:10px;
+    color:#fff; padding:10px 14px; font-size:13px; font-family:inherit; outline:none;
+  }
+  input[type=text]:focus, textarea:focus{ border-color:rgba(255,255,255,0.25); }
+  textarea{ width:100%; resize:vertical; font-family:Consolas, monospace; font-size:12px; }
+  select{
+    background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); color:#fff;
+    border-radius:6px; padding:3px 6px; font-size:12px;
+  }
+  .field-group{ display:flex; align-items:center; gap:8px; padding:8px 12px; background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:10px; font-size:12px; }
+  .field-group span{ white-space:nowrap; color:var(--white-70); }
+  .checks{ display:flex; flex-wrap:wrap; gap: 6px 18px; font-size:13px; }
+  .checks label{ display:flex; align-items:center; gap:6px; color:var(--white-70); }
+  .checks label.sensitive{ color:var(--amber); }
+  .checks label.locked{ color:var(--white-40); }
+  .label-sm{ font-size:12px; font-weight:600; color:var(--white-50); margin:0 0 8px; }
+
+  .toolbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .toolbar input[type=text]{ flex:1; min-width:200px; }
+
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center;
+    z-index:100; padding:16px;
+  }
+  .modal{
+    width:min(520px,92vw); max-height:85vh; overflow:auto; background:var(--dark); border:1px solid var(--card-border);
+    border-radius:16px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal.wide{ width:min(760px,92vw); }
+  .modal h3{ margin:0 0 4px; font-size:18px; }
+  .modal p{ font-size:13px; color:var(--white-60); line-height:1.5; }
+  .modal .row.end{ justify-content:flex-end; margin-top:18px; }
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="kicker">Cadena Bitcoin</p>
+      <h1>Admin Panel</h1>
+    </div>
+    <a class="btn" href="/my-profile">&larr; Back to Profile</a>
+  </header>
+
+  <div id="access-checking" class="banner info">Checking permissions&hellip;</div>
+  <div id="access-denied" class="banner error hidden">
+    <div>
+      <strong>Access denied.</strong>
+      <div id="access-denied-detail" style="margin-top:2px;">Your account does not have admin privileges (auth_code &amp; 32).</div>
+    </div>
+  </div>
+
+  <main id="panel" class="hidden">
+
+    <!-- All DLCs -->
+    <section class="card">
+      <div class="row between">
+        <div>
+          <h2>All DLCs</h2>
+          <p class="hint">GET /dlcp/v0/all-dlcs — every contract in the DB, unmasked.</p>
+        </div>
+        <button class="btn" id="dlcs-load-btn">Load All DLCs</button>
+      </div>
+      <div id="dlcs-error" class="banner error hidden" style="margin-top:12px;"></div>
+      <p id="dlcs-message" class="hint hidden"></p>
+      <div class="table-scroll">
+        <table id="dlcs-table" class="hidden">
+          <thead><tr>
+            <th>DLC ID</th><th>Status</th><th>Product</th><th>Initiator</th><th>Acceptor</th><th>Interest</th><th>Created</th><th></th>
+          </tr></thead>
+          <tbody id="dlcs-tbody"></tbody>
+        </table>
+      </div>
+      <p id="dlcs-empty" class="hint hidden">No DLCs found.</p>
+    </section>
+
+    <!-- Users -->
+    <section class="card">
+      <h2>Users</h2>
+      <p class="hint">POST /auth/users-query — filter by auth_code bits, project fields. All bits default to "Any" (null), so an unmodified query returns every user.</p>
+
+      <p class="label-sm">auth_code filter</p>
+      <div class="row" id="mask-bits"></div>
+
+      <p class="label-sm" style="margin-top:18px;">Fields to return</p>
+      <div class="checks" id="fields-checks"></div>
+
+      <div class="row" style="margin-top:16px;">
+        <button class="btn primary" id="users-query-btn">Run Query</button>
+        <p id="users-message" class="hint hidden" style="margin:0;"></p>
+      </div>
+      <div id="users-error" class="banner error hidden" style="margin-top:12px;"></div>
+      <div class="table-scroll">
+        <table id="users-table" class="hidden">
+          <thead id="users-thead"></thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+      <p id="users-empty" class="hint hidden">No users matched.</p>
+    </section>
+
+    <!-- Transaction lookup -->
+    <section class="card">
+      <h2>Transaction Lookup</h2>
+      <p class="hint">GET /dlcp/v0/transaction — fetch a single Bitcoin transaction row by txid.</p>
+      <div class="row">
+        <input type="text" id="txid-input" placeholder="Transaction ID (hex)" style="flex:1; min-width:240px;">
+        <label class="field-group"><input type="checkbox" id="txid-include-inputs"> <span>Include inputs</span></label>
+        <button class="btn" id="txid-fetch-btn">Fetch</button>
+      </div>
+      <div id="txid-error" class="banner error hidden" style="margin-top:12px;"></div>
+      <pre id="txid-result" class="json hidden"></pre>
+    </section>
+
+    <!-- Admin Docs -->
+    <section class="card">
+      <h2>Admin Docs</h2>
+      <p class="hint">GET /dlcp/v0/admin-docs/&lt;name&gt; — backend-rendered documentation, opened in a new tab.</p>
+      <div class="toolbar">
+        <input type="text" id="doc-input" value="issue-discussion" spellcheck="false" autocomplete="off">
+        <button class="btn primary" id="doc-load-btn">Open in New Tab</button>
+      </div>
+      <div id="doc-error" class="banner error hidden" style="margin-top:12px;"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- JSON viewer modal -->
+<div id="json-modal" class="modal-backdrop hidden">
+  <div class="modal wide">
+    <div class="row between">
+      <h3 id="json-modal-title"></h3>
+      <button class="btn" id="json-modal-close">Close</button>
+    </div>
+    <pre id="json-modal-body" class="json"></pre>
+  </div>
+</div>
+
+<!-- Delete user modal -->
+<div id="delete-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <h3>Delete user</h3>
+    <p>This permanently deletes <strong id="delete-modal-email" style="color:#fff;"></strong> from the Auth-DB. Cannot be undone.</p>
+    <p>Type <code class="pill">DELETE</code> to confirm.</p>
+    <input type="text" id="delete-modal-input" placeholder='Type "DELETE"' style="width:100%;" autocomplete="off" spellcheck="false">
+    <div id="delete-modal-error" class="banner error hidden" style="margin-top:12px;"></div>
+    <div class="row end">
+      <button class="btn" id="delete-modal-cancel">Cancel</button>
+      <button class="btn danger" id="delete-modal-confirm" disabled>Delete user</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ API base + auth (mirrors src/config.ts / src/api/token.ts) ============ */
+  function getApiUrl() {
+    var host = window.location.hostname.replace(/^www\./, '');
+    if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') return 'https://cadenabitcoin.com';
+    if (host === 'staging.purabitcoin.com') return 'https://staging.purabitcoin.com';
+    if (host === 'localhost' || host === '127.0.0.1') return '';
+    return 'https://staging.purabitcoin.com';
+  }
+  var API_URL = getApiUrl();
+
+  function getToken() {
+    try { return window.localStorage.getItem('token'); } catch (e) { return null; }
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  async function apiRequest(path, opts) {
+    opts = opts || {};
+    var url = API_URL + path;
+    var headers = Object.assign({ Accept: 'application/json' }, opts.headers || {});
+    var token = getToken();
+    if (token) headers.Authorization = 'Bearer ' + token;
+    if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
+
+    var res;
+    try {
+      res = await fetch(url, {
+        method: opts.method || 'GET',
+        headers: headers,
+        body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+      });
+    } catch (e) {
+      throw new Error('Network error: request failed.');
+    }
+
+    var data = null;
+    try { data = await res.json(); } catch (e) { /* no body */ }
+
+    if (!res.ok) {
+      var detail = (data && (data.message || data.detail)) || null;
+      if (res.status === 401) throw new Error('401 Unauthorized: Invalid or expired token.');
+      if (res.status === 403) throw new Error('403 Forbidden: Admin privileges required.');
+      if (res.status === 404) throw new Error('404 Not Found: ' + (detail || 'Resource not found.'));
+      if (res.status === 422) throw new Error('422 Unprocessable Entity: ' + (detail || 'Invalid request.'));
+      throw new Error(res.status + ' Error: ' + (detail || 'Request failed.'));
+    }
+    return data;
+  }
+
+  function isAdminAuthCode(value) {
+    var code = Number(value);
+    return Number.isFinite(code) && (code & 32) === 32;
+  }
+
+  function fmtDate(v) {
+    if (v == null || v === '') return '—';
+    var n = Number(v);
+    var ms = Number.isFinite(n) ? (n < 1e12 ? n * 1000 : n) : Date.parse(String(v));
+    return Number.isFinite(ms) ? new Date(ms).toLocaleString() : '—';
+  }
+  function shortId(s) { return s ? String(s).slice(0, 8) : '—'; }
+  function formatCell(v) {
+    if (v == null) return '—';
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    if (typeof v === 'object') return JSON.stringify(v);
+    return String(v);
+  }
+  function prettyJson(data) { try { return JSON.stringify(data, null, 2); } catch (e) { return String(data); } }
+  function showEl(el) { el.classList.remove('hidden'); }
+  function hideEl(el) { el.classList.add('hidden'); }
+
+  /* ============ Access gate ============ */
+  var accessChecking = document.getElementById('access-checking');
+  var accessDenied = document.getElementById('access-denied');
+  var accessDeniedDetail = document.getElementById('access-denied-detail');
+  var panel = document.getElementById('panel');
+
+  async function checkAccess() {
+    var token = getToken();
+    if (!token) {
+      hideEl(accessChecking);
+      accessDeniedDetail.innerHTML = 'You are not logged in. <a href="/login?redirect=/admin.html" style="color:var(--secondary);font-weight:600;">Log in</a> with an admin account.';
+      showEl(accessDenied);
+      return;
+    }
+    try {
+      var res = await apiRequest('/app/auth/users-own-profile', { method: 'GET' });
+      var payload = (res && res.payload) || null;
+      hideEl(accessChecking);
+      if (payload && isAdminAuthCode(payload.auth_code)) {
+        showEl(panel);
+        initPanel();
+      } else {
+        showEl(accessDenied);
+      }
+    } catch (e) {
+      hideEl(accessChecking);
+      accessDeniedDetail.textContent = e.message || 'Could not verify your account.';
+      showEl(accessDenied);
+    }
+  }
+
+  /* ============ JSON viewer modal ============ */
+  var jsonModal = document.getElementById('json-modal');
+  var jsonModalTitle = document.getElementById('json-modal-title');
+  var jsonModalBody = document.getElementById('json-modal-body');
+  function viewJson(title, data) {
+    jsonModalTitle.textContent = title;
+    jsonModalBody.textContent = prettyJson(data);
+    showEl(jsonModal);
+  }
+  document.getElementById('json-modal-close').addEventListener('click', function () { hideEl(jsonModal); });
+  jsonModal.addEventListener('click', function (e) { if (e.target === jsonModal) hideEl(jsonModal); });
+
+  function initPanel() {
+    initAllDlcs();
+    initUsersQuery();
+    initTransactionLookup();
+    initAdminDocs();
+  }
+
+  /* ============ Admin Docs ============ */
+  // Fetches a backend-rendered HTML document (GET /dlcp/v0/admin-docs/<name>,
+  // which requires the bearer token) and opens it in a new tab. The tab is
+  // opened synchronously on click — before the fetch — so browser popup
+  // blockers treat it as a direct result of the user's click; it's then
+  // filled in once the authenticated response comes back.
+  function initAdminDocs() {
+    var input = document.getElementById('doc-input');
+    var loadBtn = document.getElementById('doc-load-btn');
+    var errorEl = document.getElementById('doc-error');
+
+    async function openDoc() {
+      var name = input.value.trim();
+      if (!name) return;
+      hideEl(errorEl);
+
+      var win = window.open('', '_blank');
+      if (!win) {
+        errorEl.textContent = 'Popup blocked — allow popups for this site to open the doc.';
+        showEl(errorEl);
+        return;
+      }
+      win.document.write('Loading…');
+
+      loadBtn.disabled = true;
+      try {
+        var res = await fetch(API_URL + '/app/dlcp/v0/admin-docs/' + encodeURIComponent(name), {
+          headers: (function () { var t = getToken(); return t ? { Authorization: 'Bearer ' + t } : {}; })(),
+        });
+        var html = await res.text();
+        if (!res.ok) throw new Error(res.status + ' Error: could not load "' + name + '".');
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+      } catch (e) {
+        win.close();
+        errorEl.textContent = e.message || 'Failed to load document.';
+        showEl(errorEl);
+      } finally {
+        loadBtn.disabled = false;
+      }
+    }
+
+    loadBtn.addEventListener('click', openDoc);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') openDoc(); });
+  }
+
+  /* ============ All DLCs ============ */
+  function initAllDlcs() {
+    var loadBtn = document.getElementById('dlcs-load-btn');
+    var errorEl = document.getElementById('dlcs-error');
+    var messageEl = document.getElementById('dlcs-message');
+    var table = document.getElementById('dlcs-table');
+    var tbody = document.getElementById('dlcs-tbody');
+    var emptyEl = document.getElementById('dlcs-empty');
+    var dlcRows = [];
+
+    loadBtn.addEventListener('click', async function () {
+      loadBtn.disabled = true;
+      loadBtn.textContent = 'Loading…';
+      hideEl(errorEl);
+      try {
+        var res = await apiRequest('/app/dlcp/v0/all-dlcs', { method: 'GET' });
+        dlcRows = Array.isArray(res && res.payload) ? res.payload : [];
+        messageEl.textContent = (res && res.message) || '';
+        showEl(messageEl);
+        renderRows();
+      } catch (e) {
+        errorEl.textContent = e.message || 'Failed to load DLCs.';
+        showEl(errorEl);
+      } finally {
+        loadBtn.disabled = false;
+        loadBtn.textContent = 'Reload';
+      }
+    });
+
+    function renderRows() {
+      tbody.innerHTML = '';
+      if (!dlcRows.length) { hideEl(table); showEl(emptyEl); return; }
+      hideEl(emptyEl);
+      dlcRows.forEach(function (d) {
+        var id = d.dlc_id || d.tmp_cntr_id;
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + escapeHtml(shortId(id)) + '</td>' +
+          '<td>' + escapeHtml(d.status || '—') + '</td>' +
+          '<td>' + escapeHtml(d.product_id || '—') + '</td>' +
+          '<td>' + escapeHtml(d.ini_email || '—') + '</td>' +
+          '<td>' + escapeHtml(d.acc_email || '—') + '</td>' +
+          '<td>' + (d.interest != null ? escapeHtml(d.interest) + '%' : '—') + '</td>' +
+          '<td>' + escapeHtml(fmtDate(d.created_at)) + '</td>' +
+          '<td><button class="btn link">View JSON</button></td>';
+        tr.querySelector('button').addEventListener('click', function () {
+          viewJson('DLC ' + shortId(id), d);
+        });
+        tbody.appendChild(tr);
+      });
+      showEl(table);
+    }
+  }
+
+  /* ============ Users query ============ */
+  var DEFAULT_FIELDS = ['uuid', 'uuid_parent', 'auth_code', 'xpub', 'balance_onchain', 'balance_derived', 'timestamp', 'disabled', 'referral_code', 'referral_first_touch_ts'];
+  var EXTRA_FIELDS = ['psswd_hsh', 'balance_onchain_immature', 'balance_mempool', 'balance_wallet', 'par_referral_code', 'referral_src_url', 'visitor_id', 'conf_tkn_hash', 'kyc_status'];
+  var SENSITIVE_FIELDS = ['psswd_hsh', 'conf_tkn_hash'];
+  var MASK_BIT_LABELS = ['Admin (32)', 'Bit 4 (16)', 'Bit 3 (8)', 'Signer (4)', 'Bit 1 (2)', 'Subscriber (1)'];
+
+  function initUsersQuery() {
+    var maskContainer = document.getElementById('mask-bits');
+    var fieldsContainer = document.getElementById('fields-checks');
+    var queryBtn = document.getElementById('users-query-btn');
+    var messageEl = document.getElementById('users-message');
+    var errorEl = document.getElementById('users-error');
+    var table = document.getElementById('users-table');
+    var thead = document.getElementById('users-thead');
+    var tbody = document.getElementById('users-tbody');
+    var emptyEl = document.getElementById('users-empty');
+    var userRows = [];
+
+    var maskSelects = MASK_BIT_LABELS.map(function (label) {
+      var group = document.createElement('div');
+      group.className = 'field-group';
+      var span = document.createElement('span');
+      span.textContent = label;
+      var select = document.createElement('select');
+      // Default to "Any" (null) on every bit, so an unmodified query returns all users.
+      select.innerHTML = '<option value="any" selected>Any</option><option value="true">Set (1)</option><option value="false">Unset (0)</option>';
+      group.appendChild(span);
+      group.appendChild(select);
+      maskContainer.appendChild(group);
+      return select;
+    });
+
+    // Always send a full-length mask, one entry per bit, defaulting every
+    // untouched bit to null (wildcard) rather than omitting the field.
+    function buildMask() {
+      return maskSelects.map(function (s) { return s.value === 'any' ? null : s.value === 'true'; });
+    }
+
+    var emailLabel = document.createElement('label');
+    emailLabel.className = 'locked';
+    emailLabel.innerHTML = '<input type="checkbox" checked disabled> email';
+    fieldsContainer.appendChild(emailLabel);
+
+    var fieldCheckboxes = [];
+    DEFAULT_FIELDS.concat(EXTRA_FIELDS).forEach(function (f) {
+      var label = document.createElement('label');
+      var sensitive = SENSITIVE_FIELDS.indexOf(f) !== -1;
+      if (sensitive) label.className = 'sensitive';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = f;
+      cb.checked = DEFAULT_FIELDS.indexOf(f) !== -1;
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(' ' + f + (sensitive ? ' (sensitive)' : '')));
+      fieldsContainer.appendChild(label);
+      fieldCheckboxes.push(cb);
+    });
+
+    function selectedFields() {
+      return ['email'].concat(fieldCheckboxes.filter(function (cb) { return cb.checked; }).map(function (cb) { return cb.value; }));
+    }
+
+    queryBtn.addEventListener('click', async function () {
+      queryBtn.disabled = true;
+      queryBtn.textContent = 'Querying…';
+      hideEl(errorEl);
+      try {
+        var fields = selectedFields();
+        var body = { fields: fields, mask: buildMask() };
+        var res = await apiRequest('/app/auth/users-query', { method: 'POST', body: body });
+        userRows = Array.isArray(res && res.payload) ? res.payload : [];
+        messageEl.textContent = (res && res.message) || '';
+        showEl(messageEl);
+        renderRows(fields);
+      } catch (e) {
+        errorEl.textContent = e.message || 'Failed to query users.';
+        showEl(errorEl);
+      } finally {
+        queryBtn.disabled = false;
+        queryBtn.textContent = 'Run Query';
+      }
+    });
+
+    function renderRows(columns) {
+      thead.innerHTML = '<tr>' + columns.map(function (c) { return '<th>' + escapeHtml(c) + '</th>'; }).join('') + '<th></th></tr>';
+      tbody.innerHTML = '';
+      if (!userRows.length) { hideEl(table); showEl(emptyEl); return; }
+      hideEl(emptyEl);
+      userRows.forEach(function (u) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = columns.map(function (c) { return '<td>' + escapeHtml(formatCell(u[c])) + '</td>'; }).join('');
+        var actionTd = document.createElement('td');
+        if (u.email) {
+          var delBtn = document.createElement('button');
+          delBtn.className = 'btn link danger';
+          delBtn.textContent = 'Delete';
+          delBtn.addEventListener('click', function () { openDeleteModal(u.email, function () {
+            userRows = userRows.filter(function (row) { return row.email !== u.email; });
+            renderRows(columns);
+          }); });
+          actionTd.appendChild(delBtn);
+        }
+        tr.appendChild(actionTd);
+        tbody.appendChild(tr);
+      });
+      showEl(table);
+    }
+  }
+
+  /* ============ Delete user modal ============ */
+  var deleteModal = document.getElementById('delete-modal');
+  var deleteModalEmail = document.getElementById('delete-modal-email');
+  var deleteModalInput = document.getElementById('delete-modal-input');
+  var deleteModalError = document.getElementById('delete-modal-error');
+  var deleteModalConfirmBtn = document.getElementById('delete-modal-confirm');
+  var deleteModalCancelBtn = document.getElementById('delete-modal-cancel');
+  var deleteOnSuccess = null;
+  var deleteTargetEmail = null;
+
+  function openDeleteModal(email, onSuccess) {
+    deleteTargetEmail = email;
+    deleteOnSuccess = onSuccess;
+    deleteModalEmail.textContent = email;
+    deleteModalInput.value = '';
+    deleteModalConfirmBtn.disabled = true;
+    hideEl(deleteModalError);
+    showEl(deleteModal);
+  }
+  function closeDeleteModal() { hideEl(deleteModal); }
+  deleteModalCancelBtn.addEventListener('click', closeDeleteModal);
+  deleteModal.addEventListener('click', function (e) { if (e.target === deleteModal) closeDeleteModal(); });
+  deleteModalInput.addEventListener('input', function () {
+    deleteModalConfirmBtn.disabled = deleteModalInput.value !== 'DELETE';
+  });
+  deleteModalConfirmBtn.addEventListener('click', async function () {
+    if (deleteModalInput.value !== 'DELETE') return;
+    deleteModalConfirmBtn.disabled = true;
+    deleteModalConfirmBtn.textContent = 'Deleting…';
+    hideEl(deleteModalError);
+    try {
+      await apiRequest('/app/auth/existing-user?email=' + encodeURIComponent(deleteTargetEmail), { method: 'DELETE' });
+      if (deleteOnSuccess) deleteOnSuccess();
+      closeDeleteModal();
+    } catch (e) {
+      deleteModalError.textContent = e.message || 'Failed to delete user.';
+      showEl(deleteModalError);
+      deleteModalConfirmBtn.disabled = false;
+    } finally {
+      deleteModalConfirmBtn.textContent = 'Delete user';
+    }
+  });
+
+  /* ============ Transaction lookup ============ */
+  function initTransactionLookup() {
+    var input = document.getElementById('txid-input');
+    var includeInputs = document.getElementById('txid-include-inputs');
+    var fetchBtn = document.getElementById('txid-fetch-btn');
+    var errorEl = document.getElementById('txid-error');
+    var resultEl = document.getElementById('txid-result');
+
+    fetchBtn.addEventListener('click', async function () {
+      var txid = input.value.trim();
+      if (!txid) return;
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = 'Fetching…';
+      hideEl(errorEl);
+      hideEl(resultEl);
+      try {
+        var qs = '?txid=' + encodeURIComponent(txid) + '&include_inputs=' + (includeInputs.checked ? 'true' : 'false');
+        var res = await apiRequest('/app/dlcp/v0/transaction' + qs, { method: 'GET' });
+        resultEl.textContent = prettyJson((res && res.payload) != null ? res.payload : res);
+        showEl(resultEl);
+      } catch (e) {
+        errorEl.textContent = e.message || 'Failed to fetch transaction.';
+        showEl(errorEl);
+      } finally {
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = 'Fetch';
+      }
+    });
+  }
+
+  checkAccess();
+})();
+</script>
+</body>
+</html>

@@ -57,7 +57,7 @@ export const exploreUseCases = [
         <li>Decide how much additional exposure you want.</li>
         <li>Borrow additional Bitcoin based on risk tolerance and objectives.</li>
         <li>Use borrowed Bitcoin to increase your total position.</li>
-        <li>Loan is settled in Bitcoin at term end (30, 90, 180 days, or 1 year).</li>
+        <li>Loan is settled in Bitcoin at term end (365-day term).</li>
       </ul>
 
       <p class="mt-4 font-semibold text-white">The Process</p>
@@ -102,7 +102,7 @@ export const exploreUseCases = [
       <p class="mt-4 font-semibold text-white">The Process</p>
       <ol class="list-decimal pl-5 space-y-1 text-white/80">
         <li>Register and download Cadena’s signer app.</li>
-        <li>Choose lending terms (30, 90, 180 days, or 1 year).</li>
+        <li>Loans currently run on a 365-day term.</li>
         <li>Set your desired yield rate; use a market or limit order.</li>
         <li>Match with borrowers.</li>
         <li>Earn Bitcoin-denominated returns.</li>

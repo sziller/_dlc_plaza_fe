@@ -6,3 +6,11 @@
 body {
   @apply bg-black text-white font-sans;
 }
+
+/* No page should ever scroll or drag sideways — anything wider than the
+   viewport (a transform, an absolutely-positioned element, etc.) should
+   clip rather than open up horizontal scroll room. */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
