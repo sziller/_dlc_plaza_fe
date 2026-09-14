@@ -6,20 +6,6 @@
         <h1 class="title">Endgame</h1>
         <p class="subtitle">Bitcoin, Sovereign Debt, and the Return of Sound Capital</p>
         <p class="author">By <strong>Kevin Bell</strong> &nbsp;·&nbsp; Founder, Cadena Bitcoin</p>
-
-        <div class="charitable-banner">
-          <strong>50% of proceeds fund kids' surf programs at
-            <a href="https://surfdojo.org" target="_blank" rel="noopener noreferrer">SurfDojo</a>
-            (Playa Hermosa, Costa Rica) and
-            <a href="https://www.bitcoinbeach.com" target="_blank" rel="noopener noreferrer">Bitcoin Beach</a>
-            (El Zonte, El Salvador).
-          </strong>
-          Pay in Bitcoin.
-        </div>
-
-        <div class="cta-row">
-          <a href="/Endgame_Kevin_Bell.pdf" class="btn btn-primary">Download free PDF</a>
-        </div>
       </div>
     </header>
 
@@ -221,7 +207,7 @@ function copy(text, key) {
 
   /* HERO */
   .hero {
-    padding: 56px 0 32px;
+    padding: 56px 0 8px;
   }
   .eyebrow {
     color: var(--accent);
@@ -251,20 +237,9 @@ function copy(text, key) {
   .author {
     font-size: 15px;
     color: var(--text-muted);
-    margin-bottom: 40px;
+    margin-bottom: 8px;
   }
   .author strong { color: var(--text); font-weight: 600; }
-  .charitable-banner {
-    background: var(--accent-soft);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 18px 22px;
-    margin-top: 32px;
-    font-size: 15px;
-    line-height: 1.5;
-  }
-  .charitable-banner strong { color: var(--accent); font-weight: 600; }
-  .charitable-banner a { color: var(--accent); text-decoration: underline; }
   .cta-row {
     display: flex;
     gap: 14px;

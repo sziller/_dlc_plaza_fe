@@ -85,6 +85,7 @@
               <a href="https://github.com/CadenaWizard/cryptlib" class="hover:text-white transition-colors" rel="noopener noreferrer" target="_blank">
                 GitHub <span class="sr-only">(opens in a new tab)</span>
               </a>
+              <span class="block text-xs text-white/40 mt-0.5">Public access returning soon</span>
             </li>
             <li>
               <a href="https://linkedin.com/company/cadenabitcoin" class="hover:text-white transition-colors" rel="noopener noreferrer" target="_blank">

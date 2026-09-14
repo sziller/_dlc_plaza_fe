@@ -167,6 +167,7 @@
           </svg>
           <span>View on GitHub</span>
         </a>
+        <p class="text-xs text-white/40 mt-2">Public access returning soon</p>
       </section>
     </div>
   </main>
