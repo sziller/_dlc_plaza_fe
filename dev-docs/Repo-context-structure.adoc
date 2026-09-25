@@ -1,0 +1,1913 @@
+= Cadena Website Repository - Future-Agent Context Window
+:toc:
+:sectnums:
+
+[[context:purpose]]
+== Purpose
+
+Repository:: `nbell0805/cadena-website`
+
+This document provides medium- and high-level architectural context for future ChatGPT instances, coding agents, and contributors working on the Cadena Website repository.
+
+The repository is primarily developed by Noah.
+
+The intended contribution model for other contributors and agents is:
+
+* understand the existing architecture and Sources of Truth before making changes;
+* implement isolated proposals on dedicated branches;
+* keep changes narrow and reviewable;
+* submit Pull Requests rather than taking implicit ownership of unrelated frontend architecture;
+* avoid remapping the complete repository for every new task.
+
+This document is intentionally not a detailed Vue, JavaScript, or frontend-programming guide.
+
+Its purpose is to establish:
+
+* repository identity and canonical baseline;
+* subsystem boundaries;
+* Sources of Truth;
+* runtime and service relationships;
+* authentication boundaries;
+* build and release conventions;
+* environment behavior;
+* deployment knowledge and unresolved areas;
+* safe working conventions for future agents.
+
+[[context:baseline]]
+== Canonical Repository Baseline
+
+Canonical branch:: `main`
+
+Observed canonical HEAD during this audit::
+
+[source,text]
+-----------------------------------------------------------------------------
+abaea0b3 Release v2.4.1
+-----------------------------------------------------------------------------
+
+Package version::
+
+[source,text]
+-----------------------------------------------------------------------------
+2.4.1
+-----------------------------------------------------------------------------
+
+The `v2.4.1` tag is attached to the preceding version-bump commit rather than the final release-artifact commit.
+
+The observed release sequence is conceptually:
+
+[source,text]
+-----------------------------------------------------------------------------
+version bump + semantic-version tag
+        |
+        v
+build application
+        |
+        v
+create release ZIP
+        |
+        v
+Release vX.Y.Z commit
+-----------------------------------------------------------------------------
+
+Therefore, the canonical `main` HEAD may legitimately be one commit ahead of the corresponding semantic-version tag.
+
+The repository also contains parallel or historical patch lines such as:
+
+[source,text]
+-----------------------------------------------------------------------------
+v2.3.23-patch
+-----------------------------------------------------------------------------
+
+Later-looking `v2.3.x` tags may coexist with the current `v2.4.x` line.
+
+Do not determine the canonical source branch by semantic-version ordering alone.
+
+Before implementing work, always establish the intended target branch.
+
+[[context:repository-sync]]
+== Repository Synchronization Rule
+
+Before beginning new work against `main`, synchronize the local reference explicitly.
+
+Only use the hard-reset form when the local `main` is intended to be a clean mirror of `origin/main` and contains no local work that must be preserved.
+
+[source,bash]
+-----------------------------------------------------------------------------
+git fetch --prune origin
+git switch main
+git reset --hard origin/main
+-----------------------------------------------------------------------------
+
+`git fetch --prune origin` removes stale local remote-tracking references for branches already deleted remotely.
+
+It does not delete remote GitHub branches.
+
+`git reset --hard origin/main` changes only the local `main` working state.
+
+Remote branches are deleted only by an explicit remote deletion command, for example:
+
+[source,bash]
+-----------------------------------------------------------------------------
+git push origin --delete <branch-name>
+-----------------------------------------------------------------------------
+
+Do not use an old local experimental branch as the basis for new work.
+
+[[context:technology]]
+== Technology Stack
+
+The primary application is a Vue-based web application.
+
+[cols="1,3", options="header"]
+|=============================================================================
+| Area
+| Technology
+
+| Frontend framework
+| Vue 3
+
+| Routing
+| Vue Router
+
+| Development and build tool
+| Vite 5
+
+| Languages
+| JavaScript, TypeScript, Vue Single-File Components
+
+| Styling
+| Tailwind CSS
+
+| HTTP client
+| Axios
+
+| Charts
+| Chart.js
+
+| Calendar
+| FullCalendar
+
+| Date input
+| Vue Datepicker
+
+| Icons
+| Heroicons, Lucide, Iconify
+
+| Package manager
+| npm
+
+| Module model
+| ES modules
+
+| Browser testing and prerendering
+| Playwright, Puppeteer
+
+| Image processing
+| Sharp and related scripts
+|=============================================================================
+
+Additional application dependencies and tooling include:
+
+* Amplitude analytics;
+* Amplitude session replay;
+* Markdown rendering;
+* Stripe;
+* Resend;
+* Three.js;
+* SEO generation;
+* RSS generation;
+* structured-data generation;
+* social-image generation;
+* PDF export.
+
+The repository should therefore be treated as more than a simple Vue SPA.
+
+[[context:architecture]]
+== High-Level Application Architecture
+
+The main browser runtime can be understood as:
+
+[source,text]
+-----------------------------------------------------------------------------
+Browser
+  |
+  v
+main.js
+  |
+  +-- global CSS
+  +-- router
+  +-- Axios initialization
+  +-- referral handling
+  +-- cookie-consent handling
+  +-- analytics
+  +-- SEO
+  +-- structured data
+  +-- Blog/CMS token restoration
+  |
+  v
+App.vue
+  |
+  +-- Navbar
+  +-- Server Status Banner
+  +-- routed page
+  +-- Cookie Banner
+  +-- ChatBot
+  +-- global overlays / mailing-list UI
+  |
+  v
+Vue Router
+  |
+  +-- transactional application pages
+  +-- public marketing pages
+  +-- Knowledge Hub
+  +-- Blog administration
+  +-- calculators
+  +-- landing pages
+-----------------------------------------------------------------------------
+
+[[context:source-topology]]
+== Source Topology
+
+The primary source areas are:
+
+[source,text]
+-----------------------------------------------------------------------------
+main.js
+
+src/
+  App.vue
+  config.ts
+
+  api/
+  blogApi/
+  components/
+  composables/
+  data/
+  functions/
+  hooks/
+  lib/
+  pages/
+  plugins/
+  router/
+  types/
+  views/
+    lp/
+
+api/
+  webhook/
+
+scripts/
+
+public/
+-----------------------------------------------------------------------------
+
+Their high-level responsibilities are:
+
+[cols="1,3", options="header"]
+|=============================================================================
+| Path
+| Responsibility
+
+| `main.js`
+| Global application bootstrap
+
+| `src/App.vue`
+| Global application shell
+
+| `src/router/`
+| URL routing, route metadata and route guards
+
+| `src/views/`
+| Main routed application and public pages
+
+| `src/views/lp/`
+| Dedicated landing pages
+
+| `src/pages/`
+| Knowledge Hub and Blog CMS pages
+
+| `src/components/`
+| Reusable UI and business components
+
+| `src/composables/`
+| Shared reactive state and application behavior
+
+| `src/hooks/`
+| Lower-level reusable runtime hooks
+
+| `src/lib/`
+| Cross-cutting helpers and domain utilities
+
+| `src/functions/`
+| Standalone formatting and helper functions
+
+| `src/data/`
+| Static and content data
+
+| `src/api/`
+| Cadena transactional backend client
+
+| `src/blogApi/`
+| Separate Knowledge Hub backend client
+
+| `src/plugins/`
+| SEO and structured-data plugins
+
+| `src/types/`
+| TypeScript interfaces and data-shape documentation
+
+| `api/`
+| Website-commerce and serverless backend
+
+| `api/webhook/`
+| Website-commerce webhook handlers
+
+| `scripts/`
+| Build, prerender, release, SEO and asset tooling
+
+| `public/`
+| Static files served directly
+|=============================================================================
+
+[[context:sot]]
+== Sources of Truth
+
+[[context:sot:bootstrap]]
+=== Application Bootstrap
+
+Source of Truth:: `main.js`
+
+Responsibilities include:
+
+* creating the Vue application;
+* installing the router;
+* loading global CSS;
+* initializing global Axios behavior;
+* restoring Blog/CMS authentication;
+* capturing referrals;
+* applying cookie-consent state;
+* conditionally initializing analytics;
+* installing SEO behavior;
+* installing structured-data behavior;
+* mounting the application.
+
+Normal feature changes should rarely require modification of this file.
+
+[[context:sot:shell]]
+=== Global Application Shell
+
+Source of Truth:: `src/App.vue`
+
+This file owns application-wide layout and shared global UI.
+
+Observed responsibilities include:
+
+* Navbar;
+* Server Status Banner;
+* routed page outlet;
+* Cookie Banner;
+* ChatBot;
+* mailing-list and exit-intent UI;
+* consumption of global authenticated-user state;
+* profile refresh behavior;
+* global logout reactions;
+* layout behavior beneath fixed global elements.
+
+Modify this file only for genuinely application-wide behavior.
+
+[[context:sot:routing]]
+=== Routing
+
+Source of Truth:: `src/router/index.js`
+
+This file is the primary Source of Truth for:
+
+* URL-to-page mapping;
+* page names;
+* lazy-loaded page imports;
+* SEO metadata attached to routes;
+* redirects;
+* route-level Cadena authentication;
+* route-level Blog administrator authentication;
+* route navigation behavior.
+
+When locating the implementation responsible for a visible browser URL, start here.
+
+[source,text]
+-----------------------------------------------------------------------------
+browser URL
+    |
+    v
+src/router/index.js
+    |
+    v
+corresponding src/views/... or src/pages/... file
+-----------------------------------------------------------------------------
+
+[[context:sot:auth]]
+=== Cadena Authenticated-User State
+
+Primary Source of Truth:: `src/composables/useAuth.ts`
+
+It owns or coordinates:
+
+* current token state;
+* current user/profile state;
+* logged-in state;
+* profile refresh;
+* user-profile caching;
+* logout;
+* token-health integration;
+* authentication synchronization between browser contexts.
+
+The shared authentication variables are module-level reactive state and are therefore shared across callers of `useAuth()`.
+
+[[context:sot:token]]
+=== Cadena JWT Persistence
+
+Primary Source of Truth:: `src/api/token.ts`
+
+The normal Cadena application JWT is stored in browser local storage under:
+
+[source,text]
+-----------------------------------------------------------------------------
+token
+-----------------------------------------------------------------------------
+
+Conceptually:
+
+[source,text]
+-----------------------------------------------------------------------------
+localStorage["token"]
+-----------------------------------------------------------------------------
+
+The module also maintains an in-memory copy for runtime use.
+
+[[context:sot:http]]
+=== Global Axios Behavior
+
+Primary Source of Truth:: `src/api/axiosSetup.ts`
+
+This is core infrastructure.
+
+Responsibilities include:
+
+* identifying whether an HTTP request targets the Cadena backend;
+* attaching the Cadena JWT only to Cadena backend requests;
+* avoiding accidental JWT disclosure to third-party services;
+* observing successful Cadena backend responses;
+* broadcasting authentication invalidation on `401` and `403`;
+* signaling backend reachability or failure on network and server errors.
+
+Do not casually modify this file.
+
+[[context:sot:environment]]
+=== Transactional Backend Selection
+
+Primary runtime configuration:: `src/config.ts`
+
+This file selects the Cadena backend URL according to the browser hostname.
+
+Observed conceptual mapping:
+
+[source,text]
+-----------------------------------------------------------------------------
+cadenabitcoin.com
+purabitcoin.com
+    |
+    v
+production Cadena backend
+
+
+staging.purabitcoin.com
+    |
+    v
+staging Cadena backend
+
+
+localhost
+127.0.0.1
+    |
+    v
+relative API paths
+    |
+    v
+Vite development proxy
+-----------------------------------------------------------------------------
+
+This file also contains default Product and Oracle-oriented configuration such as:
+
+[source,text]
+-----------------------------------------------------------------------------
+DEFAULT_ORACLE
+DEFAULT_SYMBOL
+ORACLE_LABELS
+-----------------------------------------------------------------------------
+
+Comments inside this file are not necessarily authoritative for current development proxy behavior.
+
+For current proxy behavior, use `vite.config.mjs`.
+
+[[context:runtime-dev]]
+== Development Runtime Topology
+
+The current Vite development server is configured on:
+
+[source,text]
+-----------------------------------------------------------------------------
+localhost:3000
+-----------------------------------------------------------------------------
+
+Observed Vite proxy behavior:
+
+[source,text]
+-----------------------------------------------------------------------------
+localhost:3000
+  |
+  +-- /app/*
+  |      |
+  |      v
+  |   https://staging.purabitcoin.com
+  |
+  +-- /api/*
+  |      |
+  |      v
+  |   http://localhost:3001
+  |
+  +-- /webhook/*
+         |
+         v
+      http://localhost:3001
+-----------------------------------------------------------------------------
+
+This is important.
+
+The current frontend development environment defaults `/app/*` traffic to the remote staging Cadena backend.
+
+A stale source comment elsewhere claims that `/app` is proxied to a local backend on port `8000`.
+
+That comment does not match the observed current `vite.config.mjs`.
+
+For development proxy behavior, `vite.config.mjs` takes precedence.
+
+[[context:service-boundaries]]
+== Service Boundaries
+
+The repository interacts with several materially different backend and service domains.
+
+These must remain conceptually separate.
+
+[[context:service:transactional]]
+=== Cadena Transactional Backend
+
+Frontend client location:: `src/api/`
+
+Primary URL namespaces::
+
+[source,text]
+-----------------------------------------------------------------------------
+/app/auth/*
+/app/dlcp/*
+-----------------------------------------------------------------------------
+
+Observed responsibilities include:
+
+* user registration;
+* user authentication;
+* registration confirmation;
+* own profile;
+* own derived balance;
+* account deletion;
+* server status;
+* DLC listing;
+* DLC lookup;
+* DLC deletion;
+* liquidity simulation;
+* liquidity allocation;
+* liquidity withdrawal;
+* liquidity market;
+* Product queries;
+* Oracle listing and query;
+* Oracle price;
+* Signer QR information;
+* top-up and deposit address;
+* Cadena defaults;
+* application download;
+* contact email.
+
+Observed endpoint examples include:
+
+[source,text]
+-----------------------------------------------------------------------------
+/app/auth/new-user
+/app/auth/token
+/app/auth/confirm-registration
+/app/auth/users-own-profile
+/app/auth/balance-own-derived
+/app/auth/self
+/app/auth/contact-email
+
+/app/dlcp/v0/server-status
+/app/dlcp/v0/user-dlcs
+/app/dlcp/v0/user-dlc-by-id
+/app/dlcp/v0/user-offer
+/app/dlcp/v0/user-s-qr
+/app/dlcp/v0/topup-address
+/app/dlcp/v0/cadena-defaults
+/app/dlcp/v0/download-app
+/app/dlcp/v0/product-query
+/app/dlcp/v0/liqu_alloc_simulate
+
+/app/dlcp/v1/oracles
+/app/dlcp/v1/oracle-price
+/app/dlcp/v1/liqu-allocation-requ
+/app/dlcp/v1/liqu-withdrawal-requ
+/app/dlcp/v1/liquidity-market
+/app/dlcp/v1/user-liqu-query
+-----------------------------------------------------------------------------
+
+This is the service boundary relevant to the core Cadena / DLC Plaza transactional application.
+
+[[context:service:website]]
+=== Website-Commerce Backend
+
+Repository location::
+
+[source,text]
+-----------------------------------------------------------------------------
+api/
+api/webhook/
+-----------------------------------------------------------------------------
+
+This subsystem is separate from the Cadena transactional backend.
+
+Observed files include:
+
+[source,text]
+-----------------------------------------------------------------------------
+api/create-invoice.js
+api/create-stripe-session.js
+api/get-shipping-cost.js
+api/kit-subscribe.js
+api/send-collateral-email.js
+api/setup.js
+api/validate-address.js
+
+api/webhook/lulu.js
+api/webhook/sbp.js
+api/webhook/stripe.js
+-----------------------------------------------------------------------------
+
+Internal helper modules include:
+
+[source,text]
+-----------------------------------------------------------------------------
+api/_lulu.js
+api/_shipping.js
+-----------------------------------------------------------------------------
+
+Observed responsibilities include:
+
+* Stripe checkout-session creation;
+* Stripe webhook processing;
+* Bitcoin/SBP invoice creation;
+* SBP webhook processing;
+* Lulu print-job creation;
+* Lulu shipping-cost calculation;
+* Lulu webhook setup;
+* Google-based address validation;
+* Kit subscriber registration and tagging;
+* Resend-based email sending.
+
+This subsystem is primarily related to:
+
+* Endgame and book commerce;
+* book payment;
+* fulfillment;
+* shipping;
+* related marketing and email integrations.
+
+Do not confuse this service with `src/api/`, which targets the Cadena transactional backend.
+
+[[context:service:blog]]
+=== Knowledge Hub / Blog Backend
+
+Frontend client location:: `src/blogApi/`
+
+Observed base service::
+
+[source,text]
+-----------------------------------------------------------------------------
+https://blog.cadenabitcoin.dev
+-----------------------------------------------------------------------------
+
+This service has a separate authentication domain.
+
+Observed API responsibilities include:
+
+* public list of published posts;
+* public post lookup by slug;
+* administrator list of posts;
+* administrator lookup by ID;
+* create post;
+* update post;
+* delete post;
+* Blog/CMS login.
+
+Observed endpoint families include:
+
+[source,text]
+-----------------------------------------------------------------------------
+/api/blog/posts
+/api/blog/posts/:slug
+
+/api/admin/blog/posts
+/api/admin/blog/posts/:id
+-----------------------------------------------------------------------------
+
+[[context:service:external]]
+=== External Third-Party Services
+
+The repository communicates with external services in addition to Cadena-owned services.
+
+Observed integrations include:
+
+* Amplitude;
+* Plausible;
+* Coinbase;
+* CoinGecko;
+* Stripe;
+* Lulu;
+* SBP;
+* Kit;
+* Resend;
+* Google address APIs;
+* Attio;
+* Railway-hosted chatbot service;
+* Calendly;
+* Apple App Store;
+* Google Play;
+* external QR generation;
+* FlagCDN;
+* Google Fonts;
+* social and media platforms;
+* external partner websites.
+
+Third-party calls must remain isolated from Cadena authentication headers.
+
+The global Axios setup contains explicit protection against accidentally attaching the Cadena JWT to unrelated external HTTP services.
+
+[[context:authentication]]
+== Authentication Domains
+
+There are at least two independent authentication systems.
+
+Do not merge them.
+
+[[context:authentication:cadena]]
+=== Cadena Application User Authentication
+
+Token persistence::
+
+[source,text]
+-----------------------------------------------------------------------------
+localStorage["token"]
+-----------------------------------------------------------------------------
+
+Used for core Cadena transactional functionality.
+
+Known route-level authenticated page::
+
+[source,text]
+-----------------------------------------------------------------------------
+/my-profile
+-----------------------------------------------------------------------------
+
+Other routes may still enforce authentication internally at feature level.
+
+Absence of `requiresAuth` metadata does not prove that every operation inside a page is anonymously usable.
+
+[[context:authentication:blog]]
+=== Blog / Knowledge Hub Administrator Authentication
+
+Token persistence::
+
+[source,text]
+-----------------------------------------------------------------------------
+localStorage["blog_token"]
+-----------------------------------------------------------------------------
+
+Used for Blog/CMS administration.
+
+Known protected routes include:
+
+[source,text]
+-----------------------------------------------------------------------------
+/admin/blog
+/admin/blog/new
+/admin/blog/edit/:id
+-----------------------------------------------------------------------------
+
+Unauthenticated access to those pages is redirected to:
+
+[source,text]
+-----------------------------------------------------------------------------
+/admin/login
+-----------------------------------------------------------------------------
+
+The Cadena user token and Blog administrator token are separate security domains.
+
+[[context:product-areas]]
+== Main Product and Website Areas
+
+The repository combines several different functional concerns into one project.
+
+[[context:product-areas:transactional]]
+=== Transactional Cadena Application
+
+Includes functionality such as:
+
+* registration;
+* login;
+* user profile;
+* registration state;
+* Signer pairing;
+* balances;
+* liquidity;
+* market and rate selection;
+* DLC display and history;
+* top-up and deposit information;
+* Product interaction;
+* Oracle interaction.
+
+[[context:product-areas:public]]
+=== Public Marketing Website
+
+Includes pages and features such as:
+
+* homepage;
+* About;
+* FAQ;
+* Security;
+* Contact;
+* comparison pages;
+* loan explanation pages;
+* lender explanation pages;
+* partner content;
+* acquisition landing pages;
+* App Store and Play Store links;
+* public technical material.
+
+[[context:product-areas:calculator]]
+=== Calculators
+
+Observed calculators include:
+
+* loan calculator;
+* liquidation calculator;
+* settlement calculator;
+* Bitcoin allocation calculator.
+
+Some calculator paths use Cadena price APIs and also contain fallback or direct third-party price-service calls.
+
+[[context:product-areas:content]]
+=== Knowledge and Content
+
+The repository contains both:
+
+* legacy and static article views;
+* newer Knowledge Hub and Blog content.
+
+These are not the same implementation model.
+
+Static article routes exist directly inside the main Vue repository.
+
+The newer Knowledge Hub obtains content through the separate Blog backend.
+
+[[context:product-areas:commerce]]
+=== Endgame / Book Commerce
+
+This subsystem includes:
+
+* Endgame book pages;
+* checkout;
+* shipping calculation;
+* address validation;
+* Stripe payment;
+* Bitcoin/SBP payment;
+* Lulu print fulfillment;
+* order-confirmation flow.
+
+This subsystem primarily depends on the separate root `api/` website backend.
+
+[[context:profile]]
+== User Profile Architecture
+
+`src/views/MyProfile.vue` is a significant aggregation page rather than a simple user-information form.
+
+Observed UI responsibilities include:
+
+* pending registration state;
+* email;
+* XPUB;
+* registration level;
+* wallet balance;
+* derived and liquid balance;
+* create-loan navigation;
+* locked collateral;
+* active and user DLCs;
+* referrals;
+* mailing-list entry;
+* top-up and deposit address;
+* deposit QR;
+* historical DLCs;
+* account deletion.
+
+Because multiple unrelated business concerns converge on this page, it should be considered a medium- to high-risk location for broad edits.
+
+Prefer narrow changes when touching this page.
+
+[[context:api-contract]]
+== Frontend API Contract Caution
+
+TypeScript interfaces under:
+
+[source,text]
+-----------------------------------------------------------------------------
+src/types/
+-----------------------------------------------------------------------------
+
+are useful documentation but are not guaranteed to be the final authoritative backend contract.
+
+Observed reasons include:
+
+* some API modules use `any`;
+* profile handling accepts more than one historical response shape;
+* compatibility normalization exists in shared auth and profile logic.
+
+Therefore, when modifying frontend/backend integration:
+
+. inspect the relevant `src/api/...` module;
+. inspect the actual backend endpoint and model;
+. inspect current frontend consumption;
+. update frontend types only after establishing the real runtime contract.
+
+Do not infer backend semantics from frontend interfaces alone.
+
+[[context:state]]
+== Browser Persistence and Shared State
+
+Observed persistent state includes:
+
+[cols="1,3", options="header"]
+|=============================================================================
+| Storage
+| Purpose
+
+| `localStorage["token"]`
+| Cadena application JWT
+
+| `localStorage["blog_token"]`
+| Blog/CMS administrator token
+
+| Session storage
+| User-profile cache and temporary UI state
+
+| Local storage
+| Cookie consent and selected UI/preferences
+
+| Cookies
+| Referral tracking and related browser state
+|=============================================================================
+
+Additional persisted state exists for concerns including:
+
+* exit-intent suppression;
+* mailing-list submission state;
+* profile caching;
+* rate and UI preferences;
+* allocation-page notification suppression;
+* referral attribution.
+
+[[context:build]]
+== Build Model
+
+Primary package scripts include:
+
+[source,text]
+-----------------------------------------------------------------------------
+npm run dev
+npm run build
+npm run build:staging
+npm run build:prod
+npm run preview
+npm run release
+-----------------------------------------------------------------------------
+
+Additional scripts exist for:
+
+* SEO generation;
+* prerendering;
+* RSS generation;
+* PDF.js copying;
+* hero-image generation;
+* logo generation;
+* social-image generation;
+* image resizing;
+* SEO preview tests;
+* PDF export;
+* heading audits.
+
+The build process is therefore layered.
+
+Conceptually:
+
+[source,text]
+-----------------------------------------------------------------------------
+source
+  |
+  v
+prebuild generation
+  |
+  v
+Vite build
+  |
+  v
+prerendering
+  |
+  v
+dist/
+-----------------------------------------------------------------------------
+
+Do not assume:
+
+[source,text]
+-----------------------------------------------------------------------------
+npm run build
+-----------------------------------------------------------------------------
+
+is functionally identical to:
+
+[source,text]
+-----------------------------------------------------------------------------
+npm run build:staging
+-----------------------------------------------------------------------------
+
+or:
+
+[source,text]
+-----------------------------------------------------------------------------
+npm run build:prod
+-----------------------------------------------------------------------------
+
+[[context:build:staging]]
+=== Staging Build
+
+Observed staging build behavior includes:
+
+[source,text]
+-----------------------------------------------------------------------------
+VITE_NOINDEX=1
+SITE_BASE=https://staging.purabitcoin.com
+-----------------------------------------------------------------------------
+
+The build then runs Vite and prerendering.
+
+Staging is explicitly configured for no-index behavior.
+
+[[context:build:production]]
+=== Production Build
+
+Observed production build behavior includes:
+
+[source,text]
+-----------------------------------------------------------------------------
+VITE_NOINDEX=0
+SITE_BASE=https://cadenabitcoin.com
+-----------------------------------------------------------------------------
+
+The build then runs Vite and prerendering.
+
+[[context:build:vite]]
+=== Vite-Specific Build Behavior
+
+`vite.config.mjs` contains explicit dependency chunking for major libraries including:
+
+* Vue;
+* Vue Router;
+* FullCalendar;
+* Markdown;
+* Vue Datepicker;
+* Axios;
+* Amplitude.
+
+It additionally contains render-performance logic that alters generated stylesheet loading behavior.
+
+Treat build configuration as infrastructure.
+
+[[context:release]]
+== Release Model
+
+Primary release script:: `scripts/release.sh`
+
+Observed release procedure:
+
+. verify that the current branch is `main`;
+. verify that the working tree is clean;
+. run `npm version patch`;
+. read the new package version;
+. run `npm run build`;
+. ZIP the contents of `dist`;
+. name the archive using:
++
+[source,text]
+-----------------------------------------------------------------------------
+cadena-website-vX.Y.Z-dist.zip
+-----------------------------------------------------------------------------
+. add the ZIP to Git;
+. commit using:
++
+[source,text]
+-----------------------------------------------------------------------------
+Release vX.Y.Z
+-----------------------------------------------------------------------------
+. push commits;
+. push tags.
+
+The release script therefore deliberately stores packaged release ZIPs in Git.
+
+No GitHub Actions workflow was found in the audited current checkout.
+
+[[context:artifacts]]
+== Repository Artifact Policy
+
+Current `main` was explicitly checked during this audit.
+
+Observed tracked counts:
+
+[source,text]
+-----------------------------------------------------------------------------
+node_modules tracked: 0
+dist tracked: 0
+release ZIPs tracked: 83
+-----------------------------------------------------------------------------
+
+Therefore:
+
+* current `main` does not track `node_modules`;
+* current `main` does not track `dist`;
+* current `main` deliberately retains a large historical set of release ZIP archives.
+
+Release ZIPs include historical application distributions through the current release line.
+
+Examples include:
+
+[source,text]
+-----------------------------------------------------------------------------
+cadena-website-v2.3.24-dist.zip
+cadena-website-v2.3.25-dist.zip
+cadena-website-v2.4.0-dist.zip
+cadena-website-v2.4.1-dist.zip
+-----------------------------------------------------------------------------
+
+Other historical archives such as:
+
+[source,text]
+-----------------------------------------------------------------------------
+site_build_2025-08-18.zip
+src.zip
+-----------------------------------------------------------------------------
+
+also exist.
+
+Future agents should exclude ZIP archives from normal source-code analysis unless specifically investigating a packaged historical release.
+
+Do not infer source structure by scanning archive contents during ordinary work.
+
+[[context:gitignore]]
+== Ignore Policy
+
+Current `.gitignore` excludes areas including:
+
+* `node_modules/`;
+* `dist/`;
+* caches;
+* generated feeds;
+* logs;
+* `.env*`;
+* IDE metadata;
+* `.vercel`;
+* `.netlify`.
+
+Ignore rules do not automatically remove files that were already tracked before the ignore rule was introduced.
+
+[[context:environment]]
+== Environment Configuration
+
+Observed environment files include:
+
+[source,text]
+-----------------------------------------------------------------------------
+.env
+.env.staging
+.env.production
+-----------------------------------------------------------------------------
+
+These files are currently tracked despite `.gitignore` containing:
+
+[source,text]
+-----------------------------------------------------------------------------
+.env*
+-----------------------------------------------------------------------------
+
+Treat them as potentially sensitive.
+
+Do not:
+
+* print their values casually;
+* paste secrets into issues;
+* copy secrets into external context windows;
+* alter unrelated credentials as part of feature work.
+
+Known client and build configuration key families include:
+
+* Book API base URL;
+* cookie domain;
+* referral settings;
+* indexing controls;
+* staging SEO controls;
+* site base;
+* Google Search Console verification;
+* Slack and collateral notification configuration.
+
+Observed server-side root `api/` configuration requires credentials and settings for services including:
+
+* Stripe;
+* Lulu;
+* SBP;
+* Google address validation;
+* Kit;
+* Resend.
+
+Only environment-variable names should normally be surfaced during architectural inspection unless values are explicitly required for an authorized operational task.
+
+[[context:deployment]]
+== Deployment Status
+
+Deployment is only partially mapped.
+
+Known facts:
+
+* `vercel.json` exists;
+* Vercel routing, redirect and header behavior is configured;
+* Vercel Git-triggered deployment is explicitly disabled;
+* local `.netlify/` metadata exists;
+* `.netlify/` is gitignored;
+* the local Netlify metadata contains Noah-specific absolute filesystem paths;
+* repository history contains Vercel and staging/deployment-related commits;
+* repository documentation describes build commands;
+* no canonical repository-wide staging or production deployment procedure was identified.
+
+The local Netlify metadata contains paths similar to:
+
+[source,text]
+-----------------------------------------------------------------------------
+/Users/noahbell/Developer/work/cadena-website/dist
+-----------------------------------------------------------------------------
+
+Therefore `.netlify/` must not be treated as portable deployment infrastructure or as a deployment Source of Truth.
+
+Known Vercel behavior includes:
+
+* redirecting `www.cadenabitcoin.com` to the apex domain;
+* redirecting legacy Blog URLs to Knowledge Hub routes;
+* SPA rewrites;
+* APK download headers.
+
+However, the existence of `vercel.json` does not by itself prove that Vercel is the current primary production deployment mechanism.
+
+[[context:deployment:unknown]]
+=== Deployment Information Not Yet Established
+
+The audit did not establish:
+
+* exact current production deployment mechanism;
+* exact current staging deployment mechanism;
+* operator responsible for deployment;
+* credential ownership;
+* whether release ZIPs are manually uploaded;
+* where packaged ZIPs are ultimately deployed;
+* exact role of current Netlify linkage;
+* exact role of Vercel beyond routing and serverless configuration.
+
+Future agents must not invent these answers.
+
+Resolve them only when relevant to the requested task.
+
+[[context:docs]]
+== Documentation Status
+
+Existing repository documentation is useful but not repository-wide architectural documentation.
+
+[[context:docs:authoring]]
+=== Knowledge Hub Authoring Documentation
+
+Relevant file:: `CONTENT_AUTHORING.md`
+
+This document describes Knowledge Hub and Blog authoring concerns such as:
+
+* where content is edited;
+* admin-form fields;
+* Markdown content;
+* special blocks and shortcodes;
+* images;
+* ordering and navigation;
+* SEO;
+* pre-publish checks.
+
+Treat it as operational documentation for content authoring.
+
+[[context:docs:feature]]
+=== Feature-Specific Documentation
+
+Files include:
+
+[source,text]
+-----------------------------------------------------------------------------
+QUICK_START_GUIDE.md
+IMPLEMENTATION_SUMMARY.md
+IMAGE_GENERATION_GUIDE.md
+REMAINING_ARTICLES_TEMPLATE.md
+-----------------------------------------------------------------------------
+
+These primarily relate to previously implemented public Bitcoin-lending, resource and content work.
+
+They are useful historical and feature-specific references.
+
+Do not treat them as the Source of Truth for:
+
+* overall repository architecture;
+* deployment;
+* transactional backend semantics;
+* release operations beyond what they explicitly document.
+
+[[context:docs:missing]]
+=== Missing Repository-Wide Documentation
+
+No canonical repository-wide document was identified for:
+
+* architecture;
+* environment topology;
+* service boundaries;
+* production deployment;
+* staging deployment;
+* contribution workflow.
+
+This context document is intended to fill the architecture and bootstrap portion of that gap.
+
+[[context:hosting]]
+== Hosting and URL Behavior
+
+`vercel.json` defines hosting-oriented behavior including:
+
+* canonical-host redirect;
+* Blog route redirects;
+* SPA fallback behavior;
+* direct handling of static resources;
+* APK response headers.
+
+Examples of conceptual redirects:
+
+[source,text]
+-----------------------------------------------------------------------------
+www.cadenabitcoin.com/*
+    |
+    v
+cadenabitcoin.com/*
+
+
+/blog
+    |
+    v
+/knowledge-hub
+
+
+/blog/:slug
+    |
+    v
+/article/:slug
+-----------------------------------------------------------------------------
+
+Do not confuse hosting rewrite behavior with Vue Router route definitions.
+
+Both layers may affect URL handling.
+
+[[context:seo]]
+== SEO and Prerendering
+
+SEO is a first-class subsystem.
+
+Relevant areas include:
+
+[source,text]
+-----------------------------------------------------------------------------
+src/router/index.js
+src/plugins/seo.js
+src/plugins/structured-data.js
+
+scripts/gen-seo-files.mjs
+scripts/prerender.mjs
+scripts/gen-rss-feed.mjs
+scripts/test-seo-previews.mjs
+-----------------------------------------------------------------------------
+
+The router contains extensive route-level metadata including:
+
+* title;
+* description;
+* robots settings;
+* article metadata;
+* image metadata;
+* author information;
+* publication and modification timestamps;
+* categories and tags.
+
+Build scripts additionally generate:
+
+* sitemap-oriented files;
+* robots behavior;
+* RSS;
+* Atom;
+* prerendered pages.
+
+Changes to public routes may therefore have both runtime and build-time SEO implications.
+
+[[context:analytics]]
+== Analytics and Consent
+
+The application contains multiple analytics mechanisms.
+
+Observed global behavior includes:
+
+* Plausible pageview tracking;
+* Amplitude;
+* optional Amplitude session replay;
+* cookie-consent gating;
+* different behavior on mobile and desktop.
+
+Analytics initialization is partly consent-dependent.
+
+Do not introduce new analytics or tracking calls without considering:
+
+* cookie consent;
+* privacy behavior;
+* staging and production differences;
+* existing analytics architecture.
+
+[[context:referrals]]
+== Referral Tracking
+
+Referral behavior is implemented under:
+
+[source,text]
+-----------------------------------------------------------------------------
+src/lib/referral.ts
+-----------------------------------------------------------------------------
+
+Observed concerns include:
+
+* URL referral capture;
+* referral cookies;
+* configurable cookie domain;
+* configurable TTL;
+* legacy referral-cookie cleanup.
+
+Referral state therefore crosses:
+
+* URL handling;
+* browser cookies;
+* registration and business logic.
+
+Do not treat referral parameters as simple presentational URL parameters.
+
+[[context:server-status]]
+== Server Status
+
+Backend reachability is represented as shared frontend state.
+
+Relevant modules include:
+
+[source,text]
+-----------------------------------------------------------------------------
+src/api/serverStatus.ts
+src/composables/useServerStatus.ts
+src/components/ServerStatusBanner.vue
+src/api/axiosSetup.ts
+-----------------------------------------------------------------------------
+
+Global Axios behavior contributes to server-up and server-down state based on:
+
+* successful backend requests;
+* network errors;
+* timeout conditions;
+* backend server failures.
+
+This is application-wide infrastructure.
+
+[[context:branch-discipline]]
+== Branch Discipline for Future Contributors and Agents
+
+All proposals should be made on dedicated branches from the current target branch.
+
+Typical branch naming:
+
+[source,text]
+-----------------------------------------------------------------------------
+feature/<specific-change>
+fix/<specific-bug>
+docs/<specific-doc-change>
+-----------------------------------------------------------------------------
+
+Do not reuse an old generic test branch for production work.
+
+Before branch creation, synchronize `main` when it contains no local work that must be preserved.
+
+[source,bash]
+-----------------------------------------------------------------------------
+git fetch --prune origin
+git switch main
+git reset --hard origin/main
+-----------------------------------------------------------------------------
+
+Then create the working branch.
+
+[source,bash]
+-----------------------------------------------------------------------------
+git switch -c feature/example-change
+-----------------------------------------------------------------------------
+
+Keep Pull Requests narrow.
+
+Do not mix an intended functional change with opportunistic cleanup of:
+
+* historical release ZIPs;
+* unrelated Vue architecture;
+* old comments;
+* repository ownership metadata;
+* environment-file policy;
+* unused branches;
+* unrelated SEO;
+* unrelated formatting.
+
+Such cleanup should be separately scoped if required.
+
+[[context:remote-branches]]
+== Remote Branch Safety
+
+The repository contains numerous Noah-owned remote branches.
+
+Normal fetch and synchronization operations do not delete them.
+
+Commands such as:
+
+[source,bash]
+-----------------------------------------------------------------------------
+git fetch --prune origin
+-----------------------------------------------------------------------------
+
+only clean stale local references to already-deleted remote branches.
+
+Do not use:
+
+[source,bash]
+-----------------------------------------------------------------------------
+git push origin --delete <branch-name>
+-----------------------------------------------------------------------------
+
+unless remote branch deletion is explicitly intended and authorized.
+
+[[context:change-location]]
+== Change-Location Guide
+
+Use this as a first navigation map for future tasks.
+
+[cols="1,3", options="header"]
+|=============================================================================
+| Requested Concern
+| Start Inspection Here
+
+| Browser URL or page mapping
+| `src/router/index.js`
+
+| Whole-page behavior
+| corresponding `src/views/` or `src/pages/`
+
+| Landing page
+| `src/views/lp/`
+
+| Shared visual or business component
+| `src/components/`
+
+| Shared authenticated-user behavior
+| `src/composables/useAuth.ts`
+
+| JWT persistence
+| `src/api/token.ts`
+
+| Global HTTP and authentication behavior
+| `src/api/axiosSetup.ts`
+
+| Cadena transactional backend call
+| relevant module under `src/api/`
+
+| Blog/CMS call
+| `src/blogApi/`
+
+| Book, payment or fulfillment backend
+| root `api/`
+
+| Blog route and admin access
+| `src/router/index.js` and `src/blogApi/`
+
+| SEO route metadata
+| `src/router/index.js`
+
+| Global SEO behavior
+| `src/plugins/`
+
+| Build and prerendering
+| `package.json`, `vite.config.mjs`, `scripts/`
+
+| Development proxy
+| `vite.config.mjs`
+
+| Release
+| `scripts/release.sh`
+
+| Hosting rewrites
+| `vercel.json`
+
+| Referral behavior
+| `src/lib/referral.ts`
+
+| Server availability state
+| `src/api/serverStatus.ts`, `src/composables/useServerStatus.ts`
+
+| Knowledge Hub authoring
+| `CONTENT_AUTHORING.md`
+|=============================================================================
+
+[[context:workflow]]
+== Recommended Future-Agent Workflow
+
+When a new issue is assigned, use this sequence:
+
+[source,text]
+-----------------------------------------------------------------------------
+load this context document
+        |
+        v
+read the requested issue
+        |
+        v
+identify affected subsystem
+        |
+        v
+inspect only relevant runtime path and Sources of Truth
+        |
+        v
+confirm target branch
+        |
+        v
+create dedicated branch
+        |
+        v
+implement narrow change
+        |
+        v
+run relevant build and verification
+        |
+        v
+review diff
+        |
+        v
+push branch
+        |
+        v
+open Pull Request for Noah
+-----------------------------------------------------------------------------
+
+The goal is not to re-learn the entire repository on every task.
+
+The goal is to extend this context only when a concrete issue reveals new architectural information.
+
+[[context:verification]]
+== Verification Principles
+
+There is no single observed repository-wide test suite that should be assumed to validate every change.
+
+Verification should therefore be subsystem-specific.
+
+Possible validation surfaces include:
+
+* Vite development runtime;
+* generic build;
+* staging build;
+* production build;
+* SEO preview tests;
+* prerendering;
+* affected route behavior;
+* affected API request behavior;
+* manual browser verification.
+
+Do not assume compilation alone proves that an integration works.
+
+Do not run broad release operations merely to validate a small feature branch.
+
+[[context:local-env]]
+== Local Contributor Environment
+
+During the audit, the contributor workstation did not have the `node` executable available on the active shell `PATH`.
+
+Therefore, before attempting frontend build or runtime verification, establish the project's Node and npm runtime.
+
+Do not install or select a Node version blindly without first checking whether the repository or Noah's workflow defines one elsewhere.
+
+The shell prompt also showed an active Python virtual environment:
+
+[source,text]
+-----------------------------------------------------------------------------
+(.venv)
+-----------------------------------------------------------------------------
+
+That Python environment is unrelated to the Vue/Vite frontend.
+
+It does not provide Node, npm, or JavaScript dependency isolation.
+
+[[context:cautions]]
+== Known Architectural Cautions
+
+. Frontend TypeScript interfaces are useful but are not guaranteed to be the authoritative backend contract.
+
+. Some frontend API handling supports historical response shapes.
+
+. `src/config.ts` contains at least one stale development-proxy comment. Use `vite.config.mjs` for actual current proxy behavior.
+
+. Cadena user authentication and Blog administrator authentication are separate systems.
+
+. The repository combines transactional application functionality, marketing content, Blog/CMS, analytics, SEO and book-commerce functionality.
+
+. Absence of route-level `requiresAuth` metadata does not prove that every operation on the route is anonymously available.
+
+. Environment files are currently tracked despite `.gitignore` ignoring `.env*`.
+
+. Environment values must be treated as potentially sensitive.
+
+. Vercel configuration exists, but it does not establish the current complete deployment procedure.
+
+. Local Netlify metadata exists but contains machine-specific configuration and is not a deployment Source of Truth.
+
+. The release process deliberately commits release ZIP archives.
+
+. Current `main` does not track `node_modules` or `dist`.
+
+. Historical branches or releases may have different repository hygiene and should not be assumed to reflect current `main`.
+
+. Package and repository metadata may contain stale historical ownership information. The actual Git remote and current branch history are more authoritative.
+
+[[context:unresolved]]
+== Explicitly Unresolved Areas
+
+The following items were not established during the medium- and high-level audit and must not be guessed:
+
+* exact current production deployment procedure;
+* exact current staging deployment procedure;
+* production and staging operator responsibility;
+* deployment credential ownership;
+* role of release ZIPs in the final deployment operation;
+* exact current Vercel versus Netlify responsibility;
+* exact command used to run the root `api/` website backend locally on port `3001`;
+* required Node.js version;
+* authoritative Product business semantics;
+* authoritative Oracle business semantics;
+* authoritative meaning of all `auth_code` values;
+* full implementation behavior of every individual Vue page and component;
+* branch-specific functionality on Noah's unmerged remote branches.
+
+These should be resolved only when required by a concrete issue.
+
+[[context:not-sot]]
+== Information That Must Not Be Treated as Source of Truth
+
+Do not automatically treat the following as authoritative:
+
+* old local branches;
+* old release ZIP contents;
+* comments contradicting current runtime configuration;
+* `.netlify` machine-local metadata;
+* historical implementation summaries;
+* semantic-version ordering across parallel branches;
+* frontend interfaces when backend contracts differ;
+* unmerged feature branches;
+* stale package repository metadata.
+
+Prefer, in order:
+
+. current target branch;
+. current executable and runtime configuration;
+. relevant implementation module;
+. authoritative backend API and model;
+. current build configuration;
+. explicitly maintained operational documentation.
+
+[[context:agent-summary]]
+== Minimal Agent Summary
+
+A future agent should begin with the following compact mental model:
+
+[source,text]
+-----------------------------------------------------------------------------
+Repository:
+  nbell0805/cadena-website
+
+Canonical audited line:
+  main
+  v2.4.1
+  HEAD abaea0b3
+
+Frontend:
+  Vue 3
+  Vite
+  Vue Router
+  TypeScript / JavaScript
+  Tailwind CSS
+
+Core startup:
+  main.js
+    -> App.vue
+    -> src/router/index.js
+    -> views / pages / components
+
+Cadena backend client:
+  src/api/
+  /app/auth/*
+  /app/dlcp/*
+
+Main authentication:
+  src/composables/useAuth.ts
+  localStorage["token"]
+
+Blog backend:
+  src/blogApi/
+  https://blog.cadenabitcoin.dev
+  localStorage["blog_token"]
+
+Website and book backend:
+  root api/
+  Stripe
+  SBP
+  Lulu
+  Kit
+  Resend
+  address validation
+
+Development:
+  Vite localhost:3000
+
+  /app
+    -> staging.purabitcoin.com
+
+  /api
+    -> localhost:3001
+
+  /webhook
+    -> localhost:3001
+
+Release:
+  scripts/release.sh
+  main only
+  npm version patch
+  build
+  ZIP dist
+  commit ZIP
+  push commits and tags
+
+Repository artifacts:
+  node_modules tracked: 0
+  dist tracked: 0
+  release ZIPs tracked: 83
+
+Deployment:
+  not fully mapped
+  Vercel configuration exists
+  Git deployment disabled
+  local Netlify metadata is not authoritative
+
+Contribution model:
+  synchronize target branch
+  create narrow feature / fix / docs branch
+  inspect only affected subsystem
+  verify relevant build and runtime path
+  submit Pull Request to Noah
+-----------------------------------------------------------------------------
