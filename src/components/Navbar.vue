@@ -114,25 +114,22 @@
           <router-link :class="linkClass" to="/allocate_liquidity">Create Loan</router-link>
 
           <!-- Resources dropdown -->
-          <div class="relative" data-dropdown>
-            <button
-              type="button"
-              :class="['flex items-center gap-1.5 transition-colors duration-150 rounded-xl px-3 py-1.5 hover:bg-white/[0.05]', linkClass]"
-              aria-haspopup="menu"
-              :aria-expanded="resourcesDropdownOpen"
-              @click="resourcesDropdownOpen = !resourcesDropdownOpen"
-            >
+          <div class="relative group">
+            <button :class="['flex items-center gap-1 transition', linkClass]" aria-haspopup="menu" aria-expanded="false">
               <span>Resources</span>
-              <svg class="w-3 h-3 text-white/40 transition-transform duration-200" :class="resourcesDropdownOpen ? 'rotate-180' : ''" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.939l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.25 8.27a.75.75 0 01-.02-1.06z" />
+              </svg>
             </button>
-            <Transition name="dropdown-pop">
-              <div v-if="resourcesDropdownOpen" class="absolute top-[calc(100%+8px)] right-0 w-52 rounded-2xl border border-white/[0.08] bg-[#081123] backdrop-blur-xl shadow-2xl shadow-black/60 z-50 p-1" role="menu">
-                <router-link @click="resourcesDropdownOpen = false" to="/signerapp" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Signer App</router-link>
-                <router-link @click="resourcesDropdownOpen = false" to="/security" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Security</router-link>
-                <router-link @click="resourcesDropdownOpen = false" to="/cadena-paper" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Cadena Paper</router-link>
-                <router-link @click="resourcesDropdownOpen = false" to="/endgame" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white hover:bg-white/[0.06] transition-colors duration-100" role="menuitem">Endgame Book</router-link>
-              </div>
-            </Transition>
+            <div
+              class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-[70] opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
+              role="menu"
+            >
+              <router-link to="/signerapp" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Signer App</router-link>
+              <router-link to="/security" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Security</router-link>
+              <router-link to="/cadena-paper" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
+              <router-link to="/endgame" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Endgame Book</router-link>
+            </div>
           </div>
 
           <!-- Auth + CTA -->
@@ -190,143 +187,117 @@
       </div>
     </nav>
 
-    <!-- INFO STRIP (fixed under nav, medium size, BIGGER TEXT) -->
+    <!-- INFO STRIP -->
     <div
       v-if="isLoggedIn"
       ref="infoRef"
-      class="w-full fixed left-0 right-0 z-40 bg-secondary text-white supports-[backdrop-filter]:bg-secondary backdrop-blur"
-      :style="{ top: `var(--nav-h)` }"
+      class="w-full fixed left-0 right-0 z-40 bg-secondary border-b border-white/[0.07] supports-[backdrop-filter]:bg-secondary backdrop-blur"
+      :style="{ top: 'var(--nav-h)' }"
       role="region"
       aria-label="User info"
     >
-      <!-- keep bar height the same -->
-      <div class="px-6 h-12 sm:h-14 md:h-16 flex items-center justify-center">
-        <!-- ↑ text sizes only (no height change) -->
-        <div class="h-full flex items-center justify-center gap-3 md:gap-4 text-center text-sm sm:text-base md:text-lg text-white/90">
-          <!-- Loading -->
-          <template v-if="loading">
-            <div class="flex items-center gap-3">
-              <div class="h-4 w-28 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-              <div class="h-4 w-24 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-              <div class="hidden sm:block h-4 w-28 rounded bg-white/20 animate-pulse" aria-hidden="true" />
-            </div>
-          </template>
+      <div class="px-4 py-2 sm:h-10 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2">
 
-          <!-- Error -->
-          <template v-else-if="error">
-            <div class="flex items-center gap-2 text-red-200 text-base md:text-lg">
-              <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.5a.75.75 0 011.5 0v5a.75.75 0 01-1.5 0v-5zM10 14.75a.875.875 0 100 1.75.875.875 0 000-1.75z" clip-rule="evenodd" />
+        <!-- Loading -->
+        <template v-if="loading">
+          <div class="h-3 w-24 rounded-full bg-white/10 animate-pulse" />
+          <div class="h-3 w-16 rounded-full bg-white/10 animate-pulse" />
+          <div class="hidden sm:block h-3 w-20 rounded-full bg-white/10 animate-pulse" />
+        </template>
+
+        <!-- Error -->
+        <template v-else-if="error">
+          <span class="text-xs text-red-300/80">Balance unavailable</span>
+          <button
+            v-if="canRetry"
+            class="text-xs px-2.5 py-1 rounded-full border border-white/10 hover:bg-white/10 text-white transition"
+            @click="$emit('retry')"
+          >Retry</button>
+        </template>
+
+        <!-- Data -->
+        <template v-else>
+
+          <!-- Row 1 (mobile): who you are + device status -->
+          <div class="flex items-center justify-center flex-wrap gap-2">
+            <!-- Email chip -->
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
+              <svg class="w-3 h-3 text-white shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
               </svg>
-              <span>Balance unavailable</span>
-              <button
-                v-if="canRetry"
-                class="ml-2 px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white"
-                @click="$emit('retry')"
-              >
-                Retry
-              </button>
-            </div>
-          </template>
-
-          <!-- Data -->
-          <template v-else>
-            <!-- Email -->
-            <div class="min-w-0 flex items-center gap-2">
-              <span class="hidden sm:inline text-white/70">Signed in:</span>
-              <span class="truncate max-w-[38ch] font-medium" :title="email">{{ email }}</span>
+              <span class="text-xs text-white truncate max-w-[14ch] sm:max-w-[22ch]" :title="email">{{ email }}</span>
             </div>
 
-            <span class="hidden sm:inline select-none text-white/40">•</span>
+            <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
 
             <!-- Pairing -->
             <template v-if="isPending">
-              <div class="flex flex-wrap items-center gap-2 text-amber-100" role="status">
-                <svg class="w-5 h-5 md:w-6 md:h-6 text-amber-200" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 14a1.25 1.25 0 111.25-1.25A1.251 1.251 0 0112 16zm1-4.75a1 1 0 01-2 0v-5a1 1 0 012 0z"/>
-                </svg>
-                <span class="text-sm sm:text-base md:text-lg">
-                  Finish setup: sign out/in, then scan the QR using the Cadena Signer app.
-                </span>
-                <router-link
-                  to="/register?step=3"
-                  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white text-sm"
-                >
-                  View QR
-                </router-link>
+              <div class="flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/20" role="status">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" aria-hidden="true" />
+                <span class="text-xs text-amber-200">Setup pending</span>
+                <router-link to="/register?step=3" class="text-xs text-amber-300 hover:text-white transition underline underline-offset-2">View QR</router-link>
               </div>
             </template>
             <template v-else-if="showPairing">
-              <div class="flex items-center gap-2" role="status" :aria-label="isPaired ? 'Device paired' : 'Device not paired'">
-                <span :class="['inline-block w-2.5 h-2.5 rounded-full', isPaired ? 'bg-green-400' : 'bg-red-400']" aria-hidden="true" />
-                <span class="text-white/90 font-medium">
-                  {{ isPaired ? 'Paired' : 'Not paired' }}
-                </span>
+              <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border transition"
+                :class="isPaired ? 'bg-green-500/10 border-green-400/20' : 'bg-red-500/10 border-red-400/20'"
+                role="status"
+                :aria-label="isPaired ? 'Device paired' : 'Device not paired'"
+              >
+                <span :class="['w-1.5 h-1.5 rounded-full shrink-0', isPaired ? 'bg-green-400' : 'bg-red-400 animate-pulse']" aria-hidden="true" />
+                <span :class="['text-xs font-medium', isPaired ? 'text-green-300' : 'text-red-300']">{{ isPaired ? 'Paired' : 'Not paired' }}</span>
+                <router-link v-if="!isPaired" to="/register?step=3" class="text-xs text-red-200 hover:text-white transition underline underline-offset-2 ml-0.5">Scan QR</router-link>
               </div>
-              <template v-if="!isPaired">
-                <span class="hidden sm:inline select-none text-white/40">•</span>
-                <router-link
-                  to="/register?step=3"
-                  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white focus:outline-none focus:ring-2 focus:ring-white/40"
-                  aria-label="Go to registration to scan QR with the Signer app"
-                >
-                  Scan QR code using signer app
-                </router-link>
-              </template>
             </template>
             <template v-else>
-              <div class="flex items-center gap-2" aria-hidden="true">
-                <span class="inline-block w-2.5 h-2.5 rounded-full bg-white/30 animate-pulse" />
-                <span class="text-white/70">•••∂•••</span>
+              <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06]" aria-hidden="true">
+                <span class="w-1.5 h-1.5 rounded-full bg-white/20 animate-pulse" />
+                <span class="text-xs text-white tracking-widest">···</span>
               </div>
             </template>
+          </div>
 
-            <span class="hidden sm:inline select-none text-white/40">•</span>
+          <!-- Forces a new line on mobile only; desktop stays one row -->
+          <div class="basis-full sm:hidden" aria-hidden="true" />
 
-            <!-- Liquid -->
-            <div class="flex items-center gap-2">
-              <span class="text-white/80">Liquid Balance:</span>
-              <span class="tabular-nums font-semibold" :aria-live="live" role="status">
-                <template v-if="balanceDerivedSats !== null">
-                  {{ btc(balanceDerivedSats) }} BTC
-                </template>
-                <template v-else>—</template>
+          <!-- Row 2 (mobile): balances -->
+          <div class="flex items-center justify-center flex-wrap gap-2">
+            <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
+
+            <!-- Liquid balance chip -->
+            <div class="flex flex-col sm:flex-row items-center gap-0 sm:gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
+              <span class="text-xs text-white whitespace-nowrap"><span class="sm:hidden">Liquid</span><span class="hidden sm:inline">Liquid Balance</span></span>
+              <span class="text-xs font-semibold text-white tabular-nums whitespace-nowrap" :aria-live="live" role="status">
+                <template v-if="balanceDerivedSats !== null">{{ btc(balanceDerivedSats) }} BTC</template>
+                <template v-else><span class="text-white">—</span></template>
               </span>
             </div>
 
-            <span class="hidden sm:inline select-none text-white/40">•</span>
-
-            <!-- On-chain -->
-            <div class="hidden sm:flex items-center gap-2">
-              <span class="text-white/80">Wallet Balance:</span>
-              <span class="tabular-nums font-semibold" :aria-live="live" role="status">
-                <template v-if="balanceOnchainSats !== null">
-                  {{ btc(balanceOnchainSats) }} BTC
-                </template>
-                <template v-else>—</template>
+            <!-- On-chain balance chip -->
+            <div class="flex flex-col sm:flex-row items-center gap-0 sm:gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/[0.08]">
+              <span class="text-xs text-white whitespace-nowrap"><span class="sm:hidden">Wallet</span><span class="hidden sm:inline">Wallet Balance</span></span>
+              <span class="text-xs font-semibold text-white tabular-nums whitespace-nowrap" :aria-live="live" role="status">
+                <template v-if="balanceOnchainSats !== null">{{ btc(balanceOnchainSats) }} BTC</template>
+                <template v-else><span class="text-white">—</span></template>
               </span>
             </div>
 
             <!-- Zero-balance nudge -->
             <template v-if="isZeroAvailable">
-              <span class="hidden sm:inline select-none text-white/40">•</span>
-              <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1 text-white/95">
-                  <svg class="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 14a1.25 1.25 0 111.25-1.25A1.251 1.251 0 0112 16zm1-4.75a1 1 0 01-2 0v-5a1 1 0 012 0z"/>
-                  </svg>
-                  Balance is 0
-                </span>
-                <router-link
-                  to="/my-profile"
-                  class="px-2 py-1 rounded border border-white/20 hover:bg-white/10 text-white"
-                >
-                  Add funds
-                </router-link>
-              </div>
+              <span class="w-px h-4 bg-white/10 hidden sm:block" aria-hidden="true" />
+              <router-link
+                to="/get-started"
+                class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-secondary text-xs font-bold hover:bg-white/90 transition shadow-sm"
+              >
+                <svg class="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+                </svg>
+                Fund wallet
+              </router-link>
             </template>
-          </template>
-        </div>
+          </div>
+
+        </template>
       </div>
     </div>
 
@@ -419,7 +390,6 @@ const { priceSymbol, priceCurrencySign, priceFlagCode, priceFlagAlt } = usePrice
 const { isDown: serverDown } = useServerStatus()
 
 const priceDropdownOpen = ref(false)
-const resourcesDropdownOpen = ref(false)
 
 const priceOptions = [
   { symbol: 'BTCUSD', flag: 'us', label: 'US Dollar' },
@@ -433,7 +403,6 @@ function selectPriceSymbol(symbol) {
 function closeAllDropdowns(e) {
   if (!e.target.closest('[data-dropdown]')) {
     priceDropdownOpen.value = false
-    resourcesDropdownOpen.value = false
   }
 }
 

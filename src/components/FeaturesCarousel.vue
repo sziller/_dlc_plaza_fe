@@ -71,6 +71,50 @@ function go(i) {
 function prev() { go(activeIndex.value - 1) }
 function next() { go(activeIndex.value + 1) }
 
+// ── Swipe (mobile) ──────────────────────────────────────────────────
+// Cards are already positioned by activeIndex via cardOffset()/CSS
+// transform; swiping just needs to drive that same index instead of
+// requiring arrow buttons. A tap still selects a card directly, so a
+// swipe needs to be distinguished from a tap and suppress the click
+// that would otherwise fire on touchend.
+const SWIPE_THRESHOLD = 40
+let touchStartX = 0
+let touchStartY = 0
+let touchDeltaX = 0
+let swiped = false
+
+function onTouchStart(e) {
+  const t = e.touches[0]
+  touchStartX = t.clientX
+  touchStartY = t.clientY
+  touchDeltaX = 0
+  swiped = false
+}
+function onTouchMove(e) {
+  const t = e.touches[0]
+  touchDeltaX = t.clientX - touchStartX
+  const deltaY = t.clientY - touchStartY
+  // Only claim the gesture once it's clearly horizontal — otherwise let
+  // the page scroll vertically as normal.
+  if (Math.abs(touchDeltaX) > Math.abs(deltaY) && Math.abs(touchDeltaX) > 10) {
+    swiped = true
+  }
+  // Once claimed, stop the browser from ALSO treating this drag as a
+  // native horizontal scroll of the page — without this, swiping the
+  // carousel also dragged the whole page sideways underneath it.
+  if (swiped) e.preventDefault()
+}
+function onTouchEnd() {
+  if (swiped && Math.abs(touchDeltaX) > SWIPE_THRESHOLD) {
+    if (touchDeltaX < 0) next()
+    else prev()
+  }
+}
+function onCardTap(i) {
+  if (swiped) return // this tap was really the end of a swipe — ignore it
+  go(i)
+}
+
 function restartTimer() {
   clearInterval(autoTimer)
   autoTimer = setInterval(() => {
@@ -110,7 +154,13 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Card track -->
-    <div class="fc-track" ref="trackRef">
+    <div
+      class="fc-track"
+      ref="trackRef"
+      @touchstart.passive="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+    >
       <div
         v-for="(feat, i) in features"
         :key="i"
@@ -121,7 +171,7 @@ onBeforeUnmount(() => {
           'fc-card--mob-next':  isMobile && cardOffset(i) === 1,
         }"
         :style="isMobile ? { '--card-offset': cardOffset(i) } : {}"
-        @click="go(i)"
+        @click="onCardTap(i)"
       >
         <!-- Number badge (all cards) -->
         <div class="fc-num">
@@ -168,16 +218,6 @@ onBeforeUnmount(() => {
         <!-- Bottom spacer: balances top spacer to keep content centered -->
         <div class="fc-spacer" />
       </div>
-    </div>
-
-    <!-- Mobile arrows -->
-    <div class="fc-mobile-controls">
-      <button class="fc-arrow" aria-label="Previous" @click="prev">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <button class="fc-arrow" aria-label="Next" @click="next">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
     </div>
 
     <div class="fc-footer">
@@ -419,8 +459,6 @@ onBeforeUnmount(() => {
   .fc-desc-text { font-size: 0.95rem; }
 }
 
-.fc-mobile-controls { display: none; }
-
 @media (max-width: 767px) {
   .fc-track {
     position: relative;
@@ -480,24 +518,5 @@ onBeforeUnmount(() => {
   .fc-card--mob-prev .fc-main { align-items: flex-end; }
   .fc-card--mob-prev .fc-icon,
   .fc-card--mob-next .fc-icon { width: 2rem; height: 2rem; }
-
-  .fc-mobile-controls {
-    display: flex;
-    gap: 6px;
-    margin-top: 1rem;
-  }
-  .fc-arrow {
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: transparent;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-  .fc-arrow svg { width: 16px; height: 16px; }
 }
 </style>

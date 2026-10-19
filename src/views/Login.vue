@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import TheFooter from '../components/TheFooter.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getAuthToken } from '../api/auth'
 import { isSignerAuthCode } from '../lib/authCode'
@@ -104,6 +104,21 @@ const loading = ref(false)
 const error = ref<string | null>(null)
 
 const formValid = computed(() => !!email.value && !!password.value)
+
+function dashboardPathFor(user: any): string {
+  const code = Number(user?.auth_code ?? user?.payload?.auth_code)
+  return isSignerAuthCode(code) ? '/allocate_liquidity' : '/register?step=3'
+}
+
+// If you're already signed in — including landing here via the browser's
+// back button after a previous login — bounce straight back out instead of
+// showing the sign-in form again. replace(), not push(), so this doesn't
+// itself add another entry for back to land on.
+onMounted(() => {
+  if (auth.isLoggedIn.value) {
+    router.replace(dashboardPathFor(auth.user.value))
+  }
+})
 
 // --- tiny single-flight to avoid parallel profile calls from other listeners right after login ---
 let inFlightProfile: Promise<any> | null = null
@@ -154,15 +169,10 @@ const submitLogin = async () => {
       })
     }
 
-    // 6) Route based on auth_code if present (fallback to home)
-    const code = Number(profilePayload?.auth_code)
-    if (code === 2) {
-      await router.push('/allocate_liquidity')
-    } else if (isSignerAuthCode(code)) {
-      await router.push('/allocate_liquidity')
-    } else {
-      await router.push('/')
-    }
+    // 6) Only fully signer-paired users go to dashboard; everyone else completes
+    //    pairing. replace(), not push() — /login shouldn't remain in history for
+    //    the back button to land back on once you're actually signed in.
+    await router.replace(dashboardPathFor(profilePayload))
 
     // No global "auth-changed" event here — avoids fan-out duplicate fetches
   } catch (err: any) {

@@ -6,11 +6,70 @@
         class="rounded-xl border border-white/10 shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col"
         :style="{ '--secondary': currentAccent }"
       >
-        <!-- Header: title only -->
-        <div class="mb-6 shrink-0">
+        <!-- Header: title + help icon -->
+        <div class="mb-6 shrink-0 relative flex items-center justify-center">
           <div class="text-3xl lg:text-4xl font-extrabold text-center title-text">
             {{ title }}
           </div>
+          <button
+            @click="showHelp = !showHelp"
+            class="absolute right-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full border border-white/20 bg-white/[0.06] hover:bg-white/[0.12] flex items-center justify-center text-white/50 hover:text-white transition"
+            :aria-expanded="showHelp"
+            aria-label="How borrowing and lending works"
+          >
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 10a3.001 3.001 0 01-2 2.83V13a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+
+          <!-- Help popover -->
+          <Transition name="help-pop">
+            <div
+              v-if="showHelp"
+              class="absolute top-full right-0 mt-2 w-80 z-50 rounded-2xl border border-white/10 bg-[#0e0e1a] shadow-2xl p-5 text-left space-y-4"
+            >
+              <button @click="showHelp = false" class="absolute top-3 right-3 text-white/30 hover:text-white/70 transition text-lg leading-none" aria-label="Close">×</button>
+              <p class="text-xs font-bold uppercase tracking-widest text-secondary">How it works</p>
+
+              <div class="space-y-1">
+                <p class="text-sm font-semibold text-white">Borrowing</p>
+                <p class="text-xs text-white/55 leading-relaxed pl-7">
+                  Lock your Bitcoin as collateral and receive leveraged Bitcoin exposure, at a fixed interest cost set upfront. Your collateral keeps its price exposure, so you gain without giving up your upside. At maturity the contract settles itself on-chain. No margin calls, nothing to repay manually.
+                </p>
+              </div>
+
+              <div class="w-full h-px bg-white/[0.06]" />
+
+              <div class="space-y-1">
+                <p class="text-sm font-semibold text-white">Lending</p>
+                <p class="text-xs text-white/55 leading-relaxed pl-7">
+                  Deploy your Bitcoin at a fixed rate set upfront, secured by a borrower's over-collateralised Bitcoin. Your return is set in dollars from the start, whichever way the price moves. At maturity the contract settles itself on-chain and pays your principal plus interest in Bitcoin, valued in dollars at the settlement price. Nothing to manage in between.
+                </p>
+              </div>
+
+              <div class="w-full h-px bg-white/[0.06]" />
+
+              <div class="space-y-1">
+                <p class="text-xs font-semibold text-white/70">Your keys stay yours</p>
+                <p class="text-xs text-white/45 leading-relaxed">
+                  Cadena never holds your Bitcoin. Collateral stays locked in the contract, not with us, and you can verify it on-chain at any time.
+                </p>
+              </div>
+
+              <div class="w-full h-px bg-white/[0.06]" />
+
+              <div class="space-y-1">
+                <p class="text-xs font-semibold text-white/70">No live rates yet?</p>
+                <p class="text-xs text-white/45 leading-relaxed">
+                  Set your own rate and wait to be matched, or check back when the market is more active.
+                </p>
+              </div>
+
+              <router-link to="/loan-explained" class="block text-center text-xs text-secondary underline underline-offset-2 hover:text-white transition pt-1">
+                Read the full explainer →
+              </router-link>
+            </div>
+          </Transition>
         </div>
 
         <!-- Content Wrapper -->
@@ -98,6 +157,22 @@
                 <div class="flex justify-between text-xs text-white/35 mt-1.5 tabular-nums">
                   <span>{{ currencySymbol }}1,000</span>
                   <span>{{ currencySymbol }}1,000,000</span>
+                </div>
+
+                <!-- Preset amount chips -->
+                <div class="flex justify-center gap-2 flex-wrap mt-4">
+                  <button
+                    v-for="p in [1000, 5000, 10000, 25000, 50000, 100000]"
+                    :key="p"
+                    type="button"
+                    @click="setAmountPreset(p)"
+                    :class="[
+                      'px-3 py-1.5 rounded-full text-xs font-semibold transition',
+                      usdAmount === p
+                        ? 'bg-secondary text-white'
+                        : 'bg-white/[0.06] border border-white/10 text-white/60 hover:text-white hover:bg-white/10'
+                    ]"
+                  >{{ currencySymbol }}{{ p >= 1000 ? (p / 1000) + 'K' : p }}</button>
                 </div>
               </div>
             </div>
@@ -293,16 +368,20 @@ import { notifySlackCollateralShortfall } from '../api/slackNotify'
 
 const router = useRouter()
 
+// -------- Help popover ----------
+const showHelp = ref(false)
+
 // -------- Collateral helper (matches OrderModal formula) ----------
 const FEE_PCT = 0.01
 
-function computeRequiredCollateralSats(loanSats, rateDecimal, ltv, isBorrow) {
+function computeRequiredCollateralSats(loanSats, rateDecimal, _ltv, isBorrow) {
   if (!Number.isFinite(loanSats) || loanSats <= 0) return 0
   const r = Number.isFinite(rateDecimal) ? rateDecimal : 0
-  const l = Number.isFinite(ltv) && ltv > 0 ? ltv : 0.5
   if (isBorrow) {
-    return Math.round(loanSats * (1 + 2 * r + FEE_PCT * (1 + r) / l))
+    // borrower locks: principal + 2× interest buffer + 1% fee
+    return Math.round(loanSats * (1 + 2 * r + FEE_PCT))
   }
+  // lender deploys principal only
   return loanSats
 }
 
@@ -1161,6 +1240,11 @@ function onSliderInput(e) {
   usdAmount.value = val
   usdInputRaw.value = usdInputFocused.value ? String(val) : formatUsd(val)
 }
+function setAmountPreset(val) {
+  const clamped = clampAmount(val)
+  usdAmount.value = clamped
+  usdInputRaw.value = formatUsd(clamped)
+}
 
 // -------- Fetch products once, then offers --------
 async function prefetchProducts() {
@@ -1491,5 +1575,13 @@ defineExpose({ loadOffersOnce, getEar })
   height: 6px;
   border-radius: 3px;
   background: transparent;
+}
+
+.help-pop-enter-active, .help-pop-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.help-pop-enter-from, .help-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
 }
 </style>

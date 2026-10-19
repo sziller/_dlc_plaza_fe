@@ -103,6 +103,11 @@ export interface UserLiquidityAllocation {
   duration_days: number
   liquidity_sat: number
   timestamp: number
+  // Structured Product parameters — the Source of Truth for Product semantics
+  // (financial reference symbol, product function). Not to be reconstructed
+  // by parsing service_type / product_id.
+  symbol: string
+  product_function: string
 }
 
 export interface UserLiquidityQueryResponse {

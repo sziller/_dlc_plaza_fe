@@ -40,9 +40,31 @@
         </div>
 
         <div class="chat-messages" ref="messagesEl">
-          <div v-if="messages.length === 0" class="chat-empty">
-            <p>Hi! Ask me anything about Cadena Bitcoin — loans, yield, how it works, and more.</p>
+          <!-- Welcome state with quick actions -->
+          <div v-if="messages.length === 0" class="welcome-state">
+            <div class="welcome-avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+              </svg>
+            </div>
+            <p class="welcome-greeting">Hi there! 👋</p>
+            <p class="welcome-sub">What are you looking to do today?</p>
+            <div class="quick-chips">
+              <button class="chip" @click="quickSend('I want to borrow against my Bitcoin')">
+                <span class="chip-icon">💰</span> Borrow against BTC
+              </button>
+              <button class="chip" @click="quickSend('I want to lend and earn yield on Bitcoin')">
+                <span class="chip-icon">📈</span> Lend &amp; earn yield
+              </button>
+              <button class="chip" @click="quickSend('How do I create an account?')">
+                <span class="chip-icon">🆕</span> Create an account
+              </button>
+              <button class="chip" @click="quickSend('How does Cadena work?')">
+                <span class="chip-icon">❓</span> How it works
+              </button>
+            </div>
           </div>
+
           <div v-for="(msg, i) in messages" :key="i" class="message" :class="msg.role">
             <div v-if="msg.role === 'assistant'" class="bubble md" v-html="marked(msg.content)"></div>
             <div v-else class="bubble">{{ msg.content }}</div>
@@ -94,9 +116,24 @@
       </div>
     </Transition>
 
+    <!-- Teaser card (auto-appears after delay) -->
+    <Transition name="teaser">
+      <div v-if="showTeaser && !open" class="teaser-card">
+        <button class="teaser-dismiss" @click.stop="dismissTeaser" aria-label="Dismiss">×</button>
+        <p class="teaser-heading">Need help getting started?</p>
+        <div class="teaser-chips">
+          <button @click="quickOpen('I want to borrow against my Bitcoin')">💰 Borrow</button>
+          <button @click="quickOpen('I want to lend and earn yield on Bitcoin')">📈 Lend</button>
+          <button @click="quickOpen('How do I create an account?')">🆕 Sign up</button>
+        </div>
+        <button class="teaser-chat-btn" @click="openChat">Chat with us →</button>
+      </div>
+    </Transition>
+
     <!-- Bubble button -->
     <button
       class="chat-bubble"
+      :class="{ 'is-pulsing': !open && showPulse }"
       @click="toggleChat"
       :aria-label="open ? 'Close chat' : 'Open chat'"
     >
@@ -114,7 +151,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, watch, onBeforeUnmount } from 'vue'
+import { ref, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import { marked } from 'marked'
 
 marked.setOptions({ breaks: true, gfm: true })
@@ -128,16 +165,54 @@ const MIN_H = 320
 const DEFAULT_W = 340
 const DEFAULT_H = 460
 
-const open    = ref(false)
-const draft   = ref('')
-const loading = ref(false)
-const unread  = ref(0)
-const messages  = ref([])
+const open       = ref(false)
+const draft      = ref('')
+const loading    = ref(false)
+const unread     = ref(0)
+const messages   = ref([])
 const messagesEl = ref(null)
 const inputEl    = ref(null)
+const showTeaser = ref(false)
+const showPulse  = ref(false)
 
 const chatW = ref(DEFAULT_W)
 const chatH = ref(DEFAULT_H)
+
+let teaserTimer = null
+let pulseTimer  = null
+
+onMounted(() => {
+  const seen = sessionStorage.getItem('cadena_chat_seen')
+  if (!seen) {
+    pulseTimer = setTimeout(() => { showPulse.value = true }, 2500)
+    teaserTimer = setTimeout(() => { showTeaser.value = true }, 4000)
+  }
+})
+
+function dismissTeaser() {
+  showTeaser.value = false
+  showPulse.value  = false
+  sessionStorage.setItem('cadena_chat_seen', '1')
+}
+
+function openChat() {
+  showTeaser.value = false
+  showPulse.value  = false
+  sessionStorage.setItem('cadena_chat_seen', '1')
+  open.value = true
+  unread.value = 0
+  nextTick(() => inputEl.value?.focus())
+}
+
+function quickOpen(text) {
+  openChat()
+  nextTick(() => quickSend(text))
+}
+
+function quickSend(text) {
+  draft.value = text
+  send()
+}
 
 // ── Resize ────────────────────────────────────────────────────────────────────
 
@@ -197,6 +272,8 @@ function stopResizeTouch() {
 onBeforeUnmount(() => {
   stopResize()
   stopResizeTouch()
+  clearTimeout(teaserTimer)
+  clearTimeout(pulseTimer)
 })
 
 // ── Chat logic ────────────────────────────────────────────────────────────────
@@ -205,6 +282,9 @@ function toggleChat() {
   open.value = !open.value
   if (open.value) {
     unread.value = 0
+    showTeaser.value = false
+    showPulse.value  = false
+    sessionStorage.setItem('cadena_chat_seen', '1')
     nextTick(() => inputEl.value?.focus())
   }
 }
@@ -289,6 +369,98 @@ watch(open, (val) => { if (val) scrollToBottom() })
 .chat-bubble:active {
   transform: scale(0.96);
 }
+
+.chat-bubble.is-pulsing::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid rgba(103, 56, 227, 0.5);
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 0.8; }
+  70%  { transform: scale(1.25); opacity: 0; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+/* ── Teaser card ── */
+.teaser-card {
+  background: #1a1a2e;
+  border: 1px solid rgba(103, 56, 227, 0.4);
+  border-radius: 16px;
+  padding: 16px;
+  width: 240px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(103,56,227,0.12);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.teaser-dismiss {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 4px;
+  transition: color 0.15s;
+}
+
+.teaser-dismiss:hover { color: rgba(255,255,255,0.7); }
+
+.teaser-heading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  padding-right: 20px;
+}
+
+.teaser-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.teaser-chips button {
+  background: rgba(103, 56, 227, 0.15);
+  border: 1px solid rgba(103, 56, 227, 0.3);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+
+.teaser-chips button:hover {
+  background: rgba(103, 56, 227, 0.3);
+  border-color: rgba(103, 56, 227, 0.6);
+}
+
+.teaser-chat-btn {
+  background: #6738e3;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.teaser-chat-btn:hover { opacity: 0.85; }
 
 .unread-badge {
   position: absolute;
@@ -423,20 +595,72 @@ watch(open, (val) => { if (val) scrollToBottom() })
   scrollbar-color: rgba(103, 56, 227, 0.3) transparent;
 }
 
-.chat-empty {
-  flex: 1;
+/* ── Welcome state ── */
+.welcome-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
+  padding: 12px 4px 4px;
+  gap: 8px;
+  flex: 1;
 }
 
-.chat-empty p {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.3);
-  line-height: 1.6;
-  padding: 0 8px;
+.welcome-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6738e3, #8b5cf6);
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  box-shadow: 0 4px 16px rgba(103,56,227,0.4);
+  margin-bottom: 2px;
 }
+
+.welcome-greeting {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.welcome-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  margin: 0;
+}
+
+.quick-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.chip {
+  background: rgba(103, 56, 227, 0.1);
+  border: 1px solid rgba(103, 56, 227, 0.28);
+  border-radius: 12px;
+  color: rgba(255,255,255,0.85);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+
+.chip:hover {
+  background: rgba(103, 56, 227, 0.22);
+  border-color: rgba(103, 56, 227, 0.55);
+  transform: translateX(2px);
+}
+
+.chip-icon { font-size: 15px; flex-shrink: 0; }
 
 .message { display: flex; }
 .message.user      { justify-content: flex-end; }
@@ -583,6 +807,14 @@ watch(open, (val) => { if (val) scrollToBottom() })
   transform: translateY(10px) scale(0.97);
 }
 
+.teaser-enter-active, .teaser-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.teaser-enter-from, .teaser-leave-to {
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+}
+
 .icon-enter-active, .icon-leave-active {
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
@@ -594,5 +826,6 @@ watch(open, (val) => { if (val) scrollToBottom() })
   .chatbot-wrapper { bottom: 16px; right: 16px; }
   .resize-handle   { display: none; }
   .chat-window     { width: calc(100vw - 32px) !important; height: 420px !important; }
+  .teaser-card     { width: 200px; }
 }
 </style>

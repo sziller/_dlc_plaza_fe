@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { marked } from 'marked'
 import { fetchPostBySlug, fetchPublishedPosts, type BlogPost } from '../blogApi/blog'
+import { generateOrganizationSchema, generateArticleSchema } from '../plugins/structured-data.js'
 import { useAuth } from '../composables/useAuth'
 import { isSubscriberAuthCode } from '../lib/authCode'
 import { postContactEmail, isValidEmail } from '../api/publicContact'
@@ -146,11 +147,88 @@ const contentSegments = computed(() => {
   return segments
 })
 
+// Per-article social-share preview: overrides the site-wide meta/schema
+// (set by installSeo/installStructuredData on navigation) with the actual
+// post's title/image/description once it's fetched, so links shared on
+// social media show the article itself rather than the generic site card.
+const SITE = 'https://cadenabitcoin.com'
+
+function setMeta(name: string, content: string | null | undefined, attr: 'name' | 'property' = 'name') {
+  if (!content) return
+  let el = document.querySelector(`meta[${attr}="${name}"]`)
+  if (!el) {
+    el = document.createElement('meta')
+    el.setAttribute(attr, name)
+    document.head.appendChild(el)
+  }
+  el.setAttribute('content', content)
+}
+function setLink(rel: string, href: string) {
+  let el = document.querySelector(`link[rel="${rel}"]`)
+  if (!el) {
+    el = document.createElement('link')
+    el.setAttribute('rel', rel)
+    document.head.appendChild(el)
+  }
+  el.setAttribute('href', href)
+}
+
+function applyPostSeoMeta(p: BlogPost) {
+  const title = `${p.title} — Cadena Bitcoin`
+  const desc = p.excerpt || p.subheading || undefined
+  const rawImage = p.hero_image_url || p.article_image_url || '/og-image.png'
+  const image = /^https?:\/\//.test(rawImage) ? rawImage : SITE + rawImage
+  const canonical = SITE + route.path
+
+  document.title = title
+  setMeta('description', desc)
+  setLink('canonical', canonical)
+
+  setMeta('og:title', title, 'property')
+  setMeta('og:description', desc, 'property')
+  setMeta('og:url', canonical, 'property')
+  setMeta('og:type', 'article', 'property')
+  setMeta('og:image', image, 'property')
+  setMeta('article:published_time', p.published_at || p.created_at, 'property')
+  setMeta('article:modified_time', p.updated_at, 'property')
+  setMeta('article:author', p.author_name || 'Cadena Bitcoin Team', 'property')
+
+  setMeta('twitter:card', 'summary_large_image')
+  setMeta('twitter:title', title)
+  setMeta('twitter:description', desc)
+  setMeta('twitter:image', image)
+
+  // Replace the generic schema the router-level hook injected on navigation
+  // with an accurate one for this article.
+  document.querySelectorAll('script[type="application/ld+json"]').forEach(el => el.remove())
+  ;[
+    generateOrganizationSchema(),
+    generateArticleSchema({
+      title: p.title,
+      description: desc || `${p.title} — Cadena Bitcoin Knowledge Hub`,
+      author: p.author_name || 'Cadena Bitcoin Team',
+      publishDate: p.published_at || p.created_at,
+      modifiedDate: p.updated_at,
+      url: canonical,
+      image,
+    }),
+  ].forEach((schema, i) => {
+    const script = document.createElement('script')
+    script.type = 'application/ld+json'
+    script.textContent = JSON.stringify(schema)
+    script.id = `structured-data-${i}`
+    document.head.appendChild(script)
+  })
+}
+
 const loadPost = async () => {
   loading.value = true
   error.value = null
   try {
     post.value = await fetchPostBySlug(slug.value)
+    if (post.value) {
+      applyPostSeoMeta(post.value)
+    }
     if (import.meta.env.DEV) {
       console.log('[BlogPost] loaded post:', { access_level: post.value?.access_level, title: post.value?.title })
       console.log('[BlogPost] user auth_code:', (user.value as any)?.auth_code, '| isSubscriber:', isSubscriber.value, '| isGated:', isGated.value)

@@ -1,5 +1,5 @@
 <template>
-  <section class="w-full h-full">
+  <section v-if="!hideWhenEmpty || loading || (!error && sortedData.length > 0)" class="w-full h-full">
     <div class="w-full h-full mx-auto">
       <div class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col">
         <!-- Title -->
@@ -47,7 +47,8 @@
               >
                 <td class="px-4 py-3">{{ row.role }}</td>
                 <td class="px-4 py-3">{{ row.term }}</td>
-                <td class="px-4 py-3 tabular-nums">{{ row.dollar }}</td>
+                <td class="px-4 py-3 tabular-nums">{{ row.value }}</td>
+                <td class="px-4 py-3">{{ row.symbol }}</td>
                 <td class="px-4 py-3">{{ row.interest }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ row.liquidity }}</td>
                 <td class="px-4 py-3">{{ row.date }}</td>
@@ -63,19 +64,19 @@
                 </td>
               </tr>
               <tr v-if="sortedData.length === 0">
-                <td class="px-4 py-6 text-white/70" colspan="7">No open orders found.</td>
+                <td class="px-4 py-6 text-white/70" colspan="8">No open orders found.</td>
               </tr>
             </tbody>
 
             <tbody v-else-if="loading">
               <tr>
-                <td class="px-4 py-6 text-white/70" colspan="7">Loading…</td>
+                <td class="px-4 py-6 text-white/70" colspan="8">Loading…</td>
               </tr>
             </tbody>
 
             <tbody v-else>
               <tr>
-                <td class="px-4 py-6 text-red-400" colspan="7">{{ error }}</td>
+                <td class="px-4 py-6 text-red-400" colspan="8">{{ error }}</td>
               </tr>
             </tbody>
           </table>
@@ -98,12 +99,20 @@ const { setUserFromApi } = useAuth()
 const columns = Object.freeze([
   { label: 'Type', key: 'role' },
   { label: 'Term', key: 'termDays' },
-  { label: 'Dollar', key: 'dollarValue' },
+  { label: 'Value', key: 'dollarValue' },
+  { label: 'Symbol', key: 'symbol' },
   { label: 'Interest (%)', key: 'interestBp' },
   { label: 'Collateral (BTC)', key: 'liquiditySat' },
   { label: 'Date', key: 'timestamp' },
   { label: '', key: 'actions' },
 ])
+
+// When true, this section renders nothing once loaded if there's no data —
+// used on pages (like the Create Loan page) where an empty "no orders"
+// placeholder would just be noise, unlike My Profile where it's expected.
+defineProps({
+  hideWhenEmpty: { type: Boolean, default: false },
+})
 
 const rows = ref([])
 const loading = ref(false)
@@ -129,11 +138,11 @@ function capitalize(s) {
   return v.charAt(0).toUpperCase() + v.slice(1)
 }
 
-function fmtDollar(sats) {
+function fmtValue(sats) {
   const n = Number(sats)
   if (!Number.isFinite(n) || !btcPrice.value) return '—'
-  const usd = (n / 1e8) * btcPrice.value
-  return '$' + usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const val = (n / 1e8) * btcPrice.value
+  return val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 function fmtTerm(days) {
@@ -143,6 +152,15 @@ function fmtTerm(days) {
   return `${Math.round(d)} Days`
 }
 
+// Structured Product parameters (symbol, product_function) are the sole
+// Source of Truth for Product semantics — never parsed out of product_id
+// or service_type. A missing/malformed symbol is treated as invalid data,
+// not reconstructed from the descriptive product identifier.
+function deriveRefCurrency(symbol) {
+  if (typeof symbol !== 'string' || symbol.length !== 6) return null
+  return symbol.slice(3, 6)
+}
+
 function toRow(a) {
   const collateralSats = Number(a.liquidity_sat) || 0
   return {
@@ -150,8 +168,10 @@ function toRow(a) {
     role: capitalize(a.ini_role),
     term: fmtTerm(a.duration_days),
     termDays: Number(a.duration_days) || 0,
-    dollar: fmtDollar(collateralSats),
+    value: fmtValue(collateralSats),
     dollarValue: btcPrice.value ? (collateralSats / 1e8) * btcPrice.value : 0,
+    symbol: deriveRefCurrency(a.symbol) || '—',
+    productFunction: typeof a.product_function === 'string' ? a.product_function : null,
     interest: (a.interest_bp / 100).toFixed(2) + '%',
     interestBp: Number(a.interest_bp) || 0,
     liquidity: satsToBtc(collateralSats),

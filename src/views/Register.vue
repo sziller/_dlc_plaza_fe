@@ -1,11 +1,50 @@
 <template>
   <section class="min-h-screen text-white pt-8 pb-8 px-6 flex flex-col gap-8 bg-page-gradient">
     <!-- 🧾 Step 1: Registration Form -->
-    <div v-if="step === 1" class="max-w-xl mx-auto w-full space-y-0">
+    <div v-if="step === 1" class="max-w-xl mx-auto w-full space-y-6">
       <h1 class="text-3xl font-bold text-center">Create Your Account</h1>
       <p class="text-sm text-white/70 text-center">
         You’re just a few steps away from your Bitcoin loan.
       </p>
+
+      <!-- Signer App pre-warning -->
+      <div class="flex items-start gap-4 p-4 rounded-2xl border border-secondary/30 bg-secondary/10">
+        <svg class="w-6 h-6 text-secondary shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <rect x="5" y="2" width="14" height="20" rx="2" />
+          <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none" />
+        </svg>
+        <div class="space-y-2 min-w-0">
+          <p class="text-sm font-semibold text-white">You’ll need the Cadena Signer App</p>
+          <p class="text-xs text-white/70 leading-relaxed">
+            Your Bitcoin keys stay on your phone — the free <strong class="text-white">Cadena Signer</strong> app holds them and signs every transaction so only you can authorize fund movement. You’ll use it to pair your self-custodial wallet with your Cadena account.
+          </p>
+          <div class="flex items-start justify-center gap-6 pt-1 flex-wrap">
+            <!-- iOS -->
+            <div class="flex flex-col items-center gap-1.5">
+              <div class="p-1.5 bg-white rounded-lg">
+                <img v-if="appStoreQR" :src="appStoreQR" alt="App Store QR code" class="w-20 h-20 block" />
+                <div v-else class="w-20 h-20 bg-gray-100 animate-pulse rounded" />
+              </div>
+              <div style="height:52px;display:flex;align-items:center">
+                <a href="https://apps.apple.com/us/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211" target="_blank" rel="noopener" aria-label="Download on the App Store" style="display:inline-block;line-height:0">
+                  <img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200" alt="Download on the App Store" style="height:40px;width:auto;vertical-align:middle;object-fit:contain" />
+                </a>
+              </div>
+            </div>
+            <!-- Android -->
+            <div class="flex flex-col items-center gap-1.5">
+              <div class="p-1.5 bg-white rounded-lg">
+                <img v-if="playStoreQR" :src="playStoreQR" alt="Google Play QR code" class="w-20 h-20 block" />
+                <div v-else class="w-20 h-20 bg-gray-100 animate-pulse rounded" />
+              </div>
+              <a href="https://play.google.com/store/apps/details?id=com.cadenabitcoin.mobile.signer&pcampaignid=web_share" target="_blank" rel="noopener" aria-label="Get it on Google Play" style="display:inline-block;line-height:0">
+                <img src="/img/google-play-badge.png" alt="Get it on Google Play" style="height:52px;width:auto;vertical-align:middle;object-fit:contain" />
+              </a>
+            </div>
+          </div>
+          <p class="text-xs text-white/40 text-center">Scan with your phone camera to download</p>
+        </div>
+      </div>
 
       <form class="space-y-6" @submit.prevent="submitForm" novalidate>
         <!-- Email -->
@@ -163,6 +202,55 @@
         Do <span class="font-semibold">not</span> use the phone’s default camera—only the Signer app can complete registration.
       </p>
 
+      <!-- Download prompt -->
+      <div class="p-5 rounded-2xl border border-white/10 bg-white/[0.05] space-y-4">
+        <p class="text-sm font-semibold text-white text-center">Don’t have the app yet? Scan to download:</p>
+        <div class="flex items-start justify-center gap-8 flex-wrap">
+          <!-- iOS -->
+          <div class="flex flex-col items-center gap-2">
+            <div class="p-2 bg-white rounded-xl shadow">
+              <img v-if="appStoreQR" :src="appStoreQR" alt="App Store QR code" class="w-28 h-28 block" />
+              <div v-else class="w-28 h-28 bg-gray-100 animate-pulse rounded" />
+            </div>
+            <div style="height:52px;display:flex;align-items:center">
+              <a href="https://apps.apple.com/us/app/cadena-bitcoin/id6753348211?itscg=30200&itsct=apps_box_badge&mttnsubad=6753348211" target="_blank" rel="noopener" aria-label="Download on the App Store" style="display:inline-block;line-height:0">
+                <img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1760227200" alt="Download on the App Store" style="height:40px;width:auto;vertical-align:middle;object-fit:contain" />
+              </a>
+            </div>
+          </div>
+          <!-- Android -->
+          <div class="flex flex-col items-center gap-2">
+            <div class="p-2 bg-white rounded-xl shadow">
+              <img v-if="playStoreQR" :src="playStoreQR" alt="Google Play QR code" class="w-28 h-28 block" />
+              <div v-else class="w-28 h-28 bg-gray-100 animate-pulse rounded" />
+            </div>
+            <a href="https://play.google.com/store/apps/details?id=com.cadenabitcoin.mobile.signer&pcampaignid=web_share" target="_blank" rel="noopener" aria-label="Get it on Google Play" style="display:inline-block;line-height:0">
+              <img src="/img/google-play-badge.png" alt="Get it on Google Play" style="height:52px;width:auto;vertical-align:middle;object-fit:contain" />
+            </a>
+          </div>
+        </div>
+        <p class="text-xs text-white/50 text-center">Once installed, open the app and tap <strong class="text-white/80">QR Scanner</strong> to scan the registration code below.</p>
+      </div>
+
+      <!-- In-app steps -->
+      <div class="p-5 rounded-2xl border border-white/10 bg-white/[0.05] text-left space-y-3">
+        <p class="text-sm font-semibold text-white text-center">In the Signer app:</p>
+        <ol class="space-y-2 text-sm text-white/70">
+          <li class="flex items-start gap-3">
+            <span class="shrink-0 w-6 h-6 rounded-full bg-secondary/20 text-secondary text-xs font-bold flex items-center justify-center mt-0.5">1</span>
+            <span>Sign in to your account</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="shrink-0 w-6 h-6 rounded-full bg-secondary/20 text-secondary text-xs font-bold flex items-center justify-center mt-0.5">2</span>
+            <span>Create a new wallet or restore one with your 12-word seed phrase</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="shrink-0 w-6 h-6 rounded-full bg-secondary/20 text-secondary text-xs font-bold flex items-center justify-center mt-0.5">3</span>
+            <span>Tap <strong class="text-white">QR Scanner</strong> and scan the code below to pair</span>
+          </li>
+        </ol>
+      </div>
+
       <div v-if="qrCode" class="mt-6">
         <div class="inline-block p-3 bg-white rounded">
           <img :src="qrCode" alt="Registration QR code (scan with Cadena Signer app)" class="w-64 h-64" />
@@ -258,6 +346,18 @@ import type { QRCodeUserResponse } from '../types/common/qrFace'
 import TheFooter from '../components/TheFooter.vue'
 import { isSignerAuthCode } from '../lib/authCode'
 import { notifyKitNewSubscriber } from '../api/kitSubscribe'
+import QRCode from 'qrcode'
+
+const APP_STORE_URL = 'https://apps.apple.com/us/app/cadena-bitcoin/id6753348211'
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.cadenabitcoin.mobile.signer'
+const appStoreQR = ref<string | null>(null)
+const playStoreQR = ref<string | null>(null)
+
+async function generateAppStoreQRs() {
+  const opts = { width: 180, margin: 1, color: { dark: '#000000', light: '#ffffff' } }
+  appStoreQR.value = await QRCode.toDataURL(APP_STORE_URL, opts)
+  playStoreQR.value = await QRCode.toDataURL(PLAY_STORE_URL, opts)
+}
 
 // UI state
 const step = ref<number>(1)
@@ -458,6 +558,7 @@ watch(() => route.query.step, () => syncStepFromRoute())
 onMounted(async () => {
   prefillEmailFromRoute()
   syncStepFromRoute()
+  generateAppStoreQRs()
   if (step.value === 3) {
     await loadQrCode()
     startStep3Polling()

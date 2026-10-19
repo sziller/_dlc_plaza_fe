@@ -328,26 +328,89 @@
           <li><span class="font-semibold text-white">Annualized Yield:</span> {{ reviewAnnualizedYieldWithFee }}</li>
         </ul>
 
-        <!-- Collateral Requirement Block -->
+        <!-- Collateral Breakdown Block -->
         <div v-if="allocationLoading" class="flex flex-col items-center gap-3 py-6">
           <div class="h-6 w-6 rounded-full border-3 border-white/30 border-t-white animate-spin"></div>
           <div class="text-sm text-white/80">Calculating collateral…</div>
         </div>
-        <div v-else-if="allocationResult" class="mt-4 space-y-3">
-          <div class="p-4 rounded-lg bg-secondary/10 border border-secondary/30">
-            <p class="text-base font-semibold text-white">
-              Collateral Required: {{ Number.isFinite(computedCollateralBtc) ? formatBtcValue(computedCollateralBtc) : '0' }} BTC
-            </p>
-            <p v-if="btcPrice && Number.isFinite(computedCollateralBtc)" class="text-xs text-white/60 mt-0.5">
-              ≈ {{ (computedCollateralBtc * btcPrice).toLocaleString('en-US', { style: 'currency', currency: fiatLabel, maximumFractionDigits: 0 }) }} {{ fiatLabel }}
-            </p>
-            <p class="text-sm text-white/70 mt-1">
-              Available BTC Liquidity: {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
-            </p>
-          </div>
-        </div>
-        <div v-else class="mt-4 p-4 rounded-lg bg-secondary/10 border border-secondary/30">
-          <p class="text-base font-semibold text-white">{{ collateralRequirementText }}</p>
+        <div v-else class="mt-4 space-y-3">
+          <!-- Borrower breakdown -->
+          <template v-if="isBorrower">
+            <div class="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden text-sm">
+              <div class="px-4 py-2 bg-white/[0.04] border-b border-white/[0.06]">
+                <span class="text-xs font-bold uppercase tracking-widest text-white/40">You Lock (Borrower Collateral)</span>
+              </div>
+              <div class="divide-y divide-white/[0.05]">
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">Loan principal</span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownPrincipalUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">2× Interest buffer <span class="text-white/35 text-xs">({{ usdFmt(breakdownInterestUsd) }} × 2)</span></span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownInterestUsd * 2) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">1% Cadena fee</span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownFeeUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-3 bg-secondary/[0.08]">
+                  <span class="font-bold text-white">Your total BTC locked</span>
+                  <div class="text-right">
+                    <div class="font-black text-white tabular-nums">
+                      {{ Number.isFinite(breakdownTotalBtc) ? formatBtcValue(breakdownTotalBtc) : '—' }} BTC
+                    </div>
+                    <div v-if="btcPrice && Number.isFinite(breakdownTotalBtc)" class="text-xs text-white/50 tabular-nums">
+                      = {{ usdFmt(breakdownTotalBtc * btcPrice) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="allocationResult" class="flex justify-between items-center text-xs px-1">
+              <span class="text-white/40">Available in your wallet</span>
+              <span class="tabular-nums" :class="isCollateralCovered ? 'text-green-400' : 'text-red-400'">
+                {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
+                <span v-if="isCollateralCovered"> ✓</span>
+              </span>
+            </div>
+          </template>
+
+          <!-- Lender breakdown -->
+          <template v-else>
+            <div class="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden text-sm">
+              <div class="px-4 py-2 bg-white/[0.04] border-b border-white/[0.06]">
+                <span class="text-xs font-bold uppercase tracking-widest text-white/40">You Lock (Lender Collateral)</span>
+              </div>
+              <div class="divide-y divide-white/[0.05]">
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">USD deployed</span>
+                  <span class="font-semibold tabular-nums text-white">{{ usdFmt(breakdownPrincipalUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-2.5">
+                  <span class="text-white/60">Yield you earn</span>
+                  <span class="font-semibold tabular-nums text-green-400">+{{ usdFmt(breakdownInterestUsd) }}</span>
+                </div>
+                <div class="flex justify-between items-center px-4 py-3 bg-secondary/[0.08]">
+                  <span class="font-bold text-white">Your BTC deployed</span>
+                  <div class="text-right">
+                    <div class="font-black text-white tabular-nums">
+                      {{ Number.isFinite(breakdownTotalBtc) ? formatBtcValue(breakdownTotalBtc) : '—' }} BTC
+                    </div>
+                    <div v-if="btcPrice && Number.isFinite(breakdownTotalBtc)" class="text-xs text-white/50 tabular-nums">
+                      = {{ usdFmt(breakdownTotalBtc * btcPrice) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="allocationResult" class="flex justify-between items-center text-xs px-1">
+              <span class="text-white/40">Available in your wallet</span>
+              <span class="tabular-nums" :class="isCollateralCovered ? 'text-green-400' : 'text-red-400'">
+                {{ formatSatsToBtc(allocationResult.available_btc_liquidity) }} BTC
+                <span v-if="isCollateralCovered"> ✓</span>
+              </span>
+            </div>
+          </template>
         </div>
 
         <div class="flex justify-end items-center mt-6">
@@ -882,11 +945,11 @@ const computedCollateralBtc = computed(() => {
   if (!Number.isFinite(L) || !Number.isFinite(r) || !Number.isFinite(ltv) || ltv <= 0) return NaN
 
   if (isBorrower.value) {
-    // LOAN * ((1 + interest) / LTV - 1 + feerate)
-    return roundBtc(L * ((1 + r) / ltv - 1 + FEE_PCT))
+    // principal + 2× interest buffer + 1% fee
+    return roundBtc(L * (1 + 2 * r + FEE_PCT))
   }
 
-  // Lender: collateral = loan amount
+  // Lender: deploys principal only
   return roundBtc(L)
 })
 
@@ -894,6 +957,18 @@ const computedCollateralSats = computed(() => {
   const btc = computedCollateralBtc.value
   return Number.isFinite(btc) ? Math.round(btc * 1e8) : 0
 })
+
+/* ==== Collateral breakdown ==== */
+const breakdownPrincipalUsd = computed(() => props.requestedUsd ?? 0)
+const breakdownInterestUsd  = computed(() => {
+  const p = breakdownPrincipalUsd.value
+  const r = termRateDecimal.value
+  return Number.isFinite(p) && Number.isFinite(r) ? p * r : 0
+})
+const breakdownFeeUsd = computed(() => breakdownPrincipalUsd.value * FEE_PCT)
+const breakdownTotalBtc = computed(() => computedCollateralBtc.value)
+const usdFmt = (n) =>
+  Number.isFinite(n) ? n.toLocaleString('en-US', { style: 'currency', currency: fiatLabel.value, maximumFractionDigits: 0 }) : '—'
 
 /* ==== Collateral Requirement Text ==== */
 const collateralRequirementText = computed(() => {

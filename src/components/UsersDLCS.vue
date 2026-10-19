@@ -1,5 +1,5 @@
 <template>
-  <section class="w-full h-full">
+  <section v-if="!hideWhenEmpty || loading || (!error && sortedData.length > 0)" class="w-full h-full">
     <div class="w-full h-full mx-auto">
       <div class="rounded-xl border border-secondary shadow-lg bg-dark p-6 h-full min-h-0 flex flex-col">
         <!-- Title -->
@@ -112,6 +112,13 @@ const columns = Object.freeze([
   { label: 'Role', key: 'role' },
   { label: 'Status', key: 'status' },
 ])
+
+// When true, this section renders nothing once loaded if there's no data —
+// used on pages (like the Create Loan page) where an empty "no DLCs"
+// placeholder would just be noise, unlike My Profile where it's expected.
+defineProps({
+  hideWhenEmpty: { type: Boolean, default: false },
+})
 
 // state
 const apiDlcs = ref([])

@@ -32,6 +32,7 @@
     "lite-youtube-embed": "^0.3.3",
     "lucide-vue-next": "^0.534.0",
     "marked": "^11.2.0",
+    "qrcode": "^1.5.4",
     "resend": "^4.8.0",
     "stripe": "^22.1.1",
     "three": "^0.184.0",
