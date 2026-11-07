@@ -6,7 +6,7 @@ export function installSeo(router) {
     description:
       'Cadena Bitcoin is a non-custodial Bitcoin lending and borrowing marketplace. Keep your keys, access BTC-backed loans, and earn yield without banks or sidechains.',
     robots: 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
-    image: '/Header from Noah Bell.png',
+    image: '/og-image.png',
     locale: 'en_US',
     type: 'website',
   };
@@ -48,7 +48,7 @@ export function installSeo(router) {
     setMeta('og:image:width', m.imageWidth || '1200', 'property');
     setMeta('og:image:height', m.imageHeight || '630', 'property');
     setMeta('og:image:alt', m.imageAlt || desc, 'property');
-    setMeta('og:image:type', m.imageType || 'image/webp', 'property');
+    setMeta('og:image:type', m.imageType || inferImageType(image), 'property');
     setMeta('og:locale', locale, 'property');
 
     // Twitter Card metadata
@@ -82,6 +82,13 @@ export function installSeo(router) {
     setMeta('theme-color', '#000000'); // primary
   });
 
+  function inferImageType(path){
+    const ext = String(path || '').split('.').pop().toLowerCase();
+    if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
+    if (ext === 'webp') return 'image/webp';
+    if (ext === 'png') return 'image/png';
+    return 'image/png';
+  }
   function setTitle(t){ document.title = t; }
   function setLink(rel, href){
     let el = document.querySelector(`link[rel="${rel}"]`);

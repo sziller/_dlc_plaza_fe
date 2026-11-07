@@ -125,10 +125,13 @@
               class="absolute top-full right-0 mt-2 w-52 bg-[#081123] text-white border border-secondary/40 rounded-md shadow-xl z-[70] opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200"
               role="menu"
             >
-              <router-link to="/signerapp" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Signer App</router-link>
-              <router-link to="/security" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Security</router-link>
-              <router-link to="/cadena-paper" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Cadena Paper</router-link>
-              <router-link to="/endgame" class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition" role="menuitem">Endgame Book</router-link>
+              <router-link
+                v-for="item in resourcesLinks"
+                :key="item.to"
+                :to="item.to"
+                class="block px-4 py-2 text-white hover:bg-white/10 hover:text-white transition"
+                role="menuitem"
+              >{{ item.label }}</router-link>
             </div>
           </div>
 
@@ -326,10 +329,13 @@
 
         <div>
           <div class="text-white/50 uppercase text-xs mt-4 mb-2">Resources</div>
-          <router-link @click="closeMobileMenu" to="/signerapp" class="block pl-2 py-2 hover:text-secondary">Signer App</router-link>
-          <router-link @click="closeMobileMenu" to="/security" class="block pl-2 py-2 hover:text-secondary">Security</router-link>
-          <router-link @click="closeMobileMenu" to="/cadena-paper" class="block pl-2 py-2 hover:text-secondary">Cadena Paper</router-link>
-          <router-link @click="closeMobileMenu" to="/endgame" class="block pl-2 py-2 hover:text-secondary">Endgame Book</router-link>
+          <router-link
+            v-for="item in resourcesLinks"
+            :key="item.to"
+            @click="closeMobileMenu"
+            :to="item.to"
+            class="block pl-2 py-2 hover:text-secondary"
+          >{{ item.label }}</router-link>
         </div>
 
         <router-link
@@ -384,6 +390,7 @@ import { usePriceSymbol } from '../composables/usePriceSymbol'
 import { formatBtcValue } from '../functions/amount_formatting'
 import { isSignerAuthCode } from '../lib/authCode'
 import { useServerStatus } from '../composables/useServerStatus'
+import { resourcesLinks } from '../data/siteMenu'
 
 const { selectedOracleId } = useOracle()
 const { priceSymbol, priceCurrencySign, priceFlagCode, priceFlagAlt } = usePriceSymbol()

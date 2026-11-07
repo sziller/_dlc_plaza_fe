@@ -7,6 +7,8 @@ import FeaturesCarousel from '../../components/FeaturesCarousel.vue'
 import { useAuth } from '../../composables/useAuth'
 import { postContactEmail, isValidEmail } from '../../api/publicContact'
 import { blogArticles } from '../../data/exploreContent'
+import bitcoinAdvisorLogo from '../../assets/images/bitcoin-advisor.png'
+import veritasVillagesLogo from '../../assets/images/Veritas Village AUTR.png'
 
 /* ---------- YouTube facade ---------- */
 
@@ -94,7 +96,6 @@ const comparisonRows = [
   { feature: 'No margin calls',             cadena: true,      custodial: false,       defi: '✗ liquidation engine', selling: '—' },
   { feature: 'No rehypothecation',          cadena: true,      custodial: false,       defi: '✗ pooled',             selling: '—' },
   { feature: 'No credit check',             cadena: true,      custodial: false,       defi: true,                   selling: '—' },
-  { feature: 'No taxable event',            cadena: true,      custodial: true,        defi: 'depends',              selling: false },
   { feature: 'Fully on-chain enforcement',  cadena: true,      custodial: false,       defi: true,                   selling: '—' },
   { feature: 'Bitcoin-native (no wrapping)',cadena: true,      custodial: 'depends',   defi: false,                  selling: '—' },
   { feature: 'Keep BTC price upside',       cadena: true,      custodial: true,        defi: true,                   selling: false },
@@ -196,13 +197,12 @@ function toggle(i) {
 /* ---------- Partners ---------- */
 const partners = [
   { name: '21Rates',           href: 'https://21rates.com/companies/1067/cadena-bitcoin', imgSrc: '/img/21rates-640.webp',               alt: '21Rates' },
-  { name: 'Flux',              href: 'https://www.fluxprivateotc.com/',                  imgSrc: '/img/flux-4-640.webp',                  alt: 'Flux Private OTC', imgClass: 'h-10 sm:h-12 translate-y-1.5 invert' },
   { name: 'Adopting Bitcoin',  href: 'https://sv25.adoptingbitcoin.org/',                 imgSrc: '/img/adopting-640.webp',              alt: 'Adopting Bitcoin SV25' },
   { name: 'Surfdojo',          href: 'https://surfdojo.org/',                             imgSrc: '/img/surfdojo-640.webp',              alt: 'Surfdojo' },
-  { name: 'BTC Intelligence',  href: 'https://btcintelligence.ai/cadena',              imgSrc: '/img/BTC-Intelligence-Hero-Gold-Example-640.webp', alt: 'BTC Intelligence', imgClass: 'h-11 sm:h-13' },
   { name: 'Asobitcoin',        href: 'https://www.asobitcoin.org/',                       imgSrc: '/img/partners/asobitcoin-logo.webp',  alt: 'Asobitcoin' },
   { name: 'Sazmining',         href: 'https://www.sazmining.com/',                         imgSrc: '/img/sazmining-640.webp',     alt: 'Sazmining', imgClass: 'h-7 sm:h-8 brightness-200' },
-  { name: 'Coinlateral',       href: 'https://coinlateral.finance/',                       imgSrc: '/img/coinlateral-640.webp',   alt: 'Coinlateral', imgClass: 'h-5 sm:h-6' },
+  { name: 'The Bitcoin Adviser', href: 'https://thebitcoinadviser.com/',                   imgSrc: bitcoinAdvisorLogo,            alt: 'The Bitcoin Adviser', imgClass: 'h-10 sm:h-12' },
+  { name: 'Veritas Villages',  href: 'https://www.veritasvillages.com/index.html',         imgSrc: veritasVillagesLogo,           alt: 'Veritas Villages', imgClass: 'h-12 sm:h-14 invert brightness-200 hover:invert-0' },
 ]
 
 function onEnter(el) {
@@ -634,6 +634,50 @@ onBeforeUnmount(() => {
 
         </div>
 
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         VIDEOS
+    ═══════════════════════════════════════════════════ -->
+    <section class="bg-transparent text-white px-4 py-20 sm:py-24 sm:px-6 lg:px-8">
+      <div class="max-w-5xl mx-auto">
+        <div class="reveal text-center mb-10">
+          <h2 class="text-3xl md:text-4xl font-extrabold">See how it works</h2>
+          <p class="mt-3 text-white/80 text-base">A quick walkthrough for borrowers and lenders.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-6">
+          <div class="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+            <div class="aspect-video">
+              <iframe
+                class="w-full h-full"
+                src="https://www.youtube.com/embed/EZfjeXJLKxM?si=ewKe_HsVhYNSGCrw"
+                title="For Borrowers — Cadena Bitcoin"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            <p class="px-4 py-3 text-sm font-semibold text-white/80">For Borrowers</p>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+            <div class="aspect-video">
+              <iframe
+                class="w-full h-full"
+                src="https://www.youtube.com/embed/e8GEuuSee0M?si=DRE_9dHAu3kViLG7"
+                title="For Lenders — Cadena Bitcoin"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            <p class="px-4 py-3 text-sm font-semibold text-white/80">For Lenders</p>
+          </div>
+        </div>
       </div>
     </section>
 

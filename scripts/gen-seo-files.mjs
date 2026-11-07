@@ -61,7 +61,14 @@ const buildBlogUrls = async () => {
       .filter((post) => post?.slug)
       .map((post) => {
         const lastmod = post.updated_at ? `<lastmod>${post.updated_at}</lastmod>` : ''
-        return `<url><loc>${BASE}/article/${post.slug}</loc>${lastmod}<changefreq>weekly</changefreq><priority>0.8</priority></url>`
+        // Blog CMS slugs have occasionally contained raw spaces (e.g. a
+        // title-cased slug that wasn't fully hyphenated), which produces an
+        // invalid, unencoded URL in <loc>. Percent-encode each segment so
+        // the sitemap URL stays well-formed and still resolves to the same
+        // article — never alter the slug itself (e.g. space -> hyphen),
+        // since the route match is on the exact stored slug.
+        const safeSlug = String(post.slug).split('/').map(encodeURIComponent).join('/')
+        return `<url><loc>${BASE}/article/${safeSlug}</loc>${lastmod}<changefreq>weekly</changefreq><priority>0.8</priority></url>`
       })
   } catch (error) {
     console.warn('Blog sitemap fetch failed, continuing without posts:', error?.message || error)

@@ -25,7 +25,7 @@
           <ul class="space-y-2 text-sm text-white/70">
             <li><router-link to="/contact" class="hover:text-white transition-colors">Contact</router-link></li>
             <li><router-link to="/newsletter" class="hover:text-white transition-colors">Newsletter</router-link></li>
-            <li><router-link to="/security" class="hover:text-white transition-colors">Security</router-link></li>
+            <li><a href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">On-chain proof</a></li>
           </ul>
         </div>
 
@@ -33,27 +33,24 @@
         <div>
           <p class="text-sm font-semibold text-secondary mb-4 uppercase tracking-wide">Product</p>
           <ul class="space-y-2 text-sm text-white/70">
-            <li><router-link to="/allocate_liquidity" class="hover:text-white transition-colors">Borrow</router-link></li>
-            <li><router-link to="/allocate_liquidity" class="hover:text-white transition-colors">Lend</router-link></li>
+            <li><router-link to="/allocate_liquidity" class="hover:text-white transition-colors">Create Loan</router-link></li>
             <li><router-link to="/loan-calculator" class="hover:text-white transition-colors">Loan Calculator</router-link></li>
             <li><router-link to="/settlement-calculator" class="hover:text-white transition-colors">Settlement Calculator</router-link></li>
             <li><router-link to="/liquidation-calculator" class="hover:text-white transition-colors">Liquidation Risk</router-link></li>
             <li><router-link to="/bitcoin-allocation" class="hover:text-white transition-colors">Bitcoin Allocation</router-link></li>
-            <li><router-link to="/signerapp" class="hover:text-white transition-colors">Signer App</router-link></li>
+            <li><router-link to="/knowledge-hub" class="hover:text-white transition-colors">Knowledge Hub</router-link></li>
+            <li><router-link to="/compare" class="hover:text-white transition-colors">Compare</router-link></li>
           </ul>
         </div>
 
-        <!-- Resources -->
+        <!-- Resources (shared with the Navbar menu — see src/data/siteMenu.js) -->
         <div>
           <p class="text-sm font-semibold text-secondary mb-4 uppercase tracking-wide">Resources</p>
           <ul class="space-y-2 text-sm text-white/70">
-            <li><router-link to="/knowledge-hub" class="hover:text-white transition-colors">Knowledge Hub</router-link></li>
+            <li v-for="item in resourcesLinks" :key="item.to">
+              <router-link :to="item.to" class="hover:text-white transition-colors">{{ item.label }}</router-link>
+            </li>
             <li><router-link to="/endgame-study-guide" class="hover:text-white transition-colors">Endgame Study Guide</router-link></li>
-            <li><router-link to="/compare" class="hover:text-white transition-colors">Compare</router-link></li>
-            <li><router-link to="/cadena-paper" class="hover:text-white transition-colors">Cadena Paper</router-link></li>
-            <li><router-link to="/endgame" class="hover:text-white transition-colors">Endgame book</router-link></li>
-            <li><a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Freedom Money Podcast</a></li>
-            <li><a href="https://mempool.space/tx/95bf1377f4709235656bbaafa4afe454f91e905f8bb2dfe3e2bd1b619e5aab7d" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">On-chain proof</a></li>
           </ul>
         </div>
 
@@ -69,6 +66,11 @@
             <li>
               <a href="https://youtube.com/@cadenabitcoin?si=VNgOLehpTTVFELbt" class="hover:text-white transition-colors" rel="noopener noreferrer" target="_blank">
                 YouTube <span class="sr-only">(opens in a new tab)</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/@cadenabitcoin" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">
+                Freedom Money Podcast <span class="sr-only">(opens in a new tab)</span>
               </a>
             </li>
             <li>
@@ -123,6 +125,7 @@
 <script setup>
 import { computed } from 'vue'
 import logo from '../assets/logos/cadena_bitcoin_logo_2.png'
+import { resourcesLinks } from '../data/siteMenu'
 const year = computed(() => new Date().getFullYear())
 const version = __APP_VERSION__
 </script>

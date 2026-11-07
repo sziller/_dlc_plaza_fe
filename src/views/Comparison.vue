@@ -266,13 +266,6 @@ const tableRows = [
     salt: y('Collateral-only; KYC required'),
   },
   {
-    feature: 'No taxable event',
-    cadena: y('Borrowing against BTC is not a sale. No capital gains triggered.'),
-    ledn: y('Typically not a taxable event'),
-    unchained: y('Loan proceeds not a taxable event'),
-    salt: p('Stabilization converts BTC to USDC, which may trigger a taxable event'),
-  },
-  {
     feature: 'Keep BTC price upside',
     cadena: y('Your BTC stays in the contract. If price rises, you keep the gain.'),
     ledn: y(),

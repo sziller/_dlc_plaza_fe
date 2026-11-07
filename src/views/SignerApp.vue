@@ -154,7 +154,7 @@
       <section class="text-center pt-1 fade-in-el">
         <a
           class="github-badge"
-          href="https://github.com/CadenaWizard/signer_app"
+          href="https://github.com/CadenaBitcoin/signer_app"
           target="_blank"
           rel="noopener noreferrer nofollow"
           aria-label="View the Signer app on GitHub"

@@ -34,6 +34,7 @@ const Resources          = () => import('../views/Resources.vue')
 const LoanExplained      = () => import('../views/LoanExplained.vue')
 const LoanExplainedLender = () => import('../views/LoanExplainedLender.vue')
 const Security           = () => import('../views/Security.vue')
+const Oracle              = () => import('../views/Oracle.vue')
 // Blog CMS pages
 const BlogListPage       = () => import('../pages/BlogListPage.vue')
 const BlogPostPage       = () => import('../pages/BlogPostPage.vue')
@@ -133,6 +134,11 @@ const routes = [
   { path: '/security', name: 'Security', component: Security, meta: {
     title: 'How Cadena Protects Your Bitcoin — Security & Risk Model',
     description: 'Non-custodial DLC contracts, independent oracle architecture, no margin calls, and honest gap-risk disclosure. Open-source code and on-chain proof you can verify yourself.',
+    robots: 'index,follow',
+  }},
+  { path: '/oracle', name: 'Oracle', component: Oracle, meta: {
+    title: 'Cadena Oracle — How BTC/USD Settles Your Loan',
+    description: 'For Cadena borrowers and lenders: how the DLCP oracle settles DLC loans, how BTC/USD is published from exchange feeds, and what you can inspect yourself.',
     robots: 'index,follow',
   }},
   // Blog CMS (Knowledge Hub)
@@ -470,6 +476,17 @@ const routes = [
     title: 'Signer App — Cadena Bitcoin',
     description: 'Cadena Bitcoin signer application for secure transactions.',
     robots: 'index,follow',
+  }
+},
+{
+  // Catch-all: must stay last so every defined route above matches first.
+  path: '/:pathMatch(.*)*',
+  name: 'NotFound',
+  component: () => import('../views/NotFound.vue'),
+  meta: {
+    title: 'Page Not Found — Cadena Bitcoin',
+    description: 'The page you are looking for does not exist or may have moved.',
+    robots: 'noindex,nofollow',
   }
 }
 ]
