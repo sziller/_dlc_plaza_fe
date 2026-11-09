@@ -1,6 +1,6 @@
 {
   "name": "custom-vue-dashboard",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "type": "module",
   "scripts": {
     "release": "./scripts/release.sh",
@@ -16,6 +16,7 @@
     "img:logo": "node scripts/gen-logo.mjs",
     "img:social": "node scripts/gen-social-images.mjs",
     "test:seo": "node scripts/test-seo-previews.mjs",
+    "test:oracle": "node --test tests/oracle-directory.e2e.mjs",
     "export:pdf": "node scripts/export-lp-pdf.mjs"
   },
   "dependencies": {
