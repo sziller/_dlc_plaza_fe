@@ -115,7 +115,7 @@
 
       <!-- Bottom bar -->
       <div class="mt-12 pt-6 border-t border-white/10 text-xs text-white/40 text-center leading-relaxed">
-        <p>&copy; {{ year }} Cadena Bitcoin. All rights reserved. Cadena Bitcoin is operated by Cadena Bitcoin S.A. de C.V., an El Salvador&ndash;licensed Bitcoin Service Provider. Version {{ version }}</p>
+        <p>&copy; {{ year }} Cadena Bitcoin. All rights reserved. Cadena Bitcoin is operated by Cadena Bitcoin S.A. de C.V., an El Salvador&ndash;licensed Bitcoin Service Provider. <span class="whitespace-nowrap" data-app-version>v{{ version }}</span></p>
       </div>
 
     </div>
