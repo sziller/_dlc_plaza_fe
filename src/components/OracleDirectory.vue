@@ -18,7 +18,7 @@
     <div v-else-if="state === 'error'" role="alert" class="rounded-xl border border-red-400/30 bg-red-500/[0.06] p-6" data-testid="oracle-dir-error">
       <p class="font-semibold text-white">The oracle list is temporarily unavailable.</p>
       <p class="text-sm text-white/60 mt-1">Please try again in a moment.</p>
-      <button type="button" @click="load"
+      <button type="button" @click="load(true)"
         class="mt-4 rounded-full border border-white/20 px-4 py-1.5 text-sm text-white hover:border-secondary/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary">
         Retry
       </button>
@@ -150,10 +150,10 @@ function statusTextClass(o: OracleDirectoryEntry): string {
   return o.active === true ? 'text-green-300' : o.active === false ? 'text-red-300' : 'text-white/50'
 }
 
-async function load() {
+async function load(force = false) {
   state.value = 'loading'
   try {
-    const list = await getOracleDirectory()
+    const list = await getOracleDirectory({ force })
     oracles.value = list
     if (list.length === 0) {
       selectedId.value = ''

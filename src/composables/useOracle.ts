@@ -1,10 +1,10 @@
 import { ref, computed } from 'vue'
 import { DEFAULT_ORACLE, oracleDisplayName } from '../config'
-import { getOracles, type OracleInfo } from '../api/oracle'
+import { getOracleDirectory, type OracleDirectoryEntry } from '../api/oracle'
 
 // Module-scoped refs — shared across all components (singleton pattern)
 const selectedOracleId = ref<string>(DEFAULT_ORACLE)
-const oracles = ref<OracleInfo[]>([])
+const oracles = ref<OracleDirectoryEntry[]>([])
 let fetched = false
 
 const oracleLabel = computed(() => oracleDisplayName(selectedOracleId.value))
@@ -12,17 +12,18 @@ const oracleLabel = computed(() => oracleDisplayName(selectedOracleId.value))
 async function fetchOracles(): Promise<void> {
   if (fetched) return
   try {
-    const res = await getOracles()
-    const list = Array.isArray(res?.payload) ? res.payload : []
+    // Backend contract identifies an oracle by `oracle_name` (normalised to `id`);
+    // the list is ordered with the platform default first.
+    const list = await getOracleDirectory()
     if (list.length > 0) {
       oracles.value = list
-      const firstId = list[0].oracle_id
-      if (firstId) selectedOracleId.value = firstId
+      const first = list.find((o) => o.active !== false) ?? list[0]
+      selectedOracleId.value = first.id
     }
     fetched = true
   } catch (e) {
     console.debug('Oracle list fetch failed (using default):', e)
-    // Keep DEFAULT_ORACLE — endpoint may not exist yet
+    // Keep DEFAULT_ORACLE
   }
 }
 

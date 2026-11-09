@@ -7,6 +7,9 @@
 //
 //   npm run build && npm run test:oracle
 //
+// The oracle servers themselves (oracle-stg / oracle .purabitcoin.com) are mocked too, each with
+// its own signing key, so the tests can prove which environment's oracle the page really used.
+//
 // No new dependencies: uses `playwright` (already a devDependency) and node:test.
 import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
@@ -53,6 +56,19 @@ const PROD_PAYLOAD = [
 const LEGACY_PAYLOAD = [
   { oracle_name: 'oracle_dlcp', provider: 'Cadenabitcoin DLC Oracle', supported_symbols: ['BTCUSD', 'BTCEUR'] },
 ]
+// oracle servers (what oracle(-stg).purabitcoin.com/api/v0 answers) - distinct key per environment
+const ORACLE_KEYS = {
+  'oracle-stg.purabitcoin.com': '03stagingkey0000000000000000000000000000000000000000000000000000aa',
+  'oracle.purabitcoin.com': '02productionkey00000000000000000000000000000000000000000000000000bb',
+}
+function oracleServerReply(host, apiPath) {
+  const now = Math.floor(Date.now() / 1000)
+  if (apiPath === 'oracle/oracle_info') return { main_public_key: ORACLE_KEYS[host], public_keys: [ORACLE_KEYS[host]] }
+  if (apiPath === 'oracle/oracle_status') return { future_event_count: 1, total_event_count: 2, current_time_utc: now }
+  if (apiPath === 'price_info/current/BTCUSD') return { price: 70000, aggr_sources: [] }
+  if (apiPath === 'event/next_event') return { event_id: `btcusd${now + 600}`, time_utc: now + 600 }
+  return { detail: 'not found' }
+}
 const ok = (payload) => ({ status: 200, body: { payload, message: 'Oracle definitions retrieved.', timestamp: 1 } })
 
 // ---- static server for dist/ with SPA fallback ----
@@ -72,8 +88,15 @@ before(async () => {
     if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html')
     // Always serve the SPA shell for page routes (deterministic: ignores any prerendered snapshot)
     if (!fs.existsSync(file) || file.endsWith('index.html')) file = path.join(DIST, 'index.html')
-    res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream' })
-    fs.createReadStream(file).pipe(res)
+    const send = () => {
+      res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream' })
+      fs.createReadStream(file).pipe(res)
+    }
+    // Timing control for the /allocate_liquidity tests only: MarketOverviewTable skips its start-up work when the
+    // app-wide health check is still in flight (pre-existing race, unrelated to oracles). Delaying
+    // that one route chunk lets the health check finish first, like a normal page load.
+    if (/\/assets\/BTCUSD-[^/]+\.js$/.test(urlPath)) setTimeout(send, 700)
+    else send()
   })
   await new Promise((r) => server.listen(PORT, '127.0.0.1', r))
   browser = await chromium.launch({
@@ -92,9 +115,30 @@ after(async () => {
  */
 async function open(host, reply, { route = '/oracle', viewport = { width: 1280, height: 900 } } = {}) {
   const context = await browser.newContext({ viewport })
-  const oracleCalls = []
+  const oracleCalls = []      // GET /app/dlcp/v1/oracles (the platform's oracle list)
+  const oracleApiCalls = []   // direct calls to an oracle server: "<host>/api/v0/<path>"
+  const priceCalls = []       // GET /app/dlcp/v1/oracle-price -> the `oracle` parameter
   await context.route('**/*', async (r) => {
     const url = new URL(r.request().url())
+    if (url.hostname in ORACLE_KEYS && url.pathname.startsWith('/api/v0/')) {
+      const apiPath = url.pathname.slice('/api/v0/'.length)
+      oracleApiCalls.push(`${url.hostname}/${apiPath}`)
+      return r.fulfill({
+        status: apiPath.startsWith('event/event/') ? 404 : 200,
+        contentType: 'application/json',
+        headers: { 'access-control-allow-origin': '*' },
+        body: JSON.stringify(oracleServerReply(url.hostname, apiPath)),
+      })
+    }
+    if (url.pathname === '/app/dlcp/v1/oracle-price') {
+      priceCalls.push(url.searchParams.get('oracle'))
+      return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+        body: JSON.stringify({ payload: { price: 70000 }, message: 'ok', timestamp: 1 }) })
+    }
+    if (url.pathname === '/app/dlcp/v0/server-status') {
+      return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
+        body: JSON.stringify({ payload: { ok: true, status: 'up' }, message: 'ok', timestamp: 1 }) })
+    }
     if (url.pathname === '/app/dlcp/v1/oracles') {
       oracleCalls.push(url.origin + url.pathname)
       const resp = typeof reply === 'function' ? await reply(oracleCalls.length - 1) : reply
@@ -112,7 +156,7 @@ async function open(host, reply, { route = '/oracle', viewport = { width: 1280, 
   const pageErrors = []
   page.on('pageerror', (e) => pageErrors.push(e.message))
   await page.goto(`http://${host}:${PORT}${route}`, { waitUntil: 'domcontentloaded' })
-  return { page, context, oracleCalls, pageErrors }
+  return { page, context, oracleCalls, oracleApiCalls, priceCalls, pageErrors }
 }
 
 const list = (page) => page.locator('[data-testid="oracle-list"]')
@@ -308,10 +352,110 @@ test('landing page footer "The Oracle" link opens /oracle with the directory', a
   const link = page.locator('footer a[href="/oracle"]')
   await link.waitFor({ state: 'attached' })
   assert.match(await link.innerText(), /The Oracle/)
+  // the Navbar Resources menu (same siteMenu.js source) points to the same page
+  assert.equal(await page.locator('nav a[href="/oracle"]').first().getAttribute('href'), '/oracle')
   await link.scrollIntoViewIfNeeded()
   await link.click()
   await page.waitForSelector('[data-testid="oracle-list"]')
   assert.equal(new URL(page.url()).pathname, '/oracle')
   assert.equal(await title(page).innerText(), 'Cadenabitcoin DLC Oracle')
   await context.close()
+})
+
+// ---------------------------------------------------------------------------
+// Environment-specific oracle servers (Oracle page widgets) - same build, different backend metadata
+// ---------------------------------------------------------------------------
+
+const settle = (page) => page.waitForTimeout(600) // let the page's own requests finish
+
+test('STAGING: Oracle page widgets use the staging oracle (oracle-stg), never production', async () => {
+  const { page, context, oracleApiCalls } = await open(STAGING_HOST, ok(STAGING_PAYLOAD))
+  await page.waitForSelector('[data-testid="oracle-list"]')
+  await page.waitForFunction((k) => document.body.innerText.includes(k), ORACLE_KEYS['oracle-stg.purabitcoin.com'])
+  await settle(page)
+  assert.ok(oracleApiCalls.length >= 3, `expected oracle API calls, got ${oracleApiCalls.length}`)
+  assert.ok(oracleApiCalls.every((c) => c.startsWith('oracle-stg.purabitcoin.com/')), `unexpected hosts: ${oracleApiCalls}`)
+  const body = await page.locator('body').innerText()
+  assert.ok(body.includes(ORACLE_KEYS['oracle-stg.purabitcoin.com']), 'staging signing key displayed')
+  assert.ok(!body.includes(ORACLE_KEYS['oracle.purabitcoin.com']), 'production key must not be displayed on staging')
+  assert.match(body, /GET https:\/\/oracle-stg\.purabitcoin\.com\/api\/v0\/oracle\/oracle_info/)
+  await context.close()
+})
+
+test('PRODUCTION: Oracle page widgets use the production oracle, never staging', async () => {
+  const { page, context, oracleApiCalls } = await open(PROD_HOST, ok(PROD_PAYLOAD))
+  await page.waitForSelector('[data-testid="oracle-list"]')
+  await page.waitForFunction((k) => document.body.innerText.includes(k), ORACLE_KEYS['oracle.purabitcoin.com'])
+  await settle(page)
+  assert.ok(oracleApiCalls.length >= 3)
+  assert.ok(oracleApiCalls.every((c) => c.startsWith('oracle.purabitcoin.com/')), `unexpected hosts: ${oracleApiCalls}`)
+  const body = await page.locator('body').innerText()
+  assert.ok(!body.includes(ORACLE_KEYS['oracle-stg.purabitcoin.com']))
+  assert.match(body, /GET https:\/\/oracle\.purabitcoin\.com\/api\/v0\/oracle\/oracle_info/)
+  await context.close()
+})
+
+test('backend without oracle endpoint metadata: widgets show "-", NO fallback to any oracle server', async () => {
+  const { page, context, oracleApiCalls, pageErrors } = await open(STAGING_HOST, ok(LEGACY_PAYLOAD))
+  await page.waitForSelector('[data-testid="oracle-list"]')
+  await settle(page)
+  assert.deepEqual(oracleApiCalls, [], 'must not guess an oracle server')
+  assert.match(await page.locator('body').innerText(), /\[oracle API base unavailable\]/)
+  assert.match(await page.locator('h1').first().innerText(), /price that settles/i)
+  assert.deepEqual(pageErrors, [])
+  await context.close()
+})
+
+test('platform oracle list is requested once per page view (shared by directory and widgets)', async () => {
+  const { page, context, oracleCalls } = await open(STAGING_HOST, ok(STAGING_PAYLOAD))
+  await page.waitForSelector('[data-testid="oracle-list"]')
+  await settle(page)
+  assert.equal(oracleCalls.length, 1)
+  await context.close()
+})
+
+test('existing event lookup tool still works and queries the environment\'s oracle', async () => {
+  const { page, context, oracleApiCalls } = await open(STAGING_HOST, ok(STAGING_PAYLOAD))
+  await page.waitForSelector('[data-testid="oracle-list"]')
+  await page.getByPlaceholder(/btcusd1793993400/).fill('btcusd1794229800')
+  await page.getByRole('button', { name: 'Look up' }).click()
+  await page.waitForFunction(() => document.body.innerText.includes('Not found (404)'))   // mocked 404 -> existing error path
+  assert.ok(oracleApiCalls.includes('oracle-stg.purabitcoin.com/event/event/btcusd1794229800'), oracleApiCalls.join(', '))
+  assert.ok(oracleApiCalls.every((c) => c.startsWith('oracle-stg.purabitcoin.com/')))
+  await context.close()
+})
+
+// ---------------------------------------------------------------------------
+// Identifier compatibility: backend contract is `oracle_name`
+// ---------------------------------------------------------------------------
+
+/** Deep-link /allocate_liquidity (BTCUSD.vue): MarketOverviewTable calls fetchOracles() and prices via the selected oracle. */
+async function openBtcusd(reply) {
+  const h = await open(STAGING_HOST, reply, { route: '/allocate_liquidity' })
+  await h.page.waitForTimeout(2800)
+  return h
+}
+
+test('oracle selection reads the backend `oracle_name` (/allocate_liquidity price oracle)', async () => {
+  // only DFX configured -> the app must switch to it. Code reading the non-existent `oracle_id`
+  // would silently keep the hardcoded default "oracle_dlcp".
+  const h = await openBtcusd(ok([STAGING_PAYLOAD[1]]))
+  assert.ok(h.oracleCalls.length >= 1, 'oracle list was requested by /allocate_liquidity')
+  assert.ok(h.priceCalls.includes('oracle_dfx'), `price oracle calls: ${h.priceCalls}`)
+  await h.context.close()
+})
+
+test('backend row order does not change the default oracle (DFX listed first, Cadena still default)', async () => {
+  const reversed = [STAGING_PAYLOAD[1], STAGING_PAYLOAD[0]]
+  const h = await openBtcusd(ok(reversed))
+  assert.ok(h.oracleCalls.length >= 1, 'oracle list was requested by /allocate_liquidity')
+  assert.ok(h.priceCalls.includes('oracle_dlcp'), `price oracle calls: ${h.priceCalls}`)
+  assert.ok(!h.priceCalls.includes('oracle_dfx'), `price oracle calls: ${h.priceCalls}`)
+  await h.context.close()
+  // ...and the directory lists / preselects the platform default first
+  const d = await open(STAGING_HOST, ok(reversed))
+  await d.page.waitForSelector('[data-testid="oracle-list"]')
+  assert.equal(await title(d.page).innerText(), 'Cadenabitcoin DLC Oracle')
+  assert.match(await d.page.locator('[data-testid="oracle-list"] input[type=radio]').first().getAttribute('id'), /oracle_dlcp/)
+  await d.context.close()
 })

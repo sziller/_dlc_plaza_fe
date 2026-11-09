@@ -212,10 +212,10 @@
           <div class="rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <h3 class="font-bold text-white mb-2">Open API</h3>
             <p class="text-white/70 text-sm mb-3">Query events, announcements, and attestations directly.</p>
-            <pre class="mono-box whitespace-pre-wrap">GET {{ API_BASE }}oracle/oracle_info
-GET {{ API_BASE }}price_info/current/BTCUSD
-GET {{ API_BASE }}event/next_event?definition=BTCUSD
-GET {{ API_BASE }}event/event/btcusd{unix_time}</pre>
+            <pre class="mono-box whitespace-pre-wrap">GET {{ apiBaseDisplay }}oracle/oracle_info
+GET {{ apiBaseDisplay }}price_info/current/BTCUSD
+GET {{ apiBaseDisplay }}event/next_event?definition=BTCUSD
+GET {{ apiBaseDisplay }}event/event/btcusd{unix_time}</pre>
           </div>
         </div>
 
@@ -322,12 +322,29 @@ GET {{ API_BASE }}event/event/btcusd{unix_time}</pre>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
 import OracleDirectory from '../components/OracleDirectory.vue'
+import { getOracleDirectory, oracleApiBase } from '../api/oracle'
 
-const API_BASE = 'https://oracle.purabitcoin.com/api/v0/'
 const SLOT = 600
 
+// The oracle API this page talks to is the DLCP oracle of the CURRENT environment
+// (staging backend -> oracle-stg, production backend -> oracle). Its URL comes from the
+// backend's own oracle metadata (`endpoint`, shared with the directory above), never from a
+// hardcoded host. If the backend does not report it, the widgets show "—" instead of
+// silently falling back to another environment's oracle.
+const apiBase = ref('')
+const apiBaseDisplay = computed(() => apiBase.value || '[oracle API base unavailable]/')
+
+async function ensureApiBase() {
+  if (apiBase.value) return apiBase.value
+  const base = oracleApiBase(await getOracleDirectory())
+  if (!base) throw new Error('Oracle API location unavailable')
+  apiBase.value = base
+  return base
+}
+
 async function apiGet(path) {
-  const res = await fetch(API_BASE + path, { cache: 'no-store' })
+  const base = await ensureApiBase()
+  const res = await fetch(base + path, { cache: 'no-store' })
   if (!res.ok) throw new Error(String(res.status))
   return res.json()
 }
