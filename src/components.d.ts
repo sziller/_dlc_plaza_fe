@@ -25,6 +25,7 @@ declare module 'vue' {
     MailingListModal: typeof import('./components/MailingListModal.vue')['default']
     MarketOverviewTable: typeof import('./components/MarketOverviewTable.vue')['default']
     Navbar: typeof import('./components/Navbar.vue')['default']
+    OracleDirectory: typeof import('./components/OracleDirectory.vue')['default']
     OrderModal: typeof import('./components/OrderModal.vue')['default']
     Rates50Mini: typeof import('./components/Rates50Mini.vue')['default']
     RateSelectModal: typeof import('./components/RateSelectModal.vue')['default']

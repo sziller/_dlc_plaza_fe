@@ -66,6 +66,9 @@
       <p class="text-sm text-white/40 mt-3">Overview video — production upload in progress.</p>
     </section>
 
+    <!-- Oracle directory (data-driven from the backend — see OracleDirectory.vue) -->
+    <OracleDirectory />
+
     <!-- Your loan -->
     <section id="role" class="max-w-4xl mx-auto px-6 mt-20">
       <div class="eyebrow-label">Why this matters for your loan</div>
@@ -318,6 +321,7 @@ GET {{ API_BASE }}event/event/btcusd{unix_time}</pre>
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import TheFooter from '../components/TheFooter.vue'
+import OracleDirectory from '../components/OracleDirectory.vue'
 
 const API_BASE = 'https://oracle.purabitcoin.com/api/v0/'
 const SLOT = 600
@@ -353,6 +357,7 @@ function deltaDisplay(d) {
 
 /* ---- Quick nav ---- */
 const quickNav = [
+  { href: '#directory', label: 'Oracle directory' },
   { href: '#role', label: 'Your loan' },
   { href: '#how', label: 'How it works' },
   { href: '#price', label: 'The price' },
