@@ -1,7 +1,11 @@
 const host = window.location.hostname.replace(/^www\./, '')
 
 let API_URL = ''
-if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
+if (import.meta.env.DEV) {
+  // `vite dev` (any hostname, incl. LAN names): always same-origin, so the Vite proxy
+  // decides the backend (vite.config.mjs). Never fall through to a deployed backend.
+  API_URL = ''
+} else if (host === 'cadenabitcoin.com' || host === 'purabitcoin.com') {
   API_URL = 'https://cadenabitcoin.com' // prod
 } else if (host === 'staging.purabitcoin.com') {
   API_URL = 'https://staging.purabitcoin.com'
