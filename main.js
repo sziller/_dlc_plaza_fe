@@ -47,8 +47,10 @@ const bootstrapAmplitude = async () => {
   }
 };
 
+// __ANALYTICS_ENABLED__ is false only in the local dev server (vite.config.mjs), so a developer
+// machine never feeds production analytics / session replay; always true in deployed builds.
 const hasAmplitudeConsent = (state) =>
-  !!(state?.preferences?.analytics || state?.preferences?.marketing);
+  __ANALYTICS_ENABLED__ && !!(state?.preferences?.analytics || state?.preferences?.marketing);
 
 const trackAmplitudePageView = (to) => {
   if (!amplitudeAllowed || !amp) return;

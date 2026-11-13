@@ -249,7 +249,9 @@ async function handleFooterSubscribe() {
     await postContactEmail(footerEmail.value)
 
     const attioEmail = footerEmail.value
-    fetch('https://hooks.attio.com/w/f2661d8b-9de8-4673-9281-3d3624c2e90b/50d3fdcf-686c-491f-b561-68badcff0cff', {
+    // Third-party CRM write: skipped in the local dev server (__EXTERNAL_WRITES__, vite.config.mjs)
+    // so test addresses never reach it; always on in deployed builds.
+    if (__EXTERNAL_WRITES__) fetch('https://hooks.attio.com/w/f2661d8b-9de8-4673-9281-3d3624c2e90b/50d3fdcf-686c-491f-b561-68badcff0cff', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: attioEmail }),
